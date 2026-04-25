@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
-<Rule language="beanshell" name="Ascension-Rule-ForSupportCase-CS0187964" type="GroupAggregationRefresh">
-  <Source><![CDATA[ 
-log.error("CS0187964: "+ (null == accountGroup ? "newGroup" : accountGroup.getId()));
-return accountGroup;
- ]]></Source>
-</Rule>
