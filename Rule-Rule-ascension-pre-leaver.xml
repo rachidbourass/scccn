@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Rule-Ascension-Pre-Leaver" type="Workflow">
+  <Description>Extended Rule for Leaver Event
+	</Description>
+  <Signature returnType="ResourceObject">
+    <Inputs>
+      <Argument name="identityName">
+        <Description>
+          Name of Identity Being Processed.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+  import java.text.SimpleDateFormat;
+  import java.util.Date;
+  import sailpoint.object.Identity;
+  
+  Identity refIdentity = context.getObjectByName(Identity.class, identityName);
+  
+  if (refIdentity != null) {
+  
+  Date currentDate = new Date();
+  SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+  String dateString = sf.format(currentDate);
+  refIdentity.setAttribute("leaverDate",dateString);
+  
+  context.saveObject(refIdentity);
+  context.commitTransaction();
+
+  }
+  
+  ]]></Source>
+</Rule>

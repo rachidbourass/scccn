@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="ASCN-UAR-Open-CertificationItems-Reassignment-BulkLoad-Task">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+  import java.io.BufferedReader;
+  import java.io.FileReader;
+  import java.io.InputStream;
+  import java.util.ArrayList;
+  import java.util.HashMap;
+  import java.util.Iterator;
+  import java.util.List;
+  import java.util.Map;
+
+  import sailpoint.api.Describer;
+  import sailpoint.api.SailPointContext;
+
+  import sailpoint.object.Identity;
+  import sailpoint.object.Certification;
+  import sailpoint.object.CertificationItem;
+  import sailpoint.object.Custom;
+  import sailpoint.api.Certificationer;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+
+  import sailpoint.tools.Message;
+  import sailpoint.tools.Message.Type;
+  import sailpoint.tools.Util;
+  import java.lang.Exception;
+  import org.ascn.utils.GeneralUtils;
+
+
+  String logName = "rule.ASCN-UAR-Open-CertificationItems-Reassignment-BulkLoad-Task";
+
+  StringBuilder mandatoryAttsRowSb = new  StringBuilder();
+  StringBuilder  emptyFileSb = new  StringBuilder();
+  StringBuilder  headerFormatSb = new  StringBuilder();
+  StringBuilder newManagerNotExistSb = new  StringBuilder();
+
+
+  /**
+		 * This blukLoadReassignCertificationConfiguration Method is used to read the data from the given path and reassign the certification item to the new manager.
+		 *
+		 */
+
+  public void blukLoadReassignCertificationConfiguration() throws Exception {
+    info(logName, " || blukLoadReassignCertificationConfiguration method || Entered Method");
+
+    BufferedReader bufReader = null;
+    Custom customObject = null;
+    String headers = null;
+    String line = null;
+    Identity requesterObject = null;
+    String[] valueArray = null;
+    int rowCount = 1;
+
+    try{
+
+      Map bulkLoadReassignDeatilsMap = GeneralUtils.loadCustomMap("BulkLoad Reassign Details","ASCN-UAR-Open-CertificationItems-Reassignment-BulkLoad-Task");
+      bufReader = new BufferedReader(new FileReader(bulkLoadReassignDeatilsMap.get("filepath")));
+
+      headers = bulkLoadReassignDeatilsMap.get("header");
+      line = bufReader.readLine();
+
+      if(Util.isNotNullOrEmpty(line)) {
+        if(!line.equals(headers)) {
+          headerFormatSb.append("Header Row format is invalid in File. Please provide valid Header Format:").append(headers);
+        }else{
+          while(null != (line = bufReader.readLine())) {
+            if(Util.isNotNullOrEmpty(line)) {
+
+              rowCount++;
+              valueArray = Util.csvToArray(line);
+
+              if(Util.isNotNullOrEmpty(valueArray[12]) && Util.isNotNullOrEmpty(valueArray[13]) && Util.isNotNullOrEmpty(valueArray[14])){
+
+                String certificationID = valueArray[13];
+                String certificationItemID = valueArray[14];
+                String newManager = valueArray[12];
+
+                List itemsToReassign = new ArrayList();
+
+                Filter emailFilter = Filter.eq("email", newManager);
+                Filter usernameFilter = Filter.eq("name", newManager);
+                Filter combinedFilter = Filter.or(emailFilter, usernameFilter);
+
+                // Add to QueryOptions
+                QueryOptions qo = new QueryOptions();
+                qo.addFilter(combinedFilter);
+
+                // Execute the search
+                List identities = context.getObjects(Identity.class, qo);
+
+                if (identities == null || identities.isEmpty()) {
+                  debug(logName," || blukLoadReassignCertificationConfiguration method || New Manager not found: " + newManager);
+                  newManagerNotExistSb.append(rowCount).append(",");
+                  continue;
+                }
+
+                for(Identity identityNewManager : identities){
+
+                  Certification eachCert =  context.getObjectById(Certification.class, certificationID);
+                  if(null != eachCert){
+                    String requester = eachCert.getCreator();
+                    requesterObject = context.getObjectByName(Identity.class, requester);
+
+                    CertificationItem item = context.getObjectById(CertificationItem.class, certificationItemID);
+
+                    if(null != item){
+                      itemsToReassign.add(item.getId());
+
+                      String comments = "As you are the new manager, please certify the user access.";
+
+                      eachCert.bulkReassignItems(requesterObject, itemsToReassign, identityNewManager, null, comments);
+
+                      context.saveObject(eachCert);
+                      context.commitTransaction();
+                      new Certificationer(context).refresh(eachCert);
+                      context.decache();
+                      debug(logName, " || blukLoadReassignCertificationConfiguration method || Reassignment is completed to : Manager name " + newManager + " at Row# " + rowCount);
+
+                    }
+                  }
+                }
+              }else{
+                debug(logName, " || blukLoadReassignCertificationConfiguration method || Mandatory attributes are missing at row : " + rowCount);
+                mandatoryAttsRowSb.append(rowCount).append(",");
+
+              }
+            }
+          }
+          if(rowCount == 0) {
+            emptyFileSb.append("The file contains only headers but no records to process");
+          }
+        }
+      }else{
+        emptyFileSb.append("The File is Empty");  
+      }
+
+    }catch(Exception e) {
+      error(logName," || blukLoadReassignCertificationConfiguration method ||  An exception was encountered while processing the bluk Load Reassign Certification data Configuration File, and an error message is ---> " + e.getMessage());
+      throw new Exception(e);
+    }finally {
+      try {
+        if(null != bufReader) {
+          bufReader.close();
+        }
+      } catch(Exception e) {
+        error(logName,"  || blukLoadReassignCertificationConfiguration method || Error occurred while closing the connections, and  error message is --> "  + e.getMessage());
+        throw new Exception(e);
+      }
+    }
+    info(logName," || blukLoadReassignCertificationConfiguration method || Exit Method");
+  }
+
+  try {
+    blukLoadReassignCertificationConfiguration();
+
+    if(Util.isNotNullOrEmpty(mandatoryAttsRowSb.toString())) {
+      taskResult.addMessage(new Message(Message.Type.Error, "Mandatory attributes are missing for records at Row# " + mandatoryAttsRowSb.substring(0, mandatoryAttsRowSb.length() - 1).toString(), null));
+    }
+    if(Util.isNotNullOrEmpty(newManagerNotExistSb.toString())) {
+      taskResult.addMessage(new Message(Message.Type.Error, "New Decision Maker is not found for records at Row# " + newManagerNotExistSb.substring(0, newManagerNotExistSb.length() - 1).toString(), null));
+    }
+    if(Util.isNotNullOrEmpty(emptyFileSb.toString())) {
+      taskResult.addMessage(new Message(Message.Type.Error, emptyFileSb.toString(), null));
+    } 
+    if(Util.isNotNullOrEmpty(headerFormatSb.toString())) {
+      taskResult.addMessage(new Message(Message.Type.Error, headerFormatSb.toString(), null));
+    }  
+
+  } catch(Exception e) {
+    error(logName,"  ||An exception was encountered while executing Reassign Certification Data Configuration Bulk Load Rule, and an error message is --> " + e.getMessage());
+  } 
+
+  ]]></Source>
+</Rule>

@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Rule-Ascension-Workflow-Duo-Subprocess" type="Workflow">
+  <Source><![CDATA[
+
+import sailpoint.api.ObjectUtil;
+import sailpoint.api.Provisioner;
+import sailpoint.api.RequestManager;
+import sailpoint.object.Attributes;
+import sailpoint.object.Custom;
+import sailpoint.object.EmailOptions;
+import sailpoint.object.EmailTemplate;
+import sailpoint.object.Identity;
+import sailpoint.object.IdentityRequest;
+import sailpoint.object.Link;
+import sailpoint.object.ProvisioningPlan;
+import sailpoint.object.ProvisioningPlan.AccountRequest;
+import sailpoint.object.ProvisioningPlan.AttributeRequest;
+import sailpoint.object.ProvisioningPlan.ObjectOperation;
+import sailpoint.object.ProvisioningResult;
+import sailpoint.object.Request;
+import sailpoint.object.RequestDefinition;
+import sailpoint.object.Workflow;
+import sailpoint.request.WorkflowRequestExecutor;
+import sailpoint.workflow.StandardWorkflowHandler;
+import java.sql.Timestamp;
+import sailpoint.api.SailPointContext;
+import sailpoint.object.AuditEvent;
+import sailpoint.server.Auditor;
+
+//Loop through each Duo link on the identity; launch an asynchronous workflow on each loop.
+
+for (Link duoLink : duoLinks) {
+
+    if(duoLink.getDisplayName() != null && duoLink.getDisplayName().contains("ongoogle")){	
+
+        String auditString1 = "The presence of an OnGoogle Duo link on this Identity has resulted in the suppression of Leaver subprocessing for the Duo application. This has been done to avoid unintentional removal of phone objects in Duo";
+        AuditEvent event = new AuditEvent();
+        event.setAction("Comment");
+        event.setSource("DuoLeaverSupression");
+        event.setTarget(identityName);
+        event.setAccountName(duoLink.getDisplayName());
+        event.setString1(auditString1);
+        Auditor.log(event);
+        context.commitTransaction();
+
+    }else{
+
+    String duoUsername = duoLink.getAttribute("username");
+
+    String workflowName = "Workflow-Ascension-Leaver-Subprocess-Duo";
+    String caseName = "Duo Leaver Subprocess: " + identityName + " - " + duoUsername;
+    String requesterId  = "IDM Team";
+
+    Workflow eventWorkflow = context.getObject(Workflow.class, workflowName); 
+
+    Identity id = context.getObjectByName(Identity.class, requesterId);
+
+    //Build out a map of arguments to pass to the Request Scheduler.
+
+    Attributes reqArgs = new Attributes();
+
+    reqArgs.put(StandardWorkflowHandler.ARG_REQUEST_DEFINITION, WorkflowRequestExecutor.DEFINITION_NAME); 
+
+    reqArgs.put(StandardWorkflowHandler.ARG_WORKFLOW, workflowName); 
+
+    reqArgs.put(StandardWorkflowHandler.ARG_REQUEST_NAME, caseName); 
+
+    reqArgs.put("requestName", caseName);            
+
+    //Build a map of arguments to pass to the Workflow case when it launches. 
+
+    Attributes wfArgs = new Attributes();
+
+    wfArgs.put("identityName", identityName);
+
+    wfArgs.put("flow", caseName);
+
+    wfArgs.put("workflow", eventWorkflow.getName()); 
+
+    wfArgs.put("launcher", launcher); 
+
+    wfArgs.put("duoUsername", duoUsername);
+  
+    wfArgs.put("project", project);
+
+    reqArgs.putAll(wfArgs); 
+
+    //Define the workflow request.
+
+    Request req = new Request(); 
+
+    RequestDefinition reqdef = context.getObject(RequestDefinition.class, "Workflow Request"); 
+
+    req.setDefinition(reqdef); 
+
+    req.setEventDate(new Date(System.currentTimeMillis())); 
+
+    req.setOwner(id); 
+
+    req.setName(caseName); 
+
+    req.setAttributes(reqdef, reqArgs); 
+
+    //Schedule the workflow via the request manager.
+
+    RequestManager.addRequest(context, req); 
+	
+    }
+
+}
+
+  ]]></Source>
+</Rule>

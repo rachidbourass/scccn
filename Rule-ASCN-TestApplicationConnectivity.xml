@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="ASCN-TestApplicationConnectivity">
+  <Source><![CDATA[
+    
+    import sailpoint.api.IdIterator;
+    import sailpoint.api.SailPointContext;
+    import sailpoint.connector.Connector;
+    import sailpoint.connector.ConnectorFactory;
+    import sailpoint.object.Application;
+    import sailpoint.object.EmailFileAttachment;
+    import sailpoint.object.EmailTemplate;
+    import sailpoint.object.Identity;
+    import sailpoint.object.QueryOptions;
+    import sailpoint.object.TaskDefinition;
+    import sailpoint.object.TaskResult;
+    import sailpoint.object.EmailOptions;
+    import sailpoint.tools.GeneralException;
+    import sailpoint.tools.Message;
+    import sailpoint.tools.Util;
+    import java.lang.StringBuilder;
+    import java.lang.Byte;
+    import sailpoint.api.ObjectUtil;
+    import org.ascn.utils.GeneralUtils;
+  
+    /**
+    This method returns the workgroup members email Id's
+    @param userName
+    @return
+    */
+    private static String getGroupMemberEmailId(SailPointContext context,String userName) {
+     String errorLogName = "ApplicationConnectivity";
+        try {
+            Identity idObj = context.getObjectByName(Identity.class, userName);
+            return idObj.getEmail();
+        } 
+        catch (GeneralException e) {
+              throw new RuntimeException("Cannot Find The User" +e,e);
+              GeneralUtils.createCustomErrors(errorLogName,"getGroupMemberEmailId",idObj.getEmail());
+           
+        }
+        return null;
+    }
+    public static List getWorkgroupEmails(Identity manualWorkGroup){
+    
+        List emailList = new ArrayList();
+     String errorLogName = "ApplicationConnectivity";
+        if(manualWorkGroup != null) {
+            List propertyList = new ArrayList();
+            propertyList.add("name");
+            if(manualWorkGroup.getNotificationOption().equals(Identity.WorkgroupNotificationOption.GroupEmailOnly)) {
+                emailList.add(manualWorkGroup.getEmail());
+            }
+            else if(manualWorkGroup.getNotificationOption().equals(Identity.WorkgroupNotificationOption.MembersOnly)) {
+                Iterator iterator = ObjectUtil.getWorkgroupMembers(context, manualWorkGroup, propertyList);
+                while(iterator.hasNext()) {
+                    Object[] row =(Object[])iterator.next();
+                    String memberName = (String)row[0];
+                    emailList.add(getGroupMemberEmailId(context,memberName));
+                }
+            }
+            else if(manualWorkGroup.getNotificationOption().equals(Identity.WorkgroupNotificationOption.Both)) {
+                Iterator iterator = ObjectUtil.getWorkgroupMembers(context, manualWorkGroup, propertyList);
+                while(iterator.hasNext()) {
+                    Object[] row =(Object[])iterator.next();
+                    String memberName = (String)row[0];
+                    emailList.add(getGroupMemberEmailId(context,memberName));
+                }
+                emailList.add(manualWorkGroup.getEmail());
+            }
+            else {
+        GeneralUtils.createCustomErrors(errorLogName,"getWorkgroupEmails","");
+                
+            }
+            return emailList;
+        }
+        return null;
+    }
+    public static void writeMessageToTaskResult(Message.Type type, String msg) {
+        if (null != taskResult) {
+          taskResult.addMessage(new Message(type, msg, new Object[] { msg }));
+        }
+    }
+     
+    public void writeWarningMessageToTaskResult(String msg) {
+        writeMessageToTaskResult(Message.Type.Warn, msg);
+    }
+     
+    public void writeInfoMessageToTaskResult(String msg) {
+        writeMessageToTaskResult(Message.Type.Info, msg);
+    }
+     
+    public void writeErrorMessageToTaskResult(String msg) {
+        writeMessageToTaskResult(Message.Type.Error, msg);
+    }
+    
+    //-----------------------------------Start --------------------------------
+    
+    
+    //This block is commented and inputs are provided in the TaskDefinition
+    List appList =Arrays.asList("AD-ACMHO","AD-AHMFM","AD-AHSCN","AD-KSWIC","AD-MIROC","AD-OKTUL","AD-WIAPP","AD-WIGLE","AD-DS","AD-AMITA","AD-PRESENCEHEALTH","AD-Archive","AD-AID","AD-ASC","Azure","Duo","GSuite","ServiceNow","PeopleSoft Attestation","MDStaff - AMITA");
+    boolean setMaintenance = false;
+    String SUCCESS_STRING = "Test Successful";
+    String FAILURE_STRING = "Test failed. App is put in maintainence mode or Failed connection!. Error details: ";
+    String COLUMN_APP_NAME = "applicationName";
+    String COLUMN_APP_RESULT = "connectionResult";
+    String header = "COLUMN_APP_NAME,COLUMN_APP_RESULT\n";
+    StringBuilder builder=new StringBuilder();
+    builder.append(header);
+    if(null != config) {
+    tempStr = config.get("setMaintenance_for_failedConnection");
+    if(tempStr!=null && ("true".equalsIgnoreCase(tempStr) || "false".equalsIgnoreCase(tempStr)))
+        setMaintenance = Boolean.parseBoolean(tempStr);
+    }
+    IdIterator appIterator = new IdIterator(context, context.search(Application.class, new QueryOptions(), "id"));
+    int count=0;
+    while (appIterator.hasNext()) {
+        // first put all apps out of maintenance mode
+        String appId = appIterator.next();
+        List appsInMaintenance = new ArrayList();
+        Application app = (Application) context.getObjectById(Application.class, appId);
+        if (app != null && appList.contains(app.getName())) {
+             
+            // incase if we have to remove maintenancemode to test the connection
+            if (app.isInMaintenance() && setMaintenance) {
+                long a = 0;
+                app.setMaintenanceExpiration(a);
+                context.saveObject(app);
+                context.commitTransaction();
+            }
+            //skipping apps under maintenance, as they are wantedly kept under maintenance, test connection will take time to come back.
+             
+            try {
+                // now check each app, if test connection fails set it to maintenance mode
+                Connector connector = ConnectorFactory.getConnector(app, null);
+                connector.testConfiguration();
+                count++;
+                builder.append(app.getName()+","+SUCCESS_STRING+"\n");
+                writeInfoMessageToTaskResult("ASCNLOG Test Connection "+app.getName()+" - "+SUCCESS_STRING);
+                context.decache(app);
+            } 
+            catch (Exception e) {
+                // setting connection in Maintenance mode
+                if(setMaintenance){
+                    long a = -1;
+                    app.setMaintenanceExpiration(a);
+                    context.saveObject(app);
+                    context.commitTransaction();
+                }
+                count++;
+                builder.append(app.getName()+","+FAILURE_STRING + e.getMessage()+"\n");
+                writeErrorMessageToTaskResult("ASCNLOG Test Connection "+app.getName()+" - "+FAILURE_STRING + e.getMessage());
+                context.decache(app);
+            }
+        }
+    }
+    writeInfoMessageToTaskResult("ASCNLOG Test Connection Result Report complete total Count: "+count);
+     
+    try{
+        String fileName = "TestConnection_Application_Report.csv";
+        String recipientWorkGroup = "Test Connection Application Report";
+        byte[] fileData = builder.toString().getBytes();
+        EmailTemplate emailTemplate = context.getObject( EmailTemplate.class, "Report Completion" );
+        EmailOptions emailOptions = new EmailOptions();
+        List toAddress = Arrays.asList(new String[]{"Jayapal.Pakanati@ascension.org.com"});
+        Identity manualWorkGroup = context.getObject(Identity.class, recipientWorkGroup);
+        if(manualWorkGroup != null)
+            toAddress = getWorkgroupEmails(manualWorkGroup);
+        emailOptions.setTo(toAddress);
+        emailOptions.setVariable("reportName", "Test connection Application Report");
+        EmailFileAttachment attachment = new EmailFileAttachment( fileName, EmailFileAttachment.MimeType.MIME_CSV, fileData );
+        emailOptions.addAttachment( attachment );
+        context.sendEmailNotification( emailTemplate, emailOptions );
+    }
+    catch(Exception e){
+        writeErrorMessageToTaskResult("Failed to send Test connection Application Report");
+        taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+    }
+     
+    if (null != taskResult) {
+        taskResult.setCompletionStatus(TaskResult.CompletionStatus.Success);
+    }
+    return "Goodbye!";
+    
+    ]]></Source>
+</Rule>
