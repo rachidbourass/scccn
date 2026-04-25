@@ -1,0 +1,327 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Generic-FileFeed-PopulateDBFields">
+  <Description>An IdentityIQ server-side rule that is executed after the connector's provisioning method is called. This gives the customer the ability to customize or react to anything in the ProvisioningPlan AFTER it has been sent out to the specific applications. 
+
+    This rule will be called for any application found in a plan that also has a configured 'afterProvisioningRule' configured.</Description>
+  <Source><![CDATA[
+  import sailpoint.connector.DelimitedFileConnector;
+  import sailpoint.object.Application;
+  import sailpoint.object.Attributes;
+  import sailpoint.object.TaskResult; 
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+  import sailpoint.tools.Message;
+  import sailpoint.tools.Util;  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  import java.sql.Connection;
+  import java.sql.Statement;
+  import java.sql.PreparedStatement;
+  import java.sql.DriverManager;
+  import java.sql.ResultSet;
+  import java.sql.SQLException;
+  import sailpoint.tools.Util;
+
+  Log Logger = LogFactory.getLog("rule.importtodatabase");
+
+  int failedCount = 0;
+  int count = 0;
+  String file = null;
+  String tableName = null;
+  String headerName = null;
+  String feedHeaderName = null;
+  String resultMsg = null;
+  String tableNum = null;
+  String feedHeaderVal = null;
+  String dbHeaderVal = null; 
+  String updateQuery = null;
+  boolean wrongMatch = false;
+  List propValues = new ArrayList();  
+  HashMap map = new HashMap();
+  Connection destConnection = null;
+  PreparedStatement insertStatement = null;
+  PreparedStatement updateStatement = null;
+  List tableList = new ArrayList();
+
+  if (config != null && config instanceof Map){
+    if(config.get("filePath") != null){
+      taskResult.addMessage(Message.info("Assigned File Path: " + config.get("filePath")));
+      file = config.get("filePath");
+    }
+    else{
+      taskResult.addMessage(Message.warn("File path is empty"));
+    }
+
+
+    if(config.get("truncate") != null){
+      taskResult.addMessage(Message.info("Truncate Data: " + config.get("truncate")));
+    }
+
+    if(config.get("tableName") != null){
+
+      tableNum = config.get("tableName");
+      if(Util.nullSafeCaseInsensitiveEq(tableNum,"1")){
+        headerName = "Location_ID"; 
+        feedHeaderName = "location_id";
+        tableName = "Locations";
+        feedHeaderVal = "location_id,location_name,addr1,addr2,city,state,zip,phone_number"; 
+        dbHeaderVal = "Location_ID,Location_Name,Address_1,Address_2,City,State,Zip,Default_Phone_Number"; 
+      }
+      else if(Util.nullSafeCaseInsensitiveEq(tableNum,"2")){
+        headerName = "Vendor_Name";
+        feedHeaderName = "Vendor_Name";
+        tableName = "Vendors";
+        feedHeaderVal = "Vendor_Name,Organization";
+        dbHeaderVal = "Vendor_Name,Organization";
+      }
+      else if(Util.nullSafeCaseInsensitiveEq(tableNum,"3")){
+        headerName = "Job_ID";
+        feedHeaderName = "job_id";
+        tableName = "JobCodes";
+        feedHeaderVal = "job_id,job_title";
+        dbHeaderVal = "Job_ID,Job_Title_Description";
+      }
+      else if(Util.nullSafeCaseInsensitiveEq(tableNum,"4")){
+        headerName = "Location_ID,Department_ID";
+        feedHeaderName = "location_id,department_id";
+        tableName = "BusinessUnitCode";
+        feedHeaderVal = "ministry,hr_location,department_id,description,location_id,businessunitcode";
+        dbHeaderVal = "Ministry,Hr_Location,Department_ID,Description,Location_ID,Business_Code";
+      }
+      else if(Util.nullSafeCaseInsensitiveEq(tableNum,"5")){
+        headerName = "Business_Code";
+        feedHeaderName = "businessunitcode";
+        tableName = "BusinessDescription";
+        feedHeaderVal = "businessunitcode,description";
+        dbHeaderVal= "Business_Description,Business_Code";
+      }
+      else if(Util.nullSafeCaseInsensitiveEq(tableNum,"6")){
+        headerName = "fname_lname";
+        feedHeaderName = "ManagerName";
+        tableName = "ManagerNameToID";
+        feedHeaderVal = "ManagerName,Emplid";
+        dbHeaderVal= "fname_lname,Empl_ID";
+      }
+      taskResult.addMessage(Message.info("Assigned Table Name: " + tableName));
+    }   
+  }
+
+  if(Util.isNotNullOrEmpty(file)){
+
+    BufferedReader br = null;   
+
+    try{
+      br = new BufferedReader(new FileReader(file));
+      if (br!=null){
+
+        String sCurrentLine;
+        String fileHeader = br.readLine();
+
+        List headerValues= Util.csvToList(fileHeader);
+        List actualheaderValues= Util.csvToList(feedHeaderVal);
+        List dbColumns= Util.csvToList(dbHeaderVal);
+
+        for(String headerValue : headerValues){          
+          if(!actualheaderValues.contains(headerValue)){
+            wrongMatch = true;
+            break;
+          }         
+        }
+
+        destConnection = context.getJdbcConnection();
+        if(!wrongMatch){
+
+          if (headerValues != null && !headerValues.isEmpty()) {
+            String queryValue2 = "";
+            String queryValue1 = "";
+            String query = "";
+
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sbValue = new StringBuilder();
+            StringBuilder sbUpdate = new StringBuilder();
+
+            if(null != dbColumns && !dbColumns.isEmpty()){
+              for(String attrName : dbColumns){
+                sb.append(attrName).append(",");
+                sbValue.append("?").append(",");
+              }
+
+              for(String dbcolumn : dbColumns){                       
+                sbUpdate.append(dbcolumn).append("=? ,");            
+              }              
+            }
+            if(null != sb && null != sbValue) {
+              queryValue1 = sb.deleteCharAt(sb.length() - 1).toString();
+              queryValue2 = sbValue.deleteCharAt(sbValue.length() - 1).toString();
+            }
+
+            if(Util.isNotNullOrEmpty(queryValue2) && Util.isNotNullOrEmpty(queryValue1)){
+              query = "insert into "+tableName+" ("+queryValue1+") values ("+queryValue2+")";  
+            }
+
+            if(null != sbUpdate) {
+              updateQuery = sbUpdate.deleteCharAt(sbUpdate.length() - 1).toString();             
+            }
+
+
+            insertStatement = destConnection.prepareStatement(query);
+            stmt = destConnection.createStatement();
+
+            if(Util.nullSafeCaseInsensitiveEq(config.get("truncate"),"true")){
+              stmt.execute("TRUNCATE TABLE "+tableName);             
+            }
+            else{
+              rs = stmt.executeQuery("Select "+headerName+" from "+tableName);
+              while(rs.next()){
+                if(Util.nullSafeCaseInsensitiveEq(tableNum,"4")){ 
+                  String value = "";
+                  String[] temp = headerName.split(",");
+                  for(String val: temp){
+                    if (Util.isNotNullOrEmpty(rs.getString(val))){
+                      if(Util.isNotNullOrEmpty(value)){
+                        value =  value +","+ rs.getString(val).toUpperCase();
+                      }else{
+                        value =  rs.getString(val).toUpperCase();
+                      }
+                    }                     
+                  }
+                  tableList.add(value);
+                }
+                else if(Util.isNotNullOrEmpty(rs.getString(headerName))){
+                  tableList.add(rs.getString(headerName).toUpperCase());
+                }
+              }
+            }
+            
+            while ((sCurrentLine = br.readLine()) != null) {
+              try{
+                if (sCurrentLine!=null)
+                {               
+                  propValues= Util.csvToList(sCurrentLine); 
+                  map = DelimitedFileConnector.defaultBuildMap(headerValues,propValues);
+                  String finalUpdateQuery = null;
+
+                  if(map != null && !map.isEmpty()){
+                    if(Util.nullSafeCaseInsensitiveEq(tableNum,"4")){
+
+                      String value = "";
+                      String[] temp = feedHeaderName.split(",");
+                      for(String val: temp){
+                        if(Util.isNotNullOrEmpty(map.get(val))){
+                          if(Util.isNotNullOrEmpty(value)){
+                           value =  value +","+ map.get(val).toString().toUpperCase();
+                          }else{
+                            value =  map.get(val).toString().toUpperCase();
+                          }
+                        }
+                      }
+                      map.put(feedHeaderName,value);
+                    }
+                   
+
+                    if(Util.nullSafeCaseInsensitiveEq(tableNum,"4") && Util.isNotNullOrEmpty(updateQuery)){							
+                      finalUpdateQuery = "update "+tableName+" set "+updateQuery+" where Location_ID = '"+map.get("location_id")+"' and Department_ID = '"+map.get("department_id")+"'";
+                    }
+                    else if(Util.isNotNullOrEmpty(updateQuery)){
+                      finalUpdateQuery = "update "+tableName+" set "+updateQuery+" where "+headerName+" = '"+map.get(feedHeaderName)+"'";                            
+                    }
+
+
+                    if(Util.isNotNullOrEmpty(map.get(feedHeaderName))){
+                      if( !tableList.contains(map.get(feedHeaderName).toString().toUpperCase())){                  
+
+                        int i = 1;                                     
+                        if(null != headerValues && !headerValues.isEmpty()){
+                          for(String attrName : headerValues){
+                            if(null != map.get(attrName)){
+                              insertStatement.setString( i, map.get(attrName));
+                            }
+                            else{
+                              insertStatement.setString( i, "");
+                            }
+                            i++;
+                          }                      
+                        }
+                        insertStatement.executeUpdate();    
+                        count++;
+                      }
+                      else if(tableList.contains(map.get(feedHeaderName).toString().toUpperCase())){
+                        updateStatement = destConnection.prepareStatement(finalUpdateQuery);
+                        int i = 1;                                     
+                        if(null != headerValues && !headerValues.isEmpty()){
+                          for(String attrName : headerValues){
+                            if(null != map.get(attrName)){                              
+                              updateStatement.setString( i, map.get(attrName));
+                            }
+                            else{
+                              updateStatement.setString( i, "");
+                            }
+                            i++;
+                          }                      
+                        }                          
+
+                        updateStatement.executeUpdate();
+                        count++;
+                      }
+                    }
+                  }
+                }
+              }
+              catch(SQLException se){
+                ++failedCount;
+                Logger.error("Exception in writing to database: "+se.getMessage());
+                taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+                taskResult.addMessage(Message.error("Sql Exception : "+se.getMessage()+" : "+map.get(feedHeaderName)));
+              }
+              catch(Exception e){
+                ++failedCount;
+                Logger.error("Error with line: " + sCurrentLine);
+                taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+                taskResult.addMessage(Message.error("General Exception "+e.getMessage()));
+              }
+            }
+          }
+          else{
+            taskResult.addMessage(Message.warn("File is Empty"));
+          }
+        }
+      }
+    }   
+    catch (java.io.FileNotFoundException e) {
+      Logger.error( "failed to find file: {0}"+e.getMessage());
+      taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+      taskResult.addMessage(Message.error("Failed to find file "+e.getMessage()));
+    }
+    catch(Exception exp){
+      Logger.error("General Error"+exp.getMessage());
+      taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+      taskResult.addMessage(Message.error("Error in processing "+exp.getMessage()));
+    }finally {
+      try {
+        br.close();   
+        if(insertStatement!=null)
+          insertStatement.close();
+      }catch(SQLException se2){
+        Logger.error("Exception in closing database connection: "+se2.getMessage());
+      }
+      catch (Exception excep){
+        Logger.error("Error closing connection: " +excep.getMessage());
+        taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+        taskResult.addMessage(Message.error("Error in processing "+excep.getMessage()));
+      }
+    }   
+    if(wrongMatch){
+      String resultMsg = ("Mismatch in between file provided and table name");
+      taskResult.addMessage(Message.error(resultMsg,null));
+    }
+    else{
+      String resultMsg = ("Total Processed: " + count + ", Error Count: " + failedCount);
+      taskResult.addMessage(Message.info(resultMsg,null));
+    }
+  }  
+
+  return "Total Processed: " + count + ", Error Count: " + failedCount;
+  ]]></Source>
+</Rule>

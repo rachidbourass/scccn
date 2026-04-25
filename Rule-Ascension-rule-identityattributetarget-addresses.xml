@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-IdentityAttributeTarget-Addresses" type="IdentityAttributeTarget">
+  <Description>Identity attribute target rules are used to tranform identity attribute values that are being pushed to targets.</Description>
+  <Signature returnType="Object">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="value" type="Object">
+        <Description>
+           The value of the identity attribute.  Note that this could be single value or a list of values.
+        </Description>
+      </Argument>
+      <Argument name="sourceIdentityAttribute">
+        <Description>
+           The sailpoint.object.ObjectAttribute for this target.
+        </Description>
+      </Argument>
+      <Argument name="sourceIdentityAttributeName">
+        <Description>
+           The name of the identity attribute for this target.
+        </Description>
+      </Argument>
+      <Argument name="sourceAttributeRequest">
+        <Description>
+           The sailpoint.object.ProvisioningPlan.AttributeRequest that is
+           setting the attribute on the identity.
+        </Description>
+      </Argument>
+      <Argument name="target">
+        <Description>
+           The sailpoint.object.AttributeTarget that is being processed.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+           The sailpoint.object.Identity that is being processed.
+        </Description>
+      </Argument>
+      <Argument name="project">
+        <Description>
+           The sailpoint.object.ProvisioningProject that has the changes that
+           are being requested.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="attributeValue">
+        <Description>
+          The transformed value that will be pushed to the target.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+  
+  import org.json.JSONArray;
+  import org.json.JSONObject;
+  import sailpoint.object.Identity;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.commons.lang.StringUtils;
+
+  private static Log logger = LogFactory.getLog("sailpoint.services.asc.Gsuite");
+
+  public String returnValue(Object value){
+    if(void == value || value == null){
+      return "";
+    }
+    else{
+      return value.toString();
+    }
+  }
+
+  List adrList = new ArrayList();
+  String addressDelimiter = ", ";
+
+  JSONObject json = new JSONObject();
+  
+  String streetAddress = returnValue(identity.getAttribute("streetAddress"));
+  String locality = returnValue(identity.getAttribute("city"));
+  String region = returnValue(identity.getAttribute("st"));
+  String postOfficeBox = returnValue(identity.getAttribute("postOfficeBox"));
+  String postalCode = returnValue(identity.getAttribute("postalCode"));
+  String formatted = "";
+
+  if(!StringUtils.isEmpty(streetAddress)){
+    formatted = formatted + streetAddress + addressDelimiter;
+  }
+  if(!StringUtils.isEmpty(postOfficeBox)){
+    formatted = formatted + postOfficeBox + addressDelimiter;
+  }
+  if(!StringUtils.isEmpty(locality)){
+    formatted = formatted + locality + addressDelimiter;
+  }
+  if(!StringUtils.isEmpty(region)){
+    formatted = formatted + region + addressDelimiter;
+  }
+  if(!StringUtils.isEmpty(postalCode)){
+    formatted = formatted + postalCode;
+  }
+
+  if(!StringUtils.isEmpty(streetAddress)){
+    json.put("type", "work");
+    json.put("primary", "true");
+    json.put("sourceIsStructured", "false");
+
+    json.put("streetAddress", streetAddress);
+    
+    if (!StringUtils.isEmpty(locality)) {
+      json.put("locality", locality);
+    }
+    
+    if (!StringUtils.isEmpty(region)) {
+      json.put("region", region);
+    }
+  
+    if (!StringUtils.isEmpty(postOfficeBox)) {
+      json.put("poBox", postOfficeBox);
+    }
+  
+    json.put("formatted", formatted);
+    
+    adrList.add(json.toString());
+  }
+
+  if(logger.isDebugEnabled()) logger.debug(" adrList:" + adrList);
+    
+  return adrList;
+
+]]></Source>
+</Rule>

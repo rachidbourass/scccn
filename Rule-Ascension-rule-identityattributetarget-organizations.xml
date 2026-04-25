@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-IdentityAttributeTarget-Organizations" type="IdentityAttributeTarget">
+  <Description>Identity attribute target rules are used to transform identity attribute values that are being pushed to targets.</Description>
+  <Signature returnType="Object"/>
+  <Source><![CDATA[
+	import org.json.JSONArray;
+	import org.json.JSONObject; 
+	import sailpoint.object.Identity;
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+	
+    private static Log logger = LogFactory.getLog("sailpoint.services.asc.Gsuite"); 
+
+    public String returnValue(Object value){
+        if(void == value || value == null){
+          return "";
+        }
+        else{
+          return value.toString();
+        }
+    }
+
+    List retList = new ArrayList();
+    JSONObject orgJson = new JSONObject();
+
+    orgJson.put("name",returnValue(identity.getAttribute("company")));  
+    orgJson.put("location",returnValue(identity.getAttribute("locationDescription")));  
+    orgJson.put("title",returnValue(identity.getAttribute("title")));   
+    orgJson.put("department",returnValue(identity.getAttribute("department")));
+
+    retList.add(orgJson.toString());
+
+    logger.debug(" retList:" + retList);
+    return retList;
+    ]]></Source>
+</Rule>

@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-CWR-AccountExpirationEmail-v2">
+  <Source><![CDATA[
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import sailpoint.api.SailPointContext;
+import sailpoint.object.EmailFileAttachment;
+import sailpoint.object.EmailOptions;
+import sailpoint.object.EmailTemplate;
+import sailpoint.object.Filter;
+import sailpoint.object.Identity;
+import sailpoint.object.QueryOptions;
+import sailpoint.object.Link;
+import sailpoint.tools.Util;
+import org.ascension.rules.library.IdentityUtils;
+
+IdentityUtils iu = new IdentityUtils();
+iu.setSPContext(context);
+  
+String accountExpire = "accountExpires";
+List idTypeList = new ArrayList();
+idTypeList.add("contractor");
+idTypeList.add("nom-hr contractor");
+  
+QueryOptions qo = new QueryOptions();
+Filter filter = Filter.ignoreCase(Filter.and(Filter.eq("inactive", false),Filter.in("type",idTypeList),Filter.or(Filter.notnull("manager"),Filter.notnull("contractorManager"))));
+qo.addFilter(filter);
+//qo.setResultLimit(10);
+int diff = 0;
+//List links = context.getObjects(Link.class, qo);
+Iterator iterator = context.search(Identity.class, qo);
+Map finalData = new HashMap();
+
+List successDetails = null;
+String reportData = null;
+//log.error("Links****" + links.size());
+Date today = new Date();
+  while (iterator.hasNext()) {
+  	Identity idn = (Identity) iterator.next();
+    
+    List links = iu.getIdFilteredActiveADLinks(idn);
+    if (null != links @and links.size() > 0) {
+    for (Link link: links) {
+         log.error("link data*****" + link.getNativeIdentity());
+        Object expDateStringObj = link.getAttribute(accountExpire);
+        String expDateString = expDateStringObj == null ? null : expDateStringObj.toString();
+              if (null != expDateString || !"".equals(expDateString) || "never".equals(expDateString) || expDateString.length() < 10) {
+                Date futureAccExpiration = null;
+              try{
+                 futureAccExpiration = Util.stringToDate(expDateString);
+              }catch(java.text.ParseException pe){
+                log.error("Date parshing exception: ",pe);
+              }
+              	log.error("futureAccExpiration*****" + futureAccExpiration);
+                diff = Util.getDaysDifference(futureAccExpiration, today); //adf.daysBetween(link.getAttribute(accountExpire).toString()); //
+                log.error("Difference of dates*****" + diff);
+                if (diff > 0 @and diff < 30) {
+                    log.error("User has meeted requirement***" + link.getIdentity().getName());
+                    String idCompany = link.getIdentity().getStringAttribute("company");
+                    if (link.getIdentity().getManager() != null @and !idCompany.equalsIgnoreCase("AMITA")) {
+                        log.error("User has manager *****" + link.getIdentity().getManager().getName());
+                        String managerName = "Not Available";
+                      if(null != link.getIdentity().getManager()){
+                        managerName = link.getIdentity().getManager().getDisplayableName().replaceAll(",", "");
+                      }
+                      String cManager = "Not Available";
+                      if(null != link.getIdentity().getAttribute("contractorManager")){
+                        cManager = link.getIdentity().getAttribute("contractorManager");
+                      }
+                        Identity contractorManager = context.getObjectByName(Identity.class,cManager);
+                        String cmDisplayName = "Not Available";
+                        String cmExternalEmail = "N/A";
+                      if(null != contractorManager){
+                        cmDisplayName = contractorManager.getDisplayableName().replaceAll(",", "");
+												cmExternalEmail = contractorManager.getAttribute("externalEmail");
+                      }
+                        //reportData = link.getIdentity().getDisplayableName().replaceAll(",", "") + "," + link.getIdentity().getName() + "," + link.getApplicationName() + "," + link.getDisplayName().split("\\\\")[0] + "," + link.getDisplayName() + "," + Util.dateToString(futureAccExpiration, "MM/dd/yyyy") + "," + link.getIdentity().getEmail() + "," + link.getIdentity().getFirstname() + "," + link.getIdentity().getLastname();
+                        reportData = link.getIdentity().getDisplayableName().replaceAll(",", "") + "," + link.getIdentity().getName() + "," +managerName + ","+cmDisplayName + ","+cmExternalEmail + "," +link.getDisplayName().split("\\\\")[0] + "," + link.getDisplayName() + "," + Util.dateToString(futureAccExpiration, "MM/dd/yyyy") + "," + link.getIdentity().getEmail() + "," + link.getIdentity().getFirstname() + "," + link.getIdentity().getLastname();
+                        log.error("reportData*****" + reportData);
+                        if (finalData.get(link.getIdentity().getManager().getName()) != null) {
+                            successDetails = finalData.get(link.getIdentity().getManager().getName());
+                        } else {
+                            successDetails = new ArrayList();
+                        }
+                        log.error("successDetails*****" + successDetails);
+                        successDetails.add(reportData);
+                        log.trace("After adding dummy dtaa successDetails*****" + successDetails);
+                        finalData.put(link.getIdentity().getManager().getName(), successDetails);
+                        log.error("finalData***in loop***" + finalData);
+                    }
+                }
+            }
+        
+    }
+}
+}
+log.trace("finalData******" + finalData);
+if (finalData.size() > 0) {
+    log.error("FINAL DATA: "+finalData.size());
+    log.trace("Sending email to the manager for account expiration");
+    Map mailargs = new HashMap();;
+    String strTemplate = "Ascension-EmailTemplate-CWR-AccountExpirationEmail";
+    String fileName = "account_expiration_data.csv";
+    EmailTemplate template = context.getObjectByName(EmailTemplate.class, strTemplate);
+    EmailOptions mailopts = null;
+    EmailFileAttachment attachment = null;
+    Identity mgrIden = null;
+    String finalRecords = null;
+    StringBuilder dataBuilder = null;
+    List records = null;
+    int i;
+    String toAddress = null;
+    for (String mgrName: finalData.keySet()) {
+        toAddress = null;
+        mgrIden = context.getObjectByName(Identity.class, mgrName);
+        String managerEmail = mgrIden.getEmail() != null ?  mgrIden.getEmail().toString() : null;
+        String conMgrIden.getAttribute("externalEmail") != null ? mgrIden.getAttribute("externalEmail").toString() : null;
+      //  if (mgrIden != null @and (mgrIden.getEmail() != null @or mgrIden.getAttribute("externalEmail") != null)) {
+      if(null != managerEmail @or null != conMgrIden){
+            dataBuilder = new StringBuilder();
+            //dataBuilder.append("\"Index\",\"Identity DisplayName\",\"Identity\",\"Application Name\",\"Domain Name\",\"Account Name\",\"Account Expiration\",\"Email\",\"First Name\",\"Last Name\"\n");
+            dataBuilder.append("\"Index\",\"Identity DisplayName\",\"Identity\",\"Manager Name\",\"Contractor Manager Name\",\"Manager External Email \",\"Domain Name\",\"Account Name\",\"Expiration Date\",\"Email\",\"First Name\",\"Last Name\"\n");
+            records = finalData.get(mgrName);
+            i = 0;
+            for (String rec: records) {
+                dataBuilder.append(i.toString());
+                dataBuilder.append(",");
+                dataBuilder.append(rec);
+                dataBuilder.append("\n");
+                i++;
+            }
+            finalRecords = dataBuilder.toString().replaceAll("null", "");
+            log.trace("finalRecords****" + finalRecords);
+            toAddress = managerEmail;
+            if (null != conMgrIden) {
+                toAddress = toAddress + "," + conMgrIden; 
+            }
+            toAddress = toAddress+",rajesh.saka@ascension.org";
+            mailopts = new EmailOptions(toAddress, mailargs);
+            attachment = new EmailFileAttachment(fileName, EmailFileAttachment.MimeType.MIME_CSV, finalRecords.getBytes("UTF-8"));
+            mailopts.addAttachment(attachment);
+            context.sendEmailNotification(template, mailopts);
+        }
+    }
+}
+  
+return finalData;
+ ]]></Source>
+</Rule>

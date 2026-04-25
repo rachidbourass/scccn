@@ -1,0 +1,487 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Gsuite-Email-Provisioning" type="Listener">
+  <Description>This rule can be used when the ObjectAttribute being listened to has changed.</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Rule-GSuite-AccessToken"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-Ascension-ExistingAccount-RuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-Ascension-EmailAddress-RuleLibrary"/>
+  </ReferencedRules>
+  <Signature returnType="void">
+    <Inputs>
+      <Argument name="log" type="org.apache.commons.logging.Log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="environment">
+        <Description>
+          Optional arguments passed from the task executor, if the rule is running within a task.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+          The identity which owns the attribute.
+        </Description>
+      </Argument>
+      <Argument name="attributeDefinition">
+        <Description>
+          The definition of the ObjectAttribute.
+        </Description>
+      </Argument>
+      <Argument name="attributeName">
+        <Description>
+          The name of the ObjectAttribute.
+        </Description>
+      </Argument>
+      <Argument name="oldValue">
+        <Description>
+          The original value of the ObjectAttribute.
+        </Description>
+      </Argument>
+      <Argument name="newValue">
+        <Description>
+          The new value of the ObjectAttribute.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+
+  import org.apache.log4j.Logger;			 
+  import java.util.List; 
+  import java.util.ArrayList; 
+  import sailpoint.api.Provisioner;  
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+  import sailpoint.object.Profile;
+  import sailpoint.object.ProvisioningProject; 
+  import sailpoint.object.Link;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Application;        
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.ProvisioningResult;
+  import sailpoint.object.ProvisioningPlan.AccountRequest.Operation; 
+  import sailpoint.object.Custom;
+  import sailpoint.object.Attributes;
+  import sailpoint.tools.Util;
+  import java.util.Map;
+  import java.util.HashMap;
+  import sailpoint.object.EmailTemplate;
+  import sailpoint.object.EmailOptions;
+  import java.util.Iterator;
+
+  //import sailpoint.connector.ConnectorClassLoader;
+
+  //ClassLoader currentCl = Thread.currentThread().getContextClassLoader();
+  //ClassLoader bakcedUpCl = null;
+  //if(currentCl instanceof ConnectorClassLoader){
+    //bakcedUpCl = currentCl;
+    //Thread.currentThread().setContextClassLoader(currentCl.getParent());
+  //}
+
+  // Logger logger = Logger.getLogger("sailpoint.ascension.rules.gsuite.initilizeattributes");
+  /* sendEmail methos is used to notify manager about email change/gsuite license chane*/
+  public void sendEmail(String identityName,String emailChange,String gsuiteStatusChange, String status){
+    String changeEmailTemplate="Ascension-EmailTemplate-GSuite-EmailChange";
+    String changeGsuiteStatusTemplate="Ascension-EmailTemplate-GSuite-Status-Change";
+    String strMgrId = null;
+    String strIdentityDispName = null; 
+    String email = null;
+    String mgrFN=null;
+    String mgrEmail=null;
+
+    try{
+
+      Map templateArgs = new HashMap();
+      EmailOptions emailOpts = new EmailOptions();
+      EmailTemplate emailTemplate =new EmailTemplate();
+      log.debug("inside send Email- identityName ::"+identityName);
+
+      Identity identity = context.getObjectByName(Identity.class, identityName);
+
+      if(identity != null){
+        strIdentityDispName = identity.getDisplayName(); 
+        if(identity.getManager()!=null){
+          mgrEmail=identity.getManager().getEmail();
+          mgrFirstName=identity.getManager().getAttribute("firstname");
+          mgrFN=identity.getManager().getDisplayName();
+        }
+
+        templateArgs.put("displayName",strIdentityDispName);
+
+        templateArgs.put("primaryEmail",emailChange);
+        templateArgs.put("managerFN",mgrFirstName);
+        templateArgs.put("identityName",identityName);
+        templateArgs.put("previousEmail",identity.getEmail());
+
+        emailOpts.setTo(mgrEmail); 
+
+        String gsuiteApps=null;
+        String gsuiteLicense=null;
+
+        Custom gsuiteObject = context.getObject(Custom.class,"Ascension-Custom-Gsuite");
+        if(gsuiteObject != null){
+          Attributes attr = gsuiteObject.getAttributes();
+          if(attr != null){
+            Map objectMap = attr.getMap();
+            if(objectMap != null){
+              Map gApps=new HashMap();
+              Map autoLicense=new HashMap();
+
+              autoLicense = objectMap.get("gsuite_status_to_autolicense");
+              if(autoLicense!=null){
+                gsuiteLicense=autoLicense.get(status);
+              }
+
+              gApps = objectMap.get("googleApps");
+              if(gApps!=null && gsuiteLicense!=null){
+                gsuiteApps=gApps.get(gsuiteLicense);
+
+              }
+            }
+          }
+        }
+
+        templateArgs.put("status",status);
+        templateArgs.put("identityAppsList",gsuiteApps);
+        templateArgs.put("license",gsuiteLicense);
+        templateArgs.put("docUrl","docUrl");
+        if(gsuiteStatusChange!=null && gsuiteStatusChange.equalsIgnoreCase("empClassChange")  ){
+          emailTemplate = context.getObjectByName(EmailTemplate.class,changeGsuiteStatusTemplate); 
+        }
+        if(gsuiteStatusChange!=null && gsuiteStatusChange.equalsIgnoreCase("typeChange")  ){
+          emailTemplate = context.getObjectByName(EmailTemplate.class,changeEmailTemplate);
+        }
+        if(emailTemplate!=null && emailTemplate!=""){
+          emailTemplate = (EmailTemplate) emailTemplate.deepCopy(context);
+        }				        
+        emailOpts.setVariables(templateArgs);
+        context.sendEmailNotification(emailTemplate, emailOpts);              
+      }	
+    }catch(Exception e){
+      log.error("Send Email step::Exception= "+e.printStackTrace()); 
+      throw e;
+    }
+
+  }
+  /*orgUnitPathValue method used to get the appropriate orgUnitPathValue*/
+  public String orgUnitPathValue(Identity identity){
+
+    String EA40 = "gsuiteStatus";
+    String EA20 = "gsuiteMdm";
+    String emplType = "employeeType";
+    String identityType = identity.getType();
+    Map gsuiteStatusMap=new HashMap();
+    Map statusMap=new HashMap();
+
+    String EA40Value = "";
+    String EA20Value = "";
+    String emplTypeValue = "";
+    List emplClassValues=new ArrayList();
+
+    gsuiteCustomObject = context.getObject(Custom.class,"Ascension-Custom-Gsuite");
+    if(gsuiteCustomObject != null){
+      Attributes attr = gsuiteCustomObject.getAttributes();
+      if(attr != null){
+        Map objectMap = attr.getMap();
+        if(objectMap != null){
+
+          gsuiteStatusMap = objectMap.get("gsuite_status_mapping");        
+          emplClassValues = objectMap.get("emplClassForAutoProvisioning");        
+        }
+      }
+    }
+
+    String GSuiteStatus=null;
+    String empClass=identity.getAttribute("employeeClass");
+
+    if(empClass!=null && emplClassValues.contains(empClass)){
+      GSuiteStatus="CWR_active_mail";
+
+    }else{
+      GSuiteStatus=identity.getAttribute("gsuiteStatus");
+    }
+    if(GSuiteStatus==null){
+      if (Util.nullSafeCaseInsensitiveEq(identityType, "employee") || (Util.nullSafeCaseInsensitiveEq(identityType, "physician") && Util.nullSafeCaseInsensitiveEq(hrType, "EMP"))) {
+        GSuiteStatus="EMP_active";
+      } else if(!(empClass!=null && emplClassValues.contains(empClass))){
+        GSuiteStatus="CWR_active_nomail";
+      }
+      else if((empClass!=null && emplClassValues.contains(empClass))){
+        GSuiteStatus="CWR_active_mail";
+      }
+      else{
+        GSuiteStatus="CWR_active_nomail";
+      }
+    }
+
+    String GSuiteOU=GSuiteStatus+"#";
+    if(identity.getAttribute("gsuiteMdm") != null){
+      GSuiteOU=GSuiteStatus+"#"+identity.getAttribute("gsuiteMdm");
+    }
+    if(identity.getAttribute(EA20) != null){
+      EA20Value = identity.getAttribute(EA20);
+    }
+    if(identity.getAttribute(emplType) != null){
+      emplTypeValue = identity.getAttribute(emplType);
+    }
+
+    String tmpEa40Val = identity.getAttribute(EA40);
+    if(tmpEa40Val==null){ 
+      if (Util.nullSafeCaseInsensitiveEq(identityType, "employee") || (Util.nullSafeCaseInsensitiveEq(identityType, "physician") && Util.nullSafeCaseInsensitiveEq(hrType, "EMP"))) {
+        tmpEa40Val="EMP_active";
+      } 
+      else if(Util.nullSafeCaseInsensitiveEq(identityType, "contractor") && (empClass!=null && emplClassValues.contains(empClass))){
+        tmpEa40Val="CWR_active_mail";
+      }else {
+        tmpEa40Val="CWR_active_nomail";
+      }
+    }
+
+    if(void!=tmpEa40Val && Util.isNotNullOrEmpty(tmpEa40Val)){
+      GSuiteOU = tmpEa40Val.toString()+"#"+EA20Value+"#"+emplTypeValue;         
+    } 
+
+    if(GSuiteStatus!=null && gsuiteStatusMap != null && gsuiteStatusMap.containsKey(GSuiteOU)){
+      String gsuiteString = (String) gsuiteStatusMap.get(GSuiteOU);
+
+      if(gsuiteString != null && !gsuiteString.isEmpty() && gsuiteString.contains("#")){
+
+        String[] splitString = gsuiteString.split("#");
+        if(splitString != null && splitString.length >0){
+
+          return splitString[0]; 
+        }
+      }  
+    } else{
+      return null; 
+    }
+
+
+  }
+  /*To check email is unique or not*/
+  public String checkUniqueEmail(String newMail){
+
+    String newPref= newMail.split("@")[0];
+    String newSuf=newMail.split("@")[1];
+    String dynamicEmail=null;
+    if (newPref!=null && newSuf!=null) {
+
+      dynamicEmail = queryUntilUnique(newPref, newSuf);
+      if(dynamicEmail!=null){
+        return dynamicEmail;
+      }
+
+    }
+    return newMail;
+  }
+  /*modifyGsuiteLicense method used to get the gsuiteLicense/ new email conversion value*/
+  public void modifyGsuiteLicense(String identityName,String valueChange){
+    try{
+      log.debug("inside modify email :::"+identityName);
+      String applicationName = null;
+      String nativeIdentity = null;
+      Iterator linksIterator =null; 
+      String strWorkerStatus=null;
+      Attributes appAttr=null;
+      String org=null;
+      Map map = new HashMap();    
+      String applicationType=null;
+      String newMailId=null;
+      String upn=null;
+      String exEmail=null;
+      String newMsExAtt=null;
+      String mailAd=null;
+      String msExAtt=null;
+      String strEmpClass=null;  
+      String gsuitStatus=null;
+      Map appAttrmap = new HashMap();
+
+
+      ProvisioningPlan plan = new ProvisioningPlan();    
+      Identity id=context.getObject(Identity.class, identityName);
+      log.debug("::Identity= "+id.getName());
+      strEmpClass=id.getStringAttribute("employeeClass");
+      String strEmail=id.getEmail();
+      String hrType=null;
+      String userType=id.getStringAttribute("type");
+      if(userType!=null && userType.equalsIgnoreCase("physician")){
+        hrType= getHRType(id);
+      }
+      String idn=id.getName();
+      plan.setIdentity(id);
+      List linksAccount = (List) id.getLinks();
+      Iterator itrlinksAccount = linksAccount.iterator();
+
+      while(itrlinksAccount.hasNext()){
+        Link account = (Link) itrlinksAccount.next();
+        applicationName = account.getApplicationName();
+        applicationType=account.getApplication().getType(); 
+        nativeIdentity = account.getNativeIdentity();
+        Map appAttrmap=new HashMap();
+        appAttrmap=account.getAttributes();
+        if(applicationName!=null && applicationName.equalsIgnoreCase("GSuite")){
+          mailAd=appAttrmap.get("primaryEmail");
+        }else{
+          mailAd=appAttrmap.get("mail");
+        }
+        if(mailAd != null && (applicationType.equalsIgnoreCase("Active Directory - Direct") || applicationName.equalsIgnoreCase("GSuite"))  && !applicationName.equalsIgnoreCase("AD-AID") ){				
+          msExAtt=appAttrmap.get("msExchExtensionAttribute40");
+          if((userType!=null && userType.equalsIgnoreCase("contractor")) || (hrType!=null && hrType.equalsIgnoreCase("CWR"))){
+
+            if(mailAd.contains("ascension.org")){
+              newMailId=mailAd.replace("ascension.org","ascension-external.org");
+              newMailId=checkUniqueEmail(newMailId);
+            }
+            if(mailAd.contains("ascension-external.org")){
+              newMailId=mailAd;
+            }
+            List emplClassValues=new ArrayList();   
+
+            Custom gsuiteCustomObject = context.getObject(Custom.class,"Ascension-Custom-Gsuite");
+            if(gsuiteCustomObject != null){
+              Attributes attr = gsuiteCustomObject.getAttributes();
+              if(attr != null){
+                Map objectMap = attr.getMap();
+                if(objectMap != null){
+                  emplClassValues = objectMap.get("emplClassForAutoProvisioning");
+                  log.debug("emplClasValues: " + emplClassValues);
+                }
+              }
+            }
+            if(strEmpClass!=null && emplClassValues!=null && emplClassValues.contains(strEmpClass)){        
+              newMsExAtt="CWR_active_mail"; 
+              gsuitStatus="enabled";
+            }else{
+              newMsExAtt="CWR_active_nomail";
+              gsuitStatus="revoked";
+            }
+            if(appAttrmap.get("userPrincipalName")!=null){
+              upn=appAttrmap.get("userPrincipalName").replaceAll("(?i)"+mailAd,newMailId);
+            }
+            if(appAttrmap.get("externalEmailAddress")!=null){
+              exEmail=appAttrmap.get("externalEmailAddress").replaceAll("(?i)"+mailAd,newMailId);
+            }
+          }
+          if((userType!=null && userType.equalsIgnoreCase("employee")) || (hrType!=null && hrType.equalsIgnoreCase("EMP"))){
+            if(mailAd.contains("ascension.org")){
+              newMailId=mailAd;
+            }
+            if(mailAd.contains("ascension-external.org")){
+              newMailId=mailAd.replace("ascension-external.org","ascension.org");
+              newMailId=checkUniqueEmail(newMailId);
+            }
+            if(appAttrmap.get("userPrincipalName")!=null){
+              upn=appAttrmap.get("userPrincipalName").replaceAll("(?i)"+mailAd,newMailId);
+            }
+            if(appAttrmap.get("externalEmailAddress")!=null){
+              exEmail=appAttrmap.get("externalEmailAddress").replaceAll("(?i)"+mailAd,newMailId);
+            }
+            newMsExAtt="EMP_active";
+            // EMP_active or EMP_active_mso
+          }
+          if(newMsExAtt!=null){
+            id.setAttribute("gsuiteStatus",newMsExAtt);
+            context.saveObject(id);
+            context.commitTransaction();
+          }
+        }else{
+          log.error("mailAd is not found for the Application :"+applicationName);
+        }
+        if(newMailId!= null){
+          String prefix = newMailId.replaceAll("@.*","").trim();
+          String suffix = newMailId.replaceAll(".*@","").trim();
+          String proxyAddressQueryResult = "";
+          List proxyAddressList = buildProxyAddressList(id, prefix, suffix);
+          String intendedTargetAddress = buildTargetAddress(id, prefix, suffix);
+          List toRemove = new ArrayList();
+
+          for (String intendedProxyAddress : proxyAddressList) {
+            proxyAddressQueryResult = queryARSForProxyAddressConflict(newMailId);
+
+            if (Util.nullSafeCaseInsensitiveEq(proxyAddressQueryResult, "ProxyAddressConflict")) {
+              log.debug("intendedProxyAddress that is removed from List: " +intendedProxyAddress);
+              toRemove.add(intendedProxyAddress);
+            }
+          }
+          if (proxyAddressList != null && proxyAddressList.size() > 0) {
+            if (toRemove != null && toRemove.size() > 0) {
+              proxyAddressList.removeAll(toRemove);
+            }
+          }
+          if(applicationType!=null && applicationType.equalsIgnoreCase("Active Directory - Direct")  && !applicationName.equalsIgnoreCase("AD-AID") ){
+            AccountRequest acctReq = new AccountRequest();
+            acctReq.setApplication(applicationName);
+            acctReq.setNativeIdentity(nativeIdentity);
+            acctReq.setOperation(ProvisioningPlan.AccountRequest.Operation.Modify);
+            if(valueChange!=null && valueChange.equalsIgnoreCase("empClassChange")){
+              acctReq.add(new AttributeRequest("msExchExtensionAttribute40",newMsExAtt));
+              sendEmail(identityName,strEmail,"empClassChange",newMsExAtt);
+            }
+            if(valueChange!=null && valueChange.equalsIgnoreCase("typeChange")){
+              acctReq.add(new AttributeRequest("mail",newMailId));
+              acctReq.add(new AttributeRequest("userPrincipalName",upn));
+              acctReq.add(new AttributeRequest("externalEmailAddress",exEmail));
+              acctReq.add(new AttributeRequest("msExchExtensionAttribute40",newMsExAtt));
+              acctReq.add(new AttributeRequest("proxyAddresses",proxyAddressList));
+              acctReq.add(new AttributeRequest("targetAddress",intendedTargetAddress));
+              acctReq.add(new AttributeRequest("msExchExtensionAttribute42",""));
+              sendEmail(identityName,newMailId,"typeChange",null);
+            }
+            plan.add(acctReq);
+            if(account.isDisabled() ){
+              AccountRequest enableAcctReq = new AccountRequest();
+              enableAcctReq.setApplication(applicationName);
+              enableAcctReq.setOperation(ProvisioningPlan.AccountRequest.Operation.Enable);
+              enableAcctReq.setNativeIdentity(nativeIdentity);
+              plan.add(enableAcctReq);
+            }
+            org=orgUnitPathValue(id);
+            if(org!=null){
+              id.setAttribute("orgUnitPath",org);
+              context.saveObject(id);
+              context.commitTransaction();
+            }
+          }
+          if(applicationName!=null && applicationName.equalsIgnoreCase("GSuite")){
+            AccountRequest acctGsuite = new AccountRequest();
+            acctGsuite.setApplication(applicationName);
+            acctGsuite.setNativeIdentity(nativeIdentity);
+            acctGsuite.setOperation(ProvisioningPlan.AccountRequest.Operation.Modify);
+            if(org!=null){
+              acctGsuite.add(new AttributeRequest("orgUnitPath",org));
+            }
+            if(newMailId!=null && valueChange!=null && valueChange.equalsIgnoreCase("typeChange")){
+              acctGsuite.add(new AttributeRequest("primaryEmail",newMailId));
+            }
+            // acctGsuite.add(new AttributeRequest("emails","{""address":"jesse.branch2@ascension-dev.org"",""primary":"//true}"));
+            plan.add(acctGsuite);
+          }
+        }else{
+          log.error("newMailId is not Calculated for the application :"+applicationName);
+        }
+      }
+      log.debug("plan is::::"+plan.toXml());
+      if(plan!=null){
+        Provisioner prov=new Provisioner(context);
+        prov.setNoLocking(true);
+        ProvisioningProject project=prov.compile(plan);
+        prov.execute(plan);
+      }
+    }catch(Exception e){
+      log.error("Exception :"+e);
+      e.printStackTrace();
+      throw e;
+    }
+  }
+
+  ]]></Source>
+</Rule>

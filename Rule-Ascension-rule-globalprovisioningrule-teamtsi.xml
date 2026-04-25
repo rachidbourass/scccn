@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-GlobalProvisioningRule-TeamTSI" type="JDBCProvision">
+  <Description>This rule is used by the JDBC connector to do provisioning of the data .</Description>
+  <Signature returnType="ProvisioningResult">
+    <Inputs>
+      <Argument name="log" type="org.apache.commons.logging.Log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+                The application whose data file is being processed.
+                </Description>
+      </Argument>
+      <Argument name="schema">
+        <Description>
+                The Schema currently in use.
+                </Description>
+      </Argument>
+      <Argument name="connection">
+        <Description>
+                A connection object to connect to database.
+                </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+                The ProvisioningPlan created against the JDBC application.
+                </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="result">
+        <Description>
+                A Provisioning Result object is desirable to return the status.IT can be a new object or part of  Provisioning Plan
+                </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+import sailpoint.object.ProvisioningResult;
+import java.util.List;
+import java.sql.ResultSet;
+import sailpoint.object.ProvisioningPlan;
+import sailpoint.object.ProvisioningPlan.AccountRequest;
+import sailpoint.object.ProvisioningPlan.AttributeRequest;
+import sailpoint.object.Identity;
+import java.sql.PreparedStatement;
+import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
+import sailpoint.server.Auditor;
+import sailpoint.object.AuditEvent;
+
+String ruleName = "Ascension - Rule- provisioning - TeamTSI";
+Logger logger = Logger.getLogger("TeamTSI : " + ruleName);
+logger.debug("Start : Global Provisioning Rule of  TeamTSI Application");
+
+ProvisioningResult result = new ProvisioningResult();
+result.setStatus(ProvisioningResult.STATUS_FAILED); 
+
+String userName=null,firstName=null,lastName=null,phoneNumber=null,emailAddress=null,managerEmail=null,managerName=null,CommunityID=null;
+String AccountNativeID=null, targetApplication =null;
+
+  //Update Audit for entitlment removal and leaver profile
+public void updateAudit( String action, String str3)
+{
+	AuditEvent event = new AuditEvent();
+	event.setTarget(userName);
+	event.setAction(action);
+	event.setApplication(targetApplication);
+	event.setAccountName(AccountNativeID);
+	event.setAttributeName("Operation Task Description : " + action);
+	event.setAttribute("Source", action);
+	event.setString1("User Name : "+userName);
+	event.setString2("Email ID : "+emailAddress);
+	event.setString3(str3);
+	Auditor.log(event);
+	context.commitTransaction();
+	logger.debug("Audit succesfully");
+}
+
+public void createRecord()
+{
+	try{
+		logger.debug("Application Name: "+targetApplication+", UserName: "+userName+", Firstname:"+firstName+", Lastname :"+lastName+", Email :"+emailAddress+", Manager name :"+managerName+", Manager Email :"+managerEmail+", Phone Number :"+phoneNumber+", Community ID : "+CommunityID);
+		//Save identity data in CSV
+		PreparedStatement stmt= connection.prepareStatement("insert into TeamTSI(Username,Firstname,Lastname,Phonenumber,ManagerName,ManagerEmail,EmailAddress,Community) values (?,?,?,?,?,?,?,?)");
+		stmt.setString(1, userName);
+		stmt.setString(2, firstName);
+		stmt.setString(3, lastName);
+		stmt.setString(4, phoneNumber);
+		stmt.setString(5, managerName);
+		stmt.setString(6, managerEmail);
+		stmt.setString(7, emailAddress);
+		stmt.setString(8, CommunityID);
+		stmt.execute();
+		connection.commit();
+		stmt.close();
+		updateAudit( "Create Account","Status : Record Created in CSV file");
+	}
+	catch(Exception ex)
+	{
+		logger.debug("Exception in createRecord method : "+ex);
+	}
+}
+
+public void deletRecord()
+{
+	try{
+		logger.debug("Username : "+userName+", Email : "+emailAddress);
+		//extract phonenumber from the records
+		PreparedStatement extPhoneNumberst = connection.prepareStatement("SELECT Phonenumber,Community FROM TeamTSI WHERE Username=? AND EmailAddress=?");
+		extPhoneNumberst.setString(1, userName);
+		extPhoneNumberst.setString(2, emailAddress);
+		ResultSet rst=extPhoneNumberst.executeQuery();
+		CommunityID=",";
+		while(rst.next()) {
+			phoneNumber=(String)rst.getString(1);
+			CommunityID= CommunityID+rst.getInt(2).toString();
+		}
+		rst.close();
+		extPhoneNumberst.close();
+		CommunityID= CommunityID.substring(1);
+		logger.debug("Phone number :"+phoneNumber +" ; Community id :"+CommunityID);	
+		//Remove identity data from CSV
+		PreparedStatement disableAccount = connection.prepareStatement("DELETE FROM TeamTSI WHERE Username=? AND EmailAddress=?");
+		disableAccount.setString(1, userName);
+		disableAccount.setString(2, emailAddress);
+		disableAccount.execute();
+		connection.commit();
+		disableAccount.close();
+		updateAudit( "Delete Account","Status : Record Removed from CSV file");
+	}
+	catch(Exception ex)
+	{
+		logger.debug("Exception deletRecord Method: "+ex);
+	}
+}
+
+public void removeRecord(String comID)
+{
+	logger.debug("Username : "+userName+", Email : "+emailAddress);
+	//Remove identity data from CSV
+	PreparedStatement disableAccount = connection.prepareStatement("DELETE FROM TeamTSI WHERE Username=? AND EmailAddress=? AND Community=?");
+	disableAccount.setString(1, userName);
+	disableAccount.setString(2, emailAddress);
+	disableAccount.setString(3, comID);
+	disableAccount.execute();
+	connection.commit();
+	disableAccount.close();
+	updateAudit( "Remove Account", "Status : Record Removed from CSV file for CommunityID :"+comID);	
+}
+public void extPhoneNumber()
+{	
+	logger.debug(" Extracting phonenumber using details Username : "+userName+", Email : "+emailAddress);
+	//extract phonenumber from the records
+	PreparedStatement extPhoneNumberst = connection.prepareStatement("SELECT Phonenumber FROM TeamTSI WHERE Username=? AND EmailAddress=?");
+	extPhoneNumberst.setString(1, userName);
+	extPhoneNumberst.setString(2, emailAddress);
+	ResultSet rst=extPhoneNumberst.executeQuery();
+	while(rst.next()) {
+		phoneNumber=(String)rst.getString(1);
+		break;
+	}
+	rst.close();
+	extPhoneNumberst.close();
+}
+
+if (plan != null) {	
+	Identity identity = (Identity)plan.getIdentity();
+	List accountRequests = plan.getAccountRequests();
+	if (accountRequests != null) {
+		for (ProvisioningPlan.AccountRequest accReq: accountRequests) {				
+			targetApplication = accReq.getApplication();
+			AccountNativeID = accReq.getNativeIdentity();
+			List attributeRequests = accReq.getAttributeRequests("Community");
+			//Create  ACCOUNT
+			if (accReq.getOperation().equals(ProvisioningPlan.AccountRequest.Operation.Create)){
+				String accountIdentity = accReq.getNativeIdentity();
+				//set identity form data
+				userName=(String)identity.getAttribute("samAccountName");;
+				firstName =identity.getFirstname();
+				lastName=identity.getLastname();
+				emailAddress=(String)identity.getAttribute("email");
+				managerName=(String)identity.getManager().getAttribute("firstname")+" "+identity.getManager().getAttribute("lastname");
+				managerEmail=(String)identity.getManager().getAttribute("email");
+				phoneNumber=(String)accReq.getAttributeRequest("phonenumber").getValue();
+				if (attributeRequests != null) {
+					for (ProvisioningPlan.AttributeRequest attrReq: attributeRequests) {
+						//filtering community id
+						if (attrReq.getValue() instanceof String) 
+						{
+							CommunityID=(String)attrReq.getValue() ;
+							createRecord();
+							result.setStatus(ProvisioningResult.STATUS_COMMITTED);
+							logger.debug("Record inserted in CSV File");
+						}
+						else
+						{
+							logger.debug ("Multiple community selection is not supported");
+						}
+					}
+				}
+			}	
+			
+			//DISABLE & DELETE ACCOUNT
+			if ((accReq.getOperation().equals(ProvisioningPlan.AccountRequest.Operation.Disable))||(accReq.getOperation().equals(ProvisioningPlan.AccountRequest.Operation.Delete))){
+				//set identity data
+				userName = identity.getAttribute("samAccountName");
+				emailAddress=identity.getAttribute("email");
+				deletRecord();
+				accReq.add( new ProvisioningPlan.AttributeRequest( "extphoneNumber", ProvisioningPlan.Operation.Set, phoneNumber));
+				accReq.add( new ProvisioningPlan.AttributeRequest( "extCommunityID", ProvisioningPlan.Operation.Set, CommunityID));
+				result.setStatus(ProvisioningResult.STATUS_COMMITTED);
+				logger.debug("Record removed from CSV file");
+			}
+			
+			//Modify Operations
+			if (accReq.getOperation().equals(ProvisioningPlan.AccountRequest.Operation.Modify)) {
+				if (attributeRequests != null) {
+					for (ProvisioningPlan.AttributeRequest attrReq: attributeRequests) {
+						//REMOVE ENTITLEMENTS
+						if (attrReq.getOperation().equals(ProvisioningPlan.Operation.Remove)) {
+							userName = identity.getAttribute("samAccountName");
+							emailAddress=identity.getAttribute("email");
+							try{
+								if (attrReq.getValue() instanceof String) {
+									CommunityID=attrReq.getValue();
+									extPhoneNumber();
+									removeRecord(CommunityID);
+									result.setStatus(ProvisioningResult.STATUS_COMMITTED);
+									accReq.add( new ProvisioningPlan.AttributeRequest( "extphoneNumber", ProvisioningPlan.Operation.Set, phoneNumber));
+									logger.debug("Record removed from CSV file");
+								}
+								else if (attrReq.getValue() instanceof List) {
+									logger.debug ("Multiple community selection is not supported");
+								}
+							}
+							catch(Exception ex)
+							{
+								logger.debug("Exception in Remove Operation: "+ex);
+							}
+						}
+					}
+				}
+			}			
+		}
+	}
+}
+logger.debug("END : GLobal Provisioning Rule of  TeamTSI Application");
+return result;
+]]></Source>
+</Rule>

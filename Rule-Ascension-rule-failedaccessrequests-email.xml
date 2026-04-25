@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-FailedAccessRequests-Email">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-GSuite"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import sailpoint.object.EmailFileAttachment;
+import sailpoint.object.EmailOptions;
+import sailpoint.object.EmailTemplate;
+
+List listResults = new ArrayList();
+List rows = new ArrayList();
+String SQLStr = "SELECT a.name as AccessRequestNum\r\n"
+				+ "  , a.[requester_display_name] requestor\r\n"
+				+ "  , a.[target_display_name] requestee\r\n"
+				+ "  , b.provisioning_state\r\n"
+				+ "  , b.application\r\n"
+				//+ "  , b.operation\r\n"
+				//+ "  , b.attributes\r\n"
+        + "    , CAST(DATEADD(SECOND, b.created/1000,'1970/1/1') AS datetime) as createddt\r\n"
+				+ "  FROM  [identityiq].[spt_identity_request] a\r\n"
+				+ "  , [identityiq].[spt_identity_request_item] b\r\n"
+				+ "  WHERE a.id = b.identity_request_id\r\n"
+				+ "  AND b.[provisioning_state] like 'Failed%'\r\n"
+        + "  AND b.compilation_status is NULL\r\n"
+				+ "  AND CAST(DATEADD(MILLISECOND, b.created % 1000, DATEADD(SECOND, b.created/1000, '19700101')) AS datetime) >= DATEADD(HOUR, -72, GETDATE());";
+
+public List executeQuery(){
+	Connection conn = context.getJdbcConnection();
+	PreparedStatement ps = conn.prepareStatement(SQLStr);
+  ResultSet rs = ps.executeQuery();
+	try{
+		while(rs.next()) {
+			Map  dataMap = new LinkedHashMap();
+			String reportData = rs.getString("AccessRequestNum")+",\""+rs.getString("requestor")+"\",\""+rs.getString("requestee")+"\","+rs.getString("provisioning_state")+","+rs.getString("application")+","+rs.getString("createddt");
+			rows.add(reportData);
+		}
+	}catch(SQLException sqle){
+		   log.error("SQL Exception: "+sqle);
+    }finally{
+		rs.close();
+		ps.close();
+    }
+	return rows;
+}
+List printData = executeQuery();
+LinkedHashSet lhs = new LinkedHashSet(printData);
+printData.clear();
+printData.addAll(lhs);
+if(printData.size() > 0){
+int i;
+String recordRows = null;
+StringBuilder dataBuilder = null;
+dataBuilder = new StringBuilder();
+dataBuilder.append("\"Access Request Number\",\"Requestor\",\"Requestee\",\"Provisioning State\",\"Application\",\"Created Date\"\n");
+i = 0;
+for (String rec: printData) {
+    dataBuilder.append(rec);
+    dataBuilder.append("\n");
+    i++;
+}
+recordRows = dataBuilder.toString().replaceAll("null", "");
+
+//Setup Email To Send
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HHmmss", Locale.getDefault());
+	String currentDateandTime = sdf.format(new Date());
+    Map mailargs = new HashMap();;
+    String strTemplate = "Ascension-EmailTemplate-Failed-IdentityRequests";
+	  String fileName = "failed-Identity-Requests-"+currentDateandTime+".csv";
+    EmailTemplate template = context.getObjectByName(EmailTemplate.class, strTemplate);
+    EmailOptions mailopts = null;
+    EmailFileAttachment attachment = null;
+	
+	String toAddress = "identitygovernancehcl@ascension.org,cam.weyhrich@ascension.org,amy.goulet@ascension.org,rajesh.saka@ascension.org,sandeep.vemuru@ascension-external.org,karthikeyan.ramalingam@ascension-external.org";
+    mailopts = new EmailOptions(toAddress, mailargs);
+    attachment = new EmailFileAttachment(fileName, EmailFileAttachment.MimeType.MIME_CSV, recordRows.getBytes("UTF-8"));
+    mailopts.addAttachment(attachment);
+    context.sendEmailNotification(template, mailopts);
+}
+	
+  return "";
+  
+  
+   ]]></Source>
+</Rule>

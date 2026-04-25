@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-CWR-AccountExpirationEmail">
+  <Source><![CDATA[
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+  
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.regex.Pattern;
+
+import org.ascn.objectutils.IdentityUtils;
+import org.ascn.utils.DateUtils;
+import org.ascn.reports.*;
+
+import sailpoint.api.SailPointContext;
+import sailpoint.object.Filter;
+import sailpoint.object.Identity;
+import sailpoint.object.Link;
+import sailpoint.object.QueryOptions;
+import sailpoint.tools.GeneralException;
+import sailpoint.tools.Util;
+import sailpoint.object.EmailFileAttachment;
+import sailpoint.object.EmailOptions;
+import sailpoint.object.EmailTemplate;
+DailyCRWExpiration dce = new DailyCRWExpiration("error");
+List reportees = new ArrayList();
+int rDays  = 30;		
+ //String manager = "10174665";
+  String accountExpire = "accountExpires";
+  
+   
+	 public List getManagers(){
+		List outIdn = new ArrayList();
+	  QueryOptions qo = new QueryOptions();
+		 //Filter f = Filter.ignoreCase(Filter.and(Filter.eq("managerStatus", true),Filter.eq("inactive", false), Filter.eq("correlated",true), Filter.eq("name","10375696")));
+     Filter f = Filter.ignoreCase(Filter.and(Filter.eq("managerStatus", true),Filter.eq("inactive", false), Filter.eq("correlated",true)));
+		 qo.addFilter(f);
+		 Iterator iterator = context.search(Identity.class, qo);
+		 while (iterator.hasNext()) {
+      Identity idn = (Identity) iterator.next();
+			outIdn.add(idn);
+		}
+     return outIdn;
+	 }
+public boolean sendEmail(Map finalDataMap, String toAddress){
+	String finalRecords = null;
+	Map mailargs = new HashMap();
+    String strTemplate = "Ascension-EmailTemplate-CWR-AccountExpirationEmail";
+    String fileName = "account_expiration_data.csv";
+    EmailTemplate template = context.getObjectByName(EmailTemplate.class, strTemplate);
+    EmailOptions mailopts = null;
+    EmailFileAttachment attachment = null;
+	dataBuilder = new StringBuilder();
+	dataBuilder.append("\"Index\",\"User Type\",\"User DisplayName\",\"User Name\",\"First Name\",\"Last Name\",\"User Email \",\"Manager Name\",\"Contractor Manager Name\",\"Contractor Manager Email\",\"Domain Name\",\"Account ID\",\"Expiration Date\"\n");
+	  List records  = finalDataMap.get("dataList");
+    int i = 0;
+	  for (String rec: records) {
+        dataBuilder.append(i.toString());
+        dataBuilder.append(",");
+        dataBuilder.append(rec);
+        dataBuilder.append("\n");
+        i++;
+    }
+    finalRecords = dataBuilder.toString().replaceAll("null", "");
+		mailopts = new EmailOptions(toAddress, mailargs);
+    attachment = new EmailFileAttachment(fileName, EmailFileAttachment.MimeType.MIME_CSV, finalRecords.getBytes("UTF-8"));
+    mailopts.addAttachment(attachment);
+    context.sendEmailNotification(template, mailopts);
+  return true;
+}
+Map finalData;
+List managerList = getManagers();
+ 
+if(null != managerList @and !managerList.isEmpty()){
+	for(Identity i : managerList){
+		String managerEmail = i.getEmail() != null ? i.getEmail().toString() : null;
+    String externalEmail = i.getAttribute("externalEmail") != null ? i.getAttribute("externalEmail").toString() : null;
+		String toAddress = null;
+		if(null != managerEmail){toAddress = managerEmail;}
+		else if(null != externalEmail @and null != toAddress){ toAddress = toAddress+","+externalEmail;}
+		else if(null != externalEmail @and null == toAddress){toAddress = externalEmail;}
+		if(null != toAddress){
+    String idnTypes = "contractor,non-hr contractor";
+    List listOfReportees = dce.getFilteredADLinksForManager(i.getName(),rDays,idnTypes);
+    if(null != listOfReportees @and !listOfReportees.isEmpty()){
+         finalData = new HashMap();
+				 finalData.put("dataList",listOfReportees);
+         sendEmail(finalData,toAddress);
+        
+     }else{
+       //DO NOTHING
+     }
+		}
+	}	 
+}
+ ]]></Source>
+</Rule>

@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Emailtemplate-AttributeValue">
+  <Source><![CDATA[
+
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import sailpoint.object.ApprovalItem;
+  import sailpoint.object.ApprovalSet;
+  
+  static Log logger = LogFactory.getLog("rule.emailtemplate.attributemap");
+
+  logger.debug("Entering rule Emailtemplate creating attribute value map");
+
+  String values;
+  HashMap map = new HashMap();
+  if(approvalSet!=null && null != approvalSet.getItems()){
+    List items = approvalSet.getItems();
+    if(null != items){
+      for(ApprovalItem item : items){
+        if(null != item && null != item.getValue() && item.getValue() instanceof String){
+          String attribute = item.getValue();
+          if(null != attribute){
+            String[] arrSplitString = attribute.split(" = ");
+            if( null != arrSplitString.length && arrSplitString.length >0){
+              mapKey = arrSplitString[0];
+              mapvalue = arrSplitString[1]; 
+              map.put(mapKey.trim(),mapvalue.trim());
+            }
+          }
+        }
+        else if(null != item && null != item.getValueList() && item.getValueList() instanceof List){
+          List attrList = item.getValueList();
+          if(attrList != null && !attrList.isEmpty()){
+            for(String attr:attrList){
+              if(null != attr){
+                String[] arrSplit = attr.split(" = ");
+                if( null != arrSplit.length && arrSplit.length >0){
+                  mapKey = arrSplit[0];
+                  mapvalue = arrSplit[1]; 
+                  map.put(mapKey.trim(),mapvalue.trim());
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  logger.debug("Exiting rule Emailtemplate creating attribute value map");  
+  return map;
+  ]]></Source>
+</Rule>

@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-FieldValue-Snow-Company" type="FieldValue">
+  <Description>This rule can be used to generate a field value (eg - an account name) using data from the given Identity. If this rule is run in the context of a workflow step then the arguments passed into the step will also be available. Also, any field values that have been processed so far from the policy related to the Application/Role will be available.</Description>
+  <Signature returnType="String"/>
+  <Source><![CDATA[
+  import sailpoint.object.Identity;
+  import sailpoint.object.Custom;
+  import sailpoint.tools.Util;
+
+
+  String identityCompany = "";
+  String identityMinistry = "";
+  if(null != identity){
+    identityCompany = identity.getStringAttribute("company");
+    identityMinistry = identity.getStringAttribute("ministry");
+    if(Util.isNotNullOrEmpty(identityMinistry)){
+      Custom custom = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");
+      HashMap companies = new HashMap();
+      if(custom != null ){
+        if( custom.get("SnowCompanyMapping") !=null){
+          companies = custom.get("SnowCompanyMapping");
+        }
+        //comment decache //context.decache(custom);
+      }
+
+      if(!Util.isEmpty(companies) && Util.isNotNullOrEmpty(companies.get(identityMinistry))){
+        identityCompany = companies.get(identityMinistry);         
+      }
+      if(Util.nullSafeCaseInsensitiveEq(identityMinistry,"CHIMCO")){
+        identityCompany = "MOSTL";         
+      }
+    }
+  }
+
+  return identityCompany;
+  ]]></Source>
+</Rule>

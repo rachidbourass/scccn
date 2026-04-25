@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-DoctorMaster-Provisioning" type="JDBCProvision">
+  <Description>This rule is used by the JDBC connector to do provisioning of the data .</Description>
+  <Signature returnType="ProvisioningResult">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application whose data file is being processed.
+        </Description>
+      </Argument>
+      <Argument name="schema">
+        <Description>
+          The Schema currently in use.
+        </Description>
+      </Argument>
+      <Argument name="connection">
+        <Description>
+          A connection object to connect to database.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan created against the JDBC application.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="result">
+        <Description>
+          A Provisioning Result object is desirable to return the status.IT can be a new object or part of  Provisioning Plan
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+
+  import java.sql.Connection;
+  import java.sql.PreparedStatement;
+  import java.sql.SQLException;
+  import java.sql.Statement;
+
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.ProvisioningResult;
+
+  import sailpoint.tools.Util;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+ 
+
+  Log logger = LogFactory.getLog("rule.Ascension-Rule-DoctorMaster-Provisioning");
+  /**
+	 * Check Plan for user account creation
+	 * @param na 
+	 * @return viod
+	 */
+  public void provisionDrMaster(){
+    logger.debug("provisionDrMaster Starting");
+    Map dataMap = new HashMap();
+
+    PreparedStatement preparedStatement = null;
+    //DocD48,DocH48,DocP48,DocS48,DocT40,DocM45,docName,npi,docType,TypeD48,TypeH48,TypeP48,TypeS48,TypeT40,TypeM45,ReqType,submitEmail,RecID
+    String insertQuery = "INSERT INTO ReqInvPRDOC (DocD48,DocH48,DocP48,DocS48,DocT40,DocM45,docName,npi,docType,TypeD48,TypeH48,TypeP48,TypeS48,TypeT40,TypeM45,ReqType,submitEmail,RecID) " +
+      "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    try{
+      if(plan!=null && connection != null){
+        if(Util.isNotNullOrEmpty(plan.getString("identityRequestId"))){
+          identityRequestId = plan.getString("identityRequestId");
+        }
+        if(plan.getAccountRequests()!=null){
+          for(AccountRequest accReq : plan.getAccountRequests()){
+            if(accReq != null && accReq.getAttributeRequests()!=null && !accReq.getAttributeRequests().isEmpty()){
+              dataMap = new HashMap();
+              for(AttributeRequest attReq : accReq.getAttributeRequests()){
+                dataMap.put(attReq.getName(),attReq.getValue());
+              }
+              /////// insert into DB 
+              if(preparedStatement==null){
+                preparedStatement = connection.prepareStatement(insertQuery);
+              }
+              if(preparedStatement==null){
+                result.addError("Unable to create prepared statement.");
+                result.setStatus(ProvisioningResult.STATUS_FAILED);
+              }else{
+                preparedStatement.setString(1, dataMap.get("DocD48")!=null?dataMap.get("DocD48").toString().trim():"");
+                preparedStatement.setString(2, dataMap.get("DocH48")!=null?dataMap.get("DocH48").toString().trim():"");
+                preparedStatement.setString(3, dataMap.get("DocP48")!=null?dataMap.get("DocP48").toString().trim():"");
+                preparedStatement.setString(4, dataMap.get("DocS48")!=null?dataMap.get("DocS48").toString().trim():"");
+                preparedStatement.setString(5, dataMap.get("DocT40")!=null?dataMap.get("DocT40").toString().trim():"");
+                preparedStatement.setString(6, dataMap.get("DocM45")!=null?dataMap.get("DocM45").toString().trim():"");
+                preparedStatement.setString(7, dataMap.get("docName")!=null?dataMap.get("docName").toString().trim():"");
+                preparedStatement.setString(8, dataMap.get("npi")!=null?dataMap.get("npi").toString().trim():"");
+                preparedStatement.setString(9, dataMap.get("docType")!=null?dataMap.get("docType").toString().trim():"");
+                preparedStatement.setString(10, dataMap.get("TypeD48")!=null?dataMap.get("TypeD48").toString().trim():"");
+                preparedStatement.setString(11, dataMap.get("TypeH48")!=null?dataMap.get("TypeH48").toString().trim():"");
+                preparedStatement.setString(12, dataMap.get("TypeP48")!=null?dataMap.get("TypeP48").toString().trim():"");
+                preparedStatement.setString(13, dataMap.get("TypeS48")!=null?dataMap.get("TypeS48").toString().trim():"");
+                preparedStatement.setString(14, dataMap.get("TypeT40")!=null?dataMap.get("TypeT40").toString().trim():"");
+                preparedStatement.setString(15, dataMap.get("TypeM45")!=null?dataMap.get("TypeM45").toString().trim():"");
+                preparedStatement.setString(16, dataMap.get("ReqType")!=null?dataMap.get("ReqType").toString().trim():"");
+                preparedStatement.setString(17, dataMap.get("submitEmail")!=null?dataMap.get("submitEmail").toString().trim():"");
+                preparedStatement.setString(18, identityRequestId);
+                int rsValue=preparedStatement.executeUpdate();
+
+                if(rsValue==1){
+                  //result.setStatus(ProvisioningResult.STATUS_COMMITTED);
+                }else{
+                  result.setStatus(ProvisioningResult.STATUS_FAILED);
+                }
+              }
+              /////
+            }
+          }
+        }
+      }
+      if( !ProvisioningResult.STATUS_FAILED.equalsIgnoreCase(result.getStatus())){
+        result.setStatus(ProvisioningResult.STATUS_COMMITTED);
+      }
+    }catch(Exception e){
+      logger.error("Exception : "+e.getMessage());
+      result.addError(e.getMessage());
+      result.setStatus(ProvisioningResult.STATUS_FAILED);
+    } finally {
+      try {
+        if (preparedStatement != null) {
+          preparedStatement.close();
+        }
+        if (connection != null) {
+          connection.close();
+        }
+      } catch (SQLException e) {
+        // TODO Auto-generated catch block
+        logger.error("Exception : "+e.getMessage());
+        result.addError(e.getMessage());
+      }
+    }
+    logger.debug("provisionDrMaster Endiing");
+  }
+
+  ////////
+   logger.debug("Doctor master Provisioning Rule Start");
+ 
+  String identityRequestId = "";
+  ProvisioningResult result = new ProvisioningResult();
+  provisionDrMaster();
+   logger.debug("Doctor master Provisioning Rule End");
+  return result;
+  ]]></Source>
+</Rule>

@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-EndDateCleanup-ByIdentityType">
+  <Description>Deletes ctrexpDt Identity Attribute from target Identites. May also result in follow up write backs to Active Directory to clear accountExpires values (although that is not the primary intent of this rule).</Description>
+  <Signature returnType="Object"/>
+  <Source><![CDATA[
+
+  import sailpoint.api.Identitizer;
+  import sailpoint.api.Provisioner;
+  import sailpoint.server.Auditor;
+  import sailpoint.object.Attributes;
+  import sailpoint.object.AuditEvent;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.Util;
+
+  String expirationDateAttr = "ctrexpDt";
+  List identityTypes = Util.csvToList("employee,physician");
+
+  QueryOptions ops = new QueryOptions();
+  ops.setCloneResults(true);
+  ops.addFilter(Filter.notnull(expirationDateAttr));
+  ops.addFilter(Filter.in("type",identityTypes));
+
+  Provisioner provisioner = new Provisioner(context);
+  provisioner.setDoRefresh(false);
+  provisioner.setNoRoleExpansion(true);
+
+  Iterator itr = context.search(Identity.class, ops, "id,ctrexpDt");
+
+  while (itr.hasNext()) {
+
+    Object[] next = (Object[]) itr.next();
+
+    String identityId = next[0];
+    String ctrexpDt = next[1];
+
+    Identity identity = context.getObjectById(Identity.class, identityId);
+
+    if (identity != null) {
+
+      String targetApp = "IIQ";
+      String identityName = identity.getName();
+
+      AuditEvent auditEvent = new AuditEvent(expirationDateAttr + "-CleanupTask", "Comment", identityName);
+      auditEvent.setApplication(targetApp);
+      auditEvent.setAccountName(identityName);
+      auditEvent.setString1("Next Identity To Be Evaluated: " + identityName);
+      Auditor.log(auditEvent);
+      context.commitTransaction();
+
+      // Intialize Plan
+
+      ProvisioningPlan plan = new ProvisioningPlan();
+      plan.setNativeIdentity(identityName);
+
+      // Build AccountRequest 
+
+      accountReq = new AccountRequest();
+
+      accountReq.setOperation(AccountRequest.Operation.Modify);
+      accountReq.setNativeIdentity(identityName);
+      accountReq.setApplication(targetApp);
+
+      // Build AttributeRequests
+
+      AttributeRequest attributeReq = new AttributeRequest(expirationDateAttr, null);
+      attributeReq.setOp(ProvisioningPlan.Operation.Set);
+      accountReq.add(attributeReq);
+
+      // Finalize Plan
+
+      List accountReqList = new ArrayList();
+
+      if (accountReq != null) {
+
+        accountReqList.add(accountReq);
+        plan.setAccountRequests(accountReqList);
+        plan.setIdentity(identity);
+
+      }
+
+      // Process Plan (Clear ctrExpDt on target Identity)
+
+      if (plan != null) {
+
+        provisioner.execute(plan);
+
+      }
+
+      // Decache Identity object, flush Identity variable, and lookup Identity again via hibernate for current representation.
+
+      context.decache(identity);
+      identity = null;
+
+      if (identity == null) {
+
+        Identity identity = context.getObjectById(Identity.class, identityId);
+
+        if (identity != null) {
+
+          identityName = identity.getName();
+          identityType = identity.getType();
+
+          if (identity.getAttribute(expirationDateAttr) == null) {
+
+            // Record Successful Cleanup via AuditEvent
+
+            AuditEvent auditEvent = new AuditEvent(expirationDateAttr + "-CleanupTask", "Comment", identityName);
+            auditEvent.setApplication(targetApp);
+            auditEvent.setAccountName(identityName);
+            auditEvent.setString1(expirationDateAttr + " successfully cleared from Identity: " + identityName);
+            auditEvent.setString2(expirationDateAttr + " was " + ctrexpDt);
+            auditEvent.setString3("Identity Type is " + identityType);
+            Auditor.log(auditEvent);
+            context.commitTransaction();
+
+            Map refreshMap = new HashMap();
+            refreshMap.put("synchronizeAttributes",true);
+
+            Attributes refreshAttributes = new Attributes(refreshMap);
+
+            if (refreshAttributes != null) {
+
+              Identitizer identitizer = new Identitizer(context,refreshAttributes);
+              identitizer.refresh(identity);
+
+              context.saveObject(identity);
+              context.commitTransaction();
+
+              auditEvent = new AuditEvent(expirationDateAttr + "-CleanupTask", "Comment", identityName);
+              auditEvent.setApplication(targetApp);
+              auditEvent.setAccountName(identityName);
+              auditEvent.setString1("Follow Up Identity Refresh (Attribute Sync) Launched For: " + identityName);
+              Auditor.log(auditEvent);
+              context.commitTransaction();
+
+            }
+
+
+          } else if (identity.getAttribute(expirationDateAttr) != null) {
+
+            // Record Unsuccessful Cleanup via AuditEvent
+
+            AuditEvent auditEvent = new AuditEvent(expirationDateAttr + "-CleanupTask", "Comment", identityName);
+            auditEvent.setApplication(targetApp);
+            auditEvent.setAccountName(identityName);
+            auditEvent.setString1(expirationDateAttr + " was NOT cleared from Identity: " + identityName);
+            auditEvent.setString2(expirationDateAttr + " is " + ctrexpDt);
+            auditEvent.setString3("Identity Type is " + identityType);
+            auditEvent.setString4("Clarification: " + "This was not an expected outcome. The Identity will be retried on the next run of the cleanup task; however, manual action may be required to resolve underlying cause.");
+            Auditor.log(auditEvent);
+            context.commitTransaction();
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+  ]]></Source>
+</Rule>

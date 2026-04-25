@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Extend-Contractor-Expiration-Date">
+  <Source><![CDATA[
+ /* import org.ascension.utils.ASCNDateFunctions;
+  
+  ASCNDateFunctions adf = new ASCNDateFunctions();
+  
+ 
+    if(null != value){
+      return adf.validateEndDate(value);
+    }
+  else{
+  	return "User must select the date value";
+  }
+  
+  */
+ import java.text.SimpleDateFormat;
+  import java.text.ParseException;
+  import sailpoint.tools.Util;
+  if(value!=null)
+  {
+    try
+    {
+      System.out.println("value****"+value);
+     
+      Date today=new Date();
+      if(value!=null){
+        int diff= Util.getDaysDifference(value,today);
+        System.out.println("diff****"+diff);
+        if(!(diff>0 @and diff<367)){
+            return "Please select date range between below 365 days";
+        }
+      }else{
+              return "Its mandatory to select the date";
+      }
+    }
+    catch (Exception ex)
+    {
+      return "Invalid Date Format";
+    }
+  }
+ 
+]]></Source>
+</Rule>

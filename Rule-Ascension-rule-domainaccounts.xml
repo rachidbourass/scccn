@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-DomainAccounts">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-GSuite"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+  import sailpoint.object.Identity;
+  import sailpoint.tools.Util;
+  List outList;
+public static void updateDomainAccountAttribute(String idnName){ 
+	Identity idn = context.getObjectByName(Identity.class,idnName);
+	List<Link> idnLinks = getIdADLinks(idn);
+	if(null != idn @and null != idnLinks){
+        outList = new ArrayList();
+        for(Link l : idnLinks){
+            Object displayName = l.getDisplayName();
+            outList.add(displayName);
+            
+				}
+   			idn.setAttribute("domainAccounts",outList);
+            context.saveObject(idn);
+            context.commitTransaction();
+            context.decache(idn);
+	}
+}
+  
+  List<String> idNameList = new ArrayList();
+  
+  String executionType = "bulk";
+  if("bulk".equalsIgnoreCase(executionType)){
+		idNameList = getActiveIdentityNamesByIDAttribute("company","FLJAC");
+		for(String n : idNameList){
+				updateDomainAccountAttribute(n);
+    }
+  }else{
+      updateDomainAccountAttribute("10175004");
+    }
+  
+  
+// return outList;
+  ]]></Source>
+</Rule>

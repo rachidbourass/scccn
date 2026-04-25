@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-EmailTemplate-Testing">
+  <Source><![CDATA[
+
+
+import sailpoint.object.ApprovalSet;
+import sailpoint.object.EmailOptions;
+import sailpoint.object.EmailTemplate;
+import sailpoint.object.WorkItem;
+import sailpoint.object.Workflow;
+
+String templateName = "Ascension-EmailTemplate-TerminationAdvanceNotification-Amita";
+
+String toAddress = "jonathan.zelkowski@ascension.org";
+
+Map params = new HashMap();
+params.put("approvalSet", new ApprovalSet());
+params.put("workitem", new WorkItem());
+params.put("workflow", new Workflow());
+params.put("launcher", "mockLauncher");
+params.put("identityName", "mockIdentityName");
+params.put("identityDisplayName", "mockIDisplayName");
+
+
+EmailTemplate emailTemplate = context.getObjectByName(EmailTemplate.class, templateName);
+EmailOptions emailOptions = new EmailOptions(toAddress, params);
+
+if (emailTemplate != null && emailOptions != null) {
+
+  context.sendEmailNotification(emailTemplate, emailOptions);
+
+  return "Email Should Have Been Sent...";
+
+}
+
+return "End of Rule";
+  ]]></Source>
+</Rule>

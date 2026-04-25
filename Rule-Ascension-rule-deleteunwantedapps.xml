@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-DeleteUnwantedApps">
+  <Description>This rule is used to select an Identity that is related to the given Identity</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The identity.
+        </Description>
+      </Argument>
+      <Argument name="roleName" type="String">
+        <Description>
+          The name of the sailpoint.object.Bundle (role) that is being selected for the Identity. 
+          If roles are not applicable to this Identity selection, this value will be void.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="success">
+        <Description>
+          True if the selection was successful; false otherwise.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+  import sailpoint.tools.Util;
+  import java.util.ArrayList;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Application;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Custom;
+
+  List deleteApps=new ArrayList();
+  int count=0;
+  
+  Custom appLsit = context.getObjectByName(Custom.class,"ProcessApps");
+  if(appLsit!=null){
+    deleteApps = appLsit.getList("deleteApps");        
+  }
+  if(deleteApps!=null){
+    for(String appName:deleteApps){
+      count++;
+      Application deleteApp=context.getObjectByName(Application.class, appName);
+      if(deleteApp.getType()==null){
+      context.removeObject(deleteApp);
+      context.commitTransaction();
+      }
+    }
+  }
+  retuturn count;
+
+  ]]></Source>
+</Rule>

@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Create-Entitlement">
+  <Description>An rule that is executed when Ascension Create Entitlement task is executed. This gives the customer the ability to create Entitlement if filepath is passed using task. 
+
+    This rule will be called for any file and update the displayname or attributes passed in a file prepared.</Description>
+  <Source><![CDATA[
+  import sailpoint.connector.DelimitedFileConnector;
+  import sailpoint.object.Application;
+  import sailpoint.object.Attributes;
+  import sailpoint.object.ManagedAttribute; 
+  import sailpoint.api.ManagedAttributer;
+  import sailpoint.object.TaskResult; 
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+  import sailpoint.tools.Message;
+  import sailpoint.tools.Util;  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  Log Logger = LogFactory.getLog("rule.create.managedattribute");
+
+  int failedCount = 0;
+  int count = 0;
+  String file = null;
+  String groupName = null;
+  String resultMsg = null;
+  List propValues = new ArrayList();  
+  HashMap map = new HashMap();
+  HashMap oldValueMap = new HashMap();
+
+  Application app = null; 
+  ManagedAttribute managedAttr = null;
+
+  Set set = new HashSet();
+  set.add("application");
+  set.add("type");
+  set.add("value");
+  set.add("attribute");
+  set.add("displayName");
+  set.add("requestable");
+  set.add("sysDescriptions");
+
+  if (config != null && config instanceof Map){
+    if(config.get("filePath") != null){
+      taskResult.addMessage(Message.info("assigned filePath: " + config.get("filePath")));
+      file = config.get("filePath");
+    }
+    else{
+      taskResult.addMessage(Message.warn("File path is empty"));
+    }
+  }
+
+  if(Util.isNotNullOrEmpty(file)){
+    BufferedReader br = null;   
+
+    try{
+      br = new BufferedReader(new FileReader(file));
+      if (br!=null){
+
+        String sCurrentLine;
+        String fileHeader = br.readLine();
+        List headerValues= Util.csvToList(fileHeader);
+        if (headerValues != null && !headerValues.isEmpty())  {
+
+          while ((sCurrentLine = br.readLine()) != null) {
+            try{
+              if (sCurrentLine!=null)
+              {               
+                Attributes attributes = new Attributes();
+                propValues= Util.csvToList(sCurrentLine); 
+                map = DelimitedFileConnector.defaultBuildMap(headerValues,propValues);                
+
+                if( map != null && !map.isEmpty()){
+                  app = context.getObjectByName(Application.class, map.get("application"));
+
+                  groupName = map.get("value");
+                  if(Util.isNotNullOrEmpty(groupName)){
+
+                    QueryOptions qo = new QueryOptions();
+                    qo.addFilter(Filter.eq("application", app));
+                    qo.addFilter(Filter.eq("value", groupName));
+                    qo.addFilter(Filter.eq("attribute", map.get("attribute")));
+
+                    List foundGroup = context.getObjects(ManagedAttribute.class, qo);
+                    if ( foundGroup != null && !foundGroup.isEmpty() && foundGroup.size() == 1) {
+                      managedAttr = foundGroup.get(0);
+                      if(null != managedAttr && Util.isNotNullOrEmpty(map.get("displayName")) && !Util.nullSafeEq(map.get("displayName"), managedAttr.getDisplayableName(), true)){
+                        managedAttr.setDisplayName(map.get("displayName"));
+                      }
+                      
+                      if(null != managedAttr && null != managedAttr.getAttributes()){                    
+                        oldValueMap = managedAttr.getAttributes().getMap();
+                        if(null != oldValueMap && !oldValueMap.isEmpty() && map.keySet().removeAll(set)){
+                          List attributeList = new ArrayList(map.keySet());
+                          if (attributeList != null && !attributeList.isEmpty()) {
+                            for(String eachAttribute : attributeList) {
+                              if ( !Util.nullSafeEq(map.get(eachAttribute), oldValueMap.get(eachAttribute), true)){
+                                oldValueMap.put(eachAttribute,map.get(eachAttribute));
+                              }
+                            }
+                          }
+                          attributes.setMap(oldValueMap);
+                          managedAttr.setAttributes(attributes);
+                        }
+                      }
+                    }
+                    else{
+                      managedAttr = new ManagedAttribute();
+                      String value = map.get("requestable");
+                      boolean b = Boolean.parseBoolean(value);
+
+                      managedAttr.setApplication(app);
+                      managedAttr.setRequestable(b);
+                      managedAttr.setDisplayName(map.get("displayName"));
+                      managedAttr.setAttribute(map.get("attribute"));                   
+                      managedAttr.setType(map.get("type"));
+                      managedAttr.setValue(map.get("value"));
+                      if(map.keySet().removeAll(set)){
+                        attributes.setMap(map);
+                        if(null != attributes && !attributes.isEmpty()){
+                          managedAttr.setAttributes(attributes);
+                        }
+                      }                     
+                    }
+                    context.saveObject(managedAttr);
+                    context.commitTransaction();
+                    count++;
+                  }
+                }
+              }
+            }
+            catch(Exception e){
+              ++failedCount;
+              Logger.error("Error with line: " + sCurrentLine);
+              taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+            }
+          }
+        }
+        else{
+          taskResult.addMessage(Message.warn("File is Empty"));
+        }
+      }
+    }
+    catch (java.io.FileNotFoundException e) {
+      Logger.error( "failed to find file: {0}"+e.getMessage());
+      taskResult.addMessage(Message.error("failed to find file "+e.getMessage()));
+      return "Error in processing";
+    }
+    catch(Exception exp){
+      Logger.error("General Error"+exp.getMessage());
+      taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+      taskResult.addMessage(Message.error("Error in processing "+exp.getMessage()));
+      return "Error in processing";
+
+    }finally {
+      try {
+        br.close();      
+      } catch (Exception excep){
+        Logger.error("Error closing connection: " +excep.getMessage());
+        taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+        taskResult.addMessage(Message.error("Error in processing "+excep.getMessage()));
+        return "Error in processing";
+      }
+    }   
+    String resultMsg = ("Total Processed: " + count + ", Error Count: " + failedCount);
+    context.commitTransaction();
+    context.decache();
+    taskResult.addMessage(Message.info(resultMsg,null));
+  }  
+
+  return "Total Processed: " + count + ", Error Count: " + failedCount;
+  ]]></Source>
+</Rule>

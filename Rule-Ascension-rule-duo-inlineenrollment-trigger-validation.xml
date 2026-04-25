@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-DUO-InlineEnrollment-Trigger-Validation" type="IdentityTrigger">
+  <Description>This rule can be used for Certification Events that use rule triggers. The previousIdentity and newIdentity hold snapshots of the identity before the update has occurred and the state of the identity after the update, respectively.</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-DUO-InlineEnrollment"/>
+  </ReferencedRules>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="previousIdentity">
+        <Description>
+          The identity before the refresh/aggregation (this will be null when an
+          identity is created).
+        </Description>
+      </Argument>
+      <Argument name="newIdentity">
+        <Description>
+          The identity after the refresh/aggregation (this will be null when an
+          identity is deleted).
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="result">
+        <Description>
+          A boolean describing the result of the rule.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+	import java.util.List;
+	import sailpoint.object.Custom;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.Identity;
+  Custom custom=context.getObjectByName(Custom.class,"Ascension-Custom-DUO-InlineEnrollment");		
+	//log.error("AppNames in custom object*******"+custom.getAttributes().keySet());
+  AccountRequest accReq = null;
+  String identityName = newIdentity.getName();
+	if(getDuoCreated(newIdentity,"Duo")){
+			List grps = null;
+			String chkGrp=null;
+			String addGrp=null;
+			for (String appName: custom.getAttributes().keySet()) {
+				grps = custom.get(appName);		
+				for(String splitGroups:grps){
+					chkGrp = splitGroups.split("##")[0];
+					addGrp = splitGroups.split("##")[1];
+					if (isAppExist(identityName, appName) @and isGroupExisted(identityName, chkGrp, appName) @and !isGroupExisted(identityName, addGrp, appName)) {
+						return true;
+					}
+				}
+			}		
+		}else if (newIdentity.getAttribute("employeeId") != null @or isAppExist(identityName, "Azure")) {
+			List grps = null;
+			String chkGrp=null;
+			String addGrp=null;
+			for (String appName: custom.getAttributes().keySet()) {
+				grps = custom.get(appName);		
+				for(String splitGroups:grps){
+					chkGrp = splitGroups.split("##")[1];
+					addGrp = splitGroups.split("##")[0];
+					if (isAppExist(identityName, appName) @and isGroupExisted(identityName, chkGrp, appName) @and!isGroupExisted(identityName, addGrp, appName)) {
+						return true;
+					}
+				}
+			}
+		}
+  
+  return false;]]></Source>
+</Rule>
