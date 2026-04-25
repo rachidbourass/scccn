@@ -1,0 +1,508 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="ASCN-Rule-Opsadminconsole-Rulelibrary">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+
+  import java.util.ArrayList;
+  import java.util.Arrays;
+  import java.util.Date;
+  import java.util.HashMap;
+  import java.util.HashSet;
+  import java.util.List;
+
+  import java.util.Map;
+  import java.util.Set;
+  import java.util.Iterator;
+
+  import sailpoint.api.IdentityService;
+  import sailpoint.api.ObjectUtil;
+  import sailpoint.api.Provisioner;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.api.Workflower;
+  import sailpoint.api.TaskManager;
+  import sailpoint.object.Application;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.IdentityRequest;
+  import sailpoint.object.IdentityRequestItem;
+  import sailpoint.object.Link;
+
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.ProvisioningPlan.Operation;
+
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.ResourceObject;
+
+  import sailpoint.object.Workflow;
+  import sailpoint.object.WorkflowLaunch;
+
+  import sailpoint.object.AuditEvent;
+  import sailpoint.object.TaskDefinition;
+  import sailpoint.object.TaskResult;
+  import sailpoint.object.TaskResult.CompletionStatus;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.Util;
+
+  import sailpoint.object.Rule;  
+  import sailpoint.api.Aggregator;
+  import sailpoint.connector.Connector;
+
+  import sailpoint.object.IdentityTrigger;
+  import sailpoint.object.IdentityChangeEvent;
+
+  import org.ascn.utils.GeneralUtils;
+  import sailpoint.object.IdentityEntitlement;
+  import sailpoint.object.Attributes;
+  import java.util.regex.Pattern;
+  import java.util.regex.Matcher;
+  import sailpoint.server.Auditor;
+  import org.apache.log4j.Logger;
+  import org.apache.log4j.Level;
+
+  import javax.naming.InvalidNameException;
+  import javax.naming.ldap.LdapName;
+
+  String logName = "org.ascn.rule.ops.console.rulelibrary";
+
+  public void launchWorkflow(String identityName,ProvisioningPlan plan,String comments,String flow){
+    debug(logName,"OPSLOG launchWorkflow called for user:"+identityName);
+    try {
+      HashMap launchArgsMap = new HashMap();
+      WorkflowLaunch wflaunch = new WorkflowLaunch();
+      String workflowName = "ASCN-Workflow-Opsadminconsole-LcmProvisioning";
+      String requestName = "ASCN-Workflow-Opsadminconsole-LcmProvisioning for " + identityName;
+      Workflow workflow = (Workflow) context.getObjectByName(Workflow.class, workflowName);
+
+      launchArgsMap.put("identityName", identityName); 
+      launchArgsMap.put("plan",plan);     
+      launchArgsMap.put("flow",flow);   
+      launchArgsMap.put("approvalScheme","none");
+      launchArgsMap.put("retry","true");
+      launchArgsMap.put("workItemComments",comments);
+      launchArgsMap.put("workflow",workflow);
+      wflaunch.setWorkflowName(workflowName);      
+      wflaunch.setWorkflowRef(workflowName);    
+      wflaunch.setCaseName(requestName);   
+      wflaunch.setVariables(launchArgsMap); 
+      Workflower workflower = new Workflower(context);
+      WorkflowLaunch launch = workflower.launch(wflaunch);
+      debug(logName,"launchWorkflow launched for user:"+launch);     
+    } catch (Exception e) {     
+      error(logName,"Exception during launchWorkflow::"+e,e);  
+    }
+    return;
+  }
+
+  public void launchWorkflow(String identityName,String workflowName,String launcher, Boolean sendMail,String comments){
+    debug(logName,"OPSLOG launchWorkflow called for user:"+identityName);  
+    try {
+      IdentityTrigger trigger = new IdentityTrigger();
+
+      trigger.setName("OpsConsoleJoinerTrigger");
+
+      HashMap launchArgsMap = new HashMap();
+      String requestName = workflowName+" "+ identityName;
+      debug(logName,"OPSLOG requestName is:"+requestName);
+
+      launchArgsMap.put("event", null);
+      launchArgsMap.put("launcher", launcher);   
+      launchArgsMap.put("identityName", identityName); 
+      launchArgsMap.put("trigger", trigger); 
+      launchArgsMap.put("retry","true"); 
+      launchArgsMap.put("flow","Ops Joiner"); 
+
+      WorkflowLaunch wflaunch = new WorkflowLaunch();
+      Workflow wf = (Workflow) context.getObjectByName(Workflow.class, workflowName);
+      wflaunch.setWorkflowName(wf.getName());
+      wflaunch.setWorkflowRef(wf.getName());
+
+      wflaunch.setCaseName(requestName);
+      wflaunch.setVariables(launchArgsMap);
+      Workflower workflower = new Workflower(context);
+      WorkflowLaunch launch = workflower.launch(wflaunch);      
+    } catch (Exception e) {
+      error(logName,"Exception during launchWorkflow::"+e,e);      
+    }
+  }
+
+  public ProvisioningPlan getIdentityCubePlan(String employee,String attrName,String newValue){  
+    ProvisioningPlan plan = new ProvisioningPlan();
+    try {
+      plan.setIdentity(context.getObject(Identity.class, employee));
+      if(attrName.equalsIgnoreCase("Inactive")){
+        boolean flag = false;
+        if(newValue.equalsIgnoreCase("true")){
+          boolean flag = true;
+        }
+        plan.add("IIQ", identityName, attrName, ProvisioningPlan.Operation.Set, flag);
+      }
+
+      plan.add("IIQ", identityName, attrName, ProvisioningPlan.Operation.Set, newValue);
+      debug(logName,"getIdentityCubePlan");	  
+
+    }catch (Exception e) {
+      error(logName,"Exception during launchWorkflow::"+e,e);
+    } 
+    return plan;
+  }
+
+
+  
+
+  public String singleAccountAggregation(String applicationName,String singleAggAccountName){
+    ResourceObject rObj = null;
+    ResourceObject newRObj  = null;  
+    String customSingleAggKey = "SingleAccAggAttributes";
+    String opsconCustomObjectName = "ASCN-Custom-Opsadminconsole";
+    String finalResult = "";
+    log.error("singleAccountAggregation 1");
+    try {
+      Application appObject = context.getObjectByName(Application.class, applicationName);     
+      String appConnName = appObject.getConnector();
+      Connector appConnector = sailpoint.connector.ConnectorFactory.getConnector(appObject, null);
+
+      if(appConnector!=null){
+        rObj = (ResourceObject) appConnector.getObject("account", singleAggAccountName, null);
+        Rule customizationRule = appObject.getCustomizationRule("account");
+
+        if (null != customizationRule) {            
+          //  debug(logName,"Customization rule found for applicaiton " + applicationName);
+          HashMap ruleArgs = new HashMap();
+          ruleArgs.put("context",     context);
+          ruleArgs.put("log",         log);
+          ruleArgs.put("object",      rObj);
+          ruleArgs.put("application", appObject);
+          ruleArgs.put("connector",   appConnector);
+          ruleArgs.put("state",       new HashMap());
+
+          newRObj = context.runRule(customizationRule, ruleArgs, null);
+
+          if (null != newRObj) {
+            rObj = newRObj;
+            Attributes argMap = new Attributes();
+            argMap.put("promoteAttributes",       "true");
+            argMap.put("correlateEntitlements",   "true");
+            argMap.put("noOptimizeReaggregation", "true"); 
+            argMap.put("checkDeleted", "true");
+
+            Aggregator agg = new Aggregator(context, argMap);
+
+            if( null != agg){
+              TaskResult taskResult = agg.aggregate(appObject, rObj);
+              if (null != taskResult) {
+                finalResult = newRObj.toXml();
+                logAuditEvent("SingleAccAgg","singleAggAppName",singleAggAppName,null,singleAggAccountName);
+              }
+            }
+          }
+        }
+      }
+
+    }catch (NullPointerException ex) { 
+
+      finalResult = "ERROR: Could not aggregate as either account is not present in target or application connection is not working properly";
+
+    }
+    catch (Exception ex) { 
+
+      finalResult = "ERROR: Could not aggregate an account due to: " + ex;
+
+    }
+    return finalResult;
+  }
+
+
+  public ProvisioningPlan getEntitlementPlan(String employee,String appname,List entitlement,String op)
+  {
+    ProvisioningPlan plan = new ProvisioningPlan();
+    try 
+    {
+      plan.setNativeIdentity(employee);
+      AccountRequest accountRequest = new AccountRequest();
+      accountRequest.setApplication(appname);
+      accountRequest.setOperation(AccountRequest.Operation.Modify);
+
+      Filter filter1 = Filter.eq("application.name",appname);
+      Filter filter2 = Filter.eq("identity.name",employee);
+      Filter filter = Filter.and(filter1, filter2);
+
+      QueryOptions qo = new QueryOptions();
+
+      if(op.equalsIgnoreCase("Remove")){
+        debug(logName,"inside remove entitlement::");
+        qo.addFilter(filter);
+        Iterator it = context.search(IdentityEntitlement.class, qo);
+        if (it.hasNext()) {      
+          while (it.hasNext()) {     
+            IdentityEntitlement idEntitlement = it.next();
+            if (accountRequest.getNativeIdentity() == null) {
+            }
+            for (String ent : entitlement){           
+              if(idEntitlement.getValue().equals(ent)){             
+                accountRequest.add(new AttributeRequest(idEntitlement.getName(), ProvisioningPlan.Operation.Remove,(String)idEntitlement.getValue()));
+              }
+            }
+          }
+        }
+      }else if(op.equalsIgnoreCase("Add")){
+        for (String ent : entitlement){
+          String [] entDetails = ent.split(":");
+          String attrnName = entDetails[0];
+          String attrValue = entDetails[1];      		
+          if (accountRequest.getNativeIdentity() == null) {
+          }      
+          accountRequest.add(new AttributeRequest(attrnName, ProvisioningPlan.Operation.Add, attrValue)); 
+        }
+      }
+      plan.add(accountRequest);
+    }catch (Exception ex){
+      error(logName,"Exception during getEntitlementPlan::"+ex);
+    }
+    return plan;
+  }
+
+  public ProvisioningPlan disableAllLinks(String employee){  
+    ProvisioningPlan plan = new ProvisioningPlan(); 
+    try{
+      Identity emp= context.getObject(Identity.class, employee);
+      List appList = new ArrayList();
+      plan.setIdentity(emp);
+      String customIgnoreTermAppKey = "IgnoreTerminationApplications";
+      String configCustomObjectName = "Ascension-Custom-ContractorConfiguration";     	
+      List ignoreTermAppList = GeneralUtils.loadCustomList(customIgnoreTermAppKey, configCustomObjectName);
+      Identity identityObject= context.getObject(Identity.class, employee);
+      IdentityService identityService = new IdentityService(context);
+      if(identityObject!=null){
+        List lnkList = identityService.getLinks(identityObject,0,0);
+        if(lnkList!=null && !lnkList.isEmpty()){
+          for(Link link:lnkList){
+            if(!ignoreTermAppList.contains(link.getApplicationName())) { 
+              AccountRequest accReq = new AccountRequest();
+              accReq.setApplication(link.getApplicationName());
+              accReq.setNativeIdentity(link.getNativeIdentity());
+              accReq.setOperation(ProvisioningPlan.AccountRequest.Operation.Disable);
+              plan.add(accReq);
+            }
+          }
+        }
+      }
+    }catch (Exception ex) {
+      error(logName,"Exception during disableAllLinks::"+ex);
+    }
+    return plan;
+  }
+
+  public ProvisioningPlan enableAllLinks(String employee){
+    ProvisioningPlan plan = new ProvisioningPlan();  
+    try{    
+      Identity emp= context.getObject(Identity.class, employee);
+      List appList = new ArrayList();
+      plan.setIdentity(emp);
+
+      String customReenabledAppKey = "IncludeReenableApplications";
+      String configCustomObjectName = "Ascension-Custom-ContractorConfiguration";     	
+      List reenableAppList = GeneralUtils.loadCustomList(customReenabledAppKey, configCustomObjectName);
+
+      Identity identityObject= context.getObject(Identity.class, employee);
+      IdentityService identityService = new IdentityService(context);
+      if(identityObject!=null){
+        List lnkList = identityService.getLinks(identityObject,0,0);
+        if(lnkList!=null && !lnkList.isEmpty()){
+          for(Link link:lnkList){
+            if(reenableAppList.contains(link.getApplicationName())) {
+              AccountRequest accReq = new AccountRequest();
+              accReq.setApplication(link.getApplicationName());
+              accReq.setNativeIdentity(link.getNativeIdentity());
+              accReq.setOperation(ProvisioningPlan.AccountRequest.Operation.Enable);
+              plan.add(accReq);
+            }
+          }
+        }
+      }
+    }catch (Exception ex) {
+      error(logName,"Exception during enableAllLinks::"+ex);
+    }
+    return plan;
+  }
+
+  public TaskResult opsRunTask(String taskName,List userForTask,String Launcher){    
+    String fName = "";
+    TaskResult tr = null;
+    try {
+      if(taskName!=null){
+        TaskDefinition task = context.getObjectByName(TaskDefinition.class,taskName);
+        if (null != task) {
+          if(null != userForTask){	
+            for (String id : 	userForTask){	
+              if(fName.isEmpty()) {
+                fName = "name==\""+id+"\"";
+              }
+              else {  
+                fName = fName+"||"+"name==\""+id+"\"";                  
+              }
+              log.error("***fName***"+fName);
+              task.setArgument("filterGroups",null); 
+              task.setArgument("filter",fName); 
+            }
+          }
+
+          TaskManager tm = new TaskManager(context);
+          tm.setLauncher(Launcher);
+          tr = tm.runSync(task,new HashMap());
+        }
+      }
+    }catch (Exception e) {
+      error(logName,"Exception processing request for "+task.getName());      
+    }
+    return tr;
+  }
+
+
+  public void launchLeaver(String identityName,String workflowName,String launcher){
+    try {
+      Identity identity = context.getObjectByName(Identity.class,identityName);
+
+      Map identityModel = new HashMap();
+      identityModel.put("userName",identity.getName());
+
+      HashMap launchArgsMap = new HashMap();
+      String requestName = workflowName+" "+ identityName;
+
+      launchArgsMap.put("identityDisplayName", identity.getDisplayName());
+      launchArgsMap.put("identityName", identityName); 
+      launchArgsMap.put("launcher", launcher);  
+      launchArgsMap.put("identityModel", identityModel); 
+      launchArgsMap.put("workflowTrigger", "rule"); 
+
+      WorkflowLaunch wflaunch = new WorkflowLaunch();
+      Workflow wf = (Workflow) context.getObjectByName(Workflow.class, workflowName);
+      wflaunch.setWorkflowName(wf.getName());
+      wflaunch.setWorkflowRef(wf.getName());
+
+      wflaunch.setCaseName(requestName);
+      wflaunch.setVariables(launchArgsMap);
+      Workflower workflower = new Workflower(context);
+      WorkflowLaunch launch = workflower.launch(wflaunch);  
+    } catch (Exception e) {
+      error(logName,"Exception during launchWorkflow::"+e,e);      
+    }
+
+  }
+
+  public void cleanUpIdentity(String employee){  
+    try {
+      Identity identity = context.getObjectByName(Identity.class, employee);        
+      if (identity != null) {
+        identity.removeAttribute("childPersonas");
+        identity.removeAttribute("childPersonaNames");
+        identity.removeAttribute("initialName");
+        identity.removeAttribute("initialOperId");
+        identity.removeAttribute("internalId");
+        identity.removeAttribute("parentPersonaName");
+        identity.removeAttribute("parentPersonaSID");
+        identity.removeAttribute("personaType");
+
+        context.saveObject(identity);
+        context.commitTransaction();
+      }
+
+    }catch (Exception e) {
+      error(logName,"Exception during cleanUpIdentity::"+e,e);
+    } 
+    return plan;
+  }
+
+  public void logAuditEvent(String operation,String attributeName, String attributeValue,String comments,String identityName) {
+    try{
+      String customAuditEventKey = "auditIdentityLifecycleEventList";
+      String configCustomObjectName = "ASCN-Custom-Opsadminconsole";
+      AuditEvent auditEvent = new AuditEvent();
+      List auditEventList = GeneralUtils.loadCustomList(customAuditEventKey, configCustomObjectName);
+      if(auditEventList.contains(operation)){ 
+        if(Auditor.isEnabled("identityLifecycleEvent")){
+          auditEvent.setAction("identityLifecycleEvent");
+        }
+      }else{
+        auditEvent.setAction("OpsOverride");
+      }
+      auditEvent.setSource("Ops Admin Console");
+      if(operation.equalsIgnoreCase("Run Task")) {
+        auditEvent.setString3(identityName); 
+      }else {
+        auditEvent.setTarget(identityName);  
+      }
+      auditEvent.setAttributeName(attributeName);
+      auditEvent.setAttributeValue(attributeValue);
+      auditEvent.setAttribute("Identity Modified",identityName);
+      auditEvent.setString1(operation);
+      auditEvent.setString2(operation+" triggered through Ops Admin Console");
+      auditEvent.setAttribute("Comments",comments);
+      context.saveObject(auditEvent);
+      context.commitTransaction();
+
+    }catch (Exception ex) {
+      error(logName,"Exception processing logAuditEvent "+ex);
+    }
+  }
+
+  public boolean isValidDN(String dn) {
+    if (dn == null || dn.trim().isEmpty()) {
+      return false;
+    }
+    try {
+
+      LdapName ldapName = new LdapName(dn);
+
+      return !ldapName.isEmpty();
+
+    } catch (InvalidNameException e) {
+
+      //  error(logName,"Invalid DN format: " + e.getMessage());
+      return false;
+    }
+  }
+
+  public String isValidExpressionobjectID(String condition) {
+    String pattern = "[0-9,a-z,A-Z]{21}";
+    Pattern regex = Pattern.compile(pattern);
+    Matcher matcher = regex.matcher(condition);
+
+    if (!matcher.matches()) {
+      return "Please enter valid objectID.";
+    }
+
+    return "Success";
+  }
+
+  public String isValidExpression(String condition) {
+    String pattern = "^\\d{4}\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$";
+    Pattern regex = Pattern.compile(pattern);
+    Matcher matcher = regex.matcher(condition);
+
+    if (!matcher.matches()) {
+      return "Please enter the date in correct format.";
+    }
+
+    return "Success";
+  }
+
+  public String isValidExpressionSingleAgg(String condition,String singleAggAppName) {
+    if(singleAggAppName.startsWith("AD")){
+      if(!isValidDN(condition)){
+        return "Please enter correct DN";
+      }
+    }else{
+      return isValidExpressionobjectID(condition);
+    }
+    return "Success";
+  }
+
+
+  ]]></Source>
+</Rule>

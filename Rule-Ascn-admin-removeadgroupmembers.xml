@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="ASCN-ADMIN-RemoveADGroupMembers">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+  import sailpoint.api.Provisioner;
+  import sailpoint.object.Link;
+  import sailpoint.object.Identity;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.ProvisioningProject;
+
+  import java.util.Arrays;
+  import java.util.List;
+
+  import org.apache.commons.lang3.StringUtils;
+  import org.ascn.utils.QueryUtils;
+
+  List outList = new ArrayList();
+  //String dataList = config.get("identities");
+  String dataList = "10627073###AD-DS###CN=lpine006,OU=Users,OU=Managed,DC=txaus,DC=DS,DC=SJHS,DC=com###CN=DS-DUO-Sync-Enforced-Citrix,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com@10627073###AD-DS###CN=lpine006,OU=Users,OU=Managed,DC=txaus,DC=DS,DC=SJHS,DC=com###CN=DS-DUO-Sync-Enforced-VPN,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com@10627073###AD-DS###CN=lpine006,OU=Users,OU=Managed,DC=txaus,DC=DS,DC=SJHS,DC=com###CN=DS-DUO-Sync-Enforced-O365,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com@10627073###AD-DS###CN=lpine006,OU=Users,OU=Managed,DC=txaus,DC=DS,DC=SJHS,DC=com###CN=DS-DUO-Sync-Enforced-ERP,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com@10627073###AD-DS###CN=lpine006,OU=Users,OU=Managed,DC=txaus,DC=DS,DC=SJHS,DC=com###CN=DS-DUO-Sync,OU=Groups,OU=Admin,DC=DS,DC=SJHS,DC=com";
+  if(StringUtils.isBlank(dataList)){
+  // taskResult.addMessage("Data Can not be null or empty.");
+  }
+  
+
+  List requestList = Arrays.asList(dataList.split("@"));
+  
+  Provisioner provisioner;
+  ProvisioningPlan plan;
+  AccountRequest accReq;
+  ProvisioningProject project;
+  Identity identity;
+  try {
+      for(String s : requestList) {
+        String[] recordStr = s.split("###");
+        String identityName = recordStr[0];
+        String appName = recordStr[1];
+        String nativeId = recordStr[2];
+        String groupName = recordStr[3];
+        identity = context.getObjectByName(Identity.class,identityName);
+        if(identity == null){
+          continue;
+        }
+
+          plan = new ProvisioningPlan();
+          accReq = new AccountRequest();
+          accReq.setOperation(AccountRequest.Operation.Modify);
+          accReq.setNativeIdentity(nativeId);
+          accReq.setApplication(appName);
+          accReq.add(new AttributeRequest("memberOf",ProvisioningPlan.Operation.Remove,groupName));
+          plan.add(accReq);
+          plan.setIdentity(identity);
+          provisioner = new Provisioner(context);
+          project = provisioner.compile(plan);
+          provisioner.execute(project);
+          context.commitTransaction();
+          if(!project.isFullyCommitted()) {
+            outList.add("NOT-Removed: "+s);
+          }else{
+            outList.add("Successfully processed the record : "+s+"  PROJECT: "+project.toXml());
+          }
+
+
+      }
+    } catch (Exception e) {
+      outList.add("NOT-Removed: "+s+" = "+nativeId+" REASON: "+e);
+    } finally {
+      context.decache(identity);
+    }
+// taskResult.addMessage("TASK RESULT: "+outList);
+  return outList; //"success";
+
+
+
+  ]]></Source>
+</Rule>

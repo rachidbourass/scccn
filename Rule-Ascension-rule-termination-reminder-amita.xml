@@ -1,0 +1,239 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Termination-Reminder-Amita">
+  <Description>The Rule will be used to send email notification to the Identity Manager how is about to eligible for termination.</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Library"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+  import java.util.Collections;
+
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.Util;
+  import sailpoint.api.SailPointContext;
+
+  import sailpoint.object.EmailOptions;
+  import sailpoint.object.EmailTemplate;
+  import sailpoint.object.Custom;
+  import java.text.ParseException;
+  import java.text.SimpleDateFormat;
+  import java.util.ArrayList;
+  import java.util.Calendar;
+  import java.util.Date;
+  import java.util.GregorianCalendar;
+  import java.util.List;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;	
+  import sailpoint.tools.GeneralException;
+
+  static Log logger = LogFactory.getLog("Rule.Ascension-Rule-Termination-Reminder-Amita");
+
+  logger.debug("Ascension-Rule-Termination-Reminder-Amita");
+
+  /** check the the expire date of identity is within the given list
+	 * @param expireDateString , reminderDaysList
+	 * @return boolean true when advance the today date by any of the given date
+	 */
+  public boolean isEmailTrigger(String expireDateString,List reminderDaysList){
+    String methodName = "isEmailTrigger";
+    logger.info("Enter "+methodName);
+    boolean result = false;
+    try{
+
+      Date expireDate = convertStringToDate(expireDateString);
+
+      if(expireDate!=null){
+        GregorianCalendar today = (GregorianCalendar) GregorianCalendar.getInstance();
+        GregorianCalendar extendedCal = (GregorianCalendar) GregorianCalendar.getInstance();
+        GregorianCalendar expireDateCal = (GregorianCalendar) GregorianCalendar.getInstance();
+
+        today.set(GregorianCalendar.HOUR,0);
+        today.set(GregorianCalendar.MINUTE,0);
+        today.set(GregorianCalendar.SECOND,0);
+        today.set(GregorianCalendar.MILLISECOND ,0);
+        today.set(GregorianCalendar.HOUR_OF_DAY,0);
+
+        logger.debug("today "+today.getTime());
+
+        expireDateCal.setTime(expireDate);
+        expireDateCal.set(GregorianCalendar.HOUR,0);
+        expireDateCal.set(GregorianCalendar.MINUTE,0);
+        expireDateCal.set(GregorianCalendar.SECOND,0);
+        expireDateCal.set(GregorianCalendar.MILLISECOND ,0);
+        expireDateCal.set(GregorianCalendar.HOUR_OF_DAY,0);
+
+        logger.debug("expireDateCal "+expireDateCal.getTime());
+
+        for(String dayRange : reminderDaysList){
+          try{
+            if(Util.isNotNullOrEmpty(dayRange)){
+              dayRange = dayRange.trim();
+            }else{
+              dayRange = "";
+            }
+            extendedCal.setTime(today.getTime());
+            extendedCal.add(GregorianCalendar.DATE, Integer.parseInt(dayRange));
+            if ( expireDateCal.after(today) && expireDateCal.before(extendedCal)) {
+              logger.debug("reminder " + dayRange);
+              result = true;
+              break;
+            }
+          }catch(NumberFormatException ne){
+            continue;
+          }
+        }
+      }
+    }catch(Exception ex){
+      logger.error("Exception in "+methodName+" : "+ex.getMessage());
+    }
+    logger.info("Exit "+methodName);
+    return result;
+  }
+
+  logger.debug("Ascension-Rule-Termination-Reminder-Amita Starting");
+
+  List reminderDays = new ArrayList();
+  List contractorTypes = new ArrayList();
+
+  Custom customObj = context.getObjectByName(Custom.class,"Ascension-Custom-ContractorConfiguration");
+  if(customObj!=null) {
+    if(customObj.get("TerminationReminderDaysAmita") !=null ){
+      String terminationReminderDays = (String) customObj.get("TerminationReminderDaysAmita");
+      reminderDays = sailpoint.tools.Util.csvToList(terminationReminderDays);
+    } else{
+      throw new Exception("Entry(TerminationReminderDaysAmita) not configure. Look into custom.");
+    }
+    if(customObj.get("ContractorType") !=null ){
+      contractorTypes = (List) customObj.get("ContractorType");
+    }else{
+      throw new Exception("Entry(ContractorType) not configure. Look into custom.");
+    }
+  }else{
+    throw new Exception("Invalid Custom object. Not found in sailpoint.");
+  }
+
+  EmailTemplate template = context.getObjectByName(EmailTemplate.class, "Ascension-EmailTemplate-TerminationAdvanceNotification-Amita");
+  if(template==null){
+    throw new Exception("Invalid EmailTemplate. Not found in sailpoint.");
+  }
+
+  Map dataMap = new HashMap();
+
+  QueryOptions qo = new QueryOptions();  
+  EmailOptions options = new EmailOptions();
+  qo.addFilter( Filter.ignoreCase( Filter.in("type", contractorTypes)));
+  qo.addFilter(Filter.eq("inactive", false));
+  qo.addFilter( Filter.ignoreCase(Filter.eq ("ministry", "AMITA Health")) );
+  qo.addFilter(Filter.notnull("ctrexpDt"));
+  qo.addFilter(Filter.or(Filter.notnull("contractorManager"), Filter.notnull("manager.name")));
+  qo.addOrdering("ctrexpDt", true);
+  qo.addOrdering("lastname", true);
+  qo.addOrdering("firstname", true);
+
+  qo.setCloneResults(true);
+  Iterator allIdentityItr = context.search(Identity.class, qo);  
+
+  while (!Util.isEmpty(allIdentityItr) && allIdentityItr.hasNext()) {
+    Identity identityObj = (Identity) allIdentityItr.next();
+    try{
+      if(identityObj!=null  ) {
+
+        if(Util.isNotNullOrEmpty( identityObj.getStringAttribute("ctrexpDt")) ){
+          // check valid
+          if(isEmailTrigger(identityObj.getStringAttribute("ctrexpDt") ,reminderDays )){
+            String toAddress = "";
+            Map recordMap = new HashMap();
+            boolean validContractorManager = false;
+            if(Util.isNotNullOrEmpty(identityObj.getStringAttribute("contractorManager"))){
+              Identity cmId = context.getObjectByName(Identity.class,	identityObj.getStringAttribute("contractorManager"));
+              if (!cmId.isInactive() && Util.isNotNullOrEmpty(cmId.getEmail())){
+                validContractorManager = true;
+              }
+            }
+            //populate map if contractorManager is available
+            if(validContractorManager){
+              toAddress = identityObj.getStringAttribute("contractorManager");
+              Identity cmId = context.getObjectByName(Identity.class,	identityObj.getStringAttribute("contractorManager"));
+              recordMap.put("managerEmail", cmId.getEmail());
+              recordMap.put("managerFname", cmId.getFirstname() != null? cmId.getFirstname():"");
+              recordMap.put("managerLname", cmId.getLastname() != null? cmId.getLastname():"");
+              recordMap.put("userFname", 		Util.isNotNullOrEmpty( identityObj.getFirstname()) ? identityObj.getFirstname():"" );
+              recordMap.put("userLname", 		Util.isNotNullOrEmpty( identityObj.getLastname()) ? identityObj.getLastname():"" );
+              recordMap.put("userCompany",  	Util.isNotNullOrEmpty( identityObj.getStringAttribute("vendorName")) ? identityObj.getStringAttribute("vendorName"):"" );
+              recordMap.put("userJobTitle", 	Util.isNotNullOrEmpty( identityObj.getStringAttribute("title")) ? identityObj.getStringAttribute("title"):"" );
+              recordMap.put("userEndDate",  	Util.isNotNullOrEmpty( identityObj.getStringAttribute("ctrexpDt")) ? identityObj.getStringAttribute("ctrexpDt"):"" );
+              recordMap.put("networkId", 	Util.isNotNullOrEmpty( identityObj.getStringAttribute("samAccountName")) ? identityObj.getStringAttribute("samAccountName"):"" );
+              recordMap.put("email", 	Util.isNotNullOrEmpty( identityObj.getEmail()) ? identityObj.getEmail():"" );
+
+            }else if(identityObj.getManager()!=null && !identityObj.getManager().isInactive()  && Util.isNotNullOrEmpty(identityObj.getManager().getEmail())){
+              //check if active manager and populate map
+              toAddress = identityObj.getManager().getName();
+              recordMap.put("managerEmail", identityObj.getManager().getEmail());
+              recordMap.put("managerFname", identityObj.getManager().getFirstname());
+              recordMap.put("managerLname", identityObj.getManager().getLastname());
+              recordMap.put("userFname", 		Util.isNotNullOrEmpty( identityObj.getFirstname()) ? identityObj.getFirstname():"" );
+              recordMap.put("userLname", 		Util.isNotNullOrEmpty( identityObj.getLastname()) ? identityObj.getLastname():"" );
+              recordMap.put("userCompany",  	Util.isNotNullOrEmpty( identityObj.getStringAttribute("vendorName")) ? identityObj.getStringAttribute("vendorName"):"" );
+              recordMap.put("userJobTitle", 	Util.isNotNullOrEmpty( identityObj.getStringAttribute("title")) ? identityObj.getStringAttribute("title"):"" );
+              recordMap.put("userEndDate",  	Util.isNotNullOrEmpty( identityObj.getStringAttribute("ctrexpDt")) ? identityObj.getStringAttribute("ctrexpDt"):"" );
+              recordMap.put("networkId", 	Util.isNotNullOrEmpty( identityObj.getStringAttribute("samAccountName")) ? identityObj.getStringAttribute("samAccountName"):"" );
+              recordMap.put("email", 	Util.isNotNullOrEmpty( identityObj.getEmail()) ? identityObj.getEmail():"" );
+
+            }
+
+            if(!Util.isEmpty(recordMap)){
+              List tempList = null;
+              if(dataMap.containsKey(toAddress) && dataMap.get(toAddress) instanceof List){
+                tempList = (List) (dataMap.get(toAddress));
+              }else{
+                tempList = new ArrayList();
+              }
+              tempList.add(recordMap);
+              dataMap.put(toAddress, tempList);
+            }
+          }
+        }
+      }
+    }catch(Exception ex){
+      logger.error("Exception in sending user account termination reminder."+ ex);
+    }
+
+  }// end while
+
+  if(allIdentityItr != null) {
+    Util.flushIterator(allIdentityItr);
+  }
+
+
+  int emailCount = 0;
+  List toList = new ArrayList();
+  //sorted dataMap
+  if(!Util.isEmpty(dataMap)){
+    for(Object key : dataMap.keySet()){
+      Map args = new HashMap();
+      if(!Util.isEmpty(dataMap.get(key))){
+
+        List tempRecordList = dataMap.get(key);
+        String toEmail = (String) ((Map)tempRecordList.get(0)).get("managerEmail");
+        options.setTo(toEmail);
+        args.put("managerFname", (String) ((Map)tempRecordList.get(0)).get("managerFname"));
+        args.put("managerLname", (String) ((Map)tempRecordList.get(0)).get("managerLname"));
+        args.put("recordList",dataMap.get(key));
+        options.setVariables(args);
+        template.setBcc("IAMsailpointprov@ascension.org");
+        context.sendEmailNotification(template,options);
+        emailCount++;
+        toList.add(toEmail);
+      }
+
+    }
+  }
+
+  taskResult.setAttribute("emailCount",emailCount); 
+  taskResult.setAttribute("toList",toList); 
+  logger.debug("Ascension-Rule-Termination-Reminder-Amita Ending.");
+  return "success";
+  ]]></Source>
+</Rule>

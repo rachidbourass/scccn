@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="ASCN-ADMIN-DeleteApplication-Accounts">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+	import sailpoint.api.Provisioner;
+	import sailpoint.object.Link;
+	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.object.ProvisioningProject;
+
+	import java.util.Arrays;
+	import java.util.List;
+
+	import org.apache.commons.lang3.StringUtils;
+	import org.ascn.utils.QueryUtils;
+    List outList = new ArrayList();
+	
+	    String dataList = config.get("identities");
+		String appName =config.get("applicationName");
+		if(StringUtils.isBlank(appName)){
+		  taskResult.addMessage("Application Name can not be balnk.");
+		}
+		
+		taskResult.addMessage("Application Name...."+appName);
+		List requestList = Arrays.asList(dataList.split(","));
+		for(String s : requestList) {
+			
+			List links = QueryUtils.getIdentityAppLinks(s,appName);
+			if(!links.isEmpty()) {
+				for(Link link : links){
+					ProvisioningPlan plan = new ProvisioningPlan();
+					plan.setIdentity(link.getIdentity());
+					AccountRequest accReq = new AccountRequest();
+					accReq.setOperation(AccountRequest.Operation.Delete);
+          String nativeIdentity = link.getNativeIdentity();
+					accReq.setNativeIdentity(nativeIdentity);
+					accReq.setApplication(link.getApplicationName());
+          outList.add(s+"###"+nativeIdentity);
+					plan.add(accReq);
+					Provisioner provisioner = new Provisioner(context);
+					ProvisioningProject project = provisioner.compile(plan);
+					provisioner.execute(project);
+				}
+			}
+		}
+    taskResult.addMessage("Removed Following Account: "+outList.toString());
+    return "success";
+    
+	
+    ]]></Source>
+</Rule>

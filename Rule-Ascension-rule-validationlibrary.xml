@@ -1,0 +1,266 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-ValidationLibrary">
+  <Description>This rule is used to validate the Field values on a provisioning plan.</Description>
+  <Source><![CDATA[
+
+  import java.lang.String;
+  import java.util.ArrayList;  
+  import java.util.Date;
+  import java.util.GregorianCalendar;
+  import java.util.Calendar;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Identity;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+  import java.lang.Integer.parseInt;
+  import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;	
+	import sailpoint.tools.Util;
+
+  Custom custom = context.getObjectByName(Custom.class,"Ascension-Custom-ContractorConfiguration");
+  static Log logger = LogFactory.getLog("rule.CreateContractor");
+	
+  /**
+		 * Validate Phonenumber as per below conditions
+		 * if given phone number is not ten digits throw error message	
+		 * @param value - phonenumber field
+		 * @return messages - Error message
+		 */
+
+  public ArrayList validatePhoneNumber(String value){
+    String methodName = "validatePhoneNumber";
+    logger.debug("Entering"+methodName);   
+
+    ArrayList messages = new ArrayList();
+    String inputVal = (String)value;
+
+    if( Util.isNotNullOrEmpty(inputVal) && !(inputVal.matches("(?:\\d{3}-){2}\\d{4}") || inputVal.matches("\\d{10}"))){   
+    	if(null != custom && null != custom.get("ValidationMessages")){
+      	messages.add(custom.get("ValidationMessages").get("PhoneNumber"));
+      }
+    }
+    logger.debug("Exiting"+methodName);
+    return messages;
+ 	 }	
+  
+  /**
+		 * Validate DOB as per below conditions
+		 * if given DOB is not in correct format throw error message	
+		 * @param value - dob field
+		 * @return messages - Error message
+		 */
+
+  public ArrayList validateDOB(String value){
+    String methodName = "validateDOB";
+    logger.debug("Entering"+methodName);   
+
+    ArrayList messages = new ArrayList();
+    String inputVal = (String)value;
+
+    if( Util.isNotNullOrEmpty(inputVal) && !(inputVal.matches("^(1[0-2]|0[1-9])/(3[01]|[12][0-9]|0[1-9])$"))){   
+    	if(null != custom && null != custom.get("ValidationMessages")){
+      	messages.add(custom.get("ValidationMessages").get("DOB"));
+      }
+    }
+    logger.debug("Exiting"+methodName);
+    return messages;
+ 	 }	
+  
+  /**
+		 * Validate given field is aplhanumeric 
+		 * if given field is not alphanumeric throw error message	
+		 * @param value - from Form field
+		 * @return messages - Error message
+		 */
+  public ArrayList validateAlphaNumeric(String value){
+		String methodName = "validateAlphaNumeric";
+    logger.debug("Entering"+methodName);
+    
+    ArrayList messages = new ArrayList();
+    String inputVal = (String)value;
+
+    if( Util.isNotNullOrEmpty(inputVal) && !(inputVal.matches("^[A-Za-z0-9,\\s]*$"))){
+      if(null != custom && null != custom.get("ValidationMessages")){
+        messages.add(custom.get("ValidationMessages").get("AlphaNumeric"));
+      }
+    }
+    logger.debug("Exiting"+methodName);
+    return messages;
+  }
+  
+  /**
+		 * Validate given field is aplhanumeric or has +, whitespace characters 
+		 * if given field is not alphanumeric throw error message	
+		 * @param value - from Form field
+		 * @return messages - Error message
+		 */
+  public ArrayList validateVendorName(String value){
+		String methodName = "validateVendorName";
+    logger.debug("Entering"+methodName);
+    
+    ArrayList messages = new ArrayList();
+    String inputVal = (String)value;
+
+    if( Util.isNotNullOrEmpty(inputVal) && !(inputVal.matches("^[A-Za-z0-9,+\\s]*$"))){
+      if(null != custom && null != custom.get("ValidationMessages")){
+        messages.add(custom.get("ValidationMessages").get("AlphaNumeric"));
+      }
+    }
+    logger.debug("Exiting"+methodName);
+    return messages;
+  }  
+   /**
+		 * Validate given field is only alphabets 
+		 * if given field is not alphabets throw error message	
+		 * @param value - from Form field
+		 * @return messages - Error message
+		 */
+  
+  public ArrayList validateAlphabets(String value){
+    String methodName = "validateAlphabets";
+    logger.debug("Entering"+methodName);
+
+    ArrayList messages = new ArrayList();
+    String inputVal = (String)value;
+
+    if( Util.isNotNullOrEmpty(inputVal ) && !(inputVal.matches("^[A-Za-z0-9-'\\s]*$"))) {
+      if(null != custom && null != custom.get("ValidationMessages")){
+        messages.add(custom.get("ValidationMessages").get("Alphabets"));
+      }
+    }
+    logger.debug("Exiting"+methodName);
+    return messages;
+  }
+
+   /**
+		 * Validate given SSN field as per below conditions
+		 * if given field is not four digits throw error message	
+		 * @param value - SSN field from Form
+		 * @return messages - Error message
+		 */
+
+  public ArrayList validateSSN(String value){
+		String methodName = "validateSSN";
+    logger.debug("Entering"+methodName);
+
+    ArrayList messages = new ArrayList();
+    String inputVal = (String)value;
+
+    if(Util.isNotNullOrEmpty(inputVal) && (!(inputVal.matches("\\d{4}")))){   
+      if(null != custom && null != custom.get("ValidationMessages")){
+        messages.add(custom.get("ValidationMessages").get("SSN"));
+      }
+    }
+    logger.debug("Exiting"+methodName);
+    return messages;
+  }
+  
+  /**
+		 * Validate given EndDate field as per below conditions
+		 * if given field is past date or more than 12 months from today throw error message	
+		 * @param value - End Date from Form field
+		 * @return messages -  Error message
+		 */
+
+  public ArrayList validateEndDate(Date value){
+		String methodName = "validateEndDate";
+    logger.debug("Entering"+methodName);
+    ArrayList messages = new ArrayList();
+    
+    if(null != custom && null != custom.get("ValidationMessages") && null != custom.get("Validations")){
+          
+     if(null != custom.get("Validations").get("ValidateEndDateDays"))
+     {                    				
+    
+      Date today = new Date();
+      
+      Calendar cal = new GregorianCalendar();
+      cal.setTime(today);
+      cal.add(Calendar.DAY_OF_MONTH, -3);
+      Date yest = cal.getTime();
+       
+      Calendar cal = new GregorianCalendar();
+      cal.setTime(today);
+      cal.add(Calendar.DAY_OF_MONTH, Integer.parseInt(custom.get("Validations").get("ValidateEndDateDays")));
+      Date today90 = cal.getTime();
+
+      if(yest != null && value != null && yest.after(value)){
+
+        messages.add(custom.get("ValidationMessages").get("PastDate"));
+      }
+      if(today90 != null && value != null && today90.before(value)){
+        messages.add(custom.get("ValidationMessages").get("EnddateValidation"));
+      }    
+     }
+      logger.debug("Exiting"+methodName);
+      return messages;
+    }
+  }
+  
+  /**
+		 * Validate given start date field as per below conditions
+		 * if given field is past date or more than 50 days from today throw error message	
+		 * @param value - start Date from Form field
+		 * @return messages -  Error message
+		 */
+  
+  public ArrayList validateStartDate(Date value){
+    String methodName = "validateStartDate";
+    logger.debug("Entering"+methodName);
+    
+    ArrayList messages = new ArrayList();
+		if(null != custom && null != custom.get("ValidationMessages") && null != custom.get("Validations")){
+          
+     if(null != custom.get("Validations").get("ValidateStartDateDays"))
+     { 
+      Date currentDate = new Date();
+      Calendar cal = new GregorianCalendar();
+      cal.setTime(currentDate);
+      cal.add(Calendar.DAY_OF_MONTH, -1);
+      Date yest = cal.getTime();
+
+      Calendar cal1 = new GregorianCalendar();
+      cal1.setTime(currentDate);
+      cal1.add(Calendar.DAY_OF_MONTH, Integer.parseInt(custom.get("Validations").get("ValidateStartDateDays")));
+      Date today50 = cal1.getTime();
+    
+   
+
+    if(yest != null && value != null && yest.after(value)){
+      messages.add(custom.get("ValidationMessages").get("PastDate"));
+    }
+    
+    if(today50 != null && value != null && today50.before(value)){
+      messages.add(custom.get("ValidationMessages").get("StartDateValidation"));
+    }
+    logger.debug("Exiting"+methodName);
+    return messages;
+  
+     }
+    }
+  }
+  
+  /**
+		 * Validate given email as per below conditions
+		 * if given field is not in correct format throw error message	
+		 * @param value - email field
+		 * @return messages -  Error message
+		 */
+  
+  public ArrayList validateEmail(String value){
+    String methodName = "validateEmail";
+    logger.debug("Entering"+methodName);
+
+    ArrayList messages = new ArrayList();
+    
+    if(Util.isNotNullOrEmpty(value) && !(value.matches("^[a-zA-Z0-9.!#$%'*+/=?^_`{|}~-]+@([\\w-]+\\.)+[\\w-]{2,70}$"))) {
+      if(null != custom && null != custom.get("ValidationMessages")){
+        messages.add(custom.get("ValidationMessages").get("Email"));
+      }
+    }
+    logger.debug("Exiting"+methodName);
+    return messages;
+  }
+  ]]></Source>
+</Rule>

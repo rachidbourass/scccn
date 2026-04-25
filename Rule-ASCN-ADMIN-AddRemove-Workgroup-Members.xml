@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="ASCN-ADMIN-AddRemove-Workgroup-Members">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+   
+  import sailpoint.api.ObjectUtil;
+  import sailpoint.tools.Util;
+  import sailpoint.object.Identity;
+  import org.apache.commons.lang3.StringUtils;
+
+  String logName = "ASCN-ADMIN-AddRemove-Workgroup-Members";
+
+  public List addRemoveWorkGroupMembers(String operation, String wgName, List idNames) {
+    trace(logName, "Entering addRemoveWorkGroupMembers(String operation, String wgName, List idNames)");
+	taskResult.addMessage("Starting Operation: "+operation+" on WG: "+wgName);
+    List outList = new ArrayList();
+    String identityName = null;
+    try {
+      Identity wg = context.getObjectByName(Identity.class, wgName);
+      taskResult.addMessage("WG NAME...."+wg.getName());
+      for(String idn : idNames){
+        Identity id = context.getObjectByName(Identity.class, idn);
+        if (null != id) {
+          identityName = id.getName();
+          taskResult.addMessage("Removing WG "+wgName+" from "+id.getDisplayName());
+          if ("remove".equalsIgnoreCase(operation)){
+            id.remove(wg);
+          }
+          if ("add".equalsIgnoreCase(operation)){
+            id.add(wg);
+          }
+          outList.add(id.toString());
+          context.saveObject(id);
+          context.commitTransaction();
+          context.decache(id);
+        }
+      }
+	  taskResult.addMessage("Ending Operation: "+operation+" on WG: "+wgName);
+    } catch (Exception e) {
+      taskResult.addMessage("Error performing Operation: "+operation+" on Identity Name: "+identityName);
+    }
+	trace(logName, "Exiting addRemoveWorkGroupMembers(String operation, String wgName, List idNames)");
+    return outList;
+  }
+
+
+  public void executeOperation() {
+    trace(logName, "executeOperation()");
+    if(config.get("identities")==null){
+      taskResult.addMessage(new Message(Message.Type.Error,"User must be select in taskDefinition",null));
+      return "";
+    }
+
+    if(config.get("operation")==null){
+      taskResult.addMessage(new Message(Message.Type.Error,"User must be pass the operation",null));
+      return "";
+    }
+
+    String dataList = config.get("identities");
+    String operation=config.get("operation");
+    if(StringUtils.isBlank(operation)){
+      taskResult.addMessage("Operation can not be balnk. Add or Remove operation is required.");
+    }
+    taskResult.addMessage("DATA-LIST...."+operation);
+    List requestList = Arrays.asList(dataList.split(","));
+    for(String s : requestList) {
+      String[] splitWg = s.split("#");
+      String groupName = splitWg[0];
+      String idnStr = splitWg[1];
+      List identities = Arrays.asList(idnStr.split("@"));
+      taskResult.addMessage("Before if Add/Remove...."+identities);
+      if (identities !=null){
+        addRemoveWorkGroupMembers(operation,groupName, identities);
+
+      } else {
+	    	String msg = " There is error in execution of Remove WG Member: ";
+	    	error(logName, msg);
+        taskResult.addMessage(new Message(Message.Type.Error,msg+" "+identity.getName(),null));
+    }
+		trace(logName, "executeOperation()");
+    
+  }
+  }
+  return executeOperation();
+  
+    
+    ]]></Source>
+</Rule>

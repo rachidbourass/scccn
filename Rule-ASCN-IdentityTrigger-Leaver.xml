@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Rule-IdentityTrigger-Leaver" type="IdentityTrigger">
+  <Description>
+    This rule will be invoked when the IdentityEvent is fired from the Refresh.
+  </Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="previousIdentity">
+        <Description>
+          The identity before the refresh/aggregation (this will be null when an
+          identity is created).
+        </Description>
+      </Argument>
+      <Argument name="newIdentity">
+        <Description>
+          The identity after the refresh/aggregation (this will be null when an
+          identity is deleted).
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="result">
+        <Description>
+          A boolean describing the result of the rule.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source>
+
+  import sailpoint.rapidapponboarding.rule.LeaverRuleLibrary;
+  // THIS  IS THE ENTRY POINT METHOD THAT IDENTITY TRIGGER CALLS WHEN INVOKED BY THE IDENTITY REFRESH
+  import sailpoint.object.Custom;
+  import java.text.SimpleDateFormat;
+  import java.util.Calendar;
+  import java.util.Date;
+  import java.util.GregorianCalendar;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Identity;
+  import sailpoint.tools.Util;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  static Log logger = LogFactory.getLog("rule.Rule.IdentityTrigger.Leaver");
+  logger.info("Rule.IdentityTrigger.Leaver Start ");
+  boolean status = false;
+  String expiredDate = null;	  	
+  String userType = null;
+  String hotTerm = null;
+  String inputDateFormat = null; 
+
+  if(null != newIdentity){
+    expiredDate = newIdentity.getAttribute("ctrexpDt");	  	
+    userType = newIdentity.getAttribute("type"); 
+    hotTerm = newIdentity.getAttribute("manualTerm"); 
+  }
+
+
+  Custom custom = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration");
+  List contractorTypes = new ArrayList();
+  if(custom!=null &amp;&amp; custom.get("ContractorType") !=null){
+    contractorTypes = custom.get("ContractorType");
+    inputDateFormat = custom.get("DateFormat");	
+    //comment decache //context.decache(custom);
+  }
+
+  if(null != contractorTypes &amp;&amp; contractorTypes.contains(userType)){ 
+    if(null != newIdentity &amp;&amp; !newIdentity.isInactive() &amp;&amp; !(Util.isNotNullOrEmpty(hotTerm) &amp;&amp; hotTerm.equalsIgnoreCase("yes")) &amp;&amp; Util.isNotNullOrEmpty(inputDateFormat) &amp;&amp; Util.isNotNullOrEmpty(expiredDate)){
+      SimpleDateFormat dateFormat = new SimpleDateFormat(inputDateFormat);
+      try{
+        Date lastDay= dateFormat.parse(expiredDate);           
+        Calendar calendar = GregorianCalendar.getInstance(); 
+        calendar.setTime(lastDay);
+        calendar.set(GregorianCalendar.HOUR,0);
+        calendar.set(GregorianCalendar.MINUTE,0);
+        calendar.set(GregorianCalendar.SECOND,0);
+        calendar.set(GregorianCalendar.MILLISECOND ,0);
+        calendar.set(GregorianCalendar.HOUR_OF_DAY,0);
+        calendar.add(Calendar.DAY_OF_MONTH, +1);
+        Date expDatePlusOne = calendar.getTime();
+
+        Date currentDate = new Date();
+        Calendar today = GregorianCalendar.getInstance(); 
+        today.setTime(currentDate);
+        today.set(GregorianCalendar.HOUR,0);
+        today.set(GregorianCalendar.MINUTE,0);
+        today.set(GregorianCalendar.SECOND,0);
+        today.set(GregorianCalendar.MILLISECOND ,0);
+        today.set(GregorianCalendar.HOUR_OF_DAY,0);
+        Date todayDate = today.getTime();
+
+        if(null != expDatePlusOne &amp;&amp; null != todayDate &amp;&amp; expDatePlusOne.equals(todayDate) || expDatePlusOne.before(todayDate)){     
+          status =  true;       
+        }
+        else{
+          status = false;
+        }        
+      }
+      catch(Exception e){
+        logger.error("Exception Message "+e);
+      }
+    }
+    logger.info("Rule.IdentityTrigger.Leaver End ");
+    return status;
+  }  else{
+    return LeaverRuleLibrary.isEligibleForLeaver(context, previousIdentity, newIdentity);
+  }
+
+
+  </Source>
+</Rule>

@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Rule-ASCN-IdentitySelector-AzureMDM" type="IdentitySelector">
+  <Description>This rule is used to select an Identity that is related to the given Identity</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-GSuite"/>
+  </ReferencedRules>
+  <Signature returnType="boolean"/>
+  <Source>
+
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+  import sailpoint.tools.Util;
+
+  private boolean hasAzureLink(Identity identity) {
+
+    boolean hasAzureLink = false;
+    List azureLinks = getIdentityAppLinks(identity, "Azure"); //Sourced from Ascension-RuleLibrary-GSuite
+
+    if (azureLinks != null &amp;&amp; !azureLinks.isEmpty()) {
+
+      hasAzureLink = true;
+
+    }
+
+    return hasAzureLink;
+
+  }
+
+  boolean hasAzureLink = false;
+  boolean inactive = true;
+  String orgUnitPath = null;
+
+  if (identity != null) {
+
+    hasAzureLink = hasAzureLink(identity);
+    inactive = identity.isInactive();
+    orgUnitPath = identity.getAttribute("orgUnitPath");
+    List validOUs = Util.csvToList("/EMP/Mobile, /CWR/Mobile");
+    
+    //Check if Identity has Azure, is active, and has one of two specific orgUnitPath values
+
+    if (hasAzureLink &amp;&amp; !inactive &amp;&amp; Util.nullSafeContains(validOUs, orgUnitPath)) {
+
+      return true;
+
+    }
+
+  }
+
+  return false;
+
+
+  </Source>
+</Rule>

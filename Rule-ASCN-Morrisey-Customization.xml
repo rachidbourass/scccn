@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="ASCN-Morrisey-Customization" type="ResourceObjectCustomization">
+  <Description>This rule is configured on the application and is called after the connector has build a ResourceObject from the native application data.
+
+Initially designed for non-rule based connectors to add SPPrivileged flag to an object, but could be used to do any transformations.</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-Encryption"/>
+  </ReferencedRules>
+  <Signature returnType="ResourceObject">
+    <Inputs>
+      <Argument name="log" type="org.apache.commons.logging.Log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="object">
+        <Description>
+          The ResourceObject built by the connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          Application that references the connector.
+        </Description>
+      </Argument>
+      <Argument name="connector">
+        <Description>
+          The connector object.
+        </Description>
+      </Argument>
+      <Argument name="state">
+        <Description>
+          A Map containing state information.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="resourceObject">
+        <Description>
+          The updated resource object.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+  import sailpoint.object.ResourceObject;
+  import sailpoint.api.SailPointContext;
+  import org.apache.log4j.Logger;
+  import sailpoint.tools.Util;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Attributes;
+  import sailpoint.api.PersistenceManager;
+  import sailpoint.api.ObjectUtil;
+  import sailpoint.object.Filter;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Identity;
+  import java.util.regex.Matcher;
+	import java.util.regex.Pattern;
+  import org.ascn.utils.GeneralUtils;
+  import java.util.ArrayList;
+
+        if(void !=object && null!= object) {
+        
+        Object dob = object.getAttribute("DateOfBirth");
+        if (null!=dob) {
+            String tempValue = dob.toString();
+            if(Util.isNotNullOrEmpty(tempValue)){
+                object.setAttribute("DateOfBirth",encryptAES(tempValue));
+            }
+        }
+
+        Object ssn = object.getAttribute("SSN");
+        if (null!=ssn) {
+            String tempValue = ssn.toString();
+            if(Util.isNotNullOrEmpty(tempValue)){
+                object.setAttribute("SSN",encryptAES(tempValue));
+            }
+        }        
+
+        }
+
+
+        return object;
+        ]]></Source>
+</Rule>

@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Rule-ASCN-IdentityAttribute-Email-PeopleSoftToAD" type="IdentityAttribute">
+  <Description>Evaluate Identity Attribute by PeopleSoft HCM record</Description>
+  <Signature returnType="Object"/>
+  <Source><![CDATA[
+
+  import sailpoint.object.Custom;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.Util;
+
+  if (link != null) {
+
+    String oprid = link.getAttribute("OPRID");
+
+    if (Util.isNotNullOrEmpty(oprid) && link.getIdentity() != null) {
+
+      //Lookup AD Links for evaluated Identity using PeopleSoft OPRID; only consider AD Links marked primaryAccount.
+
+      Link adLink = null;
+
+      QueryOptions ops = new QueryOptions();
+      ops.addFilter(Filter.like("displayName", "\\" + oprid, Filter.MatchMode.END));
+      ops.addFilter(Filter.eq("application.type", "Active Directory - Direct"));
+      ops.addFilter(Filter.eq("primaryAccount", "true"));
+      ops.addFilter(Filter.eq("identity", link.getIdentity()));
+      ops.setCloneResults(true);
+
+      Iterator itr = context.search(Link.class, ops, "id");
+
+      while (itr.hasNext()) {
+
+        adLinkId = itr.next()[0];
+
+        adLink = context.getObjectById(Link.class, adLinkId);
+
+        if (adLink != null) {
+
+          break;
+
+        }
+
+      }
+
+      Util.flushIterator(itr);
+
+      if (adLink != null && Util.isNotNullOrEmpty(adLink.getAttribute("mail"))) {
+
+        //Return mail from resolved AD link for Email Identity Attribute
+
+        return adLink.getAttribute("mail");
+
+      }
+
+    }
+
+  }
+
+  return null;
+
+  ]]></Source>
+</Rule>

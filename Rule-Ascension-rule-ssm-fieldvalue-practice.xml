@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-SSM-FieldValue-Practice" type="AllowedValues">
+  <Description>Ascension-Rule-SSM-FieldValue-Practice</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-SSM"/>
+  </ReferencedRules>
+  <Signature returnType="Object"/>
+  <Source><![CDATA[
+     
+    	
+   	import sailpoint.object.Custom ; 
+  	
+  	import org.apache.commons.logging.Log;
+  	import org.apache.commons.logging.LogFactory;
+  	   	
+   	private static String CUSTOM_OBJECT_NAME_PRACTICE_LIST = "Ascension-Custom-SSM-Practices" ;
+   	
+   	Log loggerObj = LogFactory.getLog("ascension.sailpoint.rule.ssm");
+
+	loggerObj.debug("Ascension-Rule-SSM-FieldValue-Practice - Start...") ; 
+	
+	List practiceList = new ArrayList() ;
+	
+   	try {
+   	
+		loggerObj.info("Ascension-Rule-SSM-FieldValue-Practice - Getting values from - " + CUSTOM_OBJECT_NAME_PRACTICE_LIST) ;
+
+		practiceList = getListFromCustomObject(CUSTOM_OBJECT_NAME_PRACTICE_LIST) ;		
+		
+		loggerObj.info("Ascension-Rule-SSM-FieldValue-Practice - Number of Practices - " + practiceList.size()) ;  	
+   	
+   	} catch(Exception exception){
+   		
+   		loggerObj.error("Ascension-Rule-SSM-FieldValue-Practice - Exception occured while getting custom object values - " + exception.getMessage()) ;   	
+   	}
+   	
+   	loggerObj.debug("Ascension-Rule-SSM-FieldValue-Practice - End.") ;
+   	
+   	return practiceList ; 
+   	
+   	   	
+     
+  ]]></Source>
+</Rule>

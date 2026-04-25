@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-SetCWRExpDtToNull">
+  <Description>
+	Rule to Set ctrexpDt (Contractor Expiration Date) for Contractors and Non-HR Contractors from AD accounts 
+  </Description>
+  <Source><![CDATA[
+import sailpoint.object.Application;
+import sailpoint.object.Filter;
+import sailpoint.object.Identity;
+import sailpoint.object.Link;
+import sailpoint.object.QueryOptions;
+import sailpoint.object.TaskResult;
+import sailpoint.api.Terminator;
+import java.util.Date;
+import java.text.SimpleDateFormat; 
+import sailpoint.tools.Util;      
+import sailpoint.object.ProvisioningPlan;
+import sailpoint.object.ProvisioningPlan.AccountRequest;
+import sailpoint.object.ProvisioningPlan.AttributeRequest;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import sailpoint.api.Provisioner;
+
+private static Log log = LogFactory.getLog("ascension.rule.setCtrExpDt");
+
+log.debug("Start of rule Ascension-Rule-SetCtrExpDt");
+
+//String company ="TNNAS";
+//boolean simulation = false;
+//int expiringWithInDays = 30;
+
+String resultString = "";
+int identitiesFound = 0;
+
+Filter f1 = Filter.eq("type", "employee");
+//Filter f2 = Filter.eq("type", "non-hr contractor");
+Filter typeFilter = Filter.or(f1);
+
+Filter inactiveFilter = Filter.eq("inactive",false);
+//Filter companyFilter = Filter.eq("company", company);
+
+Filter cwrExpDtFilter = Filter.notnull("ctrexpDt");
+
+Filter finalFilter = Filter.and(typeFilter, inactiveFilter, cwrExpDtFilter);
+
+QueryOptions qo = new QueryOptions();
+qo.addFilter(finalFilter);
+
+Provisioner provisioner = new Provisioner(context);
+
+Iterator it = null;
+try {
+   it = context.search(Identity.class, qo, "name");
+} catch (sailpoint.tools.GeneralException ge) {
+   resultString += ge.getMessage() + "\n";
+   taskResult.addMessage(resultString);
+   return resultString;
+}
+
+StringBuilder report = new StringBuilder();
+
+report.append("Identity Name, CWR Expiration Date, ApplicationLink").append("\n");
+
+while ((null != it) && (it.hasNext())) {
+	
+	String identityDisplayName=null;
+	String identityUserName=null;
+	String ctrexpDt=null;
+	String managerUserName=null;
+	String managerDisplayName=null;
+	
+	String identityName = it.next()[0];
+	
+	if (Util.isNotNullOrEmpty(identityName)) {
+		
+		log.debug("Processing identity: "+identityName);
+		Identity identity = context.getObjectByName(Identity.class, identityName);
+		if (identity != null) {
+			String ctrexpDt= (String)identity.getAttribute("ctrexpDt");
+			log.debug("Currently set ctrexpDt: "+ctrexpDt);
+			
+			if (Util.isNotNullOrEmpty(ctrexpDt)) {
+				//for employee ctrexpDate should be null, if not set it to null also get all active directory links and set accountExpires to "never"
+				identity.setAttribute("ctrexpDt",null);
+				log.debug("Setting ctrexpDt to null: ");
+				//context.saveObject(identity);
+				report.append(identityName).append(",").append(ctrexpDt);
+				log.debug("After Setting ctrexpDt to null: ");
+				//get list of active directory links
+				List links = identity.getLinks();
+					 
+			   if (links != null) {
+				   for (Link link : links) {
+					   if (link != null) {			   
+						   if(link.getApplication().getType().equalsIgnoreCase("Active Directory - Direct")) {
+							   
+							   log.debug("Setting accountExpires on AD links: ");
+							   
+							   if (Util.isNotNullOrEmpty(link.getAttribute("accountExpires")) && !(link.getAttribute("accountExpires").equals("never"))) {
+								   //link.setAttribute("accountExpires","never");
+								   ProvisioningPlan plan = new ProvisioningPlan();
+								   
+								   plan.setIdentity(identity);
+								   
+								   AccountRequest acctReq = new AccountRequest();
+								   appName=link.getApplicationName();
+								   accountName =link.getNativeIdentity();
+									
+									acctReq.setApplication(appName);
+									acctReq.setNativeIdentity(accountName);
+									acctReq.setOperation(ProvisioningPlan.AccountRequest.Operation.Modify);
+									log.debug("Setting accountExpires on AD link: "+appName);
+																	
+									AttributeRequest attrReq = new AttributeRequest("accountExpires", ProvisioningPlan.Operation.Set, null);
+									acctReq.add(attrReq);
+									plan.add(acctReq);
+									log.debug("Plan XML: " + plan.toXml());
+									//provisioner.execute(plan);
+									
+									report.append(",").append(appName);
+									
+								}
+							}
+						}
+					}
+				}
+				report.append("\n");
+				identitiesFound++;
+			}
+		}		
+	}
+
+}
+
+report.append("identitiesFound: ").append(identitiesFound);
+
+return report.toString();
+
+ ]]></Source>
+</Rule>

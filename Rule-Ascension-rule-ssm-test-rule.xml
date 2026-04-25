@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-SSM-Test-Rule">
+  <Description>Rule - SSM - Test Rule</Description>
+  <Signature returnType="Object"/>
+  <Source><![CDATA[
+
+
+	import com.google.cloud.pubsub.v1.TopicAdminClient;
+	import com.google.pubsub.v1.ProjectName;
+	import com.google.pubsub.v1.Topic;
+	
+	import com.google.api.core.ApiFuture;
+	import com.google.cloud.pubsub.v1.Publisher;
+	import com.google.common.collect.ImmutableMap;
+	import com.google.protobuf.ByteString;
+	import com.google.pubsub.v1.PubsubMessage;
+	import com.google.pubsub.v1.TopicName;
+	
+  	import org.apache.commons.logging.Log;
+  	import org.apache.commons.logging.LogFactory;
+  	  
+  	Log loggerObj = LogFactory.getLog("ascension.sailpoint.rule.ssm");	
+  	  	
+  	List outList = new ArrayList();
+  	
+  	loggerObj.debug("Ascension-Rule-CaseTracker-Test-Rule - Start...");
+  	
+	void getAllTopics(){
+	    	
+		try {
+			
+			 TopicAdminClient topicAdminClient = TopicAdminClient.create() ; 
+			
+		      ProjectName projectName = ProjectName.of("asc-collab-sailpoint-prod");
+		      
+		      for (Topic topic : topicAdminClient.listTopics(projectName).iterateAll()) {
+		        
+		        outList.add(topic.getName()) ;
+		      }
+		      
+		      loggerObj.debug("Listed all topics.");
+		      
+		      outList.add("Listed all topics.") ;
+		
+		} catch (Exception exception) {
+			
+			loggerObj.error(exception.getMessage()) ;
+			
+			outList.add(exception.getMessage()) ;
+		}
+	}
+	
+	void publishMessage(){
+		try {	
+		
+			String userInfo = 	"{" +
+								"\"email\": \"TTSSMTes-dev@tnnas.com\","+
+								"\"windowsAccountName\": \"TNNAS\\TTSSM001-dev\","+
+								"\"domain\": \"TNNAS\","+
+								"\"username\": \"TTSSM001-dev\","+
+								"\"adGroups\": {\"DS-CT-OfficerViewer\"},"+
+								"\"eventTime\": \"2021-08-16 11:53:00\""+
+								"}" ;
+			TopicName topicName = TopicName.of("asc-ahnat-sailpoint-dev", "sailpoint.user.dev");
+		    Publisher publisher = Publisher.newBuilder(topicName).build();
+		    ByteString data = ByteString.copyFromUtf8(userInfo);
+		      PubsubMessage pubsubMessage =
+		          PubsubMessage.newBuilder()
+		              .setData(data)
+		              .putAllAttributes(ImmutableMap.of("DS-CT-OfficerViewer", "false"))
+		              .build();
+
+		      // Once published, returns a server-assigned message id (unique within the topic)
+		      ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
+		      String messageId = messageIdFuture.get();	
+		      
+		      outList.add(messageId) ;	    
+		    		
+		} catch (Exception exception) {
+			
+			loggerObj.error(exception.getMessage()) ;
+			
+			outList.add(exception.getMessage()) ;
+		}	
+	}
+	
+	
+	getAllTopics() ;
+	
+	//publishMessage() ; 
+	
+	loggerObj.debug("Ascension-Rule-CaseTracker-Test-Rule - End."); 
+	
+	return outList ; 
+	
+
+
+  
+  ]]></Source>
+</Rule>

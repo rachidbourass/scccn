@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension Voyager Identity Data Dump">
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+ 
+		import sailpoint.object.Identity;
+		import sailpoint.object.Filter;
+		import sailpoint.object.QueryOptions;
+		import sailpoint.api.ObjectUtil;
+		import sailpoint.tools.Util;
+		import java.nio.file.Path;
+		import java.nio.file.Files;
+		import java.nio.file.Paths;
+		import java.nio.file.LinkOption;
+		import java.nio.charset.Charset;
+		import sailpoint.tools.Util;
+		
+		private static String getIdentityData(Identity identity){
+			String data ="";
+			String userName = identity.getName();
+			String employeeId,department,userType,ministry,buildingId,inactive,badgeNumber,businessUnit,businessUnitDescription,city,company="";
+			String ctrexpDt,departmentNumber,displayName,email,firstname,internalId,jobcode,lastname,location,locationDescription,manager,middleName="";
+			String samAccountName,st,streetAddress,title,vendorName,type,personaType,ssn,dob="";
+			try {
+
+				employeeId = (Util.isNotNullOrEmpty(identity.getAttribute("employeeId")) ? identity.getAttribute("employeeId") : "");
+				department = (Util.isNotNullOrEmpty(identity.getAttribute("department")) ? identity.getAttribute("department") : "");
+				userType = (Util.isNotNullOrEmpty(identity.getAttribute("userSubType")) ? identity.getAttribute("userSubType") : "");
+				ministry = (Util.isNotNullOrEmpty(identity.getAttribute("ministry")) ? identity.getAttribute("ministry") : "");
+				buildingId = (Util.isNotNullOrEmpty(identity.getAttribute("buildingId")) ? identity.getAttribute("buildingId") : "");
+				inactive = (Util.isNotNullOrEmpty(identity.isInactive().toString())? identity.isInactive().toString() : "false");
+				badgeNumber = (Util.isNotNullOrEmpty(identity.getAttribute("badgeNumber")) ? identity.getAttribute("badgeNumber") : "");
+				businessUnit = (Util.isNotNullOrEmpty(identity.getAttribute("businessUnit")) ? identity.getAttribute("businessUnit") : "");
+				businessUnitDescription = (Util.isNotNullOrEmpty(identity.getAttribute("businessUnitDescription")) ? identity.getAttribute("businessUnitDescription") : "");
+				city = (Util.isNotNullOrEmpty(identity.getAttribute("city")) ? identity.getAttribute("city") : "");
+				company = (Util.isNotNullOrEmpty(identity.getAttribute("company")) ? identity.getAttribute("company") : "");
+				ctrexpDt = (Util.isNotNullOrEmpty(identity.getAttribute("ctrexpDt")) ? identity.getAttribute("ctrexpDt") : "");
+				departmentNumber = (Util.isNotNullOrEmpty(identity.getAttribute("departmentNumber")) ? identity.getAttribute("departmentNumber") : "");
+				displayName = (Util.isNotNullOrEmpty(identity.getAttribute("displayName")) ? identity.getAttribute("displayName") : "");
+				email = (Util.isNotNullOrEmpty(identity.getAttribute("email")) ? identity.getAttribute("email") : "");
+				firstname = (Util.isNotNullOrEmpty(identity.getAttribute("firstname")) ? identity.getAttribute("firstname") : "");
+				internalId = (Util.isNotNullOrEmpty(identity.getAttribute("internalId")) ? identity.getAttribute("internalId") : "");
+				jobcode = (Util.isNotNullOrEmpty(identity.getAttribute("jobcode")) ? identity.getAttribute("jobcode") : "");
+				lastname = (Util.isNotNullOrEmpty(identity.getAttribute("lastname")) ? identity.getAttribute("lastname") : "");
+				location = (Util.isNotNullOrEmpty(identity.getAttribute("location")) ? identity.getAttribute("location") : "");
+				locationDescription = (Util.isNotNullOrEmpty(identity.getAttribute("locationDescription")) ? identity.getAttribute("locationDescription") : "");
+				manager = (Util.isNotNullOrEmpty(identity.getAttribute("manager")) ? identity.getAttribute("manager") : "");
+				middleName = (Util.isNotNullOrEmpty(identity.getAttribute("middleName")) ? identity.getAttribute("middleName") : "");
+				samAccountName = (Util.isNotNullOrEmpty(identity.getAttribute("samAccountName")) ? identity.getAttribute("samAccountName") : "");
+				st = (Util.isNotNullOrEmpty(identity.getAttribute("st")) ? identity.getAttribute("st") : "");
+				streetAddress = (Util.isNotNullOrEmpty(identity.getAttribute("streetAddress")) ? identity.getAttribute("streetAddress") : "");
+				title = (Util.isNotNullOrEmpty(identity.getAttribute("title")) ? identity.getAttribute("title") : "");
+				vendorName = (Util.isNotNullOrEmpty(identity.getAttribute("vendorName")) ? identity.getAttribute("vendorName") : "");
+				type = (Util.isNotNullOrEmpty(identity.getAttribute("type")) ? identity.getAttribute("type") : "");
+				personaType = (Util.isNotNullOrEmpty(identity.getAttribute("personaType")) ? identity.getAttribute("personaType") : "");
+				ssn = (Util.isNotNullOrEmpty(identity.getAttribute("ssn")) ? identity.getAttribute("ssn") : "");
+				dob = (Util.isNotNullOrEmpty(identity.getAttribute("dob")) ? identity.getAttribute("dob") : "");
+				data=userName+"|"+firstname+"|"+lastname+"|"+displayName+"|"+middleName+"|"+badgeNumber+"|"+employeeId+"|"+samAccountName+"|"+title+"|"+manager+"|"+personaType+"|"+type+"|"+businessUnit+"|"+businessUnitDescription+"|"+internalId+"|"+email+"|"+jobcode+"|"+department+"|"+departmentNumber+"|"+location+"|"+locationDescription+"|"+company+"|"+vendorName+"|"+ctrexpDt+"|"+streetAddress+"|"+city+"|"+st+"|"+ssn+"|"+dob;
+			}
+			catch (Exception e){
+				data=userName+"|"+firstname+"|"+lastname+"|"+displayName+"|"+middleName+"|"+badgeNumber+"|"+employeeId+"|"+samAccountName+"|"+title+"|"+manager+"|"+personaType+"|"+type+"|"+businessUnit+"|"+businessUnitDescription+"|"+internalId+"|"+email+"|"+jobcode+"|"+department+"|"+departmentNumber+"|"+location+"|"+locationDescription+"|"+company+"|"+vendorName+"|"+ctrexpDt+"|"+streetAddress+"|"+city+"|"+st+"|"+ssn+"|"+dob+"|VOYAGER Exception "+e.getMessage();
+			}				
+			return data;
+		}
+		
+		int count=0;
+		Path outPath = Paths.get("D:\\identityVoyagerDump.csv"); //Absolute Path of Output File
+
+		BufferedWriter bw = Files.newBufferedWriter(outPath, Charset.forName("UTF-8")); 
+
+		bw.write("userName|firstname|lastname|displayName|middleName|badgeNumber|employeeId|samAccountName|title|manager|personaType|type|businessUnit|businessUnitDescription|internalId|email|jobcode|department|departmentNumber|location|locationDescription|company|vendorName|ctrexpDt|streetAddress|city|st|ssn|dob");
+
+		QueryOptions ops = new QueryOptions();
+		//ops.addFilter(Filter.notnull("employeeId"));
+
+		Iterator wgItr = context.search(Identity.class, ops, "id");
+
+		while (wgItr.hasNext()) {
+
+			Identity identity = context.getObjectById(Identity.class, wgItr.next()[0]);
+
+			if (identity != null) {
+				count++;
+				String data = getIdentityData(identity);
+				bw.newLine();
+				bw.write(data);
+				context.decache(identity);
+				if(count%1000==0){
+					bw.flush();
+				}
+			}
+		}
+
+		Util.flushIterator(wgItr);
+		bw.close();
+		return count;
+	
+  ]]></Source>
+</Rule>

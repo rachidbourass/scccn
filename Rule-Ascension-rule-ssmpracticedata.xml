@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-SSMPracticeData">
+  <Source><![CDATA[
+ import sailpoint.tools.RFC4180LineParser;
+  import sailpoint.tools.RFC4180LineIterator;
+  import java.io.InputStream;
+  import java.io.BufferedInputStream;
+  import java.io.FileInputStream;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.object.Custom;
+  import sailpoint.tools.Util;
+  
+//Get the input file stream
+private static RFC4180LineParser parser = new RFC4180LineParser(',');
+  String filePath = "\\\\andc1wapp0147.ds.sjhs.com\\AppAggregation\\SSMPracticeData.csv";
+InputStream stream=null;
+String fileEncoding = "UTF-8";
+Map practiceDataMap = new HashMap();
+Map updatedPracticeDataMap = new HashMap();
+private InputStream getFileStream() throws Exception
+{
+
+if(filePath == null)
+{
+  throw new GeneralException("FilePath cannot be null");
+}
+try
+  {
+   File file = new File(filePath);
+  if(!file.exists())
+     {
+	 
+	 throw new GeneralException("File does not exists");
+	 }
+  else
+  {
+  stream = new BufferedInputStream(new FileInputStream(file));
+  }
+  
+  
+  }
+  catch(Exception exception)
+  {
+     throw new GeneralException(exception.printStackTrace());
+  }
+  return stream;
+}
+
+public void processLines(RFC4180LineIterator lines)
+{
+boolean done = false;
+int linesRead = 0;
+String line = null;
+
+while(!done)
+{
+line = lines.readLine();
+  if(null==line)
+{
+done=true;
+continue;
+}
+  //To skip first line as it has header
+  else if(linesRead==0)
+  {
+  linesRead++;
+    continue;
+  }
+
+  //To skip commented lines
+else if(line.startsWith("#")||line.length()<1)
+{
+   continue;
+}
+else{
+linesRead++;
+}
+List tokens = parser.parseLine(line);
+if(tokens.size()>5)
+{
+  
+String key = tokens.get(6);
+String practiceName = tokens.get(3);
+ if(null != practiceName)
+  practiceDataMap.put(key,practiceName);
+}
+}
+}
+ InputStream inputStream = getFileStream();
+ RFC4180LineIterator lines = null;
+ if(null!=inputStream){
+     if(null!=fileEncoding){ 
+	 try{
+	   lines = new RFC4180LineIterator(new BufferedReader(new InputStreamReader(inputStream,fileEncoding)));
+	 }
+	 catch(GeneralException exception){
+	 throw new GeneralException(exception);
+	 }
+	 }
+	 }
+    if(null!=lines)
+	{
+	   processLines(lines);
+	
+	}
+	lines.close();
+	inputStream.close();
+	Custom customObject = context.getObjectByName(Custom.class,"Ascension-Custom-SSMPracticeData");
+Custom oldCustomObject = context.getObjectByName(Custom.class,"Ascension-Custom-SSMPracticeData-old"); 
+  
+if(null ==customObject)
+{
+  customObject = new Custom();
+ customObject.setName("Ascension-Custom-SSMPracticeData");
+customObject.put("currentPracticeData",practiceDataMap);
+ context.saveObject(customObject);
+}
+
+else
+{
+  if(null ==oldCustomObject)
+  {
+    oldCustomObject = new Custom();
+    oldCustomObject.setName("Ascension-Custom-SSMPracticeData-old");
+    oldCustomObject.put("oldPracticeData",customObject.get("currentPracticeData"));
+  context.saveObject(oldCustomObject);
+  }
+  else
+  {
+     oldCustomObject.put("oldPracticeData",customObject.get("currentPracticeData"));
+     context.saveObject(oldCustomObject);
+  }
+ }
+   customObject.put("currentPracticeData",practiceDataMap);
+  context.saveObject(customObject);
+   context.commitTransaction();
+  ]]></Source>
+</Rule>

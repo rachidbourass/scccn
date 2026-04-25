@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Tableau-BeforeOperationRule" type="WebServiceBeforeOperationRule">
+  <Description>The Web Services connector will call this rule before performing ANY defined operation. This rule can be used to add/update values in the endpoint object before performing the operation and/or add persistent values to the application's data.
+(See information about what to return for more information)</Description>
+  <Signature returnType="Object">
+    <Inputs>
+      <Argument name="log" type="org.apache.commons.logging.Log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>The application associated with the operation being processed.</Description>
+      </Argument>
+      <Argument name="requestEndPoint">
+        <Description>The current request information containing the header, body, context url, method type, response attribute map, 
+                and response code. This object can be modified directly and returned by the rule to update the endpoint information that is
+                used by the current operation.
+                </Description>
+      </Argument>
+      <Argument name="oldResponseMap">
+        <Description>Earlier response object </Description>
+      </Argument>
+      <Argument name="restClient">
+        <Description>REST Client Object</Description>
+      </Argument>
+      <Argument name="provisioningPlan">
+        <Description>A ProvisioningPlan object containing the payload of the http request. A provisioning plan has an account request which defines the operation to be performed on the account.
+                 An account request can contain multiple attribute requests and each attribute request represents an operation on a single account attribute.
+                </Description>
+      </Argument>
+      <Argument name="partition">
+        <Description>If applicable, a Partition object with the current aggregation's partitioning information.
+                </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="Map">
+        <Description>An updated or unmodified 'requestEndPoint' object. If application object modifications are desired, create a map containing keys 'updatedEndPoint' and 'connectorStateMap' and use it as the return value;
+                Within the new map, the 'updatedEndPoint' can be set to an updated or unmodified 'requestEndPoint' object. The 'connectorStateMap' will be saved as persistent values in the application definition.
+                </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[import org.ascn.webservices.TableauAuth;
+  import sailpoint.object.Identity;
+	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.tools.GeneralException;
+  
+  String arOperation = null;
+  String contentType = "application/xml";
+  String acceptType = "application/json";
+  String userName = "DS\\svcsail";
+  String userPassword = "TwVsqtj8!";
+  String siteName="AscensionNational";
+  String authUrl = "https://tableau.ascension.org/api/3.19/auth/signin";
+  
+  
+  TableauAuth ta = new TableauAuth();
+  ta.setUserName(userName);
+  ta.setUserPassword(userPassword);
+  ta.setSiteName(siteName);
+	ta.setTokenUrl(authUrl);
+	ta.setAccept(acceptType);
+	ta.setContentType(contentType);
+  
+	String outToken = ta.getToken();
+  //return outToken;
+  String accountId = ta.getAccountId(provisioningPlan);
+  arOperation = ta.getArOperation();
+ 	Map requestHeader = new HashMap();
+  if(null != outToken){
+     //Executed when Disable Operation is executed.
+    if(null != accountId @and null!= arOperation @and "Disable".equals(arOperation)){
+      String userUrl = requestEndPoint.getFullUrl()+"/"+accountId;
+      requestEndPoint.setFullUrl(userUrl);
+      contentType = "application/xml";
+    }
+    requestHeader.put("X-Tableau-Auth",outToken);  
+    requestHeader.put("Accept",acceptType);
+    requestHeader.put("Content-Type",contentType);
+    requestEndPoint.setHeader(requestHeader);
+  }else{
+    throw new Exception("Empty Token Returned / Token is NULL");
+  }
+
+   return requestEndPoint;]]></Source>
+</Rule>

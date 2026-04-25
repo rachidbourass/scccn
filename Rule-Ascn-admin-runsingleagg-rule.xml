@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="ASCN-ADMIN-RunSingleAgg-Rule">
+  <Description>
+    
+     RunSingleAgg-Rule
+    
+  </Description>
+  <Signature returnType="String"/>
+  <Source><![CDATA[
+ import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+import java.util.List;
+import java.util.ArrayList;
+import sailpoint.object.Identity;
+import java.util.Iterator;
+import sailpoint.object.Filter;
+import sailpoidnt.object.QueryOptions;
+import org.apache.commons.lang.StringUtils;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Calendar;
+import sailpoint.object.Application;
+import sailpoint.object.Attributes;
+import sailpoint.object.ResourceObject;
+import sailpoint.object.TaskResult;
+import sailpoint.api.Aggregator;
+import sailpoint.connector.ConnectorFactory;
+  
+Logger log = Logger.getLogger("sailpoint.ascension.rules.single.aggregation");
+log.setLevel(Level.DEBUG);
+   List userDN = new ArrayList();
+
+  log.debug("Starting iiq rule RunSingleAgg-Rule---+ ");
+  String dataList = config.get("identitiesToAggregate");
+		List requestList = Arrays.asList(dataList.split("@"));
+		for(String s : requestList) {
+			
+			String[] recordStr = s.split("###");
+			String applicationName = recordStr[0];
+			String accountName = recordStr[1];
+      
+  
+    // We have already validated all of the arguments.  Now just load the objects.
+    Application appObject = context.getObjectByName(Application.class, applicationName);
+    String appConnName = appObject.getConnector();
+    log.debug("Single Aggregation Rule: Application " + applicationName + " uses connector " + appConnName);
+    String errorMessage="";
+    Object appConnector = sailpoint.connector.ConnectorFactory.getConnector(appObject, null);
+    if(null == appConnector)
+    {
+        errorMessage = "Single Aggregation Rule: Failed to construct an instance of connector [" + appConnName + "]";
+        log.debug(errorMessage);
+        return;
+    }
+    
+    ResourceObject rObj = null;
+    boolean foundAccount =false;
+    try
+    {
+        log.debug("Single Aggregation Rule: accountName: " + accountName);
+        rObj = (ResourceObject) appConnector.getObject("account", accountName, null);
+        
+        if(rObj != null)
+        {
+            foundAccount = true;
+           log.debug(" Single Aggregation Rule: foundAccount "+foundAccount);
+        }
+        else //just in case it gets past the catch
+        {
+            foundAccount = false;
+           log.debug(" Single Aggregation Rule: foundAccount "+foundAccount);
+        }
+    }
+    catch(Throwable nsme) //will catch if it can't find an account
+    {
+      System.out.println("NSME - "+nsme);
+    	log.error(" Single Aggregation Rule: errorMessage "+errorMessage);
+    
+    }
+    
+    if(foundAccount)
+    {
+    	 log.debug("Single Aggregation Rule: Got raw resourceObject: " + rObj.toXml());
+    	 log.debug("Single Aggregation Rule: 4");
+        
+        
+        
+    }else {
+    	log.debug("Single Aggregation Rule: Account Not Found>>> ");
+    }
+    
+    // Next we perform a miniature "Aggregation" using IIQ's built in Aggregator.
+    // Create an arguments map for the aggregation task. 
+    
+    
+    // arguments to the account aggregation tasks.  Some suggested defaults are:
+    Attributes argMap = new Attributes();
+    argMap.put("applications", applicationName);
+    argMap.put("checkDeleted", "false");
+    argMap.put("checkHistory", "false");
+    argMap.put("checkPolicies", "false");
+    argMap.put("correlateEntitlements", "false");
+    argMap.put("correlateOnly", "true"); //READ ME: If you modify this to false, change it back to true when you're done using the rule! Only set to this false if your intent is to create a net new Identity Cube containing only the AD account you're aggregating. This argument, when set to false, is the equivalent of deselecting the "Only create links if they can be correlated to an existing identity" checkbox on an Account Aggregation task.
+    argMap.put("correlateScope", "false");
+    argMap.put("deltaAggregation", "false");
+    argMap.put("enablePartitioning", "false");
+    argMap.put("haltOnMaxError", "false");
+    argMap.put("noAutoCreateApplications", "true");
+    argMap.put("noAutoCreateScopes", "true");
+    argMap.put("noNeedsRefresh", "false");
+    argMap.put("noOptimizeReaggregation", "true");
+    argMap.put("promoteManagedAttributes", "true");
+    argMap.put("refreshCertifications", "false");
+    argMap.put("refreshScorecard", "false");
+    argMap.put("sequential", "false");
+    argMap.put("taskCompletionEmailNotify", "Disabled");
+
+    // Construct an aggregator instance.
+    Aggregator agg = new Aggregator(context, argMap);
+    
+    if(null == agg)
+    {
+        errorMessage = "Single Aggregation Rule: Null Aggregator returned from constructor. Unable to Aggregate!";
+        log.debug(errorMessage);
+        return;
+    }
+
+    // Invoke the aggregation task by calling the aggregate() method.
+    // Note: the aggregate() call may take serveral seconds to complete.
+    log.debug("Single Aggregation Rule: Calling aggregate() method... ");
+    TaskResult taskResult = agg.aggregate(appObject, rObj);
+    log.debug("aggregation complete.");
+
+    if (null == taskResult)
+    {
+        errorMessage = "Single Aggregation Rule: ERROR: Null taskResult returned from aggregate() call.";
+        log.debug(errorMessage);
+    }
+    else
+    {
+    	
+    	 log.debug("Single Aggregation Rule: TaskResult details: \n" + taskResult.toXml()); 
+    	 
+    	 
+    }
+  
+    }
+    return foundAccount;
+    
+		
+          
+      ]]></Source>
+</Rule>

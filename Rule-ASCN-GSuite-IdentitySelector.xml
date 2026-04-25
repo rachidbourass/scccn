@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-AssignmentRule-GSuiteRole" type="IdentitySelector">
+  <Description>
+  This identity assignment rule evaluates an Identity to determine the provisioning\n
+  a GSuite Account. The provisioning will not happen if any of the following gsuiteStatus, gsuiteMdm and employeeType\n
+  identity attributes do not exist on the identity profile
+  </Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Rule-Ascension-EmailAddress-RuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-GSuite"/>
+  </ReferencedRules>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The identity.
+        </Description>
+      </Argument>
+      <Argument name="roleName" type="String">
+        <Description>
+          The name of the sailpoint.object.Bundle (role) that is being selected for the Identity. 
+          If roles are not applicable to this Identity selection, this value will be void.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="success">
+        <Description>
+          True if the selection was successful; false otherwise.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+  import java.util.Map;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Attributes;
+  import sailpoint.api.IdentityService; 
+  import sailpoint.object.Application;
+  import java.util.List;
+  import sailpoint.tools.Util;
+  import org.ascn.utils.QueryUtils;
+  import org.ascn.utils.GeneralUtils;
+  import org.apache.commons.lang3.StringUtils;
+  
+  String logName = "org.ascension.rule.ASCN-GSuiteAccess-IdentitySelector";
+  info(logName, ": Entering: "+identity.getName());
+  
+  //Declare constants. In Beanshell static final objects 
+  //are cached, refrain from using those here
+  String customObjectName = "Ascension-Custom-Gsuite";
+  String appName = "GSuite";
+    
+  if (null != identity && !identity.isInactive()) {
+	try {
+		//Collect all required attributes from Identity
+		//If any of these attribute/values are missing on the 
+		//Identity cube, the provisioning will happen in case of
+		//Non-AMITA users.
+		
+		String company = identity.getAttribute("company");
+		boolean hasAccount = QueryUtils.hasLinks(identity.getName(),appName);
+		// String EA40Value = identity.getAttribute("gsuiteStatus"); 
+		// EA40Value is assigned only after GSuite Account is provisioned. 
+		// So this will prevent identities from being provisioned 
+		//String EA20Value =  identity.getAttribute("gsuiteMdm"); This Value is currently always null
+		String emplTypeValue = identity.getAttribute("employeeType");
+		//String gsuiteAttributeValue = EA40Value+"#"+EA20Value+"#"+emplTypeValue;
+		
+		//Provision GSuite Account to identities with company = AMITA
+		if (meetsContractorBirthrightGSuite(identity)) { return true;}
+				
+		//Provision Identities with AMITA as Company and do not have GSuite Accounts
+		//Map customMap = loadCustomMap("gsuite_status_mapping",customObjectName)
+		if (!"AMITA".equalsIgnoreCase(company) && !hasAccount && !StringUtils.isBlank(emplTypeValue)) {
+			info(logName, ": Assigning Role to Non-AMITA: "+identity.getName());
+			return true;
+		}
+	}catch (Exception e){
+		error(logName,": Error: "+e);
+		//Since this rule operates on a single Identity, throw runtime exception
+		//If you need to loop thru multiple identities, do not throw a RuntimeException.
+		throw new RuntimeException(logName,": Error: "+e);
+	}
+  
+  }
+  info(logName, ": Exiting: "+identity.getName());
+  return false;
+  ]]></Source>
+</Rule>

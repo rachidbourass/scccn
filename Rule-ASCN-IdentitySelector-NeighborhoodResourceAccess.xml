@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="ASCN-Rule-IdentitySelector-NeighborhoodResourceAccess" type="IdentitySelector">
+  <Description>This rule is used to select an Identity that is related to the given Identity</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log" type="org.apache.commons.logging.Log"/>
+      <Argument name="context" type="sailpoint.api.SailPointContext"/>
+      <Argument name="identity" type="Identity"/>
+      <Argument name="roleName" type="String"/>
+    </Inputs>
+    <Returns>
+      <Argument name="success"/>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+import sailpoint.object.Application;
+import sailpoint.object.Identity;
+import sailpoint.object.Link;
+import sailpoint.object.Filter;
+import sailpoint.object.QueryOptions;
+import sailpoint.tools.Util;
+import sailpoint.api.IdentityService;
+import java.util.List;
+
+  // HELPER: Get Principal Name
+  private String getPrincipalName(Identity identity) {
+    IdentityService iService = new IdentityService(context);
+    QueryOptions ops = new QueryOptions();
+    ops.addFilter(Filter.eq("type","Active Directory - Direct"));
+
+    List adApps = context.getObjects(Application.class, ops);
+    List links = iService.getLinks(identity, adApps, null);
+    
+    String samAccountName = identity.getAttribute("samAccountName");
+
+    if (Util.isNotNullOrEmpty(samAccountName) && !identity.isInactive()) {
+      if(links != null){
+        for(Object obj : links){
+          Link link = (Link) obj;
+          
+          // CRASH FIX: Added null safety for Application Type
+          if(link.getApplication() != null && "Active Directory - Direct".equalsIgnoreCase(link.getApplication().getType())){
+            
+            // CRASH FIX: Extract value first and check for null before comparing
+            String linkSAM = link.getAttribute("sAMAccountName");
+
+            if(linkSAM != null && linkSAM.equalsIgnoreCase(samAccountName)){
+              String principalName = link.getAttribute("msDS-PrincipalName");
+              if (Util.isNotNullOrEmpty(principalName)) {
+                return principalName;
+              }
+            }
+          }
+        }
+      }
+    }
+    return "";
+  }
+
+  // HELPER: Adjust NetBIOS
+  private void netBiosAdjustment(String netBiosVal) {
+    if (Util.nullSafeCaseInsensitiveEq(netBiosVal, "CRITTENTON-NET")) {
+      super.netBios = "MIROC";
+    }
+    if (Util.nullSafeCaseInsensitiveEq(netBiosVal, "MEDXCELFM")) {
+      super.netBios = "AHMFM";
+    }
+    if (Util.nullSafeCaseInsensitiveEq(netBiosVal, "VCHS_NT_DOMAIN")) {
+      super.netBios = "KSWIC";
+    }
+  }
+
+  // HELPER: Logic Check
+  private boolean shouldReceiveNeighborhoodResourceAccess(String principalName) {
+    // Get everything before the backslash
+    netBios = principalName.replaceAll("\\\\.*.","");
+
+    if (Util.isNotNullOrEmpty(netBios)) {
+      netBiosAdjustment(netBios);
+      if (roleName != null && roleName.contains(netBios)) {
+        return true;
+      } 
+    }
+    return false;
+  }
+
+  static String netBios;
+
+  String principalName = getPrincipalName(identity);
+
+  if (Util.isNotNullOrEmpty(principalName)) {
+    return shouldReceiveNeighborhoodResourceAccess(principalName);
+  }
+
+  return false;
+  ]]></Source>
+</Rule>

@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="ASCN-Firewall-Attestation-EntitySelector" type="CertificationScheduleEntitySelector">
+<Description>
+This rule is optionally run to determine which entities to certify as part of a certification campaign. It can return either a Filter object or a list of identity names.
+</Description>
+<Signature returnType="Filter or List of Strings">
+<Inputs>
+  <Argument name="definition">
+    <Description>
+    The sailpoint.object.CertificationDefinition that is being used to generate the certification campaign
+    </Description>
+  </Argument>
+</Inputs>
+<Returns>
+  <Argument name="Filter or List of Strings">
+    <Description>
+    If returning a Filter, that will be used to query for sailpoint.object.Identity names to include. If returning a list of strings, those should be the names of sailpoint.object.Identity objects to include.
+    </Description>
+  </Argument>
+</Returns>
+</Signature>
+<Source>
+    <![CDATA[
+    import java.util.ArrayList;
+    import java.util.Arrays;
+    import java.util.Iterator;
+    import java.util.List;
+
+    import sailpoint.api.SailPointContext;
+    import sailpoint.object.Filter;
+    import sailpoint.object.Identity;
+    import sailpoint.object.IdentityEntitlement;
+    import sailpoint.object.QueryOptions;
+    
+    import org.ascn.utils.Common;
+    
+    String RULE_NAME = "ASCN-Firewall-Attestation-EntitySelector";
+    String LOG_NAME = "sailpoint.ascension.firewall.entityselector";
+    Common.info(LOG_NAME,"Entering " + RULE_NAME);
+    
+    List names = new ArrayList();
+    QueryOptions qo = new QueryOptions();
+    String appName = "AD-DS";
+
+    try{
+        List entitlementsToCertify = Arrays.asList("CN=AHNAT-Firewall RO,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com","CN=AHNAT-Firewall RW,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com");
+
+        Filter filter =   Filter.ignoreCase(Filter.and(Filter.eq("application.name", appName),Filter.in("value",entitlementsToCertify),Filter.eq("name", "memberOf")));
+        qo.addFilter(filter);
+        Iterator identityEntNames = context.search(IdentityEntitlement.class, qo);
+        
+        while (identityEntNames.hasNext()) {
+            IdentityEntitlement  ie = (IdentityEntitlement) identityEntNames.next();
+            String identityName = ie.getIdentity().getName();  
+            if (identityName != null) {   
+                names.add(identityName);
+            }
+        }
+    }catch(Exception e){
+        Common.error(LOG_NAME,"Error in Firewall Entity Selector Rule"+e);
+    }
+    Common.info(LOG_NAME,"Exiting " + RULE_NAME);
+    return names;
+    ]]> 
+</Source>
+</Rule>
