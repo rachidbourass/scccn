@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="Ascension Modified Manager Reporting Notification">
+  <Body>
+    #set($ctx = $spTools.class.forName("sailpoint.api.SailPointFactory").getMethod("getFactory", null).invoke(null,null).getCurrentContext())
+#set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Framework-Header-Footer-StyleSheet")) 
+#set($ruleArgs = { 
+"keyEmailTemplate"  : "styleSheet"
+}) 
+#set($styleSheet = $ctx.runRule($ruleObj, $ruleArgs))
+#if( $ruleObj )
+$ctx.decache($ruleObj)
+#end
+#set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Framework-Header-Footer-StyleSheet")) 
+#set($ruleArgs = { 
+"keyEmailTemplate"  : "headerTemplate"
+}) 
+#set($headerTemplate = $ctx.runRule($ruleObj, $ruleArgs))
+#if( $ruleObj )
+$ctx.decache($ruleObj)
+#end
+#set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Framework-Header-Footer-StyleSheet")) 
+#set($ruleArgs = { 
+"keyEmailTemplate"  : "footerTemplate"
+}) 
+#set($footerTemplate = $ctx.runRule($ruleObj, $ruleArgs))
+#if( $ruleObj )
+$ctx.decache($ruleObj)
+#end
+#set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Server-Root-Path")) 
+#set($ruleArgs = {})
+#set($rootPath = $ctx.runRule($ruleObj, $ruleArgs))
+<![CDATA[<html>
+<head>
+<meta charset="UTF-8">	    
+#if( $styleSheet )
+$styleSheet
+#end 
+</head>     
+<body>
+#if( $headerTemplate )
+$headerTemplate
+#end
+<br/>
+<p>Hello,</p>
+<p>You are receiving this email because the following user(s) have been assigned to you as their new manager in the system.
+   #foreach($user in $userList)
+      <li>$user</li>  
+   #end
+    No further action is required from your end at this point.</p>
+
+   <p> Thank you, <br/>
+    The IAM Operations Team. </p> 
+    #if( $footerTemplate )
+$footerTemplate
+#end
+</body>
+</html>]]>
+  </Body>
+  <Description>
+  </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="userList" type="string">
+        <Description>The display name of the Identity that is being changed.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>New Reportee Assignment</Subject>
+</EmailTemplate>

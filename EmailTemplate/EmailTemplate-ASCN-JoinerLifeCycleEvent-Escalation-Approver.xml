@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="Ascension-EmailTemplate-JoinerLifeCycleEvent-Escalation-Approver">
+  <Body>
+ #set($ctx = $spTools.class.forName("sailpoint.api.SailPointFactory").getMethod("getFactory", null).invoke(null,null).getCurrentContext())
+#set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Framework-Header-Footer-StyleSheet")) 
+#set($ruleArgs = { 
+"keyEmailTemplate"  : "styleSheet"
+}) 
+#set($styleSheet = $ctx.runRule($ruleObj, $ruleArgs))
+#if( $ruleObj )
+$ctx.decache($ruleObj)
+#end
+#set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Framework-Header-Footer-StyleSheet")) 
+#set($ruleArgs = { 
+"keyEmailTemplate"  : "headerTemplate"
+}) 
+#set($headerTemplate = $ctx.runRule($ruleObj, $ruleArgs))
+#if( $ruleObj )
+$ctx.decache($ruleObj)
+#end
+#set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Framework-Header-Footer-StyleSheet")) 
+#set($ruleArgs = { 
+"keyEmailTemplate"  : "footerTemplate"
+}) 
+#set($footerTemplate = $ctx.runRule($ruleObj, $ruleArgs))
+#if( $ruleObj )
+$ctx.decache($ruleObj)
+#end
+#set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Server-Root-Path")) 
+#set($ruleArgs = {})
+#set($rootPath = $ctx.runRule($ruleObj, $ruleArgs))
+<![CDATA[<html>
+<head>
+<meta charset="UTF-8">	    
+#if( $styleSheet )
+$styleSheet
+#end
+</head>
+<body>
+    #if( $headerTemplate )
+$headerTemplate
+#end
+<br/>
+      
+<p>Hello,</p>
+<p>This email is to inform you that access request for $!identityDisplayName has escalated because it was not approved in the required timeframe. 
+Please review and take action on the work item.  You can find it in "My Work" under "Work Items" in Ascension Access Management (AAM):
+<a href="$rootPath/workitem/commonWorkItem.jsf#/commonWorkItem/$item.id"><strong>Click here</strong></a> to get started on this task.</p>
+<p>Thank you,</br>
+The IAM Operations Team</p>
+#if($footerTemplate)
+$footerTemplate
+#end
+</body>
+</html>]]>
+      
+    </Body>
+  <Description>
+      Email Template for escalating to approver manager
+    </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" type="Workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+      <Argument name="item" type="WorkItem">
+        <Description>The WorkItem representing the review.</Description>
+      </Argument>
+      <Argument name="approvalSet" type="ApprovalSet">
+        <Description>The ApprovalSet object contained in the workflow.</Description>
+      </Argument>
+      <Argument name="launcher" type="string">
+        <Description>The name of the Identity that launched the workflow.</Description>
+      </Argument>
+      <Argument name="identityDisplayName" type="string">
+        <Description>The display name of the Identity that is being changed.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>ACTION REQUIRED: Assign AD Domain for New Associate - Escalation</Subject>
+</EmailTemplate>

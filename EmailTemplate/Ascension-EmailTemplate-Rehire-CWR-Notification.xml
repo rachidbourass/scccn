@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="Ascension-EmailTemplate-Rehire-CWR-Notification">
+  <Body>
+    #set($ctx = $spTools.class.forName("sailpoint.api.SailPointFactory").getMethod("getFactory", null).invoke(null,null).getCurrentContext())
+    #set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Framework-Header-Footer-StyleSheet")) 
+    #set($ruleArgs = { 
+    "keyEmailTemplate"  : "styleSheet"
+    }) 
+    #set($styleSheet = $ctx.runRule($ruleObj, $ruleArgs))
+    #if( $ruleObj )
+    $ctx.decache($ruleObj)
+    #end
+    #set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Framework-Header-Footer-StyleSheet")) 
+    #set($ruleArgs = { 
+    "keyEmailTemplate"  : "headerTemplate"
+    }) 
+    #set($headerTemplate = $ctx.runRule($ruleObj, $ruleArgs))
+    #if( $ruleObj )
+    $ctx.decache($ruleObj)
+    #end
+    #set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Framework-Header-Footer-StyleSheet")) 
+    #set($ruleArgs = { 
+    "keyEmailTemplate"  : "footerTemplate"
+    }) 
+    #set($footerTemplate = $ctx.runRule($ruleObj, $ruleArgs))
+    #if( $ruleObj )
+    $ctx.decache($ruleObj)
+    #end
+    #set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Server-Root-Path")) 
+    #set($ruleArgs = {})
+    #set($rootPath = $ctx.runRule($ruleObj, $ruleArgs))
+    &lt;html>
+    &lt;head>
+    &lt;meta charset="UTF-8">	    
+    #if($styleSheet)
+    $styleSheet
+    #end
+    &lt;/head>
+    &lt;body>
+    #if( $headerTemplate )
+    $headerTemplate
+    #end
+    &lt;br/>
+    
+ In preparation for the arrival of your new hire, please read this email and complete the necessary steps.
+
+&lt;p>Below is the user name and temporary password for your new hire’s access to email, standard Google apps, local ministry network, and myAscension portal, inclusive of myHR applications, Kronos timekeeping, and Peoplesoft modules for Travel/Expense and purchasing.&lt;strong>Please forward this information to your new hire, including the User ID Terms listed at the bottom of the message.&lt;/strong>&lt;/p>
+    
+Name: $userName&lt;br/>
+Active Directory ID: $activeDirectoryId&lt;br/>
+Temporary Password: $temporaryPassword&lt;br/>
+Health Ministry: $healthMinistry&lt;br/>
+Worker Type: $workerType&lt;br/>
+Worker ID: $workerId&lt;br/>
+Business Unit: $businessUnit&lt;br/>
+Corporate Job Code: $corporateJobCode&lt;br/>
+Start Date: $startDate&lt;br/>
+Hiring Manager: $hiringManager&lt;br/>
+E-Mail Address: $email&lt;br/>
+Domain: $domain&lt;br/>&lt;br/>   
+If they require additional application access&lt;br/>
+Click here to Provisioning Guide for Network and Application Access - https://gdaintranet.ascension.org/technology/provisioning-guide-for-network-and-application-access&lt;br/>
+    
+Upon arrival, you will need to provide your new hire their user name and temporary password for them to log into their Ascension device and email. If they are attending an orientation session on their first day, please ensure they have this information on hand. They will also be required to enroll separately in multi-factor authentication prior to gaining access to the myAscension portal. For more information about multi-factor authentication, please see https://mfa.ascension.org/faq.&lt;br/>&lt;br/>
+
+Note: A password will not be set if one already exists. In case the associate is not aware of their current password, please have them contact the Ascension Technologies Help Desk for a password reset.&lt;br/>&lt;br/>
+
+    
+This email was automatically generated. Please do not respond to this email. If you have any questions, please call the AIS Help Desk at 877-635-0535.&lt;br/>&lt;br/>
+
+Thank you,&lt;br/>
+Identity &amp; Access Management&lt;br/>&lt;br/>
+    
+
+CONFIDENTIALITY NOTICE:&lt;br/>
+    
+This email message and any accompanying data or files is confidential and may contain privileged information intended only for the named recipient(s). If you are not the intended recipient(s), you are hereby notified that the dissemination, distribution, and or copying of this message is strictly prohibited. If you receive this message in error, or are not the named recipient(s), please notify the sender at the email address above, delete this email from your computer, and destroy any copies in any form immediately. Receipt by anyone other than the named recipient(s) is not a waiver of any attorney-client, work product, or other applicable privilege.&lt;br/>&lt;br/>
+    
+    
+    
+                                                  &lt;center>&lt;strong> Ascension Credential (User ID) Terms for Non-Associates &lt;/center>&lt;/strong>&lt;br/>
+    
+    
+
+ By accepting and using my Ascension-assigned unique User ID, I recognize and agree as follows:&lt;br/>
+● I understand and agree that all information on Ascension Information Systems (“Systems”) is confidential. I recognize that any improper use or disclosure of information could cause damage to patients and/or Ascension. I understand that Ascension may take such remedial action as it deems appropriate, including, but not limited to termination of my access.&lt;br/>
+● I understand that I am required to immediately report any incident that may threaten the security and privacy of information maintained on Systems to privacyofficer@ascension.org.&lt;br/>
+● I understand that any means of access granted to me by Ascension (e.g., username, password, token) has been assigned to me alone, and that I may not share such means of access with any other person, even if that individual has been granted access by Ascension themself.&lt;br/>&lt;br/>
+
+    
+○ I acknowledge and agree that I am fully responsible for all access to information made using my means of access, whether such access was intended, negligent, or inadvertent, and regardless of whether any such access was made with my knowledge and/or permission.&lt;br/>
+○ I understand that my unique User ID/password acts as my personal “signature” when accessing Systems and holds me accountable for all transactions associated with its use.&lt;br/>
+○ I acknowledge that I will not use another user’s account, with or without that person’s permission. I will not attempt to learn the password to another user's account whether the attempt is successful or not.&lt;br/>
+○ I understand that if I become aware of, or have reason to suspect that, someone other than me has access to or is using my means of access, I must notify Ascension immediately so that Ascension may terminate my existing means of access. In that event, Ascension may issue me another means of access.&lt;br/>
+○ I understand I may be obligated to appear in person or provide confidential personal information for verification of my identity (e.g., last four digits of SSN#, mother’s maiden name, etc.).&lt;br/>
+○ I acknowledge that my access to Systems is a privilege. While Ascension seeks to avoid the disruption or termination of access granted to me, I acknowledge that Ascension may terminate my access at any time, with or without notice, and with or without cause. I understand that Systems, and all information available through its use, are and will remain the property of Ascension.&lt;br/>&lt;br/>
+    
+● By using or accessing Systems, I am agreeing to comply with these Terms and other applicable Ascension policy and procedures, which may be implemented and amended from time to time. I also agree to comply with all federal, state, and local laws and regulations. I understand that any use of Systems or the information within Systems for non-agreed upon purposes is expressly prohibited. I further understand that using and/or accessing Systems without proper authorization is strictly prohibited. In addition, the following activities are specifically prohibited:&lt;br/>&lt;br/>
+    
+    
+○ Attempting to disguise my identity, the identity of my account, or of the machine that I am using.&lt;br/>
+○ Attempting to impersonate another person or organization.&lt;br/>
+○ Appropriating Ascension’s name, network names, network number spaces, or local ministry logos, trademarks, or service marks.&lt;br/>
+○ Using Ascension’s assigned Internet number space for my own domain.&lt;br/>
+○ Attempting to intercept, monitor, forge, alter, or destroy other users’ communications.&lt;br/>
+○ Engaging in actions that disrupt or interfere with the legitimate use by other users of Systems, that interfere with the supervisory or accounting functions of Systems, or that are likely to have such effects. Such conduct includes, but is not limited to: placing of unlawful information on Systems, transmitting data or programs likely to result in the loss of an individual’s work or system downtime, sending “chain letters” or “broadcast” messages to lists or individuals, or any other use that causes congestion of Systems or interferes with the work of others (i.e., SPAM).&lt;br/>
+○ Distributing or sending unlawful communications of any kind, including but not limited to threats of violence, obscenity, child pornography and/or harassing communications. Determination of the type of content of any communication is at the discretion of Ascension management.&lt;br/>
+○ Attempting to bypass computer or network security mechanisms. Possession of tools that bypass security or probe security, or possession of files that may be used as input or output for such tools, shall be considered equivalent to such an attempt. The unauthorized scanning or probing of Systems is also prohibited.&lt;br/>
+○ Violating any laws, regulations, or ordinances, including, but not limited to, copyright, discrimination, harassment, privacy, and/or export controls. Ascension may contact local or federal law enforcement authorities to investigate any matter, at its sole discretion.&lt;br/>&lt;br/>
+    
+    
+● I understand that Ascension is authorizing me to access, use, and disclose only information which is necessary for me to perform my essential job function that is part of the agreed upon purpose (“Authorized Information”). I will not access any information other than for these purposes, including my own or friends and family members’ protected health information (“PHI”) unless required to do so for my job function.&lt;br/>
+● I understand that I may only access Authorized Information that is PHI in accordance with the HIPAA Minimum Necessary Rule and all other applicable federal and state laws and regulations.&lt;br/>
+● I understand that Ascension does not authorize my access to, or the use or disclosure of, any other information maintained on Systems (“Restricted Information”) that is not Authorized Information. I further recognize that if I intentionally access any Restricted Information, I will be in violation of these Terms and may be in violation of both state and federal laws that could subject me to civil and/or criminal liability. I understand that, in using Systems, I may, with or without intent, come into contact with Restricted Information. I agree not to further access, use, or disclose this Restricted Information. If I do so, I agree to immediately notify Ascension so that Ascension can take appropriate action. Notification must be provided to privacyofficer@ascension.org.&lt;br/>
+● I understand that my access is subject to periodic audits by Ascension to ensure the privacy and security of Ascension’s information. I agree to provide Ascension with any documentation or information necessary for Ascension to perform such monitoring and auditing and to cooperate with Ascension in performing such activities.&lt;br/>
+● I understand that if my employer does not adhere to Ascension’s provisioning and de-provisioning policies and procedures to receive access to Systems, my access may be terminated.&lt;br/>
+● I understand that Ascension strictly observes all copyrights and conditions regarding the use and distribution of commercially purchased software, and that copying and/or using any software or documentation that has been illegally copied is prohibited.&lt;br/>
+● I understand that as a condition to access Systems, I agree to sign any software license agreements required by a software vendor, if applicable. &lt;br/>&lt;br/>
+
+</Body>
+  <Description>
+    Email template for notifying configured user(s) when Rehire lifecycle is triggered.
+  </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="alert" type="Alert">
+        <Description>The alert object being acted upon.</Description>
+      </Argument>
+      <Argument name="alertDefinitionName" type="string">
+        <Description>Name of the Alert Definition triggering the action.</Description>
+      </Argument>
+      <Argument name="errorMessage" type="string">
+        <Description>Optional message containing more meaningful insight upon error</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>New/Rehire Notification - $userName</Subject>
+</EmailTemplate>

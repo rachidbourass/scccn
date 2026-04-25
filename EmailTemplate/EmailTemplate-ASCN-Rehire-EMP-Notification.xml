@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="Ascension-EmailTemplate-Rehire-EMP-Notification">
+  <Body>
+In preparation for the arrival of your new hire, please read this email and complete the necessary steps.
+
+Below is the user name and temporary password for your new hire’s access to email, standard Google apps, local ministry network, and myAscension portal, inclusive of myHR applications, Kronos timekeeping, and Peoplesoft modules for Travel/Expense and purchasing.
+
+User Name: $userName
+Active Directory ID: $activeDirectoryId
+Temporary Password: $temporaryPassword
+Health Ministry: $healthMinistry
+Worker Type: $workerType
+Worker ID: $workerId
+Business Unit: $businessUnit
+Corporate Job Code: $corporateJobCode
+Start Date: $startDate
+Hiring Manager: $hiringManager
+E-Mail Address: $email
+Domain: $domain
+    
+If they require additional application access
+Click here to Provisioning Guide for Network and Application Access - https://gdaintranet.ascension.org/technology/provisioning-guide-for-network-and-application-access
+
+Upon arrival, you will need to provide your new hire their user name and temporary password for them to log into their Ascension device and email. If they are attending an orientation session on their first day, please ensure they have this information on hand. They will also be required to enroll separately in multi-factor authentication prior to gaining access to the myAscension portal. For more information about multi-factor authentication, please see https://mfa.ascension.org/faq.
+
+Note: A password will not be set if one already exists. In case the associate is not aware of their current password, please have them contact the Ascension Technologies Help Desk for a password reset.
+
+This email was automatically generated. Please do not respond to this email. If you have any questions, please call the AIS Help Desk at 877-635-0535. 
+    
+Thank you,
+Identity &amp; Access Management
+
+CONFIDENTIALITY NOTICE:
+This email message and any accompanying data or files is confidential and may contain privileged information intended only for the named recipient(s). If you are not the intended recipient(s), you are hereby notified that the dissemination, distribution, and or copying of this message is strictly prohibited. If you receive this message in error, or are not the named recipient(s), please notify the sender at the email address above, delete this email from your computer, and destroy any copies in any form immediately. Receipt by anyone other than the named recipient(s) is not a waiver of any attorney-client, work product, or other applicable privilege.
+ </Body>
+  <Description>
+    Email template for notifying configured user(s) when Rehire lifecycle is triggered.
+  </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="alert" type="Alert">
+        <Description>The alert object being acted upon.</Description>
+      </Argument>
+      <Argument name="alertDefinitionName" type="string">
+        <Description>Name of the Alert Definition triggering the action.</Description>
+      </Argument>
+      <Argument name="errorMessage" type="string">
+        <Description>Optional message containing more meaningful insight upon error</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>New/Rehire Notification - $userName</Subject>
+</EmailTemplate>

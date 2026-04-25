@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="Ascension-EmailTemplate-Star-Attestation-Escalate">
+  <Body>#set($ctx = $spTools.class.forName("sailpoint.api.SailPointFactory").getMethod("getFactory", null).invoke(null,null).getCurrentContext())
+    #set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Framework-Header-Footer-StyleSheet")) 
+    #set($ruleArgs = { 
+    "keyEmailTemplate"  : "styleSheet"
+    }) 
+    #set($styleSheet = $ctx.runRule($ruleObj, $ruleArgs))
+    #if( $ruleObj )
+    $ctx.decache($ruleObj)
+    #end
+    #set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Framework-Header-Footer-StyleSheet")) 
+    #set($ruleArgs = { 
+    "keyEmailTemplate"  : "headerTemplate"
+    }) 
+    #set($headerTemplate = $ctx.runRule($ruleObj, $ruleArgs))
+    #if( $ruleObj )
+    $ctx.decache($ruleObj)
+    #end
+    #set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Framework-Header-Footer-StyleSheet")) 
+    #set($ruleArgs = { 
+    "keyEmailTemplate"  : "footerTemplate"
+    }) 
+    #set($footerTemplate = $ctx.runRule($ruleObj, $ruleArgs))
+    #if( $ruleObj )
+    $ctx.decache($ruleObj)
+    #end
+    #set($ruleObj = $ctx.getObjectByName($spTools.class.forName("sailpoint.object.Rule"), "Rule-Server-Root-Path")) 
+    #set($ruleArgs = {})
+    #set($rootPath = $ctx.runRule($ruleObj, $ruleArgs))
+    #set($currentYear = $spTools.formatDate($certification.getActivated(),"YYYY"))
+    #set($dueDate = $spTools.formatDate($certification.getExpiration(),"MM/dd/yyyy"))
+    <![CDATA[
+    <html>
+    <head>
+    <p>
+    <style>.header {background-color:#FFFFFF; width:100%; text-align:left;}.header img{width:25%;height:20%} a {color:#e20074; font-family: Tele-GroteskHal, Arial, Verdana}li {list-style-type:square}p,td,li,div {font-family: Tele-GroteskHal, Arial, Verdana}</style>
+    </p>
+    <div class="header"><img src="https://iga.ascension.org/identityiq/images/custom/emailTemplateBannerLogo.png"></div>
+    <meta charset="UTF-8">       
+    #if( $styleSheet )
+    $styleSheet
+    #end 
+    </head>  
+    <body>
+    #if( $headerTemplate )
+    $headerTemplate
+    #end
+    <br/>
+    <p>
+    Hello,<br/>      
+    <p>
+    The user access review <b>Star User Attestation</b> is scheduled to be completed by <b>$dueDate</b>.
+    </p>
+    <p></p>
+    <p>
+    <b>The individuals indicated below report to you and have reviews assigned to them that are incomplete:</b>
+    </p>
+    <p>
+    $workItem.getOwner().getName() [$workItem.getOwner().getEmail()]
+    </p>
+    <p></p>
+    <p>
+    <b>Please follow these instructions to reassign their reviews to yourself:</b>
+    </p>
+    <p>
+    &nbsp;&nbsp;&nbsp; 1. Click this link:  <a href="$rootPath/lcm/ReassignWorkItems.jsf"><b>[Click here]<b/></a>
+    </p>
+    <p>
+    &nbsp;&nbsp;&nbsp; 2. On the "Reassign Certification Work Items" page, choose the Manager that reports to you from the drop-down list titled [Select Manager].
+    </p>
+    <p>
+    &nbsp;&nbsp;&nbsp; 3. Select the Certification Work Items you want to reassign from the drop-down list titled [Select Certification Work Items].
+    </p>
+    <p>
+    &nbsp;&nbsp;&nbsp; 4. Click the [Reassign] button to reassign the selected Certification Work Items to yourself. 
+    </p>
+    <p>
+    <b>Alternatively, please help Ascension to ensure completion of the review by encouraging the person(s) listed above to complete the attestation in a timely manner.</b>
+    </p>
+    <p>
+    If you have any questions, please open a Service Now Unlisted Service Request with the UAR resolver group AHNAT/OPS/SOLUTIONS IMP/IAM/Identity Governance/UAR.
+    </p>   
+    #if( $footerTemplate )
+    $footerTemplate
+    #end
+    </body>
+    </html>
+    ]]>
+   </Body>
+  <Description>
+    Email Template for notifying work item owners of new certifications.
+    Arguments
+    ---------
+    workItemName (String): The name of the Workitem
+    workItem (Workitem): The Workitem object
+    certification (Certification): The Certification Object
+    requesterName (String): The display name of the Identity that requested the
+    certification
+  </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workItemName" type="string">
+        <Description>The description property (also the name property) of
+          the certification WorkItem.</Description>
+      </Argument>
+      <Argument name="workItem" type="WorkItem">
+        <Description>The WorkItem object for the certification.</Description>
+      </Argument>
+      <Argument name="certification" type="Certification">
+        <Description>The Certification object.</Description>
+      </Argument>
+      <Argument name="requesterName" type="string">
+        <Description>The display name of the Identity that requested the
+          certification.</Description>
+      </Argument>
+      <Argument name="snrManagerDisplayName" type="string"/>
+      <Argument name="ownerName" type="string">
+        <Description>The display name of the Identity that owns the
+          certification.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>-secure- Access Review Escalated</Subject>
+</EmailTemplate>

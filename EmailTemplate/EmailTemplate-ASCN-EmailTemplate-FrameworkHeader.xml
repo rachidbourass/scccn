@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="EmailTemplate-FrameworkHeader">
+  <Body>	
+  </Body>
+  <Subject>Global Header</Subject>
+</EmailTemplate>
