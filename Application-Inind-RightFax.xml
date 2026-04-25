@@ -1,0 +1,374 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application connector="sailpoint.connector.DelimitedFileConnector" featuresString="DIRECT_PERMISSIONS, NO_RANDOM_ACCESS, DISCOVER_SCHEMA" icon="enterpriseIcon" name="ININD - Right Fax" profileClass="" type="DelimitedFile">
+  <AccountCorrelationConfig>
+    <Reference class="sailpoint.object.CorrelationConfig" name="Ascension-DisconnectedApps-Correlation Config"/>
+  </AccountCorrelationConfig>
+  <Attributes>
+    <Map>
+      <entry key="PassphraseForPrivateKey"/>
+      <entry key="PrivateKeyFilePath"/>
+      <entry key="acceleratorPackEnabled"/>
+      <entry key="accountCorrelationAttrExpression"/>
+      <entry key="accountCreateConditionalRule"/>
+      <entry key="accountCreateEntitlements"/>
+      <entry key="accountDisableAttrExpression"/>
+      <entry key="accountLockAttrExpression"/>
+      <entry key="acctAggregationEnd">
+        <value>
+          <Date>1704496045745</Date>
+        </value>
+      </entry>
+      <entry key="acctAggregationStart">
+        <value>
+          <Date>1704496038271</Date>
+        </value>
+      </entry>
+      <entry key="additionalAppBusApprovalRule"/>
+      <entry key="additionalAppBusApprovers"/>
+      <entry key="afterProvisioningRule"/>
+      <entry key="apAdditionalApplicationAfterProvisioningRule"/>
+      <entry key="apAdditionalApplicationCorrelationRule"/>
+      <entry key="apAdditionalApplicationCreationRule"/>
+      <entry key="apAdditionalApplicationCustomizationRule"/>
+      <entry key="apAdditionalApplicationMCustomizationRule"/>
+      <entry key="apAdditionalApplicationMGroupRefreshRule"/>
+      <entry key="apAdditionalApplicationPreIterateRule"/>
+      <entry key="apAfterMoverJoiner">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAfterRehireAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAttributeSyncEligibleRule"/>
+      <entry key="apBeforeMoverAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apPopulationReverseLeaverOptions"/>
+      <entry key="appBusApprovalRule"/>
+      <entry key="appBusApprovers"/>
+      <entry key="ascBusinessApplication" value="ININD - Right Fax"/>
+      <entry key="authoritativeEmployee"/>
+      <entry key="authoritativeNonEmployee"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="beforemoverPrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="birthrightEntAttrExpression"/>
+      <entry key="busApp">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="commentsAttr"/>
+      <entry key="commentsValue"/>
+      <entry key="compositeDefinition"/>
+      <entry key="delimiter" value=","/>
+      <entry key="displayFormRule"/>
+      <entry key="evaluateCreateprovpolicy"/>
+      <entry key="file" value="\\andc1wapp0147.ds.sjhs.com\AppAggregation\ININD - Right Fax.csv"/>
+      <entry key="filetransport" value="local"/>
+      <entry key="filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="ftpsAuthMethod" value="password"/>
+      <entry key="ftpsClientCertificateFilePath"/>
+      <entry key="ftpsClientCertificatePassphrase"/>
+      <entry key="group.filetransport" value="local"/>
+      <entry key="group.filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.partitionMode" value="auto"/>
+      <entry key="hardPolicyviolations"/>
+      <entry key="hasHeader">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="isCaseInsensitiveMerge">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="isSortedByIndexColumn">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="joinerEnabled"/>
+      <entry key="joinerPopulationRegex"/>
+      <entry key="joinerRoles"/>
+      <entry key="mergeRows">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="moveAccountContainer"/>
+      <entry key="moverExtendedRule"/>
+      <entry key="moverProcess" value="Do Nothing"/>
+      <entry key="moverRevocation" value="Do Nothing"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="parseType" value="delimited"/>
+      <entry key="partitionMode" value="auto"/>
+      <entry key="port"/>
+      <entry key="primarySyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="primarypasswordSyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="privilegedAccountAttrExpression"/>
+      <entry key="privilegedEntAttrExpression"/>
+      <entry key="rehireExtendedRule"/>
+      <entry key="rehirePrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="rehireProcess" value="Do Nothing"/>
+      <entry key="removeEntitlementLeaverExceptionExpression"/>
+      <entry key="renameLDAPaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="requestorFormRole"/>
+      <entry key="reverseTerminationExtendedRule"/>
+      <entry key="reverseleaverProcess" value="Do Nothing"/>
+      <entry key="scramblePasswordAttr"/>
+      <entry key="sftpAuthMethod" value="password"/>
+      <entry key="skipSupervisorApproval"/>
+      <entry key="snowAssignmentGroup" value="90d24643dbc5b2003c53de865e9619c6"/>
+      <entry key="snowAssignmentGroupName" value="AHNAT/INF/Telecom/RightFax"/>
+      <entry key="softPolicyviolations"/>
+      <entry key="stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="DelimitedFile Template"/>
+      <entry key="terminationExtendedRule"/>
+      <entry key="terminationProcess" value="Do Nothing"/>
+      <entry key="xDays"/>
+      <entry key="xDeleteDays"/>
+    </Map>
+  </Attributes>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <ProvisioningForms>
+    <Form name="ININD - Right Fax-CreatePolicy" objectType="account" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="ININD - Right Fax-CreatePolicy"/>
+        </Map>
+      </Attributes>
+      <Section name="Section 1">
+        <Field displayName="Username" name="Username" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[return identity.getName();]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Firstname" name="Firstname" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("firstname"))){
+              return identity.getAttribute("firstname");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Lastname" name="Lastname" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("lastname"))){
+              return identity.getAttribute("lastname");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="EmployeeNumber" name="EmployeeNumber" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("employeeId"))){
+              return identity.getAttribute("employeeId");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="EmailAddress" name="EmailAddress" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("email"))){
+              return identity.getAttribute("email");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Department" name="Department" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("department"))){
+              return identity.getAttribute("department");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Net BIOS" name="Net BIOS" required="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>ININD</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Domain" name="Domain" required="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>inind.DS.SJHS.COM</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Does the user need their own fax number?" name="Does the user need their own fax number?" required="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Yes</String>
+                <String>No</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Department Fax Number" name="Department Fax Number" required="true" type="string"/>
+        <Field displayName="Does the user need to be a delegate of a department mailbox?" name="Does the user need to be a delegate of a department mailbox?" required="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Yes</String>
+                <String>No</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Department Mailbox Name" name="Department Mailbox Name" required="true" type="string"/>
+      </Section>
+    </Form>
+  </ProvisioningForms>
+  <Schemas>
+    <Schema displayAttribute="Username" identityAttribute="Username" instanceAttribute="" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="Username" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Firstname" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Lastname" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EmployeeNumber" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EmailAddress" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Department" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" multi="true" name="Role" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Net BIOS" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Domain" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Does the user need their own fax number?" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Department Fax Number" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Does the user need to be a delegate of a department mailbox?" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Department Mailbox Name" type="string">
+        <Description/>
+      </AttributeDefinition>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>

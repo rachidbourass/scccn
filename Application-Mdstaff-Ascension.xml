@@ -1,0 +1,344 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application authoritative="true" connector="sailpoint.connector.webservices.WebServicesConnector" featuresString="PROVISIONING, ENABLE, PASSWORD, AUTHENTICATE, UNLOCK" name="MDStaff - Ascension" profileClass="" type="Web Services">
+  <AccountCorrelationConfig>
+    <Reference class="sailpoint.object.CorrelationConfig" name="Ascension-CorrelationConfig-MDStaff-Ascension"/>
+  </AccountCorrelationConfig>
+  <Attributes>
+    <Map>
+      <entry key="acceleratorPackEnabled"/>
+      <entry key="accountCorrelationAttrExpression"/>
+      <entry key="accountCreateConditionalRule"/>
+      <entry key="accountCreateEntitlements"/>
+      <entry key="accountDisableAttrExpression"/>
+      <entry key="accountLockAttrExpression"/>
+      <entry key="additionalAppBusApprovalRule"/>
+      <entry key="additionalAppBusApprovers"/>
+      <entry key="afterProvisioningRule"/>
+      <entry key="apAdditionalApplicationAfterProvisioningRule"/>
+      <entry key="apAdditionalApplicationCorrelationRule"/>
+      <entry key="apAdditionalApplicationCreationRule"/>
+      <entry key="apAdditionalApplicationCustomizationRule"/>
+      <entry key="apAdditionalApplicationMCustomizationRule"/>
+      <entry key="apAdditionalApplicationMGroupRefreshRule"/>
+      <entry key="apAdditionalApplicationPreIterateRule"/>
+      <entry key="apAfterMoverJoiner">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAfterRehireAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAttributeSyncEligibleRule"/>
+      <entry key="apBeforeMoverAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apPopulationReverseLeaverOptions"/>
+      <entry key="appBusApprovalRule"/>
+      <entry key="appBusApprovers"/>
+      <entry key="authenticationMethod" value="No Auth"/>
+      <entry key="authoritativeEmployee"/>
+      <entry key="authoritativeNonEmployee"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="beforemoverPrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="birthrightEntAttrExpression"/>
+      <entry key="busApp">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="clientCertAuthEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="clientId_CA" value="3:ACP:bX5YMeEhbTsKyTci6zxN68+u8PdsNB7RWxspRQJlTIk="/>
+      <entry key="clientSecret_CA" value="3:ACP:Ko9xya5C1SZHG1l82/iiboncyJGEPBdo58VpErTVSTQ="/>
+      <entry key="commentsAttr"/>
+      <entry key="commentsValue"/>
+      <entry key="compositeDefinition"/>
+      <entry key="connectionParameters">
+        <value>
+          <List>
+            <Map>
+              <entry key="afterRule"/>
+              <entry key="beforeRule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody" value="grant_type=password&amp;username=$application.clientId_CA$&amp;password=$application.clientSecret_CA$&amp;instance=asc&amp;facilityID=4a8331e6-01fa-4861-9c5c-dee3f78663bb"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl"/>
+              <entry key="customAuthUrl" value="https://asc.api.asm-cloud.com/api/tokens"/>
+              <entry key="header"/>
+              <entry key="httpMethodType" value="POST"/>
+              <entry key="operationType" value="Custom Authentication"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="parentEndpointName"/>
+              <entry key="resMappingObj">
+                <value>
+                  <Map>
+                    <entry key="access_token" value="['access_token']"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath" value="$"/>
+              <entry key="sequenceNumberForEndpoint" value="1"/>
+              <entry key="uniqueNameForEndPoint" value="GetAccessToken"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+            <Map>
+              <entry key="afterRule" value="Ascension-Rule-MDStaff-Ascension-After"/>
+              <entry key="beforeRule"/>
+              <entry key="body">
+                <value>
+                  <Map>
+                    <entry key="bodyFormData"/>
+                    <entry key="bodyFormat" value="raw"/>
+                    <entry key="jsonBody"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="contextUrl" value="/api/status"/>
+              <entry key="customAuthUrl"/>
+              <entry key="header">
+                <value>
+                  <Map>
+                    <entry key="Authorization" value="Bearer $application.access_token$"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="httpMethodType" value="GET"/>
+              <entry key="operationType" value="Account Aggregation"/>
+              <entry key="paginationSteps"/>
+              <entry key="pagingInitialOffset">
+                <value>
+                  <Integer>0</Integer>
+                </value>
+              </entry>
+              <entry key="pagingSize">
+                <value>
+                  <Integer>50</Integer>
+                </value>
+              </entry>
+              <entry key="parentEndpointName"/>
+              <entry key="resMappingObj">
+                <value>
+                  <Map>
+                    <entry key="NPI" value="['NPI']"/>
+                  </Map>
+                </value>
+              </entry>
+              <entry key="responseCode">
+                <value>
+                  <List>
+                    <String>2**</String>
+                  </List>
+                </value>
+              </entry>
+              <entry key="rootPath" value="$"/>
+              <entry key="sequenceNumberForEndpoint" value="2"/>
+              <entry key="uniqueNameForEndPoint" value="GetProviderInfo"/>
+              <entry key="xpathNamespaces"/>
+            </Map>
+          </List>
+        </value>
+      </entry>
+      <entry key="createAccountWithEntReq">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="custom_auth_token_info" value="3:ACP:Kx8qhbVkLHKaTVLO8Ia8Ar1cDp27mXQD+TT7Swyq3jzRulWnU3LNoA+/IwBhaozGUpWT+WhQ0m4Z&#10;cTzBmnpZylDW/pa0HDEX/uBfRpkxEJgJ2dCpxhFM/mY0T5Aixkf70fZx8GPQLrnFBU14rxJwo87d&#10;KnZmtQWSCxdC931cQadwolBs3p5Kpe7V4vHxCUQMama0GyhRrRKQSdOgJV3oTMBOrsRwvGYewcT5&#10;GaT7ykJBb3X17lH/PKBhexmDiKE9m4DZS3RjtRkJFq3e6TmLPkERRNJMQuc3tjWvi3yLCli0R90Z&#10;L/DQGzX2WgtX+0eKK/2v1F2q21yipg4JqBoPII9K0SluP1iwYGyPUAGkVKFtfEqgG4lrpSHfmZ2h&#10;dXcphWWlrGqVFX5ScUea5uUuhyHMzTbAMWlziittxEIA/LEP2Eo6s2sVQQw+42goZBFwUahs09BI&#10;hJ+xj3BF6IgCP/3td2GEL90osVhs89OeOKocAZY3XR7BYZ+rLgIrtDOnc3woNFMv8z5i0D/QgiSj&#10;UgYWr4IEx4IONayHHNNR4xvQ41N0kIZRi9dLp6OAPDmx5L4com2BfFyrySNxjSuVnlNBQf5Lck2O&#10;yJaDpvD8gQvcKWO/1yM4bkkH1wF1ZnCexe3SzgZccKdlLZ6p7FDkLg7aYnzU7QNlZEXOeHPmLgeu&#10;jPRgJ8HZcElhB7KZq8CUbiwmYaqOAg+RKDnhnbW3f67OpvyCEMwXb4O31pXQsXnJNAZ5TE+hVZDN&#10;ofkUgBPXrhKSyq6SBP780tarmGGZ3Q=="/>
+      <entry key="displayFormRule"/>
+      <entry key="enableHasMore" value="true"/>
+      <entry key="enableStatus"/>
+      <entry key="encrypted" value="accesstoken,refresh_token,oauth_token_info,client_secret,private_key,private_key_password,clientCertificate,clientKeySpec,resourceOwnerPassword,,custom_auth_token_info,clientId_CA,clientSecret_CA"/>
+      <entry key="evaluateCreateprovpolicy"/>
+      <entry key="fixedPlanMultivaluedAttribute" value="true"/>
+      <entry key="genericWebServiceBaseUrl" value="https://asc.api.asm-cloud.com"/>
+      <entry key="hardPolicyviolations"/>
+      <entry key="httpCookieSpecsStandard" value="true"/>
+      <entry key="isGetObjectRequiredForPTA">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="joinerEnabled"/>
+      <entry key="joinerPopulationRegex"/>
+      <entry key="joinerRoles"/>
+      <entry key="mdStaff-InstanceName" value="asc"/>
+      <entry key="moveAccountContainer"/>
+      <entry key="moverExtendedRule"/>
+      <entry key="moverProcess" value="Do Nothing"/>
+      <entry key="moverRevocation" value="Do Nothing"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="oAuthJwtHeader">
+        <value>
+          <Map>
+            <entry key="alg" value="RS256"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="oAuthJwtPayload">
+        <value>
+          <Map>
+            <entry key="aud"/>
+            <entry key="exp" value="15f"/>
+            <entry key="iss"/>
+            <entry key="sub"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="password_CA" value="Sailpoint1"/>
+      <entry key="primarySyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="primarypasswordSyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="private_key_to_update"/>
+      <entry key="privilegedAccountAttrExpression"/>
+      <entry key="privilegedEntAttrExpression"/>
+      <entry key="rehireExtendedRule"/>
+      <entry key="rehirePrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="rehireProcess" value="Do Nothing"/>
+      <entry key="removeEntitlementLeaverExceptionExpression"/>
+      <entry key="renameLDAPaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="requestorFormRole"/>
+      <entry key="reverseTerminationExtendedRule"/>
+      <entry key="reverseleaverProcess" value="Do Nothing"/>
+      <entry key="saml_assertion_url"/>
+      <entry key="saml_request_body"/>
+      <entry key="scramblePasswordAttr"/>
+      <entry key="skipSupervisorApproval"/>
+      <entry key="softPolicyviolations"/>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="Web Services"/>
+      <entry key="terminationExtendedRule"/>
+      <entry key="terminationProcess" value="Do Nothing"/>
+      <entry key="throwProvAfterRuleException">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="throwProvBeforeRuleException">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="timeoutInSeconds" value="1000"/>
+      <entry key="version" value="v2"/>
+      <entry key="xDays"/>
+      <entry key="xDeleteDays"/>
+    </Map>
+  </Attributes>
+  <CreationRule>
+    <Reference class="sailpoint.object.Rule" name="Rule-Creation-MDStaff-Ascension"/>
+  </CreationRule>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <Schemas>
+    <Schema displayAttribute="ProviderID" groupAttribute="" identityAttribute="ProviderID" instanceAttribute="" nativeObjectType="user" objectType="account">
+      <AttributeDefinition name="ProviderID" type="string"/>
+      <AttributeDefinition name="Ministry_Domain" type="string"/>
+      <AttributeDefinition name="PrimaryAddress_OfficeState" type="string"/>
+      <AttributeDefinition name="SecondaryAddress_OfficeState" type="string"/>
+      <AttributeDefinition name="NPI" type="string"/>
+      <AttributeDefinition name="MaskedSSN" type="string"/>
+      <AttributeDefinition name="FirstName" type="string"/>
+      <AttributeDefinition name="MiddleName" type="string"/>
+      <AttributeDefinition name="LastName" type="string"/>
+      <AttributeDefinition name="BirthDate" type="string"/>
+      <AttributeDefinition name="PrimaryAddress_OfficeCity" type="string"/>
+      <AttributeDefinition name="PrimaryAddress_OfficeAddress1" type="string"/>
+      <AttributeDefinition name="PrimaryAddress_OfficeAddress2" type="string"/>
+      <AttributeDefinition name="PrimaryAddress_OfficeZipCode" type="string"/>
+      <AttributeDefinition name="PrimaryAddress_OfficeTelephone" type="string"/>
+      <AttributeDefinition name="PrimaryAddress_OfficeFax" type="string"/>
+      <AttributeDefinition name="PrimaryAddress_Location" type="string"/>
+      <AttributeDefinition name="PrimaryAddress_StartDate" type="string"/>
+      <AttributeDefinition name="PrimaryAddress_EndDate" type="string"/>
+      <AttributeDefinition name="SecondaryAddress_OfficeCity" type="string"/>
+      <AttributeDefinition name="SecondaryAddress_OfficeAddress1" type="string"/>
+      <AttributeDefinition name="SecondaryAddress_OfficeAddress2" type="string"/>
+      <AttributeDefinition name="SecondaryAddress_OfficeZipCode" type="string"/>
+      <AttributeDefinition name="SecondaryAddress_OfficeTelephone" type="string"/>
+      <AttributeDefinition name="SecondaryAddress_OfficeFax" type="string"/>
+      <AttributeDefinition name="SecondaryAddress_Location" type="string"/>
+      <AttributeDefinition name="SecondaryAddress_StartDate" type="string"/>
+      <AttributeDefinition name="SecondaryAddress_EndDate" type="string"/>
+      <AttributeDefinition name="Specialty1" type="string"/>
+      <AttributeDefinition name="Specialty2" type="string"/>
+      <AttributeDefinition name="Specialty3" type="string"/>
+      <AttributeDefinition name="Specialty4" type="string"/>
+      <AttributeDefinition name="FacilityName" type="string"/>
+      <AttributeDefinition name="Title" type="string"/>
+      <AttributeDefinition name="IDNumber" type="string"/>
+      <AttributeDefinition name="Status" type="string"/>
+      <AttributeDefinition name="DEANumber" type="string"/>
+      <AttributeDefinition name="StateProfLicense" type="string"/>
+      <CustomizationRule>
+        <Reference class="sailpoint.object.Rule" name="ASCN-MDStaff-Ascension-Customization"/>
+      </CustomizationRule>      
+    </Schema>
+    <Schema descriptionAttribute="" displayAttribute="" identityAttribute="" instanceAttribute="" nativeObjectType="group" objectType="group"/>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>

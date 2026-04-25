@@ -1,0 +1,995 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application connector="sailpoint.connector.JDBCConnector" featuresString="DISCOVER_SCHEMA, PROVISIONING, SYNC_PROVISIONING, DIRECT_PERMISSIONS, SEARCH, ENABLE, UNLOCK" icon="databaseIcon" name="Invision" profileClass="" type="JDBC">
+  <AccountCorrelationConfig>
+    <Reference class="sailpoint.object.CorrelationConfig" name="Ascension-CorrelationConfig-RACF-Invision"/>
+  </AccountCorrelationConfig>
+  <Attributes>
+    <Map>
+      <entry key="SQL" value="select a.accountno ,firstname FName,MidInit MName,lastname LName,empID EmpID,a.tpx_id GenTPXID,a2k_id GenA2KID,a2k_pw GenA2KPW,DateAdded ,DateDeactivated ,Comments ReqComment,CostCenter ,recID RecID,lastRecID , EmpPhone Phone,empEmail EMail,EmpTitle JobTitle,EmpSite EmplSite,ReqDate ,reqFName ReqFName,reqLname ReqLName,ReqEMail ,ApprID ApproveUserID,mailCode BundlMailCode,bundl NeedBundl,jbundl NeedJBundl,  spool NeedSpool,NetView NeedNetView,thin NeedThin,tso NeedTSO,username UserName ,a.DateUpdated ,LegacyEmpID, ProdT40 NeedT40, InvIDT40  , ProdS48 NeedD48, InvIDS48 , ProdM45 NeedM45, InvIDM45, ProdH48 NeedH48, InvIDH48  , ProdP48 NeedP48, InvIDP48, ProdS48 NeedS48, InvIDS48, ISNULL(entitlementT40,'') + ','+ISNULL(entitlementM45,'') + ','+ISNULL(entitlementP48,'') + ','+ISNULL(entitlementH48,'') + ','+ISNULL(entitlementS48 ,'') + ','+ISNULL(entitlementD48,'') + ','+ISNULL(testEntitlementD48,'') + ','+ISNULL(testEntitlementT40,'') + ','+ISNULL(testEntitlementM45,'') + ','+ISNULL(testEntitlementH48,'') + ','+ISNULL(testEntitlementP48,'') + ','+ISNULL(testEntitlementS48,'') as entitlement from TPXAccounts a left join invSailpoint b on b.accountno = a.accountno  Where username is not NULL order by a.username;"/>
+      <entry key="acceleratorPackEnabled"/>
+      <entry key="accountCorrelationAttrExpression"/>
+      <entry key="accountCreateConditionalRule"/>
+      <entry key="accountCreateEntitlements"/>
+      <entry key="accountDisableAttrExpression"/>
+      <entry key="accountLockAttrExpression"/>
+      <entry key="acctAggregationEnd">
+        <value>
+          <Date>1734579008081</Date>
+        </value>
+      </entry>
+      <entry key="acctAggregationStart">
+        <value>
+          <Date>1734579000382</Date>
+        </value>
+      </entry>
+      <entry key="additionalAppBusApprovalRule"/>
+      <entry key="additionalAppBusApprovers"/>
+      <entry key="afterProvisioningRule" value="Ascension-Invision-AfterProvisioning-Rule"/>
+      <entry key="aggregationMode">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="aggregationPartitioned">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="aggregationType" value="account"/>
+      <entry key="apAdditionalApplicationAfterProvisioningRule"/>
+      <entry key="apAdditionalApplicationCorrelationRule"/>
+      <entry key="apAdditionalApplicationCreationRule"/>
+      <entry key="apAdditionalApplicationCustomizationRule"/>
+      <entry key="apAdditionalApplicationMCustomizationRule"/>
+      <entry key="apAdditionalApplicationMGroupRefreshRule"/>
+      <entry key="apAdditionalApplicationPreIterateRule"/>
+      <entry key="apAfterMoverJoiner">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAfterRehireAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAttributeSyncEligibleRule"/>
+      <entry key="apBeforeMoverAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apPopulationReverseLeaverOptions"/>
+      <entry key="appBusApprovalRule"/>
+      <entry key="appBusApprovers"/>
+      <entry key="ascBusinessApplication"/>
+      <entry key="authoritativeEmployee"/>
+      <entry key="authoritativeNonEmployee"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="beforemoverPrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="birthrightEntAttrExpression"/>
+      <entry key="buildMapRule" value="Ascension-Rule-Buildmap-Invision"/>
+      <entry key="busApp">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="commentsAttr"/>
+      <entry key="commentsValue"/>
+      <entry key="compositeDefinition"/>
+      <entry key="deltaTable"/>
+      <entry key="displayFormRule"/>
+      <entry key="driverClass" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+      <entry key="evaluateCreateprovpolicy"/>
+      <entry key="getDeltaSQL"/>
+      <entry key="getObjectSQL" value="select * from InvisionRequests where UserName = '$(identity)';"/>
+      <entry key="group.SQL" value="select * from InvisionRequests Where entitlement &lt;&gt; '' AND entitlement  is not null"/>
+      <entry key="group.aggregationMode">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.deltaTable"/>
+      <entry key="group.driverClass" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+      <entry key="group.getDeltaSQL"/>
+      <entry key="group.getObjectSQL" value="select * from InvisionRequests Where entitlement &lt;&gt; '' AND entitlement  is not null"/>
+      <entry key="group.isPermissionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.mergeRows">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.password" value="2:ACP:fpdACVsPKQs4ohfgSYTmoHtoH9xySMUmNC7ja/Vx3nY="/>
+      <entry key="group.url" value="jdbc:sqlserver://10.23.85.160:1433;databaseName=TPX_TNNAS;encrypt=true;trustServerCertificate=true;sslProtocol=TLSv1.2;"/>
+      <entry key="group.useExecuteQuery">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.useStoredProcedureDelta">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.useStoredProcedureDirectPermission">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.useStoredProcedureGetObject">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.useStoredProcedureSqlStmt">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.user" value="avirtual"/>
+      <entry key="hardPolicyviolations"/>
+      <entry key="isPermissionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="jdbcExceptionBucketing">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="jdbcProvisionRule" value="Ascension-Rule-Invision-Provisioning"/>
+      <entry key="joinerEnabled"/>
+      <entry key="joinerPopulationRegex"/>
+      <entry key="joinerRoles"/>
+      <entry key="mergeRows">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="moveAccountContainer"/>
+      <entry key="moverExtendedRule"/>
+      <entry key="moverProcess" value="Do Nothing"/>
+      <entry key="moverRevocation" value="Do Nothing"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="noPermissions" value="false"/>
+      <entry key="operations" value="Create, Modify, Delete, Enable, Disable, Unlock"/>
+      <entry key="partitionMode">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="partitionStatements"/>
+      <entry key="password" value="3:ACP:NRJqJAC2dyVT1mG/uYexTwIBuz/vJErxv8BPwtk0iCk="/>
+      <entry key="primarySyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="primarypasswordSyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="privilegedAccountAttrExpression"/>
+      <entry key="privilegedEntAttrExpression"/>
+      <entry key="provisionRule" value="globalRule"/>
+      <entry key="rehireExtendedRule"/>
+      <entry key="rehirePrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="rehireProcess" value="Do Nothing"/>
+      <entry key="removeEntitlementLeaverExceptionExpression"/>
+      <entry key="renameLDAPaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="requestorFormRole"/>
+      <entry key="reverseTerminationExtendedRule"/>
+      <entry key="reverseleaverProcess" value="Do Nothing"/>
+      <entry key="scramblePasswordAttr"/>
+      <entry key="skipSupervisorApproval"/>
+      <entry key="snowAssignmentGroup"/>
+      <entry key="snowAssignmentGroupName"/>
+      <entry key="softPolicyviolations"/>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="JDBC Template"/>
+      <entry key="terminationExtendedRule"/>
+      <entry key="terminationProcess" value="Do Nothing"/>
+      <entry key="testConnSQL" value="select a.accountno ,firstname FName,MidInit MName,lastname LName,empID EmpID,a.tpx_id GenTPXID,a2k_id GenA2KID,a2k_pw GenA2KPW,DateAdded ,DateDeactivated ,Comments ReqComment,CostCenter ,recID RecID,lastRecID , EmpPhone Phone,empEmail EMail,EmpTitle JobTitle,EmpSite EmplSite,ReqDate ,reqFName ReqFName,reqLname ReqLName,ReqEMail ,ApprID ApproveUserID,mailCode BundlMailCode,bundl NeedBundl,jbundl NeedJBundl,  spool NeedSpool,NetView NeedNetView,thin NeedThin,tso NeedTSO,username UserName ,a.DateUpdated ,LegacyEmpID, ProdT40 NeedT40, InvIDT40  , ProdS48 NeedD48, InvIDS48 , ProdM45 NeedM45, InvIDM45, ProdH48 NeedH48, InvIDH48  , ProdP48 NeedP48, InvIDP48, ProdS48 NeedS48, InvIDS48, ISNULL(entitlementT40,'') + ','+ISNULL(entitlementM45,'') + ','+ISNULL(entitlementP48,'') + ','+ISNULL(entitlementH48,'') + ','+ISNULL(entitlementS48 ,'') + ','+ISNULL(entitlementD48,'') + ','+ISNULL(testEntitlementD48,'') + ','+ISNULL(testEntitlementT40,'') + ','+ISNULL(testEntitlementM45,'') + ','+ISNULL(testEntitlementH48,'') + ','+ISNULL(testEntitlementP48,'') + ','+ISNULL(testEntitlementS48,'') as entitlement from TPXAccounts a left join invSailpoint b on b.accountno = a.accountno  Where username is not NULL order by a.username;"/>
+      <entry key="url" value="jdbc:sqlserver://10.23.85.160:1433;databaseName=TPX_TNNAS;encrypt=true;trustServerCertificate=true;sslProtocol=TLSv1.2;"/>
+      <entry key="useExecuteQuery">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="useStoredProcedureDelta">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="useStoredProcedureDirectPermission">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="useStoredProcedureGetObject">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="useStoredProcedurePartition">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="useStoredProcedureSqlStmt">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="useStoredProcedureTestConn">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="user" value="avirtual"/>
+      <entry key="xDays"/>
+      <entry key="xDeleteDays"/>
+    </Map>
+  </Attributes>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <ProvisioningConfig>
+    <PlanInitializerScript>
+      <Source><![CDATA[        import sailpoint.object.ProvisioningPlan;
+        import sailpoint.object.ProvisioningPlan.AccountRequest;
+        import sailpoint.object.ProvisioningPlan.AccountRequest.Operation;
+        import sailpoint.object.ProvisioningPlan.AttributeRequest;
+        import sailpoint.api.IdentityService;
+        import sailpoint.object.Identity;
+        import sailpoint.object.Application;
+        import sailpoint.object.Attributes;
+        import sailpoint.object.Link;
+        import sailpoint.object.IdentityRequest;
+        import sailpoint.object.Custom;
+        import sailpoint.tools.Util;
+
+        if(plan!=null){
+			List accReqs = plan.getAccountRequests();
+			String idReq = plan.getArguments().get("identityRequestId");
+
+			IdentityService identityService =new IdentityService(context);                
+			if ((accReqs != null) && !accReqs.isEmpty()) {
+				for (AccountRequest accReq : accReqs) {
+					Link racfLink = null;
+					if(identity  != null && null != accReq && null != accReq.getApplication()){
+						Application app = context.getObjectByName(Application.class,accReq.getApplication());
+						List racfLinks = identityService.getLinks(identity,app);
+
+						//adding RequestID and UserName with all accountRequests
+						accReq.add(new ProvisioningPlan.AttributeRequest("RecID", ProvisioningPlan.Operation.Set, idReq));  
+						if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("samAccountName"))){
+							accReq.add(new ProvisioningPlan.AttributeRequest("UserName", ProvisioningPlan.Operation.Set, identity.getAttribute("samAccountName")));
+						}
+						else if(null != identity && Util.isNotNullOrEmpty(identity.getName()))
+						{
+							accReq.add(new ProvisioningPlan.AttributeRequest("UserName", ProvisioningPlan.Operation.Set, identity.getName()));
+						}
+
+						if ( accReq  != null && AccountRequest.Operation.Create.equals( accReq.getOperation() ) ) {
+							accReq.add(new ProvisioningPlan.AttributeRequest("NeedTPX", ProvisioningPlan.Operation.Set, "1"));
+							accReq.add(new ProvisioningPlan.AttributeRequest("ReqFlag", ProvisioningPlan.Operation.Set, "1"));
+							accReq.add(new ProvisioningPlan.AttributeRequest("ReqStatus", ProvisioningPlan.Operation.Set, "0"));
+							accReq.add(new ProvisioningPlan.AttributeRequest("ReqComment", ProvisioningPlan.Operation.Set, "Approved"));
+						}
+						else if (accReq  != null && AccountRequest.Operation.Modify.equals( accReq.getOperation()) && null != accReq.getAttributeRequest("entitlement") && null != accReq.getAttributeRequest("entitlement").getOperation() && ProvisioningPlan.Operation.Add.equals(accReq.getAttributeRequest("entitlement").getOperation())){
+							accReq.add(new ProvisioningPlan.AttributeRequest("NeedTPX", ProvisioningPlan.Operation.Set, "0"));
+							accReq.add(new ProvisioningPlan.AttributeRequest("ReqFlag", ProvisioningPlan.Operation.Set, "0"));
+							accReq.add(new ProvisioningPlan.AttributeRequest("ReqStatus", ProvisioningPlan.Operation.Set, "0"));
+							accReq.add(new ProvisioningPlan.AttributeRequest("ReqComment", ProvisioningPlan.Operation.Set, "Approved"));
+
+							List racfLinks = identityService.getLinks(identity,app);
+							if(null != racfLinks && !racfLinks.isEmpty()){
+								racfLink=racfLinks.get(0);
+
+								if(null != racfLink){
+									Attributes racfAttrs = racfLink.getAttributes();
+									if(null != racfAttrs){
+										HashMap attrMap = racfAttrs.getMap();
+
+										if(null != attrMap){
+											Iterator itr = attrMap.entrySet().iterator(); 
+
+											while(itr.hasNext()) { 
+												Map.Entry entry = itr.next(); 
+
+												if(null != entry.getKey()){
+													AttributeRequest attrReq = accReq.getAttributeRequest(entry.getKey());
+
+													if(attrReq == null && entry.getValue() != null ) {
+														accReq.add(new AttributeRequest(entry.getKey(),ProvisioningPlan.Operation.Set, entry.getValue()));		
+													}
+
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						else if (accReq  != null && AccountRequest.Operation.Modify.equals( accReq.getOperation()) && null != accReq.getAttributeRequest("entitlement") && null != accReq.getAttributeRequest("entitlement").getOperation() && ProvisioningPlan.Operation.Remove.equals(accReq.getAttributeRequest("entitlement").getOperation())){
+							String attrName= "";
+							accReq.add(new AttributeRequest("ReqType",ProvisioningPlan.Operation.Set, "Remove"));
+						
+							if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("samAccountName"))){
+								accReq.add(new ProvisioningPlan.AttributeRequest("networkID", ProvisioningPlan.Operation.Set, identity.getAttribute("samAccountName")));
+							}
+							else if(null != identity && Util.isNotNullOrEmpty(identity.getName()))
+							{
+								accReq.add(new ProvisioningPlan.AttributeRequest("networkID", ProvisioningPlan.Operation.Set, identity.getName()));
+							}
+
+							if(null != racfLinks && !racfLinks.isEmpty()){
+								racfLink=racfLinks.get(0);
+								accReq.add(new AttributeRequest("tpx_id",ProvisioningPlan.Operation.Set, racfLink.getAttribute("GenTPXID")));	
+								accReq.add(new ProvisioningPlan.AttributeRequest("ReqStatus", ProvisioningPlan.Operation.Set, "0"));
+								accReq.add(new ProvisioningPlan.AttributeRequest("ReqDate", ProvisioningPlan.Operation.Set, racfLink.getAttribute("ReqDate")));
+							}
+						}
+						else if (accReq  != null && AccountRequest.Operation.Disable.equals(accReq.getOperation())){
+						  accReq.add(new AttributeRequest("ReqType",ProvisioningPlan.Operation.Set, "Term"));	
+						  if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("samAccountName"))){
+							accReq.add(new ProvisioningPlan.AttributeRequest("networkID", ProvisioningPlan.Operation.Set, identity.getAttribute("samAccountName")));
+						  }
+						  else if(null != identity && Util.isNotNullOrEmpty(identity.getName()))
+						  {
+							accReq.add(new ProvisioningPlan.AttributeRequest("networkID", ProvisioningPlan.Operation.Set, identity.getName()));
+						  }
+						  if(null != racfLinks && !racfLinks.isEmpty()){
+							racfLink=racfLinks.get(0);
+							accReq.add(new AttributeRequest("tpx_id",ProvisioningPlan.Operation.Set, racfLink.getAttribute("GenTPXID")));	accReq.add(new ProvisioningPlan.AttributeRequest("ReqDate", ProvisioningPlan.Operation.Set, racfLink.getAttribute("ReqDate")));
+						  }
+						}
+					}
+				}
+			}
+        }
+        ]]></Source>
+    </PlanInitializerScript>
+  </ProvisioningConfig>
+  <ProvisioningForms>
+    <Form name="Ascension-Form-Invision-CreatePolicy" objectType="account" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="Ascension-Form-Invision-CreatePolicy"/>
+        </Map>
+      </Attributes>
+      <Description>Create policy form for invision application</Description>
+      <Section name="Basic Details">
+        <Field name="AppUser" type="string" value="T4Vrt"/>
+        <Field name="UserName" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String samName = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("samAccountName"))){
+              samName = identity.getAttribute("samAccountName");
+              }
+              else{
+              samName = identity.getName();
+              }
+              return samName;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="EmpID" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String empID = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("employeeId"))){
+              empID = identity.getAttribute("employeeId");
+              }
+              return empID;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="FName" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String values = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getFirstname())){
+              values = identity.getFirstname();
+              }
+              return values;
+
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="MName" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String values = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("middleInitial"))){
+              values = identity.getAttribute("middleInitial");
+              }
+              return values;
+
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="LName" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String values = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getLastname())){
+              values = identity.getLastname();
+              }
+              return values;                           
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="ExpDate" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String values = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("ctrexpDt"))){
+              values = identity.getAttribute("ctrexpDt");
+              }
+              return values;              
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="Dept3Char" type="string" value="NAS"/>
+        <Field name="Last4SSN" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Rule-DecryptSSN-FieldValue"/>
+          </RuleRef>
+        </Field>
+        <Field name="Phone" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String values = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("mobile"))){
+              values = identity.getAttribute("mobile");
+              }
+              return values;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="EMail" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String values = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("email"))){
+              values = identity.getAttribute("email");
+              }
+              return values;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="CostCenter" type="string"/>
+        <Field name="JobTitle" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String values = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("title"))){
+              values = identity.getAttribute("title");
+              }
+              return values;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="ReqFName" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String values = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getFirstname())){
+              values = identity.getFirstname();
+              }
+              return values;
+
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="ReqMName" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String values = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("middleInitial"))){
+              values = identity.getAttribute("middleInitial");
+              }
+              return values;
+
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="ReqLName" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String values = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getLastname())){
+              values = identity.getLastname();
+              }
+              return values;                           
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="ReqPhone" type="string"/>
+        <Field name="ReqEMail" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.tools.Util;
+
+              String values = "";
+
+              if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("email"))){
+              values = identity.getAttribute("email");
+              }
+              return values;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="ReqDate" type="string">
+          <Script>
+            <Source><![CDATA[
+              import java.text.SimpleDateFormat;
+
+              String format = "yyyy-MM-dd";
+              String dateString = null;
+
+              Date today = new Date();
+              SimpleDateFormat dateFormatIIQ = new SimpleDateFormat(format);
+              if(null != today){
+              dateString = dateFormatIIQ.format(today);
+              }
+
+              return dateString;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="ApproveUserID" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Identity;
+              String managerName = "";
+
+              if (identity != null && identity.getManager() != null) {
+              managerName = identity.getManager().getName();
+              }
+              return managerName;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="ApproveEMail" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Identity;
+              String managerEmail = "";
+
+              if (identity != null && identity.getManager() != null) {
+              managerEmail = identity.getManager().getAttribute("email");
+              }
+              return managerEmail;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="Approved" type="string" value="1"/>
+        <Field name="AutoSignOn" type="string" value="1"/>
+        <Field name="GenTPXID" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Invision-Field-TPXID"/>
+          </RuleRef>
+        </Field>
+        <Field name="GenA2KID" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Invision-Field-InvisionID"/>
+          </RuleRef>
+        </Field>
+        <Field name="GenA2KPW" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Invision-Field-InvisionPW"/>
+          </RuleRef>
+        </Field>
+        <Field name="CurrentTPXID" type="string"/>
+        <Field name="NeedTSO" type="string" value="0"/>
+        <Field name="NeedSpool" type="string" value="0"/>
+        <Field name="NeedNetView" type="string" value="0"/>
+        <Field name="NeedThin" type="string" value="0"/>
+        <Field name="NeedJBundl" type="string" value="0"/>
+        <Field name="NeedBundl" type="string" value="0"/>
+        <Field name="Comment1" type="string"/>
+        <Field name="Expired" type="string" value="0"/>
+        <Field name="EmailInd" type="string" value="0"/>
+        <Field name="ProfID" type="string" value="0"/>
+      </Section>
+    </Form>
+    <Form name="Ascension-Form-Invision-UpdatePolicy" objectType="account" type="Update">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="Ascension-Form-Invision-UpdatePolicy"/>
+        </Map>
+      </Attributes>
+      <Section name="Basic Details">
+        <Field name="ReqDate" type="string">
+          <Script>
+            <Source><![CDATA[
+              import java.text.SimpleDateFormat;
+
+              String format = "yyyy-MM-dd";
+              String dateString = null;
+
+              Date today = new Date();
+              SimpleDateFormat dateFormatIIQ = new SimpleDateFormat(format);
+              if(null != today){
+              dateString = dateFormatIIQ.format(today);
+              }
+
+              return dateString;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="ApproveUserID" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Identity;
+              String managerName = "";
+
+              if (identity != null && identity.getManager() != null) {
+              managerName = identity.getManager().getName();
+              }
+              return managerName;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="ApproveEMail" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Identity;
+              String managerEmail = "";
+
+              if (identity != null && identity.getManager() != null) {
+              managerEmail = identity.getManager().getAttribute("email");
+              }
+              return managerEmail;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="Approved" type="string" value="1"/>
+        <Field name="CreatedDate" type="string" value="null"/>
+        <Field name="CreatedTime" type="string" value="null"/>
+        <Field name="CreatedUserID" type="string" value="null"/>
+        <Field name="ReqTime" type="string" value="1900-01-01"/>
+        <Field name="GeneratedDate" type="string" value="1900-01-01"/>
+        <Field name="GeneratedTime" type="string" value="1900-01-01"/>
+        <Field name="ApproveDate" type="string" value="1900-01-01"/>
+      </Section>
+    </Form>
+  </ProvisioningForms>
+  <Schemas>
+    <Schema displayAttribute="UserName" identityAttribute="UserName" instanceAttribute="" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="AppUser" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="FName" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="MName" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="LName" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EmpID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="GenTPXID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="GenA2KPW" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ReqComment" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="RecID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="lastRecID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Phone" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EMail" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="JobTitle" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ReqDate" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ReqFName" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ReqLName" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ReqEMail" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ApproveUserID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="BundlMailCode" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedBundl" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedJBundl" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedSpool" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedNetView" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedThin" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedTSO" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="UserName" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="DateUpdated" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="LegacyEmpID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" multi="true" name="entitlement" schemaObjectType="group" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ExpDate" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Dept3Char" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Last4SSN" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ReqStatus" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ReqEmpID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ReqUserID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ReqMName" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ReqPhone" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ReqTime" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ApproveEMail" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Approved" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ApproveDate" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="AutoSignOn" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedTPX" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="GenA2KID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="CurrentTPXID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="CreatedDate" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="CreatedTime" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="CreatedUserID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Comment1" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="GeneratedDate" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="GeneratedTime" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="GeneratedUserID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Expired" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ReqFlag" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EmailInd" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="area" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ProfID" type="string">
+        <Description/>
+      </AttributeDefinition>
+    </Schema>
+    <Schema descriptionAttribute="" displayAttribute="entitlement" identityAttribute="entitlement" instanceAttribute="" nativeObjectType="group" objectType="group" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="ProfileT40" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ProfileM45" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ProfileP48" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ProfileD48" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ProfileS48" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ProfileH48" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="TCL" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="PROUT" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="MenuGrp" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="CashGrp" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="PRCOL" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="cwSupv" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="cwWorkload" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="cwDemand" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Comment2" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" name="entitlement" schemaObjectType="group" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EmplSite" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedT40" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedM45" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedP48" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedD48" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedS48" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedH48" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedTestT40" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedTestM45" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedTestP48" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedTestD48" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedTestS48" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NeedTestH48" type="string">
+        <Description/>
+      </AttributeDefinition>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>

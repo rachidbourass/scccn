@@ -1,0 +1,388 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application connector="sailpoint.connector.DelimitedFileConnector" featuresString="DIRECT_PERMISSIONS, NO_RANDOM_ACCESS, DISCOVER_SCHEMA" icon="enterpriseIcon" name="ReadySet" profileClass="" type="DelimitedFile">
+  <AccountCorrelationConfig>
+    <Reference class="sailpoint.object.CorrelationConfig" name="AscensionCorrelation - ReadySet"/>
+  </AccountCorrelationConfig>
+  <Attributes>
+    <Map>
+      <entry key="PassphraseForPrivateKey"/>
+      <entry key="PrivateKeyFilePath"/>
+      <entry key="acceleratorPackEnabled"/>
+      <entry key="accountCorrelationAttrExpression"/>
+      <entry key="accountCreateConditionalRule"/>
+      <entry key="accountCreateEntitlements"/>
+      <entry key="accountDisableAttrExpression"/>
+      <entry key="accountLockAttrExpression"/>
+      <entry key="additionalAppBusApprovalRule"/>
+      <entry key="additionalAppBusApprovers"/>
+      <entry key="afterProvisioningRule"/>
+      <entry key="apAdditionalApplicationAfterProvisioningRule"/>
+      <entry key="apAdditionalApplicationCorrelationRule"/>
+      <entry key="apAdditionalApplicationCreationRule"/>
+      <entry key="apAdditionalApplicationCustomizationRule"/>
+      <entry key="apAdditionalApplicationMCustomizationRule"/>
+      <entry key="apAdditionalApplicationMGroupRefreshRule"/>
+      <entry key="apAdditionalApplicationPreIterateRule"/>
+      <entry key="apAfterMoverJoiner">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAfterRehireAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAttributeSyncEligibleRule"/>
+      <entry key="apBeforeMoverAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apPopulationReverseLeaverOptions"/>
+      <entry key="appBusApprovalRule"/>
+      <entry key="appBusApprovers"/>
+      <entry key="ascBusinessApplication"/>
+      <entry key="authoritativeEmployee"/>
+      <entry key="authoritativeNonEmployee"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="beforemoverPrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="birthrightEntAttrExpression"/>
+      <entry key="busApp">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="commentsAttr"/>
+      <entry key="commentsValue"/>
+      <entry key="compositeDefinition"/>
+      <entry key="delimiter" value=","/>
+      <entry key="displayFormRule"/>
+      <entry key="evaluateCreateprovpolicy"/>
+      <entry key="file" value="\\andc1wapp0147.ds.sjhs.com\AppAggregation\ReadySet.csv"/>
+      <entry key="filetransport" value="local"/>
+      <entry key="filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="ftpsAuthMethod" value="password"/>
+      <entry key="ftpsClientCertificateFilePath"/>
+      <entry key="ftpsClientCertificatePassphrase"/>
+      <entry key="group.filetransport" value="local"/>
+      <entry key="group.filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.partitionMode" value="auto"/>
+      <entry key="hardPolicyviolations"/>
+      <entry key="hasHeader">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="indexColumn" value="Username"/>
+      <entry key="isCaseInsensitiveMerge">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="isSortedByIndexColumn">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="joinerEnabled"/>
+      <entry key="joinerPopulationRegex"/>
+      <entry key="joinerRoles"/>
+      <entry key="mergeColumns">
+        <value>
+          <List>
+            <String>Role</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="mergeRows">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="moveAccountContainer"/>
+      <entry key="moverExtendedRule"/>
+      <entry key="moverProcess" value="Do Nothing"/>
+      <entry key="moverRevocation" value="Do Nothing"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="parseType" value="delimited"/>
+      <entry key="partitionMode" value="auto"/>
+      <entry key="port"/>
+      <entry key="primarySyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="primarypasswordSyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="privilegedAccountAttrExpression"/>
+      <entry key="privilegedEntAttrExpression"/>
+      <entry key="rehireExtendedRule"/>
+      <entry key="rehirePrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="rehireProcess" value="Do Nothing"/>
+      <entry key="removeEntitlementLeaverExceptionExpression"/>
+      <entry key="renameLDAPaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="requestorFormRole"/>
+      <entry key="reverseTerminationExtendedRule"/>
+      <entry key="reverseleaverProcess" value="Do Nothing"/>
+      <entry key="scramblePasswordAttr"/>
+      <entry key="sftpAuthMethod" value="password"/>
+      <entry key="skipSupervisorApproval"/>
+      <entry key="snowAssignmentGroup"/>
+      <entry key="snowAssignmentGroupName"/>
+      <entry key="softPolicyviolations"/>
+      <entry key="stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="DelimitedFile Template"/>
+      <entry key="terminationExtendedRule"/>
+      <entry key="terminationProcess" value="Do Nothing"/>
+      <entry key="xDays"/>
+      <entry key="xDeleteDays"/>
+    </Map>
+  </Attributes>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <ProvisioningForms>
+    <Form name="Ascension-Form-ReadySet-CreatePolicy" objectType="account" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="Ascension-Form-ReadySet-CreatePolicy"/>
+        </Map>
+      </Attributes>
+      <Section name="Section 1">
+        <Field displayName="Username" name="Username" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[return identity.getName();]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Firstname" name="Firstname" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("firstname"))){
+              return identity.getAttribute("firstname");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Lastname" name="Lastname" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("lastname"))){
+              return identity.getAttribute("lastname");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Email" name="Email" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("email"))){
+              return identity.getAttribute("email");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Suffix/Credentials:" name="Suffix/Credentials:" required="true" reviewRequired="true" type="string"/>
+        <Field displayName="Date of Birth (mm/dd/yyyy):" name="Date of Birth (mm/dd/yyyy):" required="true" reviewRequired="true" type="string"/>
+        <Field displayName="Allow Assignment for Correspondence:" name="Allow Assignment for Correspondence:" required="true" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>No</String>
+                <String>Yes</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Location:" name="Location:" required="true" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>ALBIR-ST VINCENT'S 119</String>
+                <String>ALBIR-ST VINCENT'S BIRMINGHAM</String>
+                <String>ALBIR-ST VINCENT'S BLOUNT</String>
+                <String>ALBIR-ST VINCENT'S CHILTON</String>
+                <String>ALBIR-ST VINCENT'S EAST</String>
+                <String>ALBIR-ST VINCENT'S ST CLAIR</String>
+                <String>ALMOB-BAY MEDICAL</String>
+                <String>ALMOB-PROVIDENCE HOSPITAL - MOBILE</String>
+                <String>AMITA-ASCENSION ALEXIAN BROTHERS</String>
+                <String>AMITA-ASCENSION ALEXIAN BROTHERS BEHAVIORAL HEALTH</String>
+                <String>AMITA-ASCENSION HOLY FAMILY</String>
+                <String>AMITA-ASCENSION MERCY</String>
+                <String>AMITA-ASCENSION RESURRECTION</String>
+                <String>AMITA-ASCENSION SAINT ALEXIUS</String>
+                <String>AMITA-ASCENSION SAINT FRANCIS</String>
+                <String>AMITA-ASCENSION SAINT JOSEPH CHICAGO</String>
+                <String>AMITA-ASCENSION SAINT JOSEPH ELGIN</String>
+                <String>AMITA-ASCENSION SAINT JOSEPH JOLIET</String>
+                <String>AMITA-ASCENSION SAINT MARY CHICAGO</String>
+                <String>AMITA-ASCENSION SAINT MARY KANKAKEE</String>
+                <String>AOH TEST</String>
+                <String>ASCENSION HEALTH - EHS CLINIC</String>
+                <String>ASCENSION HEALTH - EVENT</String>
+                <String>ASCENSION HEALTH - LAB</String>
+                <String>DCWAS-ASCENSION PROVIDENCE HEALTH AND WELLNESS - WASHINGTON</String>
+                <String>FLJAC-ST VINCENT'S RIVERSIDE - JACKSONVILLE</String>
+                <String>FLJAC-ST. VINCENT'S CLAY</String>
+                <String>FLJAC-ST. VINCENT'S SOUTHSIDE</String>
+                <String>FLPEN-SACRED HEART HOSPITAL PENSACOLA</String>
+                <String>FLPEN-SACRED HEART ON THE EMERALD COAST ASSOCIATE HEALTH</String>
+                <String>FLPEN-SACRED HEART ON THE GULF ASSOCIATE HEALTH &amp; WELLNESS</String>
+                <String>INEVA-ST. VINCENT EVANSVILLE</String>
+                <String>ININD-ST. VINCENT ANDERSON</String>
+                <String>ININD-ST. VINCENT CLAY</String>
+                <String>ININD-ST. VINCENT DUNN</String>
+                <String>ININD-ST. VINCENT INDIANAPOLIS</String>
+                <String>ININD-ST. VINCENT JENNINGS</String>
+                <String>ININD-ST. VINCENT KOKOMO</String>
+                <String>ININD-ST. VINCENT MERCY</String>
+                <String>ININD-ST. VINCENT RANDOLPH</String>
+                <String>ININD-ST. VINCENT SALEM</String>
+                <String>ININD-ST. VINCENT WILLIAMSPORT</String>
+                <String>KSWIC-VIA CHRISTI MANHATTAN</String>
+                <String>KSWIC-VIA CHRISTI PITTSBURG</String>
+                <String>KSWIC-VIA CHRISTI ST. JOSEPH</String>
+                <String>KSWIC-VIA CHRISTI WICHITA</String>
+                <String>MDBAL-SAINT AGNES HOSPITAL - BALTIMORE</String>
+                <String>MIDET-ASCENSION MACOMB/OAKLAND - WARREN</String>
+                <String>MIDET-ASCENSION MACOMB/OAKLAND- MADISON HEIGHTS</String>
+                <String>MIDET-ASCENSION PROVIDENCE - NOVI</String>
+                <String>MIDET-ASCENSION PROVIDENCE - SOUTHFIELD</String>
+                <String>MIDET-ASCENSION RIVER DISTRICT - EAST CHINA TOWNSHIP</String>
+                <String>MIDET-ASCENSION ST. JOHN - DETROIT</String>
+                <String>MIGRA-ASCENSION GENESYS - GRAND BLANC</String>
+                <String>MIKAL-ASCENSION BORGESS - ALLEGAN</String>
+                <String>MIKAL-ASCENSION BORGESS - KALAMAZOO</String>
+                <String>MIKAL-ASCENSION BORGESS/LEE - DOWAGIAC</String>
+                <String>MIKAL-ASCENSION BORGESS/PIPP - PLAINWELL</String>
+                <String>MIROC-ASCENSION PROVIDENCE - ROCHESTER</String>
+                <String>MISAG-ASCENSION ST. MARY'S - SAGINAW</String>
+                <String>MISAG-ASCENSION STANDISH - STANDISH</String>
+                <String>MITAW-ASCENSION ST. JOSEPH - TAWAS</String>
+                <String>NYBIN-LOURDES HOSPITAL - BINGHAMTON</String>
+                <String>OKTUL-ST. JOHN BROKEN ARROW</String>
+                <String>OKTUL-ST. JOHN SAPULPA</String>
+                <String>OKTUL-ST. JOHN JANE PHILLIPS - BARTLESVILLE</String>
+                <String>OKTUL-ST. JOHN MEDICAL CENTER - TULSA</String>
+                <String>OKTUL-ST. JOHN OWASSO</String>
+                <String>TNNAS-ST. THOMAS - DEKALB</String>
+                <String>TNNAS-ST. THOMAS - HICKMAN</String>
+                <String>TNNAS-ST. THOMAS - HIGHLANDS</String>
+                <String>TNNAS-ST. THOMAS - MIDTOWN</String>
+                <String>TNNAS-ST. THOMAS - RIVER PARK</String>
+                <String>TNNAS-ST. THOMAS - RUTHERFORD</String>
+                <String>NNAS-ST. THOMAS - STONES RIVER</String>
+                <String>TNNAS-ST. THOMAS - THREE RIVERS</String>
+                <String>TNNAS-ST. THOMAS - WEST</String>
+                <String>TXAUS-TEXAS ADMINISTRATIVE OFFICE BUILDING - AUSTIN</String>
+                <String>TXWAC-ASCENSION PROVIDENCE HOSPITAL - WACO</String>
+                <String>WIAPP-MERCY HOSPITAL</String>
+                <String>WIAPP-ST. ELIZABETH HOSPITAL - APPLETON</String>
+                <String>WIMIL-ALL SAINTS - RACINE</String>
+                <String>WIMIL-COLUMBIA ST MARY'S- M</String>
+                <String>WIMIL-ELMBROOK</String>
+                <String>WIMIL-ST. FRANCIS</String>
+                <String>WIMIL-ST. JOSEPH'S</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+      </Section>
+    </Form>
+  </ProvisioningForms>
+  <Schemas>
+    <Schema displayAttribute="Username" identityAttribute="Username" instanceAttribute="" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="Username" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Firstname" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Lastname" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EmployeeNumber" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EmailAddress" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="Department" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" multi="true" name="Role" type="string">
+        <Description/>
+      </AttributeDefinition>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>
