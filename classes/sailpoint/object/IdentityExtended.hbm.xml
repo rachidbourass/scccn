@@ -1,0 +1,342 @@
+<!-- (c) Copyright 2008 SailPoint Technologies, Inc., All Rights Reserved. -->
+
+<!--
+Extended attribute mappings for Identity.
+
+By default we will map 10 extended attributes, but this may be raised to
+a maximum of 20.  Using ExtendedPropertyAccessor can add attributes beyond 
+the limit of 20 and have meaningful names.  Example of ExtendedPropertyAccessor 
+is shown below.
+
+Only the first five attributes are indexed, to provide
+an example of how to specify an index.  In a production deployment you
+will usually index most of the extended attributes since they are
+usually added for searching, but index maintenance slows down updates to
+the identity cube so add them only if necessary.
+
+All extended properties must be of type="string".
+
+We need the extended attributes to be large enough to hold arbitrary
+customer data but not so large that Hibernate turns them into a blob or
+other type which cannot be used in searches.
+
+The maximum size of a VARCHAR on various sysems is:
+
+    Oracle - 4000
+    SQLServer - 8000
+    MySQL 5 - 65K
+    DB2 8.1 - 32K
+
+With each dialect, Hibernate will use a non-indexable type for strings
+of a certain size length.  This size cliff is often less than the max size
+for varchar on that system, so be careful if extending the sizes of these
+fields beyond what is specified in this file.
+
+SQL Server will not index a value greater than 900 "bytes".
+Now that we're using NVARCHAR on SQL Server there are two bytes per
+characcter so the maximum size of an indexed string column is 450.
+If you know you are not running on SQL Server, or you know you will
+not need an index on the column,  you may raise the size safely.
+
+MySQL will only index 767 "bytes" by default for InnoDB tables.
+Using varchar with UTF-8, this equates to at most 255 characters.
+MySQL will allow indexing a subset of the column length,
+so generated ddl will have mysql indexes substringed to 255 by default.
+
+-->
+
+    <property name="extended1" type="string" length="450"
+              index="spt_identity_extended1_ci"/>
+    <property name="extended2" type="string" length="450"
+              index="spt_identity_extended2_ci"/>
+    <property name="extended3" type="string" length="450"
+              index="spt_identity_extended3_ci"/>
+    <property name="extended4" type="string" length="450"
+              index="spt_identity_extended4_ci"/>
+    <property name="extended5" type="string" length="450"
+              index="spt_identity_extended5_ci"/>
+
+    <property name="extended6" type="string" length="450"/>
+    <property name="extended7" type="string" length="450"/>
+    <property name="extended8" type="string" length="450"/>
+    <property name="extended9" type="string" length="450"/>
+    <property name="extended10" type="string" length="450"/>
+
+    <!-- An example of using ExtendedPropertyAccessor to add
+         attributes beyond the limit of 20 numbered 
+         SailPointObject properties and have meaningful names.
+
+    <property name="costCenter" type="string" length="450"
+              access="sailpoint.persistence.ExtendedPropertyAccessor"/>
+    -->
+
+    <!--
+    <property name="extended11" type="string" length="450"/>
+    <property name="extended12" type="string" length="450"/>
+    <property name="extended13" type="string" length="450"/>
+    <property name="extended14" type="string" length="450"/>
+    <property name="extended15" type="string" length="450"/>
+    <property name="extended16" type="string" length="450"/>
+    <property name="extended17" type="string" length="450"/>
+    <property name="extended18" type="string" length="450"/>
+    <property name="extended19" type="string" length="450"/>
+    <property name="extended20" type="string" length="450"/>
+    -->
+
+    <many-to-one embed-xml="false" name="extendedIdentity1" class="sailpoint.object.Identity"/>
+    <many-to-one embed-xml="false" name="extendedIdentity2" class="sailpoint.object.Identity"/>
+    <many-to-one embed-xml="false" name="extendedIdentity3" class="sailpoint.object.Identity"/>
+    <many-to-one embed-xml="false" name="extendedIdentity4" class="sailpoint.object.Identity"/>
+    <many-to-one embed-xml="false" name="extendedIdentity5" class="sailpoint.object.Identity"/>
+    <!--OOTB END-->
+<!--SERVICE ACCOUNT, LEAVER START - UNCOMMENT THIS FOR SERVICE ACCOUNTT BETA FEATURE-->
+<property name="saccountOwnerone" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_sOwnone_ci"/>
+<!--SERVICE ACCOUNT, LEAVER END - UNCOMMENT THIS FOR SERVICE ACCOUNTT BETA FEATURE-->
+<!--SERVICE ACCOUNT,CREATE, AGGREGATION REPORTING START - UNCOMMENT THIS FOR SERVICE ACCOUNTT BETA FEATURE-->  
+<property name="serviceCube" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_sCube_ci"/>
+<!--SERVICE ACCOUNT, CREATE, AGGREGATION, REPORTING END - - UNCOMMENT THIS FOR SERVICE ACCOUNTT BETA FEATURE-->
+<!--PERSONA, JOINER, LEAVER, MOVER, CREATE, EDIT, REPORTING START - UNCOMMENT THIS FOR PERSONA BETA FEATURE-->    
+<!--<property name="relationships" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_relationships_ci"/>
+<property name="mgrrelationships" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_mgrrltionships_ci"/>-->
+<!--PERSONA, JOINER, LEAVER, MOVER, CREATE, EDIT, REPORTING END - UNCOMMENT THIS FOR PERSONA BETA FEATURE--> 
+<!--JOINER START-->   
+<property name="needsJoiner" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_needsJoiner_ci"/>
+<!--JOINER END--> 
+<!--CREATE/EDIT/REGISTER IDENTITY START-->
+<property name="middleName" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_middleName_ci"/>
+<!--CREATE/EDIT/REGISTER IDENTITY END-->
+<!--CREATE/EDIT IDENTITY START - UNCOMMENT THIS FOR CONTRACTOR CREATE/EDIT BETA FEATURE-->
+<property name="ctrexpDt" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_ctrexpDt_ci"/>
+<property name="ctrMgr" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_ctrMgr_ci"/>
+<!--CREATE/EDIT IDENTITY END - UNCOMMENT THIS FOR CONTRACTOR CREATE/EDIT BETA FEATURE-->
+<!--CONTRACTOR PLUGIN START - UNCOMMENT THIS FOR CONTRACTOR PLUGIN-->
+<!--<property name="ctrProfid" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_ctrProfid_ci"/>
+<property name="ctrDptid" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_ctrDptid_ci"/>
+<property name="ctrVendorid" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_ctrVendorid_ci"/>
+<property name="ctrPrfmgrdpids" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_ctrPrfmgrdpids_ci"/>
+<property name="ctrAcctadmdpids" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_ctrAcctadmdpids_ci"/>
+<property name="ctrAcctspndpids" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_ctrAcctspndpids_ci"/>-->
+<!--CONTRACTOR PLUGIN END -UNCOMMENT THIS FOR CONTRACTOR PLUGIN--> 
+
+<!--Ascension Indexed Attributes START-->
+<property name="department" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_department_ci"/>
+<property name="title" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_title_ci"/>
+<property name="orgUnitPath" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_orgUnitPath_ci"/>
+<property name="company" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_company_ci"/>
+<property name="termDate" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_termDate_ci"/>
+<property name="leaverDate" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_leaverDate_ci"/>        
+<property name="gsuiteStatus" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_gsuiteStatus_ci"/>
+<property name="locationDescription" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_locationDescription_ci"/>
+<property name="otherTelephone" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_otherTelephone_ci"/>
+<property name="albirMiscellaneous" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_albirMiscellaneous_ci"/>
+<property name="businessUnit" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_businessUnit_ci"/>
+<property name="workLocationCode" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_workLocationCode_ci"/>
+<property name="employeeId" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_employeeId_ci"/>
+<property name="primaryEmail" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_primaryEmail_ci"/>
+<property name="departmentNumber" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_departmentNumber_ci"/>
+<property name="employeeClass" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_employeeClass_ci"/>
+<property name="archiving" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_archiving_ci"/>
+<property name="mailDomain" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_mailDomain_ci"/>
+<property name="managerLevel" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_managerLevel_ci"/>
+<property name="samAccountName" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_samAccountName_ci"/>
+<property name="dob" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_dob_ci"/>
+<property name="ssn" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_ssn_ci"/>
+<property name="jobFamily" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_jobFamily_ci"/>	
+<property name="taniumData" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_taniumData_ci"/>
+<property name="operId" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_operId_ci"/>
+<property name="ministry" type="string" length="450"
+		  access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_ministry_ci"/>
+<property name="hireDate" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_hireDate_ci"/>
+<property name="isManager" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_isManager_ci"/>
+<property name="jobcode" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_jobcode_ci"/>		
+<property name="externalEmail" type="string" length="450"
+		access="sailpoint.persistence.ExtendedPropertyAccessor"
+		index="spt_identity_external_email_ci"/>
+<property name="npiNumber" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_npi_Number_ci"/>
+<property name="isContractorManager" type="string" length="15"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_isContractorManager_ci"/>
+<property name="contractorManager" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_contractorManager_ci"/>
+<property name="isAMG" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_isAMG_ci"/>
+<property name="noTriggers" type="string" length="15"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_noTriggers_ci"/>
+<property name="noSync" type="string" length="15"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_noSync_ci"/>
+<property name="providerID" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_providerID_ci"/>
+<property name="buildingId" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_buildingId_ci"/>		  
+<property name="businessUnitDescription" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_businessUnitDescription_ci"/>		 
+<property name="notes" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_notes_ci"/>
+<property name="internalId" type="string" length="12"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_internalId_ci"/>
+<property name="courionId" type="string" length="20"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_courionId_ci"/>
+<property name="avatarId" type="string" length="20"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_avatarId_ci"/>
+<property name="parentPersonaName" type="string" length="20"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_parentPersonaName_ci"/>
+<property name="personaType" type="string" length="20"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_personaType_ci"/>
+<property name="identityType" type="string" length="25"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_identityType_ci"/>
+<property name="initialName" type="string" length="15"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_initialName_ci"/>
+<property name="lastHireDate" type="string" length="450"
+		  access="sailpoint.persistence.ExtendedPropertyAccessor"
+		  index="spt_identity_external_lastHireDate_ci"/>
+<property name="joinerDate" type="string" length="11"
+		  access="sailpoint.persistence.ExtendedPropertyAccessor"
+		  index="spt_identity_external_joinerDate_ci"/>
+<property name="authSourceAppName" type="string" length="100"
+		  access="sailpoint.persistence.ExtendedPropertyAccessor"
+		  index="spt_identity_external_authSourceAppName_ci"/>		
+<property name="pendingRefreshWorkflow" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_pendingRefreshWorkflow_ci"/>		
+<property name="practiceLocation" type="string" length="100"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_practiceLocation_ci"/>
+<property name="providerSspecialty" type="string" length="100"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_providerSspecialty_ci"/>
+<property name="licenseType" type="string" length="50"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_licenseType_ci"/>
+<property name="officeAddress" type="string" length="100"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_officeAddress_ci"/>
+<property name="officeCity" type="string" length="50"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_officeCity_ci"/>
+<property name="officeZip" type="string" length="12"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_officeZip_ci"/>
+<property name="officePhone" type="string" length="15"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_officePhone_ci"/>
+<property name="officeFax" type="string" length="15"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_officeFax_ci"/>		  
+<property name="domainAccounts" type="string" length="450"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_domainAccounts_ci"/>	
+<property name="badgeNumber" type="string" length="25"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_badgeNumber_ci"/>	
+<property name="rehireType" type="string" length="25"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_rehireType_ci"/>	
+<property name="rehireAction" type="string" length="10"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_rehireAction_ci"/>		
+<property name="rehireEffDate" type="string" length="25"
+          access="sailpoint.persistence.ExtendedPropertyAccessor"
+          index="spt_identity_rehireEffDate_ci"/>			  
+<!--Ascension Indexed Attributes END-->
