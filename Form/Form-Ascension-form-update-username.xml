@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Ascension-Form-Update-UserName" type="Workflow">
+  <Button action="next" label="Submit"/>
+  <Button action="cancel" label="Cancel" parameter="exitWorkflow" value="true"/>
+  <Section>
+    <Field displayName="Application" dynamic="true" helpKey="Select Application" name="inputApplication" postBack="true" required="true" type="string">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source><![CDATA[
+			import java.util.Collections;
+			
+            List result = new ArrayList();
+            result.add("Athena Health");
+			result.add("IMS ReadyTracker");
+			result.add("Order Facilitator");
+			result.add("Phreesia");
+			result.add("Passport");
+			result.add("Standing Stone");
+			result.add("PwC Smart");
+			result.add("Paceart Optima");
+			result.add("Midas");
+			result.add("Meditech Legacy Archive Viewer");
+			result.add("Kofax");
+			result.add("CashPro");
+			result.add("PureOHS");
+			result.add("PharmacyKeeper");
+			result.add("Optum Care Coordination Platform");
+			result.add("Redoc");
+			result.add("ApplicationXtender");
+			result.add("Report2Web");
+			result.add("RALS Bedside Glucose");
+       		result.add("Care Management");
+			result.add("CPN - Centricity Perinatal");
+			result.add("CNExT Registry");
+			result.add("Intellispace Perinatal");
+			result.add("ININD - PowerScribe for Radiology");
+            result.add("INEVA - PowerScribe");
+			result.add("Legacy Record Viewer (LRV)");
+			result.add("Metriq Cancer Registry");
+			result.add("NeoData");
+			result.add("Trauma Base V9");
+			result.add("GIQuIC Registry");
+			result.add("Metriq- Elekta Cloud Solution (ECS)");
+			result.add("Interqual Review Manager");
+			result.add("Timeless - Womens & Infants");
+			result.add("ININD - Censitrac");
+			result.add("KSWIC - Censitrac");
+			result.add("TXAUS - Censitrac");
+			
+            Collections.sort(result);
+            return result;
+          ]]></Source>
+        </Script>
+      </AllowedValuesDefinition>
+      <Attributes>
+        <Map>
+          <entry key="valueProperty" value="name"/>
+        </Map>
+      </Attributes>
+      <ValidationScript>
+        <Source><![CDATA[ 
+          if(null == inputApplication) { 
+          return "Application cannot be null";
+          }            
+        ]]></Source>
+      </ValidationScript>
+    </Field>
+    <Field dependencies="inputApplication" displayName="Identity" dynamic="true" helpKey="Select User" name="inputIdentity" required="true" type="identity">
+      <Attributes>
+        <Map>
+          <entry key="filterString">
+            <value>
+              <Script>
+                <Source><![CDATA[
+                  import sailpoint.tools.Util;       
+                  import sailpoint.object.Filter;
+               
+                  Filter activeFilter = Filter.eq("inactive", false);
+                  String appValue = "";
+                  if(null != form.getField("inputApplication") && Util.isNotNullOrEmpty( form.getField("inputApplication").getValue())){
+                  	appValue = form.getField("inputApplication").getValue();
+                  }
+                 
+                  Filter appFilter = Filter.eq("links.application.name", appValue);
+                  Filter finalFilter = Filter.and(appFilter, activeFilter);
+                 
+                  field.setFilterString( finalFilter.getExpression() );
+
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <ValidationScript>
+        <Source><![CDATA[ 
+          if(null == inputIdentity) { 
+          return "Identity cannot be null";
+          }            
+        ]]></Source>
+      </ValidationScript>
+    </Field>
+    <Field displayName="User Name" helpKey="Provide Value" name="inputUserName" required="true" type="string">
+      <Attributes>
+        <Map>
+          <entry key="valueProperty" value="name"/>
+        </Map>
+      </Attributes>
+      <ValidationScript>
+        <Source><![CDATA[ 
+          if(null == inputUserName) { 
+          return "User Name cannot be null";
+          }            
+        ]]></Source>
+      </ValidationScript>
+    </Field>
+    <Field displayName="Password" helpKey="Provide Password" name="inputPassword" required="true" type="string">
+      <Attributes>
+        <Map>
+          <entry key="valueProperty" value="name"/>
+        </Map>
+      </Attributes>
+      <ValidationScript>
+        <Source><![CDATA[ 
+          if(null == inputPassword) { 
+          return "Password cannot be blank";
+          }            
+        ]]></Source>
+      </ValidationScript>
+    </Field>
+  </Section>
+</Form>

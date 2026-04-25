@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE QuickLink PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<QuickLink action="workflow" category="Access" cssClass="QuickLink-PopUpRequest" messageKey="MDM-Acknowledgement" name="ASCN-MDM-Acknowledgment">
+  <Attributes>
+    <Map>
+      <entry key="httpSession">
+        <value>
+          <Script>
+            <Source>
+              import javax.faces.context.FacesContext;
+              import javax.servlet.http.HttpSession;
+              FacesContext fc = FacesContext.getCurrentInstance();
+              HttpSession session = fc.getExternalContext().getSession(true);
+              return session;
+            </Source>
+          </Script>
+        </value>
+      </entry>
+      <entry key="workflowName" value="ASCN-MDM-Acknowledgment"/>
+    </Map>
+  </Attributes>
+  <QuickLinkOptions allowSelf="true">
+    <DynamicScopeRef>
+      <Reference class="sailpoint.object.DynamicScope" name="Everyone"/>
+    </DynamicScopeRef>
+  </QuickLinkOptions>
+</QuickLink>

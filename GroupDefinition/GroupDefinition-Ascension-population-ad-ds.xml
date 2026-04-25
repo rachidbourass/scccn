@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE GroupDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<GroupDefinition indexed="true" name="Ascension-Population-AD-DS" private="true">
+  <Description>Ascension-Population-AD-DS</Description>
+  <GroupFilter>
+    <CompositeFilter operation="AND">
+      <Filter ignoreCase="true" operation="EQ" property="links.application.id" value="0af01f3d735d158081735de669da0455"/>
+    </CompositeFilter>
+  </GroupFilter>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="sp_ssany005"/>
+  </Owner>
+</GroupDefinition>

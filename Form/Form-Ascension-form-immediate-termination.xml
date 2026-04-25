@@ -1,0 +1,827 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Ascension-Form-Immediate-Termination" type="Workflow">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="Immediate Disablement"/>
+    </Map>
+  </Attributes>
+  <Section columns="1" label="Associate/Contractor Selection">
+    <Field displayName="Identity" name="userName" postBack="true" required="true" type="Identity">
+      <Attributes>
+        <Map>
+          <entry key="filterString">
+            <value>
+              <Script>
+                <Source><![CDATA[  
+                 				
+                  import sailpoint.object.Custom;
+                  import sailpoint.object.Filter;
+                  import sailpoint.object.Identity;
+
+                  String user = "";
+                  if(null != identityModel){
+                  user = identityModel.get("launcher");
+                  }
+                  List groupName = new ArrayList();                                 				   
+                  List userTypes = new ArrayList();
+				  List adminGroups=new ArrayList();
+				  boolean userinAdminWG=false;
+
+                  Identity identity = context.getObjectByName(Identity.class,user);
+                  Custom custom = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration");
+				  
+				  if(custom!=null && custom.get("userTypes") !=null){  
+                  userTypes = custom.get("userTypes");
+                  adminGroups = custom.get("WorkGroup");
+                  }
+
+                   if(null != identity){
+                  List groups = identity.getWorkgroups();                  
+                  if (null != groups){
+                  for(Identity group : groups){                  
+                  groupName.add(group.getName()); 
+                  if(adminGroups.contains(group.getName())){
+                  userinAdminWG=true;
+                  }
+                  }
+                  }
+                  }
+
+               
+                  Filter filter = Filter.eq("inactive", false);
+
+                   if(userinAdminWG){
+                  field.setFilterString(filter.getExpression());
+                  }
+                  else{
+                  Filter managerFilter = Filter.eq("manager.name", user);
+                  Filter finalFilter = Filter.and(managerFilter, filter); 
+                  field.setFilterString( finalFilter.getExpression() );
+                  }
+
+                  if(null!=custom){
+                  //comment decache //context.decache(custom);
+                  }
+                  if(null!=identity){
+                  //comment decache //context.decache(identity);
+                  }
+				  
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+  <Section name="HTML Section 1" type="text">
+    <Field displayType="textarea" name="userNameHelp" postBack="true" type="String">
+      <Attributes>
+        <Map>
+          <entry key="contentIsEscaped" value="true"/>
+          <entry key="height" value="200"/>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+				 	
+				  import sailpoint.object.Form;
+                  import sailpoint.object.Field;
+
+                  Field userNameField = form.getField("userName");
+
+                  if (userNameField.getValue() != null) {
+                  return true;
+                  } else {
+                  return false;
+                  }
+				  ]]></Source>
+              </Script>
+            </value>
+          </entry>
+          <entry key="readOnly" value="true"/>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source><![CDATA[
+		 	
+          import sailpoint.object.Form;
+          import sailpoint.object.Field;
+          import sailpoint.tools.Util;
+
+          Field userNameHelp = form.getField("userNameHelp");
+
+          userNameHelp.setDisplayName("");
+
+          String htmlBody = "";
+
+          htmlBody = "<p>This event will only disable the users access.  After disabling this user, please make sure to terminate their HR record by logging into the portal or calling the MSC.</p><p>Hint: Try searching for an Identity using...</p><ul style=\"padding-left: 20px\"><li style=\"margin-top: 2px\">Employee Number</li style=\"margin-top: 2px\"><li style=\"margin-top: 2px\">Email Address/Google Identity</li><li style=\"margin-top: 2px\">Primary Network ID</li><li style=\"margin-top: 2px\">Doe, Jane</li><li style=\"margin-top: 2px\">Jane Doe</li></ul>";
+
+          return htmlBody;
+		  
+        ]]></Source>
+      </Script>
+    </Field>
+  </Section>
+  <Section columns="3">
+    <Attributes>
+      <Map>
+        <entry key="hidden">
+          <value>
+            <Script>
+              <Source><![CDATA[  
+			    
+                import sailpoint.tools.Util;
+                if (Util.isNotNullOrEmpty(userName)){
+                return false;
+                }
+                return true;
+				
+              ]]></Source>
+            </Script>
+          </value>
+        </entry>
+        <entry key="readOnly" value="true"/>
+      </Map>
+    </Attributes>
+    <Field columnSpan="1" dependencies="userName" displayName="First Name" dynamic="true" name="firstname" type="String">
+      <Script>
+        <Source><![CDATA[
+          		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          termValue = idn.getFirstname();
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Suffix" dynamic="true" name="middleName" type="String">
+      <Script>
+        <Source><![CDATA[  
+          		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          termValue = idn.getAttribute("middleName");
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Last Name" dynamic="true" name="lastname" type="String">
+      <Script>
+        <Source><![CDATA[  
+          		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          termValue = idn.getLastname();
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Social Security Number(Last four digits)" dynamic="true" name="ssn" type="String">
+      <Script>
+        <Includes>
+          <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-Encryption"/>
+        </Includes>
+        <Source><![CDATA[
+         		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String decryptValue = "";
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null && Util.isNotNullOrEmpty(idn.getAttribute("ssn"))) {
+          decryptValue = decryptAES(idn.getAttribute("ssn"));
+          if(Util.isNullOrEmpty(decryptValue)){
+          decryptValue = idn.getAttribute("ssn");
+          }
+          //comment decache //context.decache(idn);
+          }
+          }
+          return decryptValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="DOB" dynamic="true" name="dob" type="String">
+      <Script>
+        <Includes>
+          <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-Encryption"/>
+        </Includes>
+        <Source><![CDATA[   
+          		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String decryptVal = "";
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null && Util.isNotNullOrEmpty(idn.getAttribute("dob"))) {
+          decryptVal = decryptAES(idn.getAttribute("dob")); 
+          if(Util.isNullOrEmpty(decryptVal)){
+          decryptVal = idn.getAttribute("dob");
+          }
+          //comment decache //context.decache(idn);
+          }
+          }
+          return decryptVal;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Mobile Number" dynamic="true" name="mobile" type="String">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[ 
+                  				
+                  import sailpoint.tools.Util;
+                  import sailpoint.object.Identity;
+                  import sailpoint.object.Custom;
+                  
+                  Custom custom = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");
+
+                  if (Util.isNotNullOrEmpty(userName)){            
+                  Identity idn = context.getObjectByName(Identity.class, userName);
+                  if (null!=idn && Util.isNotNullOrEmpty(idn.getAttribute("type")) && null!=custom && null!=custom.get(idn.getAttribute("type"))) {
+                  
+                  List typeValue = custom.get(idn.getAttribute("type"));
+                  if(typeValue.contains(field.getName())){
+                  return true;
+                  }
+                  //comment decache //context.decache(idn);
+				  //comment decache //context.decache(custom);
+                  }
+                  }                
+                  return false;
+				  
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source><![CDATA[ 
+          		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          termValue = idn.getAttribute("mobile");
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="User Type" dynamic="true" name="employeeType" type="String">
+      <Script>
+        <Source><![CDATA[    
+		  
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          termValue = idn.getAttribute("type");
+          if(null!=termValue){
+          termValue=termValue.toUpperCase();
+          }
+
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Expiration Date" dynamic="true" name="ctrexpDt" type="String">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+				  
+                  import sailpoint.tools.Util;
+                  import sailpoint.object.Identity;
+                  import sailpoint.object.Custom;
+                  
+                  Custom custom = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");
+
+                  if (Util.isNotNullOrEmpty(userName)){            
+                  Identity idn = context.getObjectByName(Identity.class, userName);
+                  if (null!=idn && Util.isNotNullOrEmpty(idn.getAttribute("type")) && null!=custom && null != custom.get(idn.getAttribute("type"))) {
+                  
+                  List typeValue = custom.get(idn.getAttribute("type"));
+                  if(typeValue.contains(field.getName())){
+                  return true;
+                  }
+                  //comment decache //context.decache(idn);
+				  //comment decache //context.decache(custom);
+                  }
+                  }                
+                  return false;
+				  
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source><![CDATA[      
+		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {         
+          termValue = idn.getAttribute("ctrexpDt");
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Start Date" dynamic="true" name="hireDate" type="String">
+      <Script>
+        <Source><![CDATA[   
+		  
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          termValue = idn.getAttribute("hireDate");
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Ministry" dynamic="true" name="ministry" type="String">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[  
+				  
+                  import sailpoint.tools.Util;
+                  import sailpoint.object.Identity;
+                  import sailpoint.object.Custom;
+                  
+                  Custom custom = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");
+
+                  if (Util.isNotNullOrEmpty(userName)){            
+                  Identity idn = context.getObjectByName(Identity.class, userName);
+                  if (null!=idn && Util.isNotNullOrEmpty(idn.getAttribute("type")) && null!=custom && null != custom.get(idn.getAttribute("type"))) {
+                  
+                  List typeValue = custom.get(idn.getAttribute("type"));
+                  if(typeValue.contains(field.getName())){
+                  return true;
+                  }
+                  //comment decache //context.decache(idn);
+				  //comment decache //context.decache(custom);
+                  }
+                  }                
+                  return false;
+				  
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source><![CDATA[    
+		  
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          termValue = idn.getAttribute("ministry");
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Domain" dynamic="true" name="domain" type="String">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[  
+				 
+                  import sailpoint.tools.Util;
+                  import sailpoint.object.Identity;
+                  import sailpoint.object.Custom;
+                  
+                  Custom custom = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");
+
+                  if (Util.isNotNullOrEmpty(userName)){            
+                  Identity idn = context.getObjectByName(Identity.class, userName);
+                  if (null!=idn && Util.isNotNullOrEmpty(idn.getAttribute("type")) && null!=custom && null != custom.get(idn.getAttribute("type"))) {
+                  
+                  List typeValue = custom.get(idn.getAttribute("type"));
+                  if(typeValue.contains(field.getName())){
+                  return true;
+                  }
+                  //comment decache //context.decache(idn);
+				  //comment decache //context.decache(custom);
+                  }
+                  }                
+                  return false;
+				  
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source><![CDATA[   
+		 
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          termValue = idn.getAttribute("domain");
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Job Title" dynamic="true" name="title" type="String">
+      <Script>
+        <Source><![CDATA[    
+		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          termValue = idn.getAttribute("title");
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Location(Facility)" dynamic="true" name="location" type="String">
+      <Script>
+        <Source><![CDATA[   
+			
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+          String type = "";
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          type=idn.getAttribute("type");
+
+          if(null!=type && type.equalsIgnoreCase("non-hr contractor")){
+          termValue = idn.getAttribute("location");
+          }else{
+          termValue = idn.getAttribute("locationDescription");
+          }
+
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Dept/Office Name" dynamic="true" name="department" type="String">
+      <Script>
+        <Source><![CDATA[  
+         		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          termValue= idn.getAttribute("department");
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Email" dynamic="true" name="externalEmail" type="String">
+      <Script>
+        <Source><![CDATA[   
+		 
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+          String type = "";
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          type=idn.getAttribute("type");
+
+          if(null!=type && type.equalsIgnoreCase("non-hr contractor")){
+          termValue = idn.getAttribute("externalEmail");
+          }else{
+          termValue = idn.getAttribute("email");
+          }
+
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Ascension Manager" dynamic="true" name="manager" type="sailpoint.object.Identity">
+      <Script>
+        <Source><![CDATA[  
+		 
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          return idn.getAttribute("manager");
+          }
+          }
+          return "";
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Vendor Name" dynamic="true" name="vendorName" type="String">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[  
+				
+                  import sailpoint.tools.Util;
+                  import sailpoint.object.Identity;
+                  import sailpoint.object.Custom;
+                  
+                  Custom custom = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");
+
+                  if (Util.isNotNullOrEmpty(userName)){            
+                  Identity idn = context.getObjectByName(Identity.class, userName);
+                  if (null!=idn && Util.isNotNullOrEmpty(idn.getAttribute("type")) && null!=custom && null != custom.get(idn.getAttribute("type"))) {
+                  
+                  List typeValue = custom.get(idn.getAttribute("type"));
+                  if(typeValue.contains(field.getName())){
+                  return true;
+                  }
+                  //comment decache //context.decache(idn);
+				  //comment decache //context.decache(custom);
+                  }
+                  }                
+                  return false;
+				  
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source><![CDATA[      
+			
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          termValue = idn.getAttribute("vendorName");
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="Contractor Company Manager" dynamic="true" name="contractorManager" type="String">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[  
+				
+                  import sailpoint.tools.Util;
+                  import sailpoint.object.Identity;
+                  import sailpoint.object.Custom;
+                  
+                  Custom custom = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");
+
+                  if (Util.isNotNullOrEmpty(userName)){            
+                  Identity idn = context.getObjectByName(Identity.class, userName);
+                  if (null!=idn && Util.isNotNullOrEmpty(idn.getAttribute("type")) && null!=custom && null != custom.get(idn.getAttribute("type"))) {
+                  
+                  List typeValue = custom.get(idn.getAttribute("type"));
+                  if(typeValue.contains(field.getName())){
+                  return true;
+                  }
+                  //comment decache //context.decache(idn);
+				  //comment decache //context.decache(custom);
+                  }
+                  }                
+                  return false;
+				  
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source><![CDATA[
+			
+          import sailpoint.tools.Util;       
+          import sailpoint.object.Identity;
+
+          String value = "";
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity identity = context.getObjectByName(Identity.class, userName);
+          if (identity != null) {
+          value = identity.getAttribute("contractorManager");
+          //comment decache //context.decache(identity);
+          }
+          }
+          return value;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" dependencies="userName" displayName="External Manager's Email" dynamic="true" name="vendorManagerEmail" type="String">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+					
+                  import sailpoint.tools.Util;
+                  import sailpoint.object.Identity;
+                  import sailpoint.object.Custom;
+                  
+                  Custom custom = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");
+
+                  if (Util.isNotNullOrEmpty(userName)){            
+                  Identity idn = context.getObjectByName(Identity.class, userName);
+                  if (null!=idn && Util.isNotNullOrEmpty(idn.getAttribute("type")) && null!=custom && null != custom.get(idn.getAttribute("type"))) {
+                  
+                  List typeValue = custom.get(idn.getAttribute("type"));
+                  if(typeValue.contains(field.getName())){
+                  return true;
+                  }
+                  //comment decache //context.decache(idn);
+				  //comment decache //context.decache(custom); 
+                  }
+                  }                
+                  return false;
+				  
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source><![CDATA[    
+			
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity idn = context.getObjectByName(Identity.class, userName);
+          if (idn != null) {
+          termValue =  idn.getAttribute("vendorManagerEmail");
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+		  
+
+        ]]></Source>
+      </Script>
+    </Field>
+  </Section>
+  <Button action="next" label="Ok"/>
+  <Button action="cancel" label="Cancel"/>
+</Form>

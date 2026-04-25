@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Ascension-Form-RehireApproval" type="Workflow">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="Is User eligble for rehire "/>
+    </Map>
+  </Attributes>
+  <Section label="User Information">
+    <Field columnSpan="1" displayName="First Name" name="firstname" readOnly="true" type="String">
+      <Script>
+        <Source><![CDATA[          		
+         import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(identityName)) {
+          Identity idn = context.getObjectByName(Identity.class, identityName);
+          if (idn != null) {
+          termValue = idn.getFirstname();
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Middle Name" name="middleName" readOnly="true" type="String">
+      <Script>
+        <Source><![CDATA[  
+          		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(identityName)) {
+          Identity idn = context.getObjectByName(Identity.class, identityName);
+          if (idn != null) {
+          termValue = idn.getAttribute("middleName");
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Last Name" name="lastname" readOnly="true" type="String">
+      <Script>
+        <Source><![CDATA[           		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(identityName)) {
+          Identity idn = context.getObjectByName(Identity.class, identityName);
+          if (idn != null) {
+          termValue = idn.getLastname();
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Ministry" name="ministry" readOnly="true" type="String">
+      <Script>
+        <Source><![CDATA[           		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(identityName)) {
+          Identity idn = context.getObjectByName(Identity.class, identityName);
+          if (idn != null) {
+          termValue = idn.getAttribute("ministry");
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+        ]]></Source>
+      </Script>
+    </Field>
+  </Section>
+  <Button action="next" label="Approval"/>
+  <Button action="cancel" label="Cancel"/>
+  <Button action="cancel" label="Return" readOnly="true"/>
+</Form>

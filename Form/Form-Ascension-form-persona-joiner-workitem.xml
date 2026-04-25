@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Ascension-Form-Persona-Joiner-Workitem" type="Workflow">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="Possible matching Identity Persona found for user $(idName) [$(displayName)]"/>
+      <entry key="subtitle" value="If $(idName) [$(displayName)] is a net new identity not having any existing matching identity in IIQ then click on 'Create New Identity Persona' option."/>
+    </Map>
+  </Attributes>
+  <Section label="Incoming User Information - $(idName) - [$(displayName)]">
+    <Field columnSpan="1" displayName="Profile Type" name="profileType" readOnly="true" type="String">
+      <Script>
+        <Source><![CDATA[          		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(identityName)) 
+          {
+            Identity idn = context.getObjectByName(Identity.class, identityName);
+            if (idn != null) 
+            {
+              termValue = idn.getAttribute("identityType");
+              //comment decache //context.decache(idn);
+            }
+          }
+          return termValue;
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="First Name" name="firstname" readOnly="true" type="String">
+      <Script>
+        <Source><![CDATA[          		
+         import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(identityName)) {
+          Identity idn = context.getObjectByName(Identity.class, identityName);
+          if (idn != null) {
+          termValue = idn.getFirstname();
+          //comment decache //context.decache(idn);
+          }
+          }
+          return termValue;
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Last Name" name="lastname" readOnly="true" type="String">
+      <Script>
+        <Source><![CDATA[           		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(identityName)) 
+          {
+            Identity idn = context.getObjectByName(Identity.class, identityName);
+            if (idn != null) 
+            {
+              termValue = idn.getLastname();
+              //comment decache //context.decache(idn);
+            }
+          }
+          return termValue;
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Middle Name" name="middleName" readOnly="true" type="String">
+      <Script>
+        <Source><![CDATA[           		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(identityName)) 
+          {
+            Identity idn = context.getObjectByName(Identity.class, identityName);
+            if (idn != null) 
+            {
+              termValue = idn.getAttribute("middleName");
+              //comment decache //context.decache(idn);
+            }
+          }
+          return termValue;
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Manager Name" name="managerName" readOnly="true" type="String">
+      <Script>
+        <Source><![CDATA[           		
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+          String termValue = ""; 
+
+          if (Util.isNotNullOrEmpty(identityName)) 
+          {
+            Identity idn = context.getObjectByName(Identity.class, identityName);
+            if (idn != null) 
+            {
+              Identity mgrIdentity = idn.getManager();
+          		if(null!=mgrIdentity)
+          		{
+          			termValue = mgrIdentity.getName() +"-"+mgrIdentity.getDisplayName();
+          		}
+          
+          		if(null!=idn)
+          		{
+                //comment decache //context.decache(idn);
+                if(null!=mgrIdentity)
+                {
+                    //comment decache //context.decache(mgrIdentity);
+                }
+          		}
+            }
+          }
+          return termValue;
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field displayName="Select matching Identity Persona" dynamic="true" helpKey="Select the identity that is matching the user with the details provided above and click on 'Link To Matching Identity Persona' button" name="matchingIdentity" required="true" type="string">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source><![CDATA[
+        		return namesList;
+        	]]></Source>
+        </Script>
+      </AllowedValuesDefinition>
+    </Field>
+  </Section>
+  <Button action="next" label="Link To Matching Identity Persona"/>
+  <Button action="back" label="Create New Identity Persona"/>
+</Form>

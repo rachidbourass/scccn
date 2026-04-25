@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE GroupDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<GroupDefinition indexed="true" name="Ascension-GroupDefinition-PeopleSoftAttestationPrivilegedUsers" private="true">
+  <Description>PeopleSoft Attestation Privileged Users</Description>
+  <GroupFilter>
+    <CompositeFilter operation="AND">
+      <Filter ignoreCase="true" operation="EQ" property="links.application.name" value="PeopleSoft Attestation"/>
+    </CompositeFilter>
+  </GroupFilter>
+  <Index>
+    <Reference class="sailpoint.object.GroupIndex" name="Ascension-GroupDefinition-PeopleSoftAttestationPrivilegedUsers"/>
+  </Index>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+</GroupDefinition>

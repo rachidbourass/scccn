@@ -1,0 +1,269 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Ascension-Form-ActiveDirectory-CreatePolicy" type="Application">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="Create Account"/>
+    </Map>
+  </Attributes>
+  <Section label="Account" name="Account">
+    <Field displayName="con_prov_policy_ad_objecttype" name="objectType" postBack="true" section="Account" type="string" value="User">
+      <AllowedValuesDefinition>
+        <Value>
+          <List>
+            <String>User</String>
+            <String>Contact</String>
+          </List>
+        </Value>
+      </AllowedValuesDefinition>
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+                      Object objType = field.getValue();    
+                      if ("contact".equalsIgnoreCase(objType)) {
+                      if (form.getSection("Dial-in") != null) {
+                      form.remove(form.getSection("Dial-in"));
+                      }
+                      if (form.getSection("User Details") != null) {
+                      form.remove(form.getSection("User Details"));
+                      }
+                      if (form.getSection("Skype for Business") != null) {
+                      form.remove(form.getSection("Skype for Business"));
+                      } 
+
+                      if (form.getSection("Exchange") != null && form.getSection("Exchange").getFields() != null ) {
+                      for (Object field : form.getSection("Exchange").getFields()) {
+                      String name = field.getName();
+                      if (name != null && name.indexOf(":") > 0 ) {
+                      String[] nameKeys = name.split(":");
+                      if (nameKeys.length > 1 &&
+                      "homeMDB".equalsIgnoreCase(nameKeys[2])){
+                      field.setHidden(true);
+                      }
+                      }
+                      }
+                      }  
+
+                      } else {
+                      if (form.getSection("User Details") != null && form.getSection("User Details").getFields() != null ) {
+                      for (Object field : form.getSection("User Details").getFields()) {
+                      String name = field.getName();
+                      if (name != null && name.indexOf(":") > 0 ) {
+                      String[] nameKeys = name.split(":");
+                      if (nameKeys.length > 1 &&
+                      ("sAMAccountName".equalsIgnoreCase(nameKeys[2]) 
+                      || "password".equalsIgnoreCase(nameKeys[2]))){
+                      field.setRequired(true);
+                      }
+                      }
+                      }
+                      }
+
+                      }
+
+                      return false;
+                    ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field displayName="con_prov_policy_ad_sAMAccountName" helpKey="help_con_prov_policy_ad_sAMAccountName" name="sAMAccountName" section="Account" type="string">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-Field-sAMAccountName"/>
+      </RuleRef>
+    </Field>
+    <Field displayName="con_prov_policy_ad_distinguishedName" helpKey="help_con_prov_policy_ad_distinguishedName" name="distinguishedName" section="Account" type="string">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-Field-AccountDN"/>
+      </RuleRef>
+    </Field>
+  </Section>
+  <Section label="User Details" name="User Details">
+    <Field displayName="msDS-SupportedEncryptionTypes" name="msDS-SupportedEncryptionTypes" type="string" value="24"/>
+    <Field displayName="con_prov_policy_ad_password" helpKey="help_con_prov_policy_ad_password" name="password" section="User Details" type="secret">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-Field-Password"/>
+      </RuleRef>
+    </Field>
+    <Field displayName="con_prov_policy_ad_pwdLastSet" helpKey="help_con_prov_policy_ad_pwdLastSet" name="pwdLastSet" section="User Details" type="boolean" value="true"/>
+    <Field displayName="con_prov_policy_ad_IIQDisabled" helpKey="help_con_prov_policy_ad_IIQDisabled" name="IIQDisabled" section="User Details" type="boolean" value="false"/>
+    <Field displayName="con_prov_policy_ad_primaryGroupDN" helpKey="help_con_prov_policy_ad_primaryGroupDN" name="primaryGroupDN" section="User Details" type="string"/>
+    <Field displayName="SSN" name="departmentNumber" type="string">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-DecryptSSN-FieldValue"/>
+      </RuleRef>
+    </Field>
+    <Field displayName="DOB" name="employeeType" type="string">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-DecryptDOB-FieldValue"/>
+      </RuleRef>
+    </Field>
+    <Field displayName="Mobile" name="telephoneNumber" type="string">
+      <Script>
+        <Source><![CDATA[
+         if(null != identity){
+              return identity.getAttribute("mobile");
+              }   ]]></Source>
+      </Script>
+    </Field>
+    <Field displayName="Job Title" name="title" type="string">
+      <Script>
+        <Source><![CDATA[if(null != identity){
+              return identity.getAttribute("title");
+              }   ]]></Source>
+      </Script>
+    </Field>
+    <Field displayName="Department" name="department" type="string">
+      <Script>
+        <Source><![CDATA[if(null != identity){
+              return identity.getAttribute("department");
+              }  ]]></Source>
+      </Script>
+    </Field>
+    <Field displayName="Manager" name="manager" type="string">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-Field-Manager"/>
+      </RuleRef>
+    </Field>
+    <Field displayName="End Date" name="accountExpires" type="string">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-Field-ExpirationDate"/>
+      </RuleRef>
+    </Field>
+    <Field displayName="Display Name" name="displayName" type="string">
+      <Script>
+        <Source><![CDATA[String displayNameValue = "";
+              if(null != identity){
+              displayNameValue = identity.getLastname()+", "+identity.getFirstname();
+              }  
+              return displayNameValue;]]></Source>
+      </Script>
+    </Field>
+    <Field displayName="Vendor Company" name="msExchExtensionAttribute42" type="string">
+      <Script>
+        <Source><![CDATA[
+              
+              import sailpoint.object.Identity;
+              import sailpoint.tools.Util;
+              
+              String vendorValue = "";
+              if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("vendorName"))){         
+              vendorValue = "("+identity.getAttribute("vendorName")+")";
+              }
+          
+              return vendorValue;]]></Source>
+      </Script>
+    </Field>
+    <Field displayName="Employee Number" name="employeeNumber" type="string">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+          String empId = "";
+          
+          if(null != identity && Util.isNotNullOrEmpty(identity.getAttribute("employeeId"))){
+          	empId = identity.getAttribute("employeeId");
+          }   
+          return empId;
+        ]]></Source>
+      </Script>
+    </Field>
+  </Section>
+  <Section label="General" name="General">
+    <Field displayName="con_prov_policy_ad_givenName" helpKey="help_con_prov_policy_ad_givenName" name="givenName" section="General" type="string">
+      <Script>
+        <Source><![CDATA[if(null != identity){
+              return identity.getFirstname();
+              }]]></Source>
+      </Script>
+    </Field>
+    <Field displayName="con_prov_policy_ad_sn" helpKey="help_con_prov_policy_ad_sn" name="sn" section="General" type="string">
+      <Script>
+        <Source><![CDATA[if(null != identity){
+              return identity.getLastname();
+              }]]></Source>
+      </Script>
+    </Field>
+    <Field displayName="Description" name="description" type="string">
+      <Script>
+        <Source><![CDATA[import java.text.SimpleDateFormat;
+              import java.util.Date;
+              import java.text.ParseException;
+              import sailpoint.object.Custom;
+              import sailpoint.tools.Util;
+              import org.apache.commons.logging.Log;
+              import org.apache.commons.logging.LogFactory;
+              Log logger = LogFactory.getLog("script.Ascension.AD.Field.Description");
+
+              Date date = new Date();
+              String dateString = null;
+              String format = "";
+
+              Custom custom = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration");
+              try{
+              if(custom!=null && Util.isNotNullOrEmpty(custom.get("DateFormat"))){
+              format = custom.get("DateFormat");
+              }
+
+              SimpleDateFormat dateFormatIIQ = new SimpleDateFormat(format);
+              if(null != date){
+              dateString = dateFormatIIQ.format(date);
+              }  
+              }catch(Exception ex){
+              logger.error("Exception in Converting Date to String"+ex);
+              }
+
+              if(null != custom){
+              //comment decache //context.decache(custom);
+              }
+
+              String description = "Automatically Provisioned By IdentityIQ - ["+dateString+"]";
+              return description;]]></Source>
+      </Script>
+    </Field>
+  </Section>
+  <Section label="Dial-in" name="Dial-in">
+    <Field displayName="con_prov_policy_ad_msNPAllowDialin" helpKey="help_con_prov_policy_ad_msNPAllowDialin" name="msNPAllowDialin" section="Dial-in" type="string" value="Not Set">
+      <AllowedValuesDefinition>
+        <Value>
+          <List>
+            <String>Not Set</String>
+            <String>true</String>
+            <String>false</String>
+          </List>
+        </Value>
+      </AllowedValuesDefinition>
+    </Field>
+    <Field displayName="con_prov_policy_ad_msNPCallingStationID" helpKey="help_con_prov_policy_ad_msNPCallingStationID" multi="true" name="msNPCallingStationID" section="Dial-in" type="string"/>
+    <Field displayName="con_prov_policy_ad_msRADIUSCallbackNumber" helpKey="help_con_prov_policy_ad_msRADIUSCallbackNumber" name="msRADIUSCallbackNumber" section="Dial-in" type="string"/>
+    <Field displayName="con_prov_policy_ad_msRADIUSFramedRoute" helpKey="help_con_prov_policy_ad_msRADIUSFramedRoute" multi="true" name="msRADIUSFramedRoute" section="Dial-in" type="string"/>
+    <Field displayName="con_prov_policy_ad_msRADIUSFramedIPAddress" helpKey="help_con_prov_policy_ad_msRADIUSFramedIPAddress" name="msRADIUSFramedIPAddress" section="Dial-in" type="string"/>
+  </Section>
+  <Section label="Exchange" name="Exchange">
+    <Field displayName="con_prov_policy_ad_homeMDB" helpKey="help_con_prov_policy_ad_homeMDB" name="homeMDB" section="Exchange" type="string"/>
+    <Field displayName="con_prov_policy_ad_mailNickname" helpKey="help_con_prov_policy_ad_mailNickname" name="mailNickname" section="Exchange" type="string"/>
+    <Field displayName="con_prov_policy_ad_msExchHideFromAddressLists" helpKey="help_con_prov_policy_ad_msExchHideFromAddressLists" name="msExchHideFromAddressLists" section="Exchange" type="boolean"/>
+    <Field displayName="con_prov_policy_ad_externalEmailAddress" helpKey="help_con_prov_policy_ad_externalEmailAddress" name="exch_externalEmailAddress" section="Exchange" type="string"/>
+  </Section>
+  <Section label="Skype for Business" name="Skype for Business">
+    <Field displayName="con_prov_policy_ad_SipAddressType" helpKey="help_con_prov_policy_ad_SipAddressType" name="SipAddressType" section="Skype for Business" type="string">
+      <AllowedValuesDefinition>
+        <Value>
+          <List>
+            <String>SamAccountName</String>
+            <String>FirstLastName</String>
+            <String>EmailAddress</String>
+          </List>
+        </Value>
+      </AllowedValuesDefinition>
+    </Field>
+    <Field displayName="con_prov_policy_ad_SipAddress" helpKey="help_con_prov_policy_ad_SipAddress" name="SipAddress" section="Skype for Business" type="string"/>
+    <Field displayName="con_prov_policy_ad_SipDomain" helpKey="help_con_prov_policy_ad_SipDomain" name="SipDomain" section="Skype for Business" type="string"/>
+    <Field displayName="con_prov_policy_ad_RegistrarPool" helpKey="help_con_prov_policy_ad_RegistrarPool" name="RegistrarPool" section="Skype for Business" type="string"/>
+  </Section>
+</Form>

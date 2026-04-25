@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE IdentityTrigger PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<IdentityTrigger handler="sailpoint.api.WorkflowTriggerHandler" name="Ascension-LifecycleEvent-Persona-Joiner" type="Create">
+  <Description>This is a joiner trigger for identity personas coming into IIQ</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <HandlerParameters>
+    <Attributes>
+      <Map>
+        <entry key="businessProcess"/>
+        <entry key="identityProcessingThreshold"/>
+        <entry key="identityProcessingThresholdType"/>
+        <entry key="workflow" value="Ascension-Workflow-Persona-Joiner-Process"/>
+      </Map>
+    </Attributes>
+  </HandlerParameters>
+  <Selector>
+    <IdentitySelector>
+      <Script>
+        <Source>import sailpoint.tools.Util;
+
+  import sailpoint.api.IdentityService;
+
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+  import sailpoint.object.Application;
+  import sailpoint.object.QueryOptions;
+
+  boolean triggerJoiner = false ;
+
+  String ATTR_NAME_AUTH_SOURCE_APP_NAME	="authSourceAppName" ;
+
+  if(identity!=null){
+
+    String ministry = identity.getStringAttribute("ministry");
+    String type = identity.getStringAttribute("type");
+
+    if(!Util.nullSafeCaseInsensitiveEq("AMITA Health",ministry)){
+      if(Util.nullSafeCaseInsensitiveEq("non-hr contractor",type)){
+        triggerJoiner = true;
+      } 
+    } else if (Util.nullSafeCaseInsensitiveEq("AMITA Health",ministry)){
+          
+      if(Util.nullSafeCaseInsensitiveEq("non-hr contractor",type)){
+        triggerJoiner = true;
+      } else{
+        String identityAuthSourceAppName = identity.getStringAttribute(ATTR_NAME_AUTH_SOURCE_APP_NAME) ;
+
+        if(Util.isNotNullOrEmpty(identityAuthSourceAppName)){
+
+          Application authSourceApplication = context.getObjectByName(Application.class, identityAuthSourceAppName);
+
+          if(authSourceApplication!=null){
+
+            IdentityService idService = new IdentityService(context);
+
+            List authSourceAppLinks = idService.getLinks(identity,authSourceApplication);
+
+            if(authSourceAppLinks!=null &amp;&amp; !authSourceAppLinks.isEmpty()){
+
+              for(Link authSourceAppLink: authSourceAppLinks){
+
+                if(!authSourceAppLink.isDisabled()){
+
+                  triggerJoiner = true ;
+                  break;
+                }
+              }
+
+            }
+          }
+
+        }      
+      }
+
+    }
+  }
+
+return triggerJoiner ;</Source>
+      </Script>
+    </IdentitySelector>
+  </Selector>
+</IdentityTrigger>

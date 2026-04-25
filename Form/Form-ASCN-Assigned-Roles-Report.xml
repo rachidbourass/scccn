@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="ASCN-Assigned-Roles-Report" type="Report">
+  <Section columns="2" label="RBAC Role Report Filters">
+    <Field displayName="Days Since Role Assignment" name="daysSinceAssignment" required="true" type="list" value="ref:daysSinceAssignment">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+            import java.util.List;
+            import java.util.ArrayList;
+
+            List values = new ArrayList();
+            values.add("1");
+            values.add("7");
+            values.add("30");
+            values.add("60");
+						values.add("90");
+            values.add("120");
+            values.add("150");
+            values.add("180");
+            return values;
+          </Source>
+        </Script>
+      </AllowedValuesDefinition>
+    </Field>
+    <Field displayName="Role Created Date (After)" name="roleCreatedDate" type="date"/>
+    <Field displayName="Job Code" multi="true" name="jobCode" type="list" value="ref:jobCode">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+            import org.ascn.utils.DBUtils;
+            DBUtils db = new DBUtils();
+            db.prepareData("select distinct jobcode from spt_identity where jobcode is not null order by jobcode");
+            return db.getSingleColumnData();
+          </Source>
+        </Script>
+      </AllowedValuesDefinition>
+    </Field>
+    <Field displayName="Business Unit" multi="true" name="businessUnit" type="list" value="ref:businessUnit">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+            import org.ascn.utils.DBUtils;
+            DBUtils db = new DBUtils();
+            db.prepareData("select distinct business_unit from spt_identity where business_unit is not null order by business_unit");
+            return db.getSingleColumnData();
+          </Source>
+        </Script>
+      </AllowedValuesDefinition>
+    </Field>
+    <Field displayName="Bundle Ministry Name" multi="true" name="roleMinistry" type="list" value="ref:roleMinistry">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+            import org.ascn.utils.DBUtils;
+            DBUtils db = new DBUtils();
+            db.prepareData("select distinct ministry from spt_bundle where ministry is not null order by ministry");
+            return db.getSingleColumnData();
+          </Source>
+        </Script>
+      </AllowedValuesDefinition>
+    </Field>
+    <Field displayName="Role Name Contains" multi="true" name="roleNameContains" type="list" value="ref:roleNameContains"/>
+  </Section>
+</Form>

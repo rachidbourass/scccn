@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+  <ImportAction name="merge">
+	<ObjectConfig name="Bundle">
+	  <Attributes>
+		<Map>
+		  <entry key="roleTypeDefinitions">
+			<value>
+			  <List>
+				<RoleTypeDefinition displayName="ASCIT" icon="itIcon" name="ascit" noAssignmentSelector="true" noAutoAssignment="true" noIIQ="true" noPermits="true" noRequirements="true">
+				  <Description>Defines a collection of IT entitlements which can be associated with Business Roles to provide users with specific access rights. ASCIT Roles can be constrained to entitlements within a single application or expanded to include entitlements across applications.</Description>
+				  <RequiredRights>
+					<Reference class="sailpoint.object.SPRight" name="ManageITRoles"/>
+				  </RequiredRights>
+				</RoleTypeDefinition>
+				<RoleTypeDefinition displayName="AAM Right" icon="businessIcon" name="aamright" noDetection="true" noProfiles="true" notPermittable="true" notRequired="true">
+				  <Description>An alternative Business Role for assigning capabilities; and other Ascension specific scenarios.</Description>
+				  <RequiredRights>
+					<Reference class="sailpoint.object.SPRight" name="aamRoleSPRight"/>
+				  </RequiredRights>
+				</RoleTypeDefinition>
+			  </List>
+			</value>
+		  </entry>
+		</Map>
+	</Attributes>
+	  <ObjectAttribute categoryName="Approval" defaultValue="Default" displayName="Approval Type" editMode="Permanent" name="approvalType">
+		<AllowedValues>
+		  <String>Default</String>
+		  <String>manager</String>
+		  <String>owner</String>
+		  <String>manager,owner</String>
+		  <String>manager,owner,identity</String>
+		  <String>none</String>
+		</AllowedValues>
+		<Description>Comma separated approvers for the role request</Description>
+	  </ObjectAttribute>
+	  <ObjectAttribute categoryName="Approval" displayName="Additional Approver" editMode="Permanent" name="additionalApprover" type="sailpoint.object.Identity">
+		<Description>Additional approving identity/workgroup to be used when approval type contains Identity</Description>
+	  </ObjectAttribute>
+	  <ObjectAttribute categoryName="Approval" defaultValue="false" displayName="Privileged Owner Approval" editMode="Permanent" name="privileged">
+		<AllowedValues>
+		  <String>true</String>
+		  <String>false</String>
+		</AllowedValues>
+	  </ObjectAttribute>
+	  <ObjectAttribute displayName="ASC Business Application" editMode="Permanent" name="ascBusinessApplication" namedColumn="true"/>
+	  <ObjectAttribute categoryName="Approval" defaultValue="false" displayName="Privileged Identity Approval" editMode="Permanent" name="privilegedIdentity">
+		<AllowedValues>
+		  <String>true</String>
+		  <String>false</String>
+		</AllowedValues>
+		<Description>True/False attribute whether to treat the identity level approval as privileged</Description>
+	  </ObjectAttribute>
+	  <ObjectAttribute displayName="ServiceNow Assignment Group" editMode="Permanent" name="snowAssignmentGroup">
+		<Description>The sys_id of assignment group in ServiceNow that will handle the fulfillment of the request</Description>
+      </ObjectAttribute>
+	  <ObjectAttribute displayName="ServiceNow Assignment Group Name" editMode="Permanent" name="snowAssignmentGroupName" namedColumn="true">
+		<Description>The assignment group name in ServiceNow that will handle the fulfillment of the request</Description>
+	  </ObjectAttribute>
+	  <ObjectAttribute displayName="Ministry" editMode="Permanent" name="ministry" namedColumn="true">
+		<Description>Ascension Ministry associated with the role.</Description>
+	  </ObjectAttribute>
+	  <ObjectAttribute defaultValue="false" displayName="Is Birthright Access" editMode="Permanent" name="isBirthrightAccess" namedColumn="true">
+		<AllowedValues>
+		  <String>true</String>
+		  <String>false</String>
+		</AllowedValues>
+	  </ObjectAttribute>
+	   <ObjectAttribute displayName="Role Assignment Criteria" editMode="Permanent" name="assignmentCriteria">
+			<Description>Role Assignment Criteria</Description>
+		</ObjectAttribute>
+    </ObjectConfig>
+  </ImportAction>
+</sailpoint>

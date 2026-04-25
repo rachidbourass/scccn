@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Ascension_Form_MDMValidation" type="Workflow">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="GSuite MDM Validation"/>
+      <entry key="subtitle" value="PeopleSoft status and AD status mismatch for user ($(identityName)). Thorough investigation required on this issue."/>
+      <entry key="title" value="GSuite MDM Validation"/>
+    </Map>
+  </Attributes>
+  <Section label="Event details" name="eventDetails" type="datatable">
+    <Field displayName="Identity Name" name="identityName"/>
+  </Section>
+  <Button action="next" label="Perform MDM Wipe"/>
+  <Button action="back" label="End Workflow"/>
+</Form>

@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="ASCN-ReassignWorkitems" type="Workflow">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="Reassign Certification Workitems"/>
+    </Map>
+  </Attributes>
+  <Description>Reassign Certification Workitems</Description>
+  <Section columns="2" name="Section 1">
+    <Field columnSpan="1" displayName="Select Manager" name="manager" postBack="true" required="true" type="sailpoint.object.Identity">
+      <AllowedValuesDefinition>
+        <Script>
+        <Includes>
+          <Reference class="sailpoint.object.Rule"  name="ASCN-RuleLibrary-Common"/>
+        </Includes>
+          <Source>
+            <![CDATA[
+            import java.util.List;
+            import java.util.ArrayList;
+            import sailpoint.object.Identity;
+            import sailpoint.object.Filter;
+            import sailpoint.object.QueryOptions;                
+                    
+            try{
+                QueryOptions queryOptions = new QueryOptions();
+                Identity managerP1 = context.getObjectByName(Identity.class, launcher);
+                Filter managerP1Filter =  Filter.eq("manager", managerP1);
+                queryOptions.addFilter(managerP1Filter);
+                Iterator iterator = context.search(Identity.class, queryOptions, "name");
+                List managerIdNames = new ArrayList();
+                Object[] ObjList = null;
+                while(iterator.hasNext()){
+                  ObjList = iterator.next();
+                  for(String st: ObjList){
+                    managerIdNames.add(st);
+                  }
+                }
+            return managerIdNames;
+            } catch(Exception e) {
+                error("ASCN.Form.ReassignWorkitems", "Exception encountered in ASCN-ReassignWorkitems Form: ",e);
+            }          
+            ]]>
+            </Source>
+        </Script>
+      </AllowedValuesDefinition>
+      <Attributes>
+        <Map>
+          <entry key="filterString">
+            <value>
+              <Script>
+                <Source>
+                <![CDATA[
+                import sailpoint.tools.Util;
+                import sailpoint.object.Filter;
+                import sailpoint.object.Form;
+                import sailpoint.object.Field;
+
+                Field field = form.getField("manager");             
+                Filter managerFilter = Filter.eq("managerStatus",true);
+                Filter inactiveFilter = Filter.eq("inactive",false);
+                Filter finalFilter = Filter.and(inactiveFilter,managerFilter);
+                field.setFilterString(finalFilter.toString());
+                field.setSortable(true);
+                ]]>
+                </Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="1" displayName="Select Certification Workitems" dynamic="true" multi="true" name="workitem" required="true" type="string">
+      <AllowedValuesDefinition>
+        <Script>
+        <Includes>
+          <Reference class="sailpoint.object.Rule"  name="ASCN-RuleLibrary-Common"/>
+        </Includes>
+          <Source>
+            <![CDATA[
+            import java.util.List;
+            import java.util.ArrayList;
+            import sailpoint.object.Identity;
+            import sailpoint.object.WorkItem;
+            import sailpoint.object.Filter;
+            import sailpoint.object.QueryOptions;
+            import sailpoint.tools.Util;
+            import java.util.Iterator;
+            import java.util.HashMap;
+            import java.util.Date;
+            
+            try{
+                QueryOptions queryOptions = new QueryOptions();
+                String idName = form.getField("manager")!=null ? form.getField("manager").getValue() : null;
+                Identity managerId = context.getObjectByName(Identity.class, idName);
+                List desList = new ArrayList();
+                Filter workitemFilter =  Filter.and(Filter.eq("owner", managerId),Filter.eq("type","Certification"));
+                queryOptions.addFilter(workitemFilter);
+                List workitesmList = context.getObjects(WorkItem.class, queryOptions);               
+                for(WorkItem wi : workitesmList){
+                  Date expDate = wi.getExpirationDate();
+                  Date currentDate = new Date();
+                  if (expDate.after(currentDate)) {
+                    desList.add(wi.getDescription()+"###"+wi.getId());  
+                  }                  
+                }
+            return desList;
+            }catch(Exception e) {
+                error("ASCN.Form.ReassignWorkitems", "Exception encountered in ASCN-ReassignWorkitems Form: ",e);
+            }           
+            ]]>
+            </Source>
+        </Script>
+      </AllowedValuesDefinition>
+      <Attributes>
+        <Map>
+          <entry key="readOnly">
+            <value>
+              <Script>
+                <Source>
+                <![CDATA[ 
+                boolean result=false;
+                String idName = form.getField("manager")!=null ? form.getField("manager").getValue() : null;
+                if(idName==null || idName.isEmpty() ){
+                    result=true;
+                }
+                return result;
+                ]]>  
+                </Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+  <Button action="next" label="Reassign"/>
+  <Button action="cancel" label="Cancel"/>
+</Form>

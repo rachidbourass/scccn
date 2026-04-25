@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE QuickLink PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<QuickLink action="viewCertifications" category="Tasks" created="1595008214658" cssClass="quicklink-access-reviews" id="0af01f3d735d158081735de5e6810163" messageKey="quicklink_access_reviews" modified="1652386849675" name="Access Reviews">
+  <Attributes>
+    <Map>
+      <entry key="displayText" value="true"/>
+      <entry key="textAriaLabel" value="quicklink_access_reviews_text_aria_label"/>
+      <entry key="textScript">
+        <value>
+          <Script>
+            <Source>
+                
+                  import sailpoint.object.Certification;
+                  import sailpoint.object.Filter;
+                  import sailpoint.object.QueryOptions;
+                  import sailpoint.service.certification.CertificationListService;                                    
+                  
+                  QueryOptions qo = new QueryOptions();
+                  qo.addFilter(CertificationListService.getMyCertificationsFilter(currentUser, false));
+
+                  return context.countObjects(Certification.class, qo);
+                
+              </Source>
+          </Script>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>quicklink_access_reviews_desc</Description>
+  <QuickLinkOptions allowSelf="true" created="1746576650024" id="0af01f3f96a812d98196a814af280010">
+    <DynamicScopeRef>
+      <Reference class="sailpoint.object.DynamicScope" id="0af01f3d735d158081735de5e6740162" name="Everyone"/>
+    </DynamicScopeRef>
+  </QuickLinkOptions>
+</QuickLink>

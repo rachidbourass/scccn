@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE QuickLink PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<QuickLink action="viewApprovals" category="Tasks" cssClass="quicklink-approvals" messageKey="quicklink_approvals" name="Approvals">
+  <Attributes>
+    <Map>
+      <entry key="displayText" value="true"/>
+      <entry key="textAriaLabel" value="quicklink_approvals_text_aria_label"/>
+      <entry key="textScript">
+        <value>
+          <Script>
+            <Includes>
+              <Reference class="sailpoint.object.Rule" name="Count Across Workgroups"/>
+            </Includes>
+            <Source>
+                  
+                  import sailpoint.object.WorkItem;
+                  import sailpoint.object.QueryOptions;
+                  import sailpoint.object.Filter;
+                      
+                  QueryOptions qo = new QueryOptions();
+                  qo.addFilter(Filter.eq("type", "Approval"));
+                  return countAcrossWorkgroups(context, WorkItem.class, qo, currentUser);
+                  
+                  </Source>
+          </Script>
+        </value>
+      </entry>
+      <entry key="workItemType" value="Approval"/>
+    </Map>
+  </Attributes>
+  <Description>quicklink_approvals_desc</Description>
+  <QuickLinkOptions allowSelf="true">
+    <DynamicScopeRef>
+      <Reference class="sailpoint.object.DynamicScope" name="Everyone"/>
+    </DynamicScopeRef>
+  </QuickLinkOptions>
+</QuickLink>

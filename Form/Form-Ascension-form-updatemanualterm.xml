@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Ascension-Form-UpdateManualTerm" type="Workflow">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="List of Matching Contractors "/>
+    </Map>
+  </Attributes>
+  <Section columns="1" label="Select User">
+    <Field displayName="User Name" dynamic="true" name="userName" postBack="true" type="Identity">
+      <Attributes>
+        <Map>
+          <entry key="filterString">
+            <value>
+              <Script>
+                <Source><![CDATA[       
+                  import sailpoint.object.Filter; 
+                  import sailpoint.tools.Util;
+                  
+                  String user = "noUserFound";
+                  Filter userFilter = Filter.eq("name", user);
+                  
+                  if(!Util.isEmpty(matchingUsers)){
+                     userFilter = Filter.in("name", matchingUsers);                  
+                  }                  
+                  
+                  field.setFilterString(userFilter.getExpression());
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+  <Section columns="3" label="User Information">
+    <Attributes>
+      <Map>
+        <entry key="hidden">
+          <value>
+            <Script>
+              <Source><![CDATA[
+                import sailpoint.tools.Util;   
+                import sailpoint.object.Identity;
+                if (Util.isNotNullOrEmpty(userName) ) {                
+                return false;
+                }
+                return true;
+              ]]></Source>
+            </Script>
+          </value>
+        </entry>
+        <entry key="readOnly" value="true"/>
+      </Map>
+    </Attributes>
+    <Field columnSpan="1" displayName="First Name" displayType="combobox" dynamic="true" name="firstName" type="String">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.tools.Util;       
+          import sailpoint.object.Identity;
+
+          String value = null;
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity identity = context.getObjectByName(Identity.class, userName);
+          if (identity != null) {
+          value = identity.getFirstname();
+          //comment decache //context.decache(identity);
+          }
+          }
+          return value;
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Suffix" dynamic="true" name="middlename" type="String">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.tools.Util;       
+          import sailpoint.object.Identity;
+
+          String value = null;
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity identity = context.getObjectByName(Identity.class, userName);
+          if (identity != null) {
+          value = identity.getAttribute("middleName");
+          //comment decache //context.decache(identity);
+          }
+          }
+          return value;
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Last Name" displayType="combobox" dynamic="true" name="lastName" type="String">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.tools.Util;       
+          import sailpoint.object.Identity;
+
+          String value = null;
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity identity = context.getObjectByName(Identity.class, userName);
+          if (identity != null) {
+          value = identity.getLastname();
+          //comment decache //context.decache(identity);
+          }
+          }
+          return value;
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Manager" displayType="combobox" dynamic="true" name="managerName" type="String">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.tools.Util;       
+          import sailpoint.object.Identity;
+
+          String value = null;
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity identity = context.getObjectByName(Identity.class, userName);
+          if (identity != null) {
+          value = identity.getAttribute("manager");
+          //comment decache //context.decache(identity);
+          }
+          }
+          return value;
+
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Email ID" displayType="combobox" dynamic="true" name="emailID" type="String">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.tools.Util;       
+          import sailpoint.object.Identity;
+
+          String value = null;
+          if (Util.isNotNullOrEmpty(userName)) {
+          Identity identity = context.getObjectByName(Identity.class, userName);
+          if (identity != null) {
+          value = identity.getAttribute("email");
+          //comment decache //context.decache(identity);
+          }
+          }
+          return value;
+
+        ]]></Source>
+      </Script>
+    </Field>
+  </Section>
+  <Button action="next" label="Submit"/>
+  <Button action="cancel" label="Cancel"/>
+</Form>

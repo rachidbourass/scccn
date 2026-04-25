@@ -1,0 +1,322 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Ascension-Form-NonPersona-Manual-Review" type="Workflow">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="Rehire - Manual Action Required for user : $(identityDisplayName) [$(identityName)]"/>
+      <entry key="subtitle" value="Please complete all required processing for this user and click on End Workflow to complete the workitem."/>
+      <entry key="title" value="Rehire - Manual Action Required"/>
+    </Map>
+  </Attributes>
+  <Section label="Rehire details" name="rehireDetails" type="datatable">
+    <Field displayName="Case Type" name="rehireTypeDetails"/>
+  </Section>
+  <Section columns="2" label="Event details" name="eventDetails" type="datatable">
+    <Field columnSpan="1" displayName="Identity Name" name="identityName"/>
+    <Field columnSpan="1" displayName="DisplayName" name="identityDisplayName"/>
+    <Field columnSpan="1" displayName="Network Logon ID" name="idSamAccountName">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.tools.Util;
+          if(Util.isNullOrEmpty(idSamAccountName)){
+          idSamAccountName = "Not Available";
+          }
+          return idSamAccountName;
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Type" name="type">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+          String type = ""; 
+
+          if(Util.isNotNullOrEmpty(identityName)) 
+          {
+          Identity idn = context.getObjectByName(Identity.class, identityName);
+
+          if (idn != null) 
+          {
+          type = idn.getAttribute("type");
+          if(Util.isNullOrEmpty(type))
+          {
+          type = "Not Available";
+          }
+          }
+          }
+          return type;
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Ministry" name="ministry">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+          String ministry = "";
+          if (Util.isNotNullOrEmpty(identityName)) 
+          {
+          Identity idn = context.getObjectByName(Identity.class, identityName);
+          ministry = idn.getAttribute("ministry");
+          }
+          if(Util.isNullOrEmpty(ministry)){
+          ministry = "Not Available";
+          }
+          return ministry;
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field columnSpan="1" displayName="Domain" name="domain">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+          String domain = "";
+          if (Util.isNotNullOrEmpty(identityName)) 
+          {
+          Identity idn = context.getObjectByName(Identity.class, identityName);
+          domain = idn.getAttribute("domain");
+          }
+          if(Util.isNullOrEmpty(domain)){
+          domain = "Not Available";
+          }
+          return domain;
+        ]]></Source>
+      </Script>
+    </Field>
+  </Section>
+  <Section columns="2" label="Type Change Details" name="typeChangeDetails" type="datatable">
+    <Field columnSpan="1" displayName="Old Type" name="oldTypeValue">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+                  import sailpoint.tools.Util;
+                  if(Util.isNullOrEmpty(oldTypeValue)){
+                  return true;
+                  }
+                  ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="1" displayName="New Type" name="newTypeValue">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+                  import sailpoint.tools.Util;
+                  if(Util.isNullOrEmpty(newTypeValue)){
+                  return true;
+                  }
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="2" displayName="Note" name="userTypeWorkItemDesc">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+                  import sailpoint.tools.Util;
+                  if(Util.isNullOrEmpty(userTypeWorkItemDesc)){
+                  return true;
+                  }
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+  <Section columns="2" label="Employee Class Change Details" name="emplClassChangeDetails" type="datatable">
+    <Field columnSpan="1" displayName="OldEmplClassValue" name="oldEmplClassValue">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+                  import sailpoint.tools.Util;
+                  if(Util.isNullOrEmpty(oldEmplClassValue)){
+                  return true;
+                  }
+                  ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="1" displayName="NewEmplClassValue" name="newEmplClassValue">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+                  import sailpoint.tools.Util;
+                  if(Util.isNullOrEmpty(newEmplClassValue)){
+                  return true;
+                  }
+                  ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+    <Field columnSpan="2" displayName="Note" name="emplClassWorkItemDesc">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+                  import sailpoint.tools.Util;
+                  if(Util.isNullOrEmpty(emplClassWorkItemDesc)){
+                  return true;
+                  }
+                  ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+    </Field>
+  </Section>
+  <Section label="Link Display Names" name="linkNames" type="datatable">
+    <Field displayName="Link Display Names" name="linkDisplayNames" type="string">
+      <Attributes>
+        <Map>
+          <entry key="hidden" value="true"/>
+        </Map>
+      </Attributes>
+      <Script>
+        <Includes>
+          <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-Rehire"/>
+          <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+        </Includes>
+        <Source><![CDATA[
+          Map linkDisplayNames = getLinkDisplayNames(identityName);
+          return linkDisplayNames;
+        ]]></Source>
+      </Script>
+    </Field>
+    <Field dependencies="linkDisplayNames" displayName="DB-PeopleSoft-Primary" name="peopleSoftAccount">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+                  import sailpoint.tools.Util;
+                  if(Util.isNullOrEmpty(peopleSoftAccount)){
+                  return true;
+                  }
+                  ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source><![CDATA[return linkDisplayNames.get("PeopleSoft account");]]></Source>
+      </Script>
+    </Field>
+    <Field dependencies="linkDisplayNames" displayName="AD" name="adAccountNames">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+                  import sailpoint.tools.Util;
+                  if(Util.isNullOrEmpty(adAccountNames)){
+                  return true;
+                  }
+                  ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source><![CDATA[return linkDisplayNames.get("AD accounts");]]></Source>
+      </Script>
+    </Field>
+    <Field dependencies="linkDisplayNames" displayName="ServiceNow" name="serviceNowAccountNames">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+                  import sailpoint.tools.Util;
+                  if(Util.isNullOrEmpty(serviceNowAccountNames)){
+                  return true;
+                  }
+                ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source><![CDATA[return linkDisplayNames.get("ServiceNow accounts");]]></Source>
+      </Script>
+    </Field>
+    <Field dependencies="linkDisplayNames" displayName="GSuite" name="gsuiteAccount">
+      <Attributes>
+        <Map>
+          <entry key="hidden">
+            <value>
+              <Script>
+                <Source><![CDATA[
+                  import sailpoint.tools.Util;
+                  if(Util.isNullOrEmpty(gsuiteAccount)){
+                  return true;
+                  }
+                  ]]></Source>
+              </Script>
+            </value>
+          </entry>
+        </Map>
+      </Attributes>
+      <Script>
+        <Source><![CDATA[return linkDisplayNames.get("GSuite account");]]></Source>
+      </Script>
+    </Field>
+  </Section>
+  <Section name="commentsSection">
+    <Field displayName="Comments" helpKey="Please enter comments" name="comments" required="true" section="commentsSection" type="string">
+      <ValidationScript>
+        <Source><![CDATA[
+          import sailpoint.tools.Util;
+          String message = "Enter only 15 characters";
+          String value = form.getField("comments").getValue();   
+          if(Util.isNotNullOrEmpty(value) && value.length() > 15){   
+          return message;
+          }else{
+          return null;
+          }
+        ]]></Source>
+      </ValidationScript>
+    </Field>
+  </Section>
+  <Button action="next" label="End Workflow"/>
+  <Button action="cancel" label="Cancel"/>
+</Form>

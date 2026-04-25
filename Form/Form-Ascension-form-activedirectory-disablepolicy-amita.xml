@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Ascension-Form-ActiveDirectory-DisablePolicy-AMITA" type="Application">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="Ascension-Form-ActiveDirectory-DisablePolicy-AMITA"/>
+    </Map>
+  </Attributes>
+  <Description/>
+  <Section name="General">
+    <Field name="description" type="string">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-FieldValue-AD-Description-AMITA"/>
+      </RuleRef>
+    </Field>
+    <Field displayName="extensionAttribute6" name="extensionAttribute6" type="string">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-FieldValue-AD-ExtensionAttribute6"/>
+      </RuleRef>
+    </Field>
+  </Section>
+</Form>

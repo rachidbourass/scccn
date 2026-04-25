@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Ascension-Form-ActiveDirectory-EnablePolicy" type="Application">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="Ascension-Form-ActiveDirectory-EnablePolicy"/>
+    </Map>
+  </Attributes>
+  <Section name="General">
+    <Field displayName="msDS-SupportedEncryptionTypes" name="msDS-SupportedEncryptionTypes" type="string" value="24"/>
+    <Field name="description" type="string">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-FieldValue-AD-Description"/>
+      </RuleRef>
+    </Field>
+    <Field displayName="extensionAttribute6" name="extensionAttribute6" type="string">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-FieldValue-AD-ExtensionAttribute6"/>
+      </RuleRef>
+    </Field>
+  </Section>
+</Form>

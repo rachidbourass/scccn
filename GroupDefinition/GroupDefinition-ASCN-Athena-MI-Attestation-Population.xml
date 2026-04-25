@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE GroupDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<GroupDefinition name="ASCN-Athena-MI-Attestation-Population" private="true">
+  <Description>ASCN-Epic-AMITA-Attestation-Population</Description>
+  <GroupFilter>
+    <CompositeFilter operation="OR">
+      <Filter ignoreCase="true" operation="EQ" property="links.application.name" value="Athena-MI-Attestation"/>
+    </CompositeFilter>
+  </GroupFilter>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+</GroupDefinition>
