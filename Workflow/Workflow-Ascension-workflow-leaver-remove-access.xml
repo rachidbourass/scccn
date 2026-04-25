@@ -1,0 +1,507 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Ascension-WorkFlow-Leaver-Remove-Access" type="Subprocess">
+  <Variable input="true" name="identityName">
+    <Description>
+      The name of the identity object being modified.
+    </Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      This may be passed in, if not the script queries for this
+      using a projection query and falls back to the name.
+    </Description>
+  </Variable>
+  <Variable input="true" name="identityRequestId">
+    <Description>
+      The ID of the IdentityRequest.
+    </Description>
+  </Variable>
+  <Variable name="policyViolations">
+    <Description>
+      The Policy Violations
+    </Description>
+  </Variable>
+  <Variable input="true" name="day1IdentityRequestId">
+    <Description>
+      The ID of the day one IdentityRequest.
+    </Description>
+  </Variable>
+  <Variable name="plan">
+    <Description>The provisioning plan, which is built by a service method. </Description>
+  </Variable>
+  <Variable editable="true" initializer="false" name="optimisticProvisioning">
+    <Description>
+      Set to true to enable optimistic provisioning.  This will cause
+      changes to the entitlements compiled from role assignments to be 
+      applied immediately to the identity cube rather than waiting
+      for the next refresh/reaggregation after the provisioning system
+      completes the request.
+    </Description>
+  </Variable>
+  <Variable editable="true" initializer="true" name="foregroundProvisioning">
+    <Description>
+      Normally provisioning is done in a step that uses the "background"
+      option to force the workflow to be suspend and be resumed in a
+      background task thread.  This prevents the browser session from
+      hanging since provision can sometimes take a long time.  For demos
+      and testing it can be better to do this in the foreground so that
+      provisioning will have been performed when control is returned to the
+      user.  This prevents having to run the Perform Maintenance task to 
+      see the results of the request.
+    </Description>
+  </Variable>
+  <Variable initializer="IDM Team" input="true" name="fallbackApprover">
+    <Description>
+      A String that specifies the name of the Identity that will 
+      be assigned any approvals where the owner of the approver 
+      can't be resolved. Example if the scheme is "owner" and the 
+      application doesn't specify and owner.
+    </Description>
+  </Variable>
+  <Variable initializer="LCM" input="true" name="source">
+    <Description>
+      String version of sailpoint.object.Source to indicate
+      where the request originated.  Defaults to LCM.
+    </Description>
+  </Variable>
+  <Variable initializer="false" input="true" name="trace">
+    <Description>
+      Used for debugging this workflow and when set to true trace
+      will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable name="project">
+    <Description>
+      ProvisioningProject which is just a compiled version of the ProvisioningPlan.
+    </Description>
+  </Variable>
+  <Variable name="identityRequestId" output="true">
+    <Description>
+       The sequence id of the Identity request object which is stored in 
+       the name field of the identity request.
+    </Description>
+  </Variable>
+  <Variable name="cart" output="true">
+    <Description>
+       This variable includes all ApprovalItems that are part of 
+       the request process and is updated during the AfterScript
+       of the approval process by assimilating the decisions 
+       and comments from the Approvals copy of the ApprovalItem.
+    </Description>
+  </Variable>
+  <Variable initializer="Normal" input="true" name="workItemPriority">
+    <Description>
+       The String version of a WorkItem.Priority. This variable is 
+       used to set the priority on all of the workitems generated 
+       as part of this workflow and also set on the IdentityRequest
+       object.
+    </Description>
+  </Variable>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start">
+    <Transition to="Build plan">
+      <Script>
+        <Source><![CDATA[       
+        import sailpoint.api.SailPointContext;
+        import sailpoint.object.Identity;
+        import org.ascn.utils.QueryUtils;
+        
+        boolean userStatus = false;
+        QueryUtils qu = new QueryUtils();
+        
+        if(!qu.isIdentityActive(identityName)){
+         userStatus = true;
+          
+        }
+        
+        return userStatus;
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Audit Event Entry"/>
+  </Step>
+  <Step icon="plan" name="Build plan" posX="745" posY="163" resultVariable="plan">
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Description>Process the user whose expiration date is three days before and create a provisioning plan for the user's to remove role assignment and AD OU movement.</Description>
+    <Script>
+      <Source><![CDATA[  
+  import sailpoint.api.IdentityService;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Application;
+  import sailpoint.object.Attributes; 
+  import sailpoint.object.AuditEvent;
+  import sailpoint.object.Bundle;       
+  import sailpoint.object.Custom;
+  import sailpoint.object.EntitlementGroup; 
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.IdentityEntitlement;
+  import sailpoint.object.Link;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;        
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.Util;
+  import java.util.Iterator;
+
+  private ProvisioningPlan.AccountRequest newLeaverAccountRequest(AccountRequest actReq, AccountRequest.Operation operation, String appName, String nativeIdentity) {
+
+    actReq = new AccountRequest();    
+    actReq.setApplication(appName);
+    actReq.setOperation(operation);
+    actReq.setNativeIdentity(nativeIdentity);
+
+    return actReq;
+
+  }
+
+  private ProvisioningPlan.AttributeRequest newLeaverAttributeRequest(AttributeRequest attrReq, ProvisioningPlan.Operation operation, boolean assignment, String key, String value) {
+
+    attrReq = new sailpoint.object.ProvisioningPlan.AttributeRequest();
+    attrReq.setOperation(operation);
+    attrReq.setAssignment(assignment);
+    attrReq.setName(key);
+    attrReq.setValue(value);
+
+    return attrReq;
+
+  }
+
+  private void auditLeaver3(String identityName, String appName, String nativeIdentity, String entAttr, String entValue) {
+
+    AuditEvent auditEvent = new AuditEvent();
+    auditEvent.setApplication(appName);
+    auditEvent.setSource("Leaver+3");
+    auditEvent.setAction("Comment");
+    auditEvent.setTarget(identityName);
+    auditEvent.setAccountName(nativeIdentity);
+    auditEvent.setAttributeName(entAttr);
+    auditEvent.setAttributeValue(entValue);
+    auditEvent.setString1("Object will be included in provisioning plan for removal");
+    context.saveObject(auditEvent);
+    context.commitTransaction();
+
+  }
+
+  ProvisioningPlan plan = new ProvisioningPlan();
+
+  List acctReqList = new ArrayList();
+
+  Identity identity = context.getObjectByName(Identity.class, identityName);   
+  Custom custom = context.getObjectByName(Custom.class, "Ascension-Custom-AD-DomainMapping");		
+
+  if (null != identity){	       
+
+    QueryOptions ops = new QueryOptions();
+    ops.addFilter(Filter.eq("type", "Active Directory - Direct"));
+    List adApps = context.getObjects(Application.class, ops);
+    IdentityService identityService = new IdentityService(context);
+
+    List refLinks = identityService.getLinks(identity, adApps, null);
+    if(refLinks!=null && !refLinks.isEmpty())
+    {
+      for(Link adLink: refLinks)
+      {
+        if(null!=adLink && adLink.isDisabled())
+        {
+          appName = adLink.getApplicationName();
+          accountName = adLink.getNativeIdentity();
+          ProvisioningPlan.AccountRequest acctADReq = new ProvisioningPlan.AccountRequest();
+
+          if (custom != null && null != custom.get("DomainOUMapping")) {
+            domainMap = custom.get("DomainOUMapping");
+            String principalName = adLink.getAttribute("msDS-PrincipalName");
+            if(Util.isNotNullOrEmpty(principalName)){
+              domainAD = getDomain(principalName);
+            }
+
+            if(null != domainMap && !domainMap.isEmpty() && null!=domainAD && null != domainMap.get(domainAD)){ 
+              disableDN = domainMap.get(domainAD).get("disableOU");
+            }
+          }
+
+
+          if(Util.isNotNullOrEmpty(appName) && Util.isNotNullOrEmpty(accountName)){                    
+            if(accountName.contains("OU=")){
+              valueCN= accountName.substring(0, accountName.indexOf("OU=")-1);
+            }
+
+            List attReqs = new ArrayList();
+            if(Util.isNotNullOrEmpty(disableDN)){
+              attReqs.add(new AttributeRequest("AC_NewParent", ProvisioningPlan.Operation.Set, disableDN));
+            }
+            if(Util.isNotNullOrEmpty(valueCN)){
+              attReqs.add(new AttributeRequest("AC_NewName", ProvisioningPlan.Operation.Set, valueCN));
+            } 
+            if(null != attReqs && !attReqs.isEmpty()){       
+              acctADReq.setApplication(appName);
+              acctADReq.setNativeIdentity(accountName);
+              acctADReq.setOperation(ProvisioningPlan.AccountRequest.Operation.Modify);
+              acctADReq.setAttributeRequests(attReqs); 
+
+              acctReqList.add(acctADReq); 
+            }
+          }
+        }
+      }
+    }
+
+    QueryOptions ops2 = new QueryOptions();
+    ops2.setCloneResults(true);
+    ops2.addFilter(Filter.eq("identity.id", identity.getId()));
+
+    Iterator itr = context.search(IdentityEntitlement.class, ops2, "id");
+
+    while (itr.hasNext()) {
+
+      String name = null;
+      String value = null;
+      Application app = null;
+      String appName = null;
+      String nativeIdentity = null;
+      String identityName = identity.getName();
+
+      IdentityEntitlement identityEnt = context.getObjectById(IdentityEntitlement.class, itr.next()[0]);
+      Custom customObj = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration");
+
+      if (identityEnt != null && customObj != null && customObj.get("IgnoreTerminationApplications") != null) {
+
+        List appsToIgnore = customObj.get("IgnoreTerminationApplications");
+
+        name = identityEnt.getName();
+        value = identityEnt.getValue();
+        app = identityEnt.getApplication();
+
+        if (app != null) {
+
+          appName = app.getName();
+
+        } else {
+
+          appName = "IIQ";
+
+        }
+
+        if (!Util.nullSafeContains(appsToIgnore, appName) && !appName.equalsIgnoreCase("ServiceNow")) {
+
+        nativeIdentity = identityEnt.getNativeIdentity();
+
+        if (Util.isNullOrEmpty(nativeIdentity)) {
+
+          nativeIdentity = identityName;
+
+        }
+
+
+        AccountRequest actReq = null;
+        actReq = newLeaverAccountRequest(actReq, AccountRequest.Operation.Modify, appName, nativeIdentity);
+
+        AttributeRequest attrReq = null;
+        attrReq = newLeaverAttributeRequest(attrReq, ProvisioningPlan.Operation.Remove, false, name, value);
+        auditLeaver3(identityName, appName, nativeIdentity, name, value);
+
+        actReq.add(attrReq);
+
+        acctReqList.add(actReq);
+
+
+      }
+
+      }
+
+    }
+
+    Util.flushIterator(itr);
+
+    plan.setAccountRequests(acctReqList);
+    plan.setIdentity(identity);
+    
+  }
+  return plan;
+  ]]></Source>
+    </Script>
+    <Transition to="RequestInitialize"/>
+  </Step>
+  <Step icon="Task" name="RequestInitialize" posX="201" posY="246">
+    <Arg name="formTemplate" value="Identity Update"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="enableRetryRequest"/>
+    <Arg name="allowRequestsWithViolations"/>
+    <Arg name="endOnManualWorkItems"/>
+    <Arg name="policiesToCheck"/>
+    <Arg name="workItemPriority" value="ref:workItemPriority"/>
+    <Arg name="workItemComments"/>
+    <Arg name="source" value="ref:source"/>
+    <Arg name="violationReviewDecision"/>
+    <Arg name="policyScheme" value="none"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="requireViolationReviewComments"/>
+    <Arg name="identityRequest"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="enableApprovalRecommendations"/>
+    <Arg name="asyncCacheRefresh"/>
+    <Arg name="endOnProvisioningForms"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="flow" value="Lifecycle"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Description>
+      Call the standard subprocess to initialize the request, this includes
+      auditing, building the approvalset, compiling the plan into 
+       project and checking policy violations.
+    </Description>
+    <Return name="project" to="project"/>
+    <Return name="approvalSet" to="cart"/>
+    <Return name="identityRequestId" to="identityRequestId"/>
+    <Return name="policyViolations" to="policyViolations"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Initialize"/>
+    </WorkflowRef>
+    <Transition to="Provision"/>
+  </Step>
+  <Step condition="script:!((size(policyViolations) &gt; 0 ) &amp;&amp; (policyScheme.equals(&quot;fail&quot;)))" icon="Task" name="Provision" posX="327" posY="262">
+    <Arg name="formTemplate" value="Identity Update"/>
+    <Arg name="approvalScheme" value="ref:approvalScheme"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="fallbackApprover" value="ref:fallbackApprover"/>
+    <Arg name="approvalSet"/>
+    <Arg name="manualActionsEmailTemplate" value="Pending Manual Changes"/>
+    <Arg name="workItemComments"/>
+    <Arg name="workItemPriority" value="ref:workItemPriority"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Arg name="policyScheme" value="none"/>
+    <Arg name="splitProvisioning"/>
+    <Arg name="saveUnmanagedPlan"/>
+    <Arg name="foregroundProvisioning" value="ref:foregroundProvisioning"/>
+    <Arg name="noTriggers" value="true"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="saveUnmanagedPlan_WithProjectArgument"/>
+    <Arg name="recompile"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Arg name="plan"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Description>
+      Call the standard subprocess that will process the 
+      approval decisions and do provisioning.  This
+      includes calling any configured provisioning 
+      connectors and building manual actions.
+    </Description>
+    <Return name="project" to="project"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Provision"/>
+    </WorkflowRef>
+    <Transition to="Audit Event Entry"/>
+  </Step>
+  <Step icon="Audit" name="Audit Event Entry" posX="507" posY="6">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Description>
+      Entry of Audit Event whether plan is success or failed
+    </Description>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.ProvisioningPlan;
+        import sailpoint.object.ProvisioningPlan.AccountRequest;
+        import sailpoint.object.ProvisioningResult;
+        import sailpoint.tools.Util;
+        
+				Map dataMap = new HashMap();
+        Identity identityObject = context.getObjectByName(Identity.class,identityName);
+        ProvisioningPlan.AccountRequest acctRoleReq = new ProvisioningPlan.AccountRequest();   
+         if(null != identityObject && !identityObject.isInactive()){
+            dataMap.put("Day 1 IdentityRequest ID ",day1IdentityRequestId);
+            logAudit(acctRoleReq, "User is Active. So Role removal is not performed.",  "Disable", identityName,  new ArrayList(), dataMap, day1IdentityRequestId);
+            //comment decache //context.decache(identityObject);
+         }   
+         else{
+          if(project!=null){
+            List plans = project.getPlans();
+            if(null!=plans) {
+              for(ProvisioningPlan plan:plans){
+                if(plan!=null && plan.getAccountRequests()!=null){
+                  if(plan.getResult() != null && Util.isNotNullOrEmpty(plan.getResult().getStatus())){
+                    dataMap.put("provisioningResult",plan.getResult().getStatus());
+                  }
+                  for(AccountRequest accReq : plan.getAccountRequests()){
+                     logAudit(accReq, "Role Removal After Three days",  "Disable", identityName,  new ArrayList(), dataMap, identityRequestId);
+        						
+                  }             	
+                }
+              }
+            }
+          }
+        }
+        
+      ]]></Source>
+    </Script>
+    <Transition to="Finalize">
+      <Script>
+        <Source><![CDATA[       
+        import sailpoint.api.SailPointContext;
+        import sailpoint.object.Identity;
+        
+        boolean userStatus = false;
+        
+        Identity identityObject = context.getObjectByName(Identity.class, identityName);
+        if(null != identityObject && identityObject.isInactive()){
+         userStatus = true;
+          //comment decache //context.decache(identityObject);
+        }
+        
+        return userStatus;        
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="stop"/>
+  </Step>
+  <Step catches="complete" condition="script:!((size(policyViolations) &gt; 0 ) &amp;&amp; (policyScheme.equals(&quot;fail&quot;)))" icon="Task" name="Finalize" posX="471" posY="172">
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="autoVerifyIdentityRequest"/>
+    <Arg name="approvalSet" value="ref:cart"/>
+    <Arg name="ticketManagementApplication"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="workItemPriority" value="ref:workItemPriority"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Arg name="ticketDataGenerationRule"/>
+    <Description>
+      Call the standard subprocess that can audit/finalize the request.
+    </Description>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Finalize"/>
+    </WorkflowRef>
+    <Transition to="Refresh Identity"/>
+  </Step>
+  <Step action="call:refreshIdentity" condition="ref:doRefresh" icon="Task" name="Refresh Identity" posX="599" posY="315">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="provision" value="true"/>
+    <Arg name="correlateEntitlements" value="true"/>
+    <Arg name="synchronizeAttributes" value="true"/>
+    <Arg name="doManualActions" value="ref:doManualActions"/>
+    <Transition to="Set ExternalTicketId In identityRequest"/>
+  </Step>
+  <Step icon="task" name="Set ExternalTicketId In identityRequest" posX="178" posY="404">
+    <Description>Set ExternalTicketId In identityRequest</Description>
+    <Script>
+      <Source><![CDATA[
+            import sailpoint.object.IdentityRequest;
+        import sailpoint.api.ObjectUtil;
+			 IdentityRequest iRequest = ObjectUtil.transactionLock(context, IdentityRequest.class, identityRequestId);
+			if(iRequest!=null){
+          iRequest.setExternalTicketId(day1IdentityRequestId);
+          context.saveObject(iRequest);
+          context.commitTransaction();
+          //comment decache //context.decache(iRequest);        
+       }
+        ]]></Source>
+    </Script>
+    <Transition to="stop"/>
+  </Step>
+  <Step icon="Stop" name="stop"/>
+</Workflow>

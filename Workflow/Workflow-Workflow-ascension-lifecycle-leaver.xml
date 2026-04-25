@@ -1,0 +1,1348 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Workflow-Ascension-Lifecycle-Leaver" type="IdentityLifecycle">
+  <Variable input="true" name="trigger">
+    <Description>The IdentityTrigger</Description>
+  </Variable>
+  <Variable input="true" name="event" transient="true">
+    <Description>The IdentityChangeEvent.  It can be used to build
+      the provisioning plan, but does not need to be
+      persisted with the case, so marked as transient.</Description>
+  </Variable>
+  <Variable initializer="false" name="trace">
+    <Description>Used for debugging this workflow and when set to true trace
+      will be sent to stdout.</Description>
+  </Variable>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable initializer="Lifecycle" input="true" name="flow">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable initializer="string:LCM" name="source">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable initializer="script:resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>The displayName of the identity being updated.
+      Query for this using a projection query and fall back to the name.</Description>
+  </Variable>
+  <Variable initializer="script:getIdentityProperty(identityName, &quot;manager.name&quot;)" name="identityManager">
+    <Description>The Manager of Identity being processed</Description>
+  </Variable>
+  <Variable initializer="string:none" name="approvalSet"/>
+  <Variable name="spExtAttrs"/>
+  <Variable input="true" name="reasonComments"/>
+  <Variable name="ownershipMap"/>
+  <Variable name="serviceAccountownershipMap"/>
+  <Variable name="businessApproversownershipMap"/>
+  <Variable initializer="string:false" name="foregroundProvisioning"/>
+  <Variable editable="true" input="true" name="requestType"/>
+  <Variable name="plan"/>
+  <Variable input="true" name="workItemComments">
+    <Script>
+      <Source><![CDATA[
+	  
+
+        if (reasonComments != void && reasonComments!=null) {
+        return reasonComments;
+        }
+		
+
+      ]]></Source>
+    </Script>
+  </Variable>
+  <Variable name="provisioningErrors"/>
+  <Variable initializer="string:NormalTermination" name="leaverType"/>
+  <Variable editable="true" name="isContractorLeaverEnable"/>
+  <Variable input="true" name="nativeChangeList"/>
+  <Variable input="true" name="launcher">
+    <Description>requester of the form</Description>
+  </Variable>
+  <Variable initializer="script:false" name="skipStep">
+    <Description>For Step Conditions (e.g. When skipStep)</Description>
+  </Variable>
+  <Description>Accelerator Pack Leaver Workflow</Description>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Library"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-Leaver-RuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-Framework-NotificationRuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-Framework-WrapperRuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension GSuite Leaver Rule Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="394" posY="126">
+    <Transition to="Set Launcher"/>
+  </Step>
+  <Step icon="task" name="Set Launcher" posX="464" posY="126" resultVariable="launcher">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Script>
+      <Source><![CDATA[
+	  
+        import sailpoint.object.Identity;
+        import sailpoint.tools.Util;
+        
+        String launcherName = launcher;      
+        
+        Identity identity = context.getObjectByName(Identity.class,identityName);
+        if(null != identity  && Util.isNotNullOrEmpty(identity.getAttribute("manualTerm")) && "yes".equalsIgnoreCase(identity.getAttribute("manualTerm"))){
+         if(nativeChangeList != null && !nativeChangeList.isEmpty()){
+          launcherName = nativeChangeList.get(0);
+        	}
+        }
+        return launcherName;
+		
+         
+        ]]></Source>
+    </Script>
+    <Transition to="Set Leaver Type"/>
+  </Step>
+  <Step icon="task" name="Set Leaver Type" posX="590" posY="126" resultVariable="leaverType">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Script>
+      <Source><![CDATA[
+	  
+        import sailpoint.object.Identity;
+        import sailpoint.tools.Util;
+                
+        String typeValue = "Normal";
+        
+        Identity identity = context.getObjectByName(Identity.class,identityName);
+        if(null != identity  && Util.isNotNullOrEmpty(identity.getAttribute("manualTerm")) && "yes".equalsIgnoreCase(identity.getAttribute("manualTerm"))){
+          typeValue = "Immediate";
+		  workflow.put("flow", "ImmediateDisablement");
+        }
+        return typeValue;
+		
+         
+       ]]></Source>
+    </Script>
+    <Transition to="Set Leaver Date"/>
+  </Step>
+  <Step name="Get Request Type" posX="890" posY="126" resultVariable="requestType">
+    <Script>
+      <Source><![CDATA[
+        
+        
+        if (requestType == null) {
+        return getRequestTypeName(context, workflow);
+        }
+        else {
+        return requestType;
+        }
+		
+      ]]></Source>
+    </Script>
+    <Transition to="Build Plan"/>
+  </Step>
+  <Step name="Build Plan" posX="1048" posY="126" resultVariable="plan">
+    <Script>
+      <Source><![CDATA[
+        
+        import sailpoint.object.ProvisioningPlan;
+        
+        //This method is based on Accelarator Pack feature and it will include the app accounts to plan only if the terminationOption is enabled in Application level.
+        //However, since we don't configure anything in App level for now, this method should ideally return a null Plan.
+         
+        ProvisioningPlan plan  = new ProvisioningPlan();
+        try{
+        ProvisioningPlan plan = buildLeaverPlan(context, identityName, workItemComments, workflow);
+        }
+        catch(Exception e){
+        plan  = new ProvisioningPlan();
+        }
+       
+        return plan;
+		
+
+      ]]></Source>
+    </Script>
+    <Transition to="Append GSuite Leaver Plan"/>
+  </Step>
+  <Step icon="Task" name="Process Plan" posX="1908" posY="242">
+    <Arg name="enableRetryRequest"/>
+    <Arg name="fallbackApprover"/>
+    <Arg name="endDate"/>
+    <Arg name="endOnManualWorkItems"/>
+    <Arg name="policiesToCheck"/>
+    <Arg name="formAttrs"/>
+    <Arg name="noApplicationTemplates"/>
+    <Arg name="workItemComments" value="ref:workItemComments"/>
+    <Arg name="interceptedNativeId"/>
+    <Arg name="identityRequestId"/>
+    <Arg name="source" value="ref:source"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="foregroundProvisioning" value="ref:foregroundProvisioning"/>
+    <Arg name="batchRequestItemId"/>
+    <Arg name="splitPlans"/>
+    <Arg name="validateMultipleForms"/>
+    <Arg name="doRefresh"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="validationStringLeftRightError"/>
+    <Arg name="bypassApprovals"/>
+    <Arg name="emergReq"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="psaValidationError"/>
+    <Arg name="violationReviewDecision"/>
+    <Arg name="filterRejects"/>
+    <Arg name="isValidBatchRequest"/>
+    <Arg name="interceptorErrorMessage"/>
+    <Arg name="splitProvisioning"/>
+    <Arg name="noFiltering"/>
+    <Arg name="splitProjects"/>
+    <Arg name="noTriggers"/>
+    <Arg name="autoVerifyIdentityRequest"/>
+    <Arg name="isProvisioningFailed"/>
+    <Arg name="validatePSA"/>
+    <Arg name="ticketManagementApplication"/>
+    <Arg name="asyncCacheRefresh"/>
+    <Arg name="startDate"/>
+    <Arg name="ticketId"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Arg name="requestedAppName"/>
+    <Arg name="allowRequestsWithViolations"/>
+    <Arg name="fireFighterAccess"/>
+    <Arg name="validationFireFighter"/>
+    <Arg name="workItemPriority"/>
+    <Arg name="provisioningErrors"/>
+    <Arg name="requireViolationReviewComments"/>
+    <Arg name="splitApprovalSet"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="requiredApprovalTypes"/>
+    <Arg name="disableIdentityRequests"/>
+    <Arg name="suppressNotifications" value="false"/>
+    <Arg name="doRefreshLogicalApps"/>
+    <Arg name="endOnProvisioningForms"/>
+    <Arg name="splitWorkItemComments"/>
+    <Arg name="event"/>
+    <Arg name="isEligibleForSplit"/>
+    <Arg name="forceClassicApprovalUI"/>
+    <Arg name="enablePSA"/>
+    <Arg name="sendRequestNotifications"/>
+    <Arg name="requestType" value="ref:requestType"/>
+    <Arg name="extSendRequestorNotifications"/>
+    <Arg name="isNoSplitManagerApprovalRequired"/>
+    <Arg name="policyViolations"/>
+    <Arg name="trigger"/>
+    <Arg name="identityEmail"/>
+    <Arg name="postProvisioningRule"/>
+    <Arg name="policyScheme"/>
+    <Arg name="subflowName"/>
+    <Arg name="requestor" value="ref:requestor"/>
+    <Arg name="setPreviousApprovalDecisions"/>
+    <Arg name="batchValidationError"/>
+    <Arg name="doModifyProject"/>
+    <Arg name="extPolicyScheme"/>
+    <Arg name="doTargetAggregate"/>
+    <Arg name="optimisticProvisioning"/>
+    <Return name="approvalSet" to="approvalSet"/>
+    <Return name="project" to="project"/>
+    <Return name="spExtAttrs" to="spExtAttrs"/>
+    <Return name="identityRequestId" to="identityRequestId"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Workflow-FrameWork-Wrapper"/>
+    </WorkflowRef>
+    <Transition to="Launch ServiceNow Notification Workflow">
+      <Script>
+        <Source><![CDATA[		
+          import sailpoint.object.Identity;
+		  import sailpoint.object.Custom;
+		  
+		  String inputString = null;
+          String domainValue = "";
+          List attrNames = new ArrayList();         
+          HashMap map = new HashMap();         
+          Date date = new Date();
+          
+                   
+          Identity identity = context.getObjectByName(Identity.class,identityName);          
+          
+          if(null != date){
+          	inputString= convertDateToString(date);
+          }
+          
+         	Identity identity = context.getObjectByName(Identity.class,identityName);  
+          boolean status = false;
+          String domainValue = "";
+
+          if(null != identity){
+		  
+		  Custom custom = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");       				
+            if(custom != null && !Util.isEmpty(custom.get("auditentry"))){
+              attrNames = custom.get("auditentry");            
+              for(String attrName : attrNames){
+                map.put(attrName,identity.getAttribute(attrName));
+              }
+			  //comment decache //context.decache(custom);
+            }
+			map.put("launcher",launcher);
+			String auditString = "Identity("+identityName+") (User Type:"+identity.getAttribute("type")+") was terminated on "+inputString+".";
+            if(Util.nullSafeCaseInsensitiveEq(identity.getAttribute("manualTerm"),"Yes")) {             
+              logAudit(new AccountRequest(), "ImmediateTermination",  "identityLifecycleEvent", identityName,  new ArrayList(), map, identityRequestId);
+            }
+			
+            domainValue = identity.getAttribute("domain");            
+          
+            if (Util.nullSafeCaseInsensitiveEq(domainValue,"AMITA")) {
+              status = true;
+            }
+           //comment decache //context.decache(identity);
+          }
+		  		return status;
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Manager Notification"/>
+    <Transition to="Notify Manager" when="approvalSet.hasApproved();"/>
+    <Transition to="Stop"/>
+  </Step>
+  <Step action="call:scheduleWorkflowEvent" icon="Analysis" name="Launch ServiceNow Notification Workflow" posX="2134" posY="242">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="workflow" value="Ascension-WorkFlow-Joiner-SendNotification"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="processName" value="Leaver"/>
+    <Arg name="scheduleDate">
+      <Script>
+        <Source><![CDATA[		
+          import sailpoint.object.Custom;
+          
+           Custom custom = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");       				
+           if(custom != null && custom.get("ServiceNowNotificationSchedule") !=null){
+
+              advanceTime = custom.get("ServiceNowNotificationSchedule");
+              //comment decache //context.decache(custom);
+
+              return advanceTimeByMinutes(advanceTime);         
+           }
+          
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Description>  Workflow step to Process the user that Leaver.Perform Removal Of role Access after 3 days</Description>
+    <Return name="schedulerMessage" to="schedulerMessage"/>
+    <Transition to="Manager Notification"/>
+    <Transition to="Notify Manager" when="approvalSet.hasApproved();"/>
+    <Transition to="Stop"/>
+  </Step>
+  <Step action="sendEmail" condition="skipStep" icon="Default" name="Manager Notification" posX="2134" posY="242">
+    <Arg name="template">
+      <Script>
+        <Source><![CDATA[	
+          	
+          getWrapperEmailTemplateName(workflow, project, "LeaverManager");	
+		  
+        		  
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="to">
+      <Script>
+        <Source><![CDATA[	
+		  	
+		  import sailpoint.object.Identity;
+
+		  Identity idenObject=context.getObjectByName(Identity.class,identityName);
+		  if(null!=idenObject && null!=idenObject.getManager()){          
+			Identity manager = idenObject.getManager(); 
+			//comment decache //context.decache(idenObject);	
+             if(null!=manager){			
+			return manager.getEmail();
+			}
+		  }   
+   		  
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="cc">
+      <Script>
+        <Source><![CDATA[
+			 
+       import sailpoint.object.Identity;
+
+		  Identity idenObject=context.getObjectByName(Identity.class,identityName);
+        if(null!=idenObject){          
+        String contractorManager = idenObject.getAttribute("contractorManager");         
+        Identity contractoManagerIdentity=context.getObjectByName(Identity.class,contractorManager);
+        //comment decache //context.decache(idenObject);
+        if(null!=contractoManagerIdentity){         
+          return contractoManagerIdentity.getEmail();
+        }          
+		  }
+      
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="recipientDisplayName">
+      <Script>
+        <Source><![CDATA[
+		 
+              import sailpoint.object.Identity;
+
+			  Identity idenObject=context.getObjectByName(Identity.class,identityName);
+			  if(null!=idenObject && null!=idenObject.getManager()){          
+				Identity manager = idenObject.getManager(); 
+				//comment decache //context.decache(idenObject);
+                if(null!=manager){				
+				return manager.getDisplayableName();
+				}
+			  }        					
+         	               
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="refIdentityDisplayName">
+      <Script>
+        <Source><![CDATA[	
+ 		
+         import sailpoint.object.Identity;
+
+	      Identity idenObject=context.getObjectByName(Identity.class,identityName);        
+		   if(null!=idenObject){     
+				return idenObject.getDisplayableName();
+			  }
+			  
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="requestId">
+      <Script>
+        <Source><![CDATA[
+ 		
+          getRequestId(plan);
+		  
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="apDisableStaticManagerEmailContent">
+      <Script>
+        <Source><![CDATA[
+			 
+          import sailpoint.rapidapponboarding.rule.ROADUtil;
+          return ROADUtil.getDisableFlagEmailContent(context);
+		  
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="dynamicAppContent">
+      <Script>
+        <Source><![CDATA[	
+ 		
+          getDynamicTextEmailTemplate( project,"LeaverManager", requestType);
+		  
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="provisioningErrors" value="ref:provisioningErrors"/>
+    <Transition to="Launch Remove Access Workflow"/>
+    <Transition to="Notify Manager" when="approvalSet.hasApproved();"/>
+    <Transition to="Stop"/>
+  </Step>
+  <Step action="call:scheduleWorkflowEvent" icon="Analysis" name="Launch Remove Access Workflow" posX="2134" posY="242">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="workflow" value="Ascension-WorkFlow-Leaver-Remove-Access"/>
+    <Arg name="day1IdentityRequestId" value="ref:identityRequestId"/>
+    <Arg name="scheduleDate">
+      <Script>
+        <Source><![CDATA[
+		
+          import java.util.Calendar;
+          import java.util.GregorianCalendar;
+          import org.apache.commons.logging.Log;
+          import org.apache.commons.logging.LogFactory;
+
+          Log logger = LogFactory.getLog("workflow.contractor.Leaver");
+          logger.debug("Perform Removal Of Role assignemtts after 3 days :: Entering");
+          
+          GregorianCalendar currCal = (GregorianCalendar) GregorianCalendar.getInstance();
+          int dayCount = 3;
+          currCal.add(Calendar.DATE,dayCount);
+          //currCal.add(Calendar.MINUTE, 1);
+          logger.debug("Perform Removal Of Role assignemtts after 3 days :: Exiting :: scheduleDate = "+currCal.getTime());
+        
+          return currCal.getTime();
+		  
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Description>  Workflow step to Process the user that Leaver.Perform Removal Of role Access after 3 days</Description>
+    <Return name="schedulerMessage" to="schedulerMessage"/>
+    <Transition to="Notify Manager" when="approvalSet.hasApproved();"/>
+    <Transition to="Stop"/>
+    <Transition to="Remove IdentityIQ Artifacts Ownership"/>
+  </Step>
+  <Step action="sendEmail" condition="skipStep" icon="Default" name="Notify Manager" posX="2568" posY="242">
+    <Arg name="template">
+      <Script>
+        <Source><![CDATA[
+		   
+          getWrapperEmailTemplateName(workflow, project, "LeaverManager");
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="cc">
+      <Script>
+        <Source><![CDATA[
+			
+          import sailpoint.rapidapponboarding.rule.EmailNotificationRuleLibrary;
+          Map resultMap = getProvisioningStatusMap(project);
+          if (resultMap != null && resultMap.size() > 0)
+          {
+          if ((boolean)resultMap.get("isProvgSuccessful"))
+          {
+          //return EmailNotificationRuleLibrary.ccToContractorManager(context,identityName,true,requestType, plan,project);
+          //Above return commented out to prevent "ctrMgr" hiberate errors.
+          return "";
+          }
+          else
+          {
+          return "";
+          }
+          }
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="apDisableStaticManagerEmailContent">
+      <Script>
+        <Source><![CDATA[
+			
+          import sailpoint.rapidapponboarding.rule.ROADUtil;
+          return ROADUtil.getDisableFlagEmailContent(context);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="recipientDisplayName">
+      <Script>
+        <Source><![CDATA[
+			
+          getIdentityDisplayName(workflow,identityName, project, true);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="requestId">
+      <Script>
+        <Source><![CDATA[
+			
+          getRequestId(plan);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="refIdentityDisplayName">
+      <Script>
+        <Source><![CDATA[
+			
+          getIdentityDisplayName(workflow,identityName, null, false);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="dynamicAppContent">
+      <Script>
+        <Source><![CDATA[
+			
+          getDynamicTextEmailTemplate( project,"LeaverManager", requestType);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="provisioningErrors" value="ref:provisioningErrors"/>
+    <Arg name="to">
+      <Script>
+        <Source><![CDATA[
+			
+          getIdentityNameForNotification(workflow,identityName, project, true);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="plan" value="ref:plan"/>
+    <Transition to="Remove IdentityIQ Artifacts Ownership"/>
+  </Step>
+  <Step name="Remove IdentityIQ Artifacts Ownership" posX="1808" posY="126" resultVariable="ownershipMap">
+    <Script>
+      <Source><![CDATA[
+		
+        import java.util.Map;
+        import sailpoint.rapidapponboarding.rule.WrapperRuleLibrary;
+        Map ownershipMap = new HashMap();
+        Map globalMap= WrapperRuleLibrary.getCommonFrameworkCustom(context,null, null);
+        if(globalMap!=null && workflow!=null && identityName!=null)
+        {
+        ownershipMap = removeOwnerships(context, globalMap, identityName, plan, workflow);
+        }
+        return ownershipMap;
+		
+
+      ]]></Source>
+    </Script>
+    <Transition to="Notify IdentityIQ Artifacts Reassignment" when="!(ownershipMap.isEmpty())"/>
+    <Transition to="Remove Business Approvers Ownership"/>
+  </Step>
+  <Step action="sendEmail" icon="Default" name="Notify IdentityIQ Artifacts Reassignment" posX="2134" posY="126">
+    <Arg name="template">
+      <Script>
+        <Source><![CDATA[
+			
+          getWrapperEmailTemplateName(context, null, "LeaverManagerOwnershipRemoval");
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="recipientDisplayName">
+      <Script>
+        <Source><![CDATA[
+		
+          getIdentityDisplayName(workflow,identityName, project, true);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="requestId">
+      <Script>
+        <Source><![CDATA[
+			
+          getRequestId(plan);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="ownershipMap" value="ref:ownershipMap"/>
+    <Arg name="dynamicAppContent">
+      <Script>
+        <Source><![CDATA[
+			
+          getDynamicTextEmailTemplate( project,"LeaverManagerOwnershipRemoval", requestType);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="refIdentityDisplayName">
+      <Script>
+        <Source><![CDATA[
+			
+          getIdentityDisplayName(workflow,identityName, null, false);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="to">
+      <Script>
+        <Source><![CDATA[
+		
+          getIdentityNameForNotification(workflow,identityManager, null, false);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="emailSubject">
+      <Script>
+        <Source><![CDATA[
+		
+          return "Workitems/Artifacts";
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="plan" value="ref:plan"/>
+    <Transition to="Remove Business Approvers Ownership"/>
+  </Step>
+  <Step name="Remove Service Account Ownership" posX="68" posY="10" resultVariable="serviceAccountownershipMap">
+    <Script>
+      <Source><![CDATA[
+	  
+        import java.util.Map;
+        import sailpoint.rapidapponboarding.rule.WrapperRuleLibrary;
+        Map serviceAccountownershipMap = new HashMap();
+        Map globalMap= WrapperRuleLibrary.getCommonFrameworkCustom(context,null, null);
+        if(globalMap!=null && workflow!=null && identityName!=null && plan!=null)
+        {
+        serviceAccountownershipMap = removeServiceAccountOwners(context, globalMap, identityName, plan, workflow);
+        }
+        return serviceAccountownershipMap;
+		
+
+      ]]></Source>
+    </Script>
+    <Transition to="Notify Service Account Owners Reassignment" when="!(serviceAccountownershipMap.isEmpty())"/>
+    <Transition to="Remove Business Approvers Ownership"/>
+  </Step>
+  <Step action="sendEmail" icon="Default" name="Notify Service Account Owners Reassignment" posX="28" posY="10">
+    <Arg name="template">
+      <Script>
+        <Source><![CDATA[
+		
+          getWrapperEmailTemplateName(context, null, "LeaverManagerOwnershipRemoval");
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="recipientDisplayName">
+      <Script>
+        <Source><![CDATA[
+		
+          getIdentityDisplayName(workflow,identityName, project, true);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="requestId">
+      <Script>
+        <Source><![CDATA[
+			
+          getRequestId(plan);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="ownershipMap" value="ref:serviceAccountownershipMap"/>
+    <Arg name="dynamicAppContent">
+      <Script>
+        <Source><![CDATA[
+		
+          getDynamicTextEmailTemplate( project,"LeaverManagerOwnershipRemoval", requestType);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="refIdentityDisplayName">
+      <Script>
+        <Source><![CDATA[
+			
+          getIdentityDisplayName(workflow,identityName, null, false);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="to">
+      <Script>
+        <Source><![CDATA[
+			
+          getIdentityNameForNotification(workflow,identityManager, null, false);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="emailSubject">
+      <Script>
+        <Source><![CDATA[
+			
+          return "Service Accounts";
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="plan" value="ref:plan"/>
+    <Transition to="Remove Business Approvers Ownership"/>
+  </Step>
+  <Step name="Remove Business Approvers Ownership" posX="2484" posY="126" resultVariable="businessApproversownershipMap">
+    <Script>
+      <Source><![CDATA[
+		
+        import java.util.Map;
+        import sailpoint.rapidapponboarding.rule.WrapperRuleLibrary;
+        Map businessApproversownershipMap = new HashMap();
+        Map globalMap= WrapperRuleLibrary.getCommonFrameworkCustom(context,null, null);
+        if(globalMap!=null && workflow!=null && identityName!=null && plan!=null)
+        {
+        businessApproversownershipMap = removeBusinessApproversOwners(context, globalMap, identityName, plan, workflow);
+        }
+        return businessApproversownershipMap;
+		
+		
+
+      ]]></Source>
+    </Script>
+    <Transition to="Notify Business Approvers Reassignment" when="!(businessApproversownershipMap.isEmpty())"/>
+    <Transition to="Target Aggregation"/>
+  </Step>
+  <Step action="sendEmail" icon="Default" name="Notify Business Approvers Reassignment" posX="2794" posY="126">
+    <Arg name="template">
+      <Script>
+        <Source><![CDATA[
+			
+          getWrapperEmailTemplateName(context, null, "LeaverManagerOwnershipRemoval");
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="recipientDisplayName">
+      <Script>
+        <Source><![CDATA[
+			
+          getIdentityDisplayName(workflow,identityName, project, true);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="requestId">
+      <Script>
+        <Source><![CDATA[
+			
+          getRequestId(plan);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="ownershipMap" value="ref:businessApproversownershipMap"/>
+    <Arg name="dynamicAppContent">
+      <Script>
+        <Source><![CDATA[
+			
+          getDynamicTextEmailTemplate( project,"LeaverManagerOwnershipRemoval", requestType);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="refIdentityDisplayName">
+      <Script>
+        <Source><![CDATA[
+			
+          getIdentityDisplayName(workflow,identityName, null, false);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="to">
+      <Script>
+        <Source><![CDATA[
+			
+          getIdentityNameForNotification(workflow,identityManager, null, false);
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="emailSubject">
+      <Script>
+        <Source><![CDATA[
+			
+          return "Business Approvers";
+		  
+
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="plan" value="ref:plan"/>
+    <Transition to="Target Aggregation"/>
+  </Step>
+  <Step name="Target Aggregation" posX="3128" posY="126">
+    <Script>
+      <Source><![CDATA[
+	
+        import sailpoint.rapidapponboarding.rule.WrapperRuleLibrary;
+        import org.apache.commons.logging.Log;
+        import org.apache.commons.logging.LogFactory;
+        import sailpoint.rapidapponboarding.logger.LogEnablement;
+        Log loggerTarget = LogFactory.getLog("rapidapponboarding.rules");
+        try
+        {
+        WrapperRuleLibrary.targetAggregateApplicationNativeIdOnIdentity( context,0, identityName, requestType, plan);
+        }
+        catch (Exception ex)
+        {
+        LogEnablement.isLogErrorEnabled(loggerTarget,"Error Target Aggregate Reverse Leaver "+identityName+".."+ex.getMessage());
+        }
+		
+
+      ]]></Source>
+    </Script>
+    <Transition to="Auto Reject Pending Requets"/>
+  </Step>
+  <Step name="Auto Reject Pending Requets" posX="3302" posY="126">
+    <Script>
+      <Source><![CDATA[
+
+        //Remove Pending Access Request for User being terminated
+        import sailpoint.rapidapponboarding.rule.LeaverRuleLibrary;
+        LeaverRuleLibrary.autoRejectPendingWorkItemsForTerminatedUserAccessRequest(context,identityName);
+		
+
+      ]]></Source>
+    </Script>
+    <Transition to="Clear Authentication Questions"/>
+  </Step>
+  <Step name="Clear Authentication Questions" posX="3548" posY="126">
+    <Script>
+      <Source><![CDATA[
+
+        import sailpoint.rapidapponboarding.rule.LeaverRuleLibrary;
+        LeaverRuleLibrary.clearAthenticationQuestionsOnTermination(context,identityName);
+		
+
+      ]]></Source>
+    </Script>
+    <Transition to="Defer Action"/>
+  </Step>
+  <Step name="Defer Action" posX="3818" posY="126">
+    <Script>
+      <Source><![CDATA[
+
+        executeDeferPlan(context, identityName, workflow);
+		
+
+      ]]></Source>
+    </Script>
+    <Transition to="Execute Leaver Post Rule"/>
+  </Step>
+  <Step name="Execute Leaver Post Rule" posX="3944" posY="126">
+    <Script>
+      <Source><![CDATA[
+
+        postLeaverRule( identityName,  requestType, project);
+		
+
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="4166" posY="126"/>
+  <Step icon="Default" name="Append GSuite Leaver Plan" posX="1158" posY="126" resultVariable="plan">
+    <Script>
+      <Source><![CDATA[
+	  
+	    import sailpoint.object.ProvisioningPlan;
+        plan = buildGSuiteLeaverPlan(context,identityName,plan);
+		
+        return plan;
+		
+      ]]></Source>
+    </Script>
+    <Transition to="Check Contractor Leaver"/>
+  </Step>
+  <Step icon="Default" name="Check Contractor Leaver" posX="1388" posY="126" resultVariable="isContractorLeaverEnable">
+    <Script>
+      <Source><![CDATA[
+			
+            import sailpoint.object.Identity;
+        	import sailpoint.object.Custom;
+        	import sailpoint.tools.Util;
+          
+          Identity identityContractor = context.getObjectByName(Identity.class, identityName);
+					boolean flag = false;
+        	String userType = null;
+        	if( null != identityContractor){
+          	userType = identityContractor.getAttribute("type");
+        	}
+        
+        	Custom custom = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration");
+          List contractorTypes = new ArrayList();
+          if(custom!=null && custom.get("ContractorType") !=null){
+            contractorTypes = custom.get("ContractorType");
+          }
+        
+        	if(null != contractorTypes && !contractorTypes.isEmpty() && Util.isNotNullOrEmpty(userType) && contractorTypes.contains(userType)){
+        		flag = true;
+        	} 
+        	if(identityContractor != null){
+        		//comment decache //context.decache(identityContractor);
+        	}
+        	if(custom != null){
+        		//comment decache //context.decache(custom);
+        	}		
+          return flag;
+		  
+        ]]></Source>
+    </Script>
+    <Transition to="Create Termination Plan"/>
+  </Step>
+  <Step icon="plan" name="Create Termination Plan" posX="1602" posY="126" resultVariable="plan">
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="leaverType" value="ref:leaverType"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Description>Process the user whose expiration date is today and create a provisioning plan for the user's to remove system access.</Description>
+    <Script>
+      <Source><![CDATA[
+	  
+
+      import sailpoint.api.SailPointContext;
+      import sailpoint.tools.Util;
+      import sailpoint.object.Application;
+      import sailpoint.object.Identity;
+      import sailpoint.object.Link;
+      import sailpoint.object.Custom;
+      import sailpoint.object.ProvisioningPlan;
+      import sailpoint.object.ProvisioningPlan.AccountRequest;
+      import sailpoint.object.ProvisioningPlan.AttributeRequest;
+      import sailpoint.object.ProvisioningPlan.Operation;
+
+      Custom customApp = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration");
+
+      Identity identity = context.getObjectByName(Identity.class, identityName);
+
+      List listOfAccounts=new ArrayList();
+      String appName = "";
+      String appType = "";
+      String accountName = "";
+      String valueCN = null ;
+      String disableDN = null;
+      String domainAD = null;
+
+      Map domainMap = new HashMap();
+      String expireDate= null;
+      String inputString = null;
+        
+
+      Date date = new Date(); 
+
+      if(plan == null || plan.getAccountRequests() == null || plan.getAccountRequests().size() < 1){
+        plan = new ProvisioningPlan();
+        if(null!=identity){
+          plan.setIdentity(identity); 
+        }
+      }
+
+      if(null !=identity){       
+        if(isContractorLeaverEnable){
+          domainAD = identity.getAttribute("domain"); 
+        }    
+      }
+
+      if(null != date){
+        inputString= convertDateToString(date);
+      }
+      
+      String desc = "Immediate Termination by "+launcher+" on "+inputString;
+      
+
+      if(null != customApp && null != customApp.get("IgnoreTerminationApplications")){
+        listOfAccounts=customApp.get("IgnoreTerminationApplications");
+      }
+
+      if(null != identity){         
+        List linksAccount= (List) identity.getLinks();
+        if (null != listOfAccounts){
+          Iterator itrlinksAccount = linksAccount.iterator();
+          while (itrlinksAccount.hasNext()) {
+            Link account = (Link) itrlinksAccount.next();
+            ProvisioningPlan.AccountRequest disableacctReq = new ProvisioningPlan.AccountRequest();
+            if(null != account  && null != account.getApplication()){
+              appName = account.getApplicationName();
+              accountName = account.getNativeIdentity();
+              appType = account.getApplication().getType();
+			  
+			  if (Util.isNotNullOrEmpty(appName) && Util.isNotNullOrEmpty(accountName)){
+                if(!(listOfAccounts.contains(appName))){
+                  disableacctReq.setApplication(appName);
+                  disableacctReq.setNativeIdentity(accountName);
+                  disableacctReq.setOperation(ProvisioningPlan.AccountRequest.Operation.Disable);
+                  plan.add(disableacctReq);                    
+                }  
+              }
+			  
+              if (Util.isNotNullOrEmpty(appType) && appType.equalsIgnoreCase("Active Directory - Direct")){ 
+
+                ProvisioningPlan.AccountRequest acctADReq = new ProvisioningPlan.AccountRequest();        
+                if(Util.isNotNullOrEmpty(appName) && Util.isNotNullOrEmpty(accountName)){                    
+                  List attReqs = new ArrayList();                 
+        					
+                  if(Util.isNotNullOrEmpty(leaverType) && leaverType.equalsIgnoreCase("Immediate")){
+
+                    if(null != inputString){
+                      expireDate = getADFormatedDateString(inputString);
+                    }
+										if( !Util.nullSafeCaseInsensitiveEq(identity.getStringAttribute("domain"),"AMITA")){
+                    	attReqs.add(new AttributeRequest("description", ProvisioningPlan.Operation.Set, desc));        						
+                    	attReqs.add(new AttributeRequest("accountExpires", ProvisioningPlan.Operation.Set, expireDate));
+        						}
+                  }
+                  if(null != attReqs && !attReqs.isEmpty()){       
+                    acctADReq.setApplication(appName);
+                    acctADReq.setNativeIdentity(accountName);
+                    acctADReq.setOperation(ProvisioningPlan.AccountRequest.Operation.Modify);
+                    acctADReq.setAttributeRequests(attReqs);
+                    plan.add(acctADReq); 
+                  }
+                } 
+              }				
+              
+            }	
+          }
+          if(null != itrlinksAccount){
+            Util.flushIterator(itrlinksAccount);
+          }
+        }     	
+
+        AccountRequest iiqAcctReq = new AccountRequest();
+        iiqAcctReq.setApplication("IIQ");
+        iiqAcctReq.setNativeIdentity(identityName);
+        iiqAcctReq.setOperation(AccountRequest.Operation.Modify);
+        iiqAcctReq.add(new AttributeRequest("inactive", ProvisioningPlan.Operation.Set, true));
+        if(Util.nullSafeCaseInsensitiveEq(identity.getStringAttribute("type"),"non-hr contractor")  && Util.isNotNullOrEmpty(leaverType) && leaverType.equalsIgnoreCase("Immediate") && isContractorLeaverEnable){
+          iiqAcctReq.add(new AttributeRequest("ctrexpDt", ProvisioningPlan.Operation.Set, inputString));
+        
+        
+        identity.setAttribute("ctrexpDt",inputString);
+        context.startTransaction();
+        context.saveObject(identity);
+        context.commitTransaction();
+		}
+       
+        
+        plan.add(iiqAcctReq);      
+
+        if(null != identity){
+          //comment decache //context.decache(identity);
+        }
+        if(null != customApp ){
+          //comment decache //context.decache(customApp);
+        }  
+      }
+        
+        
+
+      return plan;
+       
+    
+      ]]></Source>
+    </Script>
+    <Transition to="Update Contractor Manager">
+      <Script>
+        <Source><![CDATA[
+		
+        import sailpoint.object.Identity;
+        import sailpoint.tools.Util;
+          
+        Identity contractorIdn = context.getObjectByName(Identity.class, identityName);
+      
+        if (null != contractorIdn && Util.isNotNullOrEmpty(contractorIdn.getStringAttribute("isContractorManager")) && contractorIdn.getStringAttribute("isContractorManager").equalsIgnoreCase("true")) {          
+        	return true;        	
+        }
+        return false; 
+				
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Terminate Child Identities">
+      <Script>
+        <Source><![CDATA[
+		
+        import sailpoint.object.Identity;
+        import sailpoint.tools.Util;
+          
+        Identity identityObj = context.getObjectByName(Identity.class, identityName);
+      
+        if(null != identityObj && !Util.isEmpty(identityObj.getStringAttribute("childPersonaNames")) && Util.nullSafeCaseInsensitiveEq(identityObj.getStringAttribute("manualTerm"),"Yes")){          
+        	return true;        	
+        }
+        return false; 
+				
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Remove IdentityIQ Artifacts Ownership" when="plan == null || plan.getAccountRequests() == null || plan.getAccountRequests().size() &lt; 1"/>
+    <Transition to="Process Plan"/>
+  </Step>
+  <Step name="Update Contractor Manager">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="newContractorManager" value="ref:newContractorManager"/>
+    <Script>
+      <Source><![CDATA[
+	  
+        import sailpoint.object.Filter;
+        import sailpoint.object.Identity;
+        import sailpoint.object.QueryOptions;
+        import sailpoint.object.EmailOptions;
+        import sailpoint.object.EmailTemplate;
+        import sailpoint.api.ObjectUtil;
+        
+        int recordCounter = 0; 
+        Map managerMap = new HashMap();                    
+        QueryOptions queryOptions = new QueryOptions();
+        
+        Filter managerFilter = Filter.eq("contractorManager", identityName);
+        Filter activeFilter = Filter.eq("inactive", false);       
+        Filter filter = Filter.and(activeFilter, managerFilter);
+        
+        queryOptions.addFilter(filter);
+        queryOptions.setCloneResults(true);
+        Iterator objectList = context.search(Identity.class, queryOptions);
+				Identity ownerID = null;
+    		if (objectList != null) {
+      		while (objectList.hasNext()) {
+        		
+        		recordCounter++;
+        		Identity idObj = objectList.next();  
+        		ownerID= idObj.getManager();
+        		if(ownerID != null){
+        			if( null != idObj && null != managerMap.get(ownerID)){
+        				Map temp = managerMap.get(ownerID);      
+        				if(null != idObj.getAttribute("samAccountName")){
+        					temp.put(idObj.getAttribute("samAccountName"),idObj.getDisplayName());
+        				}
+        				else{
+        					temp.put(idObj.getName(),idObj.getDisplayName());
+        				}
+        				managerMap.put(ownerID,temp);
+        			}
+        			else if( null != idObj){
+        				Map userData = new HashMap();     
+        				if(null != idObj.getAttribute("samAccountName")){
+        					userData.put(idObj.getAttribute("samAccountName"),idObj.getDisplayName());
+        				}
+        				else{
+        					userData.put(idObj.getName(),idObj.getDisplayName());
+        				}		
+        				managerMap.put(ownerID,userData);
+       				}
+        		}
+                    
+            if(null != idObj &&  null != identityModel){
+              idObj.setAttribute("contractorManager","");
+              context.saveObject(idObj);              
+              if (0 == (recordCounter % 10)) {
+                context.commitTransaction();
+            	}       
+            }        		         
+        	}
+        	context.commitTransaction();
+         	//comment decache //context.decache();        
+        }               
+    		Util.flushIterator(objectList);          
+
+        EmailTemplate template = context.getObjectByName(EmailTemplate.class, "Ascension-EmailTemplate-ContractorManager-Change");
+        if(null != managerMap && !managerMap.isEmpty()){
+          for (Map.Entry entry : managerMap.entrySet()) {              
+            EmailOptions options = new EmailOptions();
+            Map args = new HashMap();
+            if(null != entry){
+              args.put("userMap",entry.getValue());
+              if(null != entry.getKey() && null != entry.getKey().getDisplayName()){
+                args.put("ownerName",entry.getKey().getDisplayName()); 
+        				args.put("identityDisplayName",identityDisplayName); 
+                options.setTo(entry.getKey().getAttribute("email"));
+              }
+              options.setVariables(args);
+
+              if(null != options && template !=null){
+                context.sendEmailNotification(template,options); 
+              }
+            }
+          } 
+          if(template !=null){
+            //comment decache //context.decache(template);
+          }
+        }
+		
+      ]]></Source>
+    </Script>
+    <Transition to="Terminate Child Identities">
+      <Script>
+        <Source><![CDATA[
+		
+        import sailpoint.object.Identity;
+        import sailpoint.tools.Util;
+          
+        Identity identityObj = context.getObjectByName(Identity.class, identityName);
+      
+        if(null != identityObj && !Util.isEmpty(identityObj.getStringAttribute("childPersonaNames")) && Util.nullSafeCaseInsensitiveEq(identityObj.getStringAttribute("manualTerm"),"Yes")){          
+        	return true;        	
+        }
+        return false; 
+				
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Remove IdentityIQ Artifacts Ownership" when="plan == null || plan.getAccountRequests() == null || plan.getAccountRequests().size() &lt; 1"/>
+    <Transition to="Process Plan"/>
+  </Step>
+  <Step name="Terminate Child Identities">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Identity;
+        import sailpoint.tools.Util;
+        import sailpoint.object.ProvisioningPlan;
+        import sailpoint.object.ProvisioningPlan.AccountRequest;
+        import sailpoint.object.ProvisioningPlan.AttributeRequest;
+        import sailpoint.api.Provisioner;
+        
+        Identity identityObj = context.getObjectByName(Identity.class, identityName);
+        ArrayList childPersonas = identityObj.getAttribute("childPersonaNames"); 
+        String inputString = "";
+        
+
+      	Date date = new Date(); 
+        if(null != date){
+        	inputString= convertDateToString(date);
+      	}
+        
+        if(childPersonas!=null && !childPersonas.isEmpty())
+        {
+		  Provisioner provisioner= new Provisioner(context);
+          provisioner.setNoLocking(true);
+          provisioner.setOptimisticProvisioning(true);
+		  
+          for(String childPersona: childPersonas)
+        	{
+        
+            Identity childID = context.getObjectByName(Identity.class, childPersona);
+            if(null != childID){       		
+        				ProvisioningPlan plan = new ProvisioningPlan();
+                AccountRequest iiqAcctReq = new AccountRequest();
+                iiqAcctReq.setApplication("IIQ");
+                iiqAcctReq.setNativeIdentity(childPersona);
+                iiqAcctReq.setOperation(AccountRequest.Operation.Modify);                     	       				    
+                iiqAcctReq.add(new AttributeRequest("manualTerm", ProvisioningPlan.Operation.Set, "Yes"));
+        				iiqAcctReq.add(new AttributeRequest("inactive", ProvisioningPlan.Operation.Set, true));
+                if(Util.nullSafeCaseInsensitiveEq(childID.getStringAttribute("type"),"non-hr contractor")){
+                  iiqAcctReq.add(new AttributeRequest("ctrexpDt", ProvisioningPlan.Operation.Set, inputString));
+                }
+                plan.add(iiqAcctReq);
+                plan.setIdentity(childID);
+
+                if(null != plan && !plan.isEmpty()){
+                  
+                  provisioner.execute(plan);
+                }
+              }
+            }
+          }
+        
+		
+      ]]></Source>
+    </Script>
+    <Transition to="Remove IdentityIQ Artifacts Ownership" when="plan == null || plan.getAccountRequests() == null || plan.getAccountRequests().size() &lt; 1"/>
+    <Transition to="Process Plan"/>
+  </Step>
+  <Step action="rule:Rule-Ascension-Pre-Leaver" icon="Default" name="Set Leaver Date" posX="740" posY="126">
+    <Transition to="Get Request Type"/>
+  </Step>
+  <Step action="rule:Rule-Ascension-FinalizeWorkflow" catches="complete" icon="Catches" name="Finalize" posX="164" posY="10">
+    <Transition to="Stop"/>
+  </Step>
+</Workflow>

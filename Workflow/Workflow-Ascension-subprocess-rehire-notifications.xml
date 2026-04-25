@@ -1,0 +1,292 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" libraries="Identity" monitored="true" name="Ascension-Subprocess-Rehire-Notifications" type="subprocess">
+  <Variable initializer="script:return &quot;ASCN.Workflow.&quot;+workflow.getName();" name="logName"/>
+  <Variable initializer="true" name="trace"/>
+  <Variable input="true" name="identityName"/>
+  <Variable name="identityType"/>
+  <Variable input="true" name="temporaryPassword"/>
+  <Variable name="templateName"/>
+  <Variable name="stepName"/>
+  <Variable name="identity">
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Identity;
+        Identity identity = context.getObjectByName(Identity.class, identityName);
+        return identity;
+        ]]></Source>
+    </Script>
+  </Variable>
+  <Variable name="hiringManager">
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Identity;
+        String managerEmail = "Not Available";
+        Identity identity = context.getObjectByName(Identity.class, identityName);
+        if(identity != null){
+        Identity managerIdentity = identity.getManager();
+        if(managerIdentity != null && managerIdentity.getEmail() != null){
+        managerEmail = managerIdentity.getEmail();
+        }
+        }
+        return managerEmail;
+        ]]></Source>
+    </Script>
+  </Variable>
+  <Description>Identity Lifecycle Rehire</Description>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-Rehire"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+    <Transition to="Get Identity Type"/>
+  </Step>
+  <Step icon="Default" name="Get Identity Type" posX="98" posY="10" resultVariable="identityType">
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.api.IdentityService;
+        import sailpoint.object.Application;
+        import sailpoint.object.Link;
+        import sailpoint.object.Identity;
+        
+        trace(logName, "Ascension-Subprocess-Rehire-Notifications start for identity: " + identityName);
+        
+        trace(logName, "Entering Step: "+wfcontext.getStep().getName());
+        
+        Identity identity=context.getObjectByName(Identity.class,identityName);  
+        Application applicationName=context.getObjectByName(Application.class,"DB-Peoplesoft-HCM-Primary");
+        String identityType;
+        IdentityService idService = new IdentityService(context);
+        List links = idService.getLinks(identity,applicationName);
+        if(null!=links)
+        {
+        for(Link link:links){
+        identityType= link.getAttribute("PER_ORG");
+        if(null!=identityType && "EMP".equalsIgnoreCase(identityType))
+        {
+        identityType="EMP";
+        }
+        else if(null!=identityType && "CWR".equalsIgnoreCase(identityType))
+        {
+        identityType="CWR";
+        }
+        else{
+        return null;
+        }
+        }
+        }
+        debug(logName, "identityType" + identityType);
+        trace(logName, "Exiting Step: "+wfcontext.getStep().getName());
+        return identityType;
+
+      ]]></Source>
+    </Script>
+    <Transition to="Stop">
+      <Script>
+        <Source><![CDATA[
+          if(wfcase.hasErrors()){
+          workflow.put("stepName" , wfcontext.getStep().getName());
+          return true;
+          } else{
+          return false;
+          }
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Set Template Name" when="(null != identityType)"/>
+    <Transition to="Stop"/>
+  </Step>
+  <Step name="Set Template Name" posX="454" posY="126" resultVariable="templateName">
+    <Script>
+      <Source><![CDATA[
+        trace(logName, "Entering Step: "+wfcontext.getStep().getName());
+        String templateName = null;
+        if(identityType.equals("EMP")){
+        templateName = "Ascension-EmailTemplate-Rehire-EMP-Notification";
+        } else if(identityType.equals("CWR")){
+        templateName = "Ascension-EmailTemplate-Rehire-CWR-Notification";
+        }
+        trace(logName, "Exiting Step: "+wfcontext.getStep().getName());
+        return templateName;
+      ]]></Source>
+    </Script>
+    <Transition to="Stop">
+      <Script>
+        <Source><![CDATA[
+          if(wfcase.hasErrors()){
+          workflow.put("stepName" , wfcontext.getStep().getName());
+          return true;
+          } else{
+          return false;
+          }
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Send Rehire Email Notification"/>
+  </Step>
+  <Step action="call:sendEmail" icon="Email" name="Send Rehire Email Notification" posX="668" posY="126">
+    <Arg name="template" value="ref:templateName"/>
+    <Arg name="cc">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.object.Custom;
+
+          List ccMembersList = new ArrayList();
+          Custom custom = context.getObjectByName(Custom.class,"Ascension-Custom-Rehire-Configuration");
+          if(null!=custom){
+          Map emailAttributes = custom.get("Email Attributes");
+          if(null != emailAttributes){
+          ccMembersList = emailAttributes.get("cc");
+          }
+          }
+          return ccMembersList;
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="workerType" value="ref:identityType"/>
+    <Arg name="activeDirectoryId">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("samAccountName"))) ? "Not Available" : identity.getStringAttribute("samAccountName")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="workerId">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("employeeId"))) ? "Not Available" : identity.getStringAttribute("employeeId")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="businessUnit">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("businessUnit"))) ? "Not Available" : identity.getStringAttribute("businessUnit")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="displayName">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("displayName"))) ? "Not Available" : identity.getStringAttribute("displayName")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="corporateJobCode">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("jobcode"))) ? "Not Available" : identity.getStringAttribute("jobcode")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="hiringManager" value="ref:hiringManager"/>
+    <Arg name="userName">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("displayName"))) ? "Not Available" : identity.getStringAttribute("displayName")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="temporaryPassword">
+      <Script>
+        <Source><![CDATA[(null == temporaryPassword || (void == temporaryPassword)) ? "Password Not Changed" : temporaryPassword]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="domain">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("domain"))) ? "Not Available" : identity.getStringAttribute("domain")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="from">
+      <Script>
+        <Source><![CDATA[
+        import sailpoint.object.Custom;
+
+          String fromAddress=null;
+          Custom custom = context.getObjectByName(Custom.class,"Ascension-Custom-Rehire-Configuration");
+          if(null!=custom){
+          Map emailAttributes = custom.get("Email Attributes");
+          if(null != emailAttributes){
+          fromAddress = emailAttributes.get("from");
+          }
+          }
+          return fromAddress;
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="to">
+      <Script>
+        <Source><![CDATA[
+        import sailpoint.object.Custom;
+
+          List toAddress= new ArrayList();
+          String dlEmailAddress = null;
+          String ministryDlEmailAddress = null;
+          
+          Custom contractorCustom = context.getObjectByName(Custom.class,"Ascension-Custom-ContractorConfiguration");
+          
+          //Get the Ministry DL Email address from the Custom Object
+          if(null != contractorCustom){
+          Map distributionLists = contractorCustom.get("DistributionList");
+          dlEmailAddress = distributionLists.get("IDM");
+          if(identity != null){
+          String domain = identity.getStringAttribute("domain");
+          if(null != distributionLists && !Util.isEmpty(domain)){
+          ministryDlEmailAddress = distributionLists.get(domain);
+          }
+          }
+          }
+          
+          //If the Email Address is not null add them to the To Address List
+          if(Util.isNotNullOrEmpty(dlEmailAddress)){
+          toAddress.add(dlEmailAddress);
+          }
+          if(Util.isNotNullOrEmpty(hiringManager) && !Util.nullSafeCaseInsensitiveEq(hiringManager, "Not Available")){
+          toAddress.add(hiringManager);
+          }
+          if(Util.isNotNullOrEmpty(ministryDlEmailAddress)){
+          toAddress.add(ministryDlEmailAddress);
+          }
+          addMessage(wfcontext, "Notification is sent to" + toAddress.toString());
+          String toAddressStr = Util.join(toAddress, ",");
+          return toAddressStr;
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="healthMinistry">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("ministry"))) ? "Not Available" : identity.getStringAttribute("ministry")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="operation" value="Rehire"/>
+    <Arg name="startDate">
+      <Script>
+        <Source><![CDATA[
+          String startDate = null;
+          if(identity != null){
+          startDate = findEffectiveDate(identity);
+          }
+          if(Util.isEmpty(startDate)){
+          startDate = "Not Available";
+          }
+          return startDate;
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="email">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("email"))) ? "Not Available" : identity.getStringAttribute("email")]]></Source>
+      </Script>
+    </Arg>
+    <Transition to="Stop">
+      <Script>
+        <Source><![CDATA[
+          if(wfcase.hasErrors()){
+          workflow.put("stepName" , wfcontext.getStep().getName());
+          return true;
+          } else{
+          return false;
+          }
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="1215" posY="12">
+    <Script>
+      <Source><![CDATA[
+        if(wfcase.hasErrors()){
+        throw new RuntimeException("ERROR: in step - " + workflow.get("stepName") + " : " + wfcase.getErrors());
+        }
+      ]]></Source>
+    </Script>
+  </Step>
+</Workflow>

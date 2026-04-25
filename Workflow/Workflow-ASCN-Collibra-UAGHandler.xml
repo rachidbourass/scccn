@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" monitored="true" name="ASCN-Collibra-UAGHandler">
+  <Variable name="errorMsg"/>
+  <Variable initializer="Successfully launched rest call" name="Message" output="true"/>
+  <Variable name="logName">
+    <Script>
+      <Source><![CDATA[
+       return "ASCN.Workflow."+workflow.getName();
+    ]]></Source>
+    </Script>
+  </Variable>
+  <Variable initializer="Collibra Request" name="flow"/>
+  <Variable initializer="GSuite" name="appName"/>
+  <Variable input="true" name="requesterPrimaryEmail"/>
+  <Variable input="true" name="groupPrimaryEmail"/>
+  <Variable input="true" name="collibraGUID"/>
+  <Variable input="true" name="groupCorrespondingDataset"/>
+  <Variable input="true" name="collibraRequestTimestamp"/>
+  <Variable initializer="WebService" name="source"/>
+  <Variable name="identityName">
+    <Script>
+      <Source><![CDATA[
+		return "sp_CollibraService";
+      ]]></Source>
+    </Script>
+  </Variable>
+  <Description>Workflow invoked by Collibra Rest Client to add User Access Groups (UAG) to Data Access Group (DAG)</Description>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-CollibraUAG"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="147" posY="40">
+    <Transition to="Validate Arguments"/>
+  </Step>
+  <Step icon="Default" name="Validate Arguments" posX="305" posY="41" resultVariable="errorMsg">
+    <Script>
+      <Source><![CDATA[
+      import org.ascn.utils.QueryUtils;
+		  import org.ascn.webservices.GSuiteAPI;
+		  
+		  trace(logName,"Entering Step: "+wfcontext.getStep().getName());
+		  addMessage(wfcontext, "Entering Step: "+wfcontext.getStep().getName());
+		  
+		  GSuiteAPI g = new GSuiteAPI();
+		  try {
+			  List requiredArgs = getRequiredVariables(workflow);
+			  List validationMessages = validateArguments(workflow,requiredArgs);
+			  for(String outMsg : validationMessages){
+				if(outMsg.startsWith("ERROR")){
+					addMessage(wfcontext, "ERROR In Step: "+wfcontext.getStep().getName()+" "+outMsg);
+					errorMsg = errorMsg+"\n"+outMsg;
+					throw new RuntimeException("ERROR Arguments can not be null: "+errorMsg); 
+				}
+			 }
+			  
+			  List targetList = new ArrayList();
+			  targetList.add(workflow.get("requesterPrimaryEmail"));
+			  targetList.add(workflow.get("groupPrimaryEmail"));
+		  } catch(Exception e) {
+		    errorMsg = "Exception encountered in: "+wfcontext.getStep().getName()+" "+e;
+			error(logName, errorMsg,e);
+			workflow.put("Message", errorMsg);
+			handleWorkFlowException(wfcontext, e);
+		  }
+		  addMessage(wfcontext, "Exiting Step: "+wfcontext.getStep().getName());
+          trace(logName,"Exiting Step: "+wfcontext.getStep().getName());
+		  return errorMsg;
+      ]]></Source>
+    </Script>
+    <Transition to="Return Error Message" when="script:(wfcase.hasErrors() || errorMsg != null)"/>
+    <Transition to="Execute Update"/>
+  </Step>
+  <Step icon="Message" name="Return Error Message" posX="400" posY="169" resultVariable="Message">
+    <Script>
+      <Source><![CDATA[
+			return errorMsg;
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Default" name="Execute Update" posX="305" posY="41">
+    <Script>
+      <Source><![CDATA[
+          import org.ascn.utils.QueryUtils;
+		  import org.ascn.webservices.GSuiteAPI;
+		  trace(logName,"Entering Step: "+wfcontext.getStep().getName());
+		  addMessage(wfcontext, "Entering Step: "+wfcontext.getStep().getName());
+		  
+		  String parentGroup = workflow.get("groupPrimaryEmail");
+		  String memberGroup = workflow.get("requesterPrimaryEmail");
+		  
+		  try{
+			GSuiteAPI g = new GSuiteAPI();
+			addGSuiteGroupMember(parentGroup,memberGroup);
+			if (getResponseCode() != 200) {
+				String outMsg = "RESPONSE: Add Group Member: "+getResponseMessage();
+				addMessage(wfcontext, wfcontext.getStep().getName()+" "+outMsg);
+				workflow.put("Message",outMsg);
+			} else{
+			    errorMsg = nu;
+				errorMsg = "ERROR: Could not add Group Member: "+getResponseCode()+"\n"+getErrorMessage();
+				addMessage(wfcontext, wfcontext.getStep().getName()+" "+errorMsg);
+				workflow.put("Message",errorMsg);
+			}
+		  } catch(Exception e) {
+		    errorMsg = null;
+			errorMsg = "Exception encountered in: "+wfcontext.getStep().getName()+" "+e;
+			error(logName, errorMsg,e);
+			workflow.put("Message", errorMsg);
+			handleWorkFlowException(wfcontext, e);
+		  }
+		  
+	  ]]></Source>
+    </Script>
+    <Transition to="Stop" when="script:(wfcase.hasErrors() || errorMsg != null)"/>
+    <Transition to="Audit Plan"/>
+  </Step>
+  <Step icon="Audit" name="Audit Plan" posX="659" posY="7">
+    <Script>
+      <Source><![CDATA[
+        	auditTransaction(workflow);
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="480" posY="42"/>
+</Workflow>

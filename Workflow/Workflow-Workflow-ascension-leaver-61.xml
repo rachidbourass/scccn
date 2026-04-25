@@ -1,0 +1,422 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Workflow-Ascension-Leaver-61" type="IdentityLifecycle">
+  <Variable initializer="false" name="foregroundProvisioning"/>
+  <Variable input="true" name="trigger">
+    <Description>The IdentityTrigger</Description>
+  </Variable>
+  <Variable input="true" name="event" transient="true">
+    <Description>The IdentityChangeEvent.  It can be used to build
+      the provisioning plan, but does not need to be
+      persisted with the case, so marked as transient.</Description>
+  </Variable>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable initializer="false" name="trace">
+    <Description>Used for debugging this workflow and when set to true trace
+      will be sent to stdout.</Description>
+  </Variable>
+  <Variable initializer="false" name="transient"/>
+  <Variable name="launcher"/>
+  <Variable name="inputIdentity"/>
+  <Variable input="true" name="trigger">
+    <Description>The IdentityTrigger</Description>
+  </Variable>
+  <Variable input="true" name="event">
+    <Description>The IdentityChangeEvent.  It can be used to build
+      the provisioning plan, but does not need to be
+      persisted with the case, so marked as transient.</Description>
+  </Variable>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable initializer="false" name="trace">
+    <Description>Used for debugging this workflow and when set to true trace
+      will be sent to stdout.</Description>
+  </Variable>
+  <Variable initializer="true" name="transient"/>
+  <Variable name="launcher"/>
+  <Variable name="inputIdentity"/>
+  <Variable name="adStatus"/>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+    <Transition to="Check AD Link"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="938" posY="8"/>
+  <Step icon="Default" name="Compile Delete Plan - GSuite" posX="242" posY="88" resultVariable="plan">
+    <Arg name="adStatus" value="ref:adStatus"/>
+    <Description>Compiles a Provisioning Plan to delete GSuite links. As this event only occurs 61 days after a leaverDate has been set, all GSuite links (falling under CWR or EMP OUs) associated with the Identity are deleted. This step also generates a custom Audit Log entry each time a relevant link is added to the plan.</Description>
+    <Script>
+      <Source><![CDATA[
+import sailpoint.api.IdentityService;
+import sailpoint.object.Application;
+import sailpoint.object.AuditEvent;
+import sailpoint.object.Link;
+import sailpoint.object.Identity;
+import sailpoint.object.ProvisioningPlan;
+import sailpoint.object.Source;
+import sailpoint.server.Auditor;
+import sailpoint.tools.Util;
+  
+Application refApp = context.getObjectByName(Application.class, "GSuite");
+Identity refUser = context.getObjectByName(Identity.class, identityName);
+  
+IdentityService is = new IdentityService(context);  
+
+ProvisioningPlan plan = new ProvisioningPlan();
+plan.setIdentity(refUser);
+plan.setNativeIdentity(identityName);
+ProvisioningPlan.AccountRequest accReq = new ProvisioningPlan.AccountRequest();
+List accReqs = new ArrayList();
+
+AuditEvent auditEvent = new AuditEvent();
+
+if (refUser != null) {
+
+    refLinks = is.getLinks(refUser, refApp);
+
+    if (refLinks != null && refLinks.size() > 0) {
+
+        for (Link refLink:refLinks) {
+
+            String nativeOU = refLink.getAttribute("orgUnitPath");
+
+            if (Util.isNotNullOrEmpty(nativeOU) && (nativeOU.startsWith("/CWR") || nativeOU.startsWith("/EMP"))) {
+
+               accReq = new ProvisioningPlan.AccountRequest();
+               accReq.setOperation(AccountRequest.Operation.Delete);
+               accReq.setApplication("GSuite");
+               accReq.setNativeIdentity(refLink.getNativeIdentity());
+               accReqs.add(accReq);
+
+               auditEvent = new AuditEvent("Leaver+61", "Comment", refLink.getDisplayName());
+               auditEvent.setApplication("GSuite");
+               auditEvent.setAccountName(refLink.getNativeIdentity());
+               auditEvent.setString1("Account Link will be deleted from: " + identityName);
+               auditEvent.setString2("Per Leaver+61 Days Event");
+               Auditor.log(auditEvent);
+               context.commitTransaction();
+
+            } else {
+
+               auditEvent = new AuditEvent("Leaver+61", "Comment", refLink.getDisplayName());
+               auditEvent.setApplication("GSuite");
+               auditEvent.setAccountName(refLink.getNativeIdentity());
+               auditEvent.setString1("Account Link will be retained on: " + identityName);
+               auditEvent.setString2("Per Leaver+61 Days Event");
+               auditEvent.setString3("Retention Justification: GSuite account is not located in a CWR or EMP OU.");
+               auditEvent.setString4("Current OU: " + nativeOU);
+			   Auditor.log(auditEvent);
+               context.commitTransaction();
+
+            }
+
+        }
+
+    }
+
+}
+
+for (ProvisioningPlan.AccountRequest accReq : accReqs) {
+
+   plan.add(accReq);
+
+}
+
+return plan;
+]]></Source>
+    </Script>
+    <Transition to="Append EA6 and EA40 Cleanup"/>
+  </Step>
+  <Step icon="Default" name="Execute Delete Plan" posX="715" posY="88">
+    <Description>Calls the Provisioner API to execute seamlessly execute passed in Provisioning Plan.</Description>
+    <Script>
+      <Source><![CDATA[
+import sailpoint.api.Provisioner;
+
+Provisioner provisioner = new Provisioner(context);
+provisioner.setNoLocking(true);
+provisioner.setOptimisticProvisioning(true);
+
+provisioner.execute(plan);
+]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step action="rule:Ascension-Rule-Leaver61-AD-Status" icon="Default" name="Check AD Link" posX="95" posY="12" resultVariable="adStatus">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Transition to="Compile Delete Plan - GSuite" when="script:adStatus == true"/>
+    <Transition to="Stop" when="script:adStatus == false"/>
+  </Step>
+  <Step icon="Default" name="Append EA6 and EA40 Cleanup" posX="406" posY="88" resultVariable="plan">
+    <Script>
+      <Source><![CDATA[
+import sailpoint.api.IdentityService;
+import sailpoint.object.Application;
+import sailpoint.object.AuditEvent;
+import sailpoint.object.Filter;
+import sailpoint.object.Link;
+import sailpoint.object.Identity;
+import sailpoint.object.ProvisioningPlan;
+import sailpoint.object.QueryOptions;
+import sailpoint.object.Source;
+import sailpoint.server.Auditor;
+import sailpoint.tools.Util;
+
+private List getADApps() {
+
+  QueryOptions ops = new QueryOptions();
+
+  ops.addFilter(Filter.eq("type", "Active Directory - Direct"));
+
+  List adApps = context.getObjects(Application.class, ops);
+
+  return adApps;
+
+}
+
+private void buildAttrReq(String targetAttribute, String value, AccountRequest accountReq) {
+
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+
+  AttributeRequest attributeReq = new AttributeRequest(targetAttribute, value);
+  attributeReq.setOp(ProvisioningPlan.Operation.Set);
+
+  accountReq.add(attributeReq);
+
+}
+
+List adApps = getADApps();
+Identity refUser = context.getObjectByName(Identity.class, identityName);
+  
+IdentityService is = new IdentityService(context);  
+
+ProvisioningPlan.AccountRequest accReq = new ProvisioningPlan.AccountRequest();
+List accReqs = new ArrayList();
+
+AuditEvent auditEvent = new AuditEvent();
+
+if (refUser != null) {
+
+    //Get All AD Links on Identity
+
+    refLinks = is.getLinks(refUser, adApps, null);
+
+    if (refLinks != null && refLinks.size() > 0) {
+
+        for (Link refLink:refLinks) {
+
+            //Build AccountRequests for Each AD Link
+
+            accReq = new ProvisioningPlan.AccountRequest();
+            accReq.setOperation(AccountRequest.Operation.Modify);
+            accReq.setApplication(refLink.getApplicationName());
+            accReq.setNativeIdentity(refLink.getNativeIdentity());
+            accReqs.add(accReq);
+
+            //Clear EA6 and EA40 on each AD Link
+
+            buildAttrReq("msExchExtensionAttribute40", "", accReq);
+            buildAttrReq("extensionAttribute6", "", accReq);
+
+            //Get Current EA6 and EA40 for AuditEvent
+
+            String currentEA6 = refLink.getAttribute("extensionAttribute6");
+            String currentEA40 = refLink.getAttribute("msExchExtensionAttribute40");
+            
+            //Create AuditEvent for Planned Actions
+
+            auditEvent = new AuditEvent("Leaver+61", "Comment", refLink.getDisplayName());
+            auditEvent.setApplication(refLink.getApplicationName());
+            auditEvent.setAccountName(refLink.getNativeIdentity());
+            auditEvent.setString1("Clearing EA6 and EA40 on " + refLink.getApplicationName() + " Link of: " + identityName);
+            auditEvent.setString2("Per Leaver+61 Days Event");
+            auditEvent.setAttribute("currentEA6", currentEA6);
+            auditEvent.setAttribute("currentEA40", currentEA40);
+            Auditor.log(auditEvent);
+            context.commitTransaction();
+
+        }
+
+          //Supplemental Account Request to Clear gsuiteStatus and orgUnitPath
+
+          AccountRequest accountReqTwo = new AccountRequest();
+          accountReqTwo.setOperation(AccountRequest.Operation.Modify);
+          accountReqTwo.setNativeIdentity(identityName);
+          accountReqTwo.setApplication("IIQ");
+
+          buildAttrReq("gsuiteStatus", "", accountReqTwo);
+          buildAttrReq("orgUnitPath", "", accountReqTwo);
+
+          accReqs.add(accountReqTwo);
+          
+    }
+
+}
+
+for (ProvisioningPlan.AccountRequest accReq : accReqs) {
+
+   plan.add(accReq);
+
+}
+
+return plan;
+]]></Source>
+    </Script>
+    <Transition to="Append Entitlement and Role Cleanup"/>
+  </Step>
+  <Step icon="Default" name="Append Entitlement and Role Cleanup" posX="574" posY="88">
+    <Script>
+      <Source><![CDATA[
+  import sailpoint.api.IdentityService;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Application;
+  import sailpoint.object.Attributes; 
+  import sailpoint.object.AuditEvent;
+  import sailpoint.object.Bundle;       
+  import sailpoint.object.Custom;
+  import sailpoint.object.EntitlementGroup; 
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.IdentityEntitlement;
+  import sailpoint.object.Link;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;        
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.Util;
+  import java.util.Iterator;
+
+  private ProvisioningPlan.AccountRequest newLeaverAccountRequest(AccountRequest actReq, AccountRequest.Operation operation, String appName, String nativeIdentity) {
+
+    actReq = new AccountRequest();    
+    actReq.setApplication(appName);
+    actReq.setOperation(operation);
+    actReq.setNativeIdentity(nativeIdentity);
+
+    return actReq;
+
+  }
+
+  private ProvisioningPlan.AttributeRequest newLeaverAttributeRequest(AttributeRequest attrReq, ProvisioningPlan.Operation operation, boolean assignment, String key, String value) {
+
+    attrReq = new sailpoint.object.ProvisioningPlan.AttributeRequest();
+    attrReq.setOperation(operation);
+    attrReq.setAssignment(assignment);
+    attrReq.setName(key);
+    attrReq.setValue(value);
+
+    return attrReq;
+
+  }
+
+  private void auditLeaver61(String identityName, String appName, String nativeIdentity, String entAttr, String entValue) {
+
+    //Auditor.logAs("Leaver+61", "Comment", identityName, appName, nativeIdentity, entAttr, entValue);
+
+    AuditEvent auditEvent = new AuditEvent();
+    auditEvent.setApplication(appName);
+    auditEvent.setSource("Leaver+61");
+    auditEvent.setAction("Comment");
+    auditEvent.setTarget(identityName);
+    auditEvent.setAccountName(nativeIdentity);
+    auditEvent.setAttributeName(entAttr);
+    auditEvent.setAttributeValue(entValue);
+    auditEvent.setString1("Object will be included in provisioning plan for removal");
+    context.saveObject(auditEvent);
+    context.commitTransaction();
+
+  }
+
+  List acctReqList = new ArrayList();
+
+  Identity identity = context.getObjectByName(Identity.class, identityName);  
+  Custom customObj = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration");
+
+  if (null != identity && customObj != null && customObj.get("IgnoreTerminationApplications") != null){
+
+    List appsToIgnore = customObj.get("IgnoreTerminationApplications");
+
+    QueryOptions ops = new QueryOptions();
+    ops.setCloneResults(true);
+    ops.addFilter(Filter.eq("identity.id", identity.getId()));
+
+    Iterator itr = context.search(IdentityEntitlement.class, ops, "id");
+
+    while (itr.hasNext()) {
+
+      String name = null;
+      String value = null;
+      Application app = null;
+      String appName = null;
+      String nativeIdentity = null;
+      String identityName = identity.getName();
+
+      IdentityEntitlement identityEnt = context.getObjectById(IdentityEntitlement.class, itr.next()[0]);
+
+      if (identityEnt != null) {
+
+        name = identityEnt.getName();
+        value = identityEnt.getValue();
+        app = identityEnt.getApplication();
+
+        if (app != null) {
+
+          appName = app.getName();
+
+        } else {
+
+          appName = "IIQ";
+
+        }
+
+        if (!Util.nullSafeContains(appsToIgnore, appName) && !appName.equalsIgnoreCase("ServiceNow")) {
+
+        nativeIdentity = identityEnt.getNativeIdentity();
+
+        if (Util.isNullOrEmpty(nativeIdentity)) {
+
+          nativeIdentity = identityName;
+
+        }
+
+
+        AccountRequest actReq = null;
+        actReq = newLeaverAccountRequest(actReq, AccountRequest.Operation.Modify, appName, nativeIdentity);
+
+        AttributeRequest attrReq = null;
+        attrReq = newLeaverAttributeRequest(attrReq, ProvisioningPlan.Operation.Remove, false, name, value);
+        auditLeaver61(identityName, appName, nativeIdentity, name, value);
+
+        actReq.add(attrReq);
+
+        acctReqList.add(actReq);
+
+
+      }
+
+      }
+
+    }
+
+    Util.flushIterator(itr);
+
+  }
+
+  for (ProvisioningPlan.AccountRequest acctReq : acctReqList) {
+
+    plan.add(acctReq);
+
+  }
+
+  return plan;
+  ]]></Source>
+    </Script>
+    <Transition to="Execute Delete Plan"/>
+  </Step>
+</Workflow>

@@ -1,0 +1,673 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Ascension-Workflow-ManageContractorMailboxLicense">
+  <Variable initializer="false" name="trace">
+    <Description>Enables workflow tracing when true; should be set to false outside of debugging scenarios.</Description>
+  </Variable>
+  <Variable initializer="true" name="transient">
+    <Description>Static variable; means that when the user clicks Cancel, the WorkflowCase disappears and no work item is created for the launcher at all; should be set to true.</Description>
+  </Variable>
+  <Variable name="requestedAction" output="true">
+    <Description>Placeholder variable; ends up populated by initial form response.</Description>
+  </Variable>
+  <Variable name="identityName" output="true">
+    <Description>Placeholder variable; ends up populated by initial form response.</Description>
+  </Variable>
+  <Variable name="plan">
+    <Description>Placeholder variable; populated during the Build Plan step using the   buildMailLicensingPlan(identityName, samAccountName, requestedAction) method from Rule-Ascension-EmailAddress-RuleLibrary.</Description>
+  </Variable>
+  <Variable name="approvalSet">
+    <Description>Placeholder variable; populated upon subprocess generation of the approvalSet.</Description>
+  </Variable>
+  <Variable initializer="IDM Team" name="fallbackApprover" required="true">
+    <Description>Identity or Workgroup assigned nested approvals when there is an issue assigning to an expected target.</Description>
+  </Variable>
+  <Variable name="isUsersManager">
+    <Description>Placeholder variable; Boolean formed using contextIsUsersManager(String identityName) method from Rule-Ascension-EmailAddress-RuleLibrary.</Description>
+  </Variable>
+  <Variable name="isUsersContractorManager">
+    <Description>Placeholder variable; Boolean formed using contextIsUsersContractorManager(String identityName) method from Rule-Ascension-EmailAddress-RuleLibrary.</Description>
+  </Variable>
+  <Variable name="isUsersTrustedRequester">
+    <Description>Placeholder variable; Boolean formed using contextIsTrustedRequester(String identityName) method from Rule-Ascension-EmailAddress-RuleLibrary.</Description>
+  </Variable>
+  <Variable name="identityEmail">
+    <Description>Placeholder variable; populated during Update WorkflowContext step; reflects the email attribute of the target Identity.</Description>
+  </Variable>
+  <Variable name="identityDisplayName">
+    <Description>Placeholder variable; populated during Update WorkflowContext step; reflects the displayName attribute of the target Identity.</Description>
+  </Variable>
+  <Variable name="workItemComments">
+    <Description>Not currently used by this workflow, but included to ensure expected subprocess behaviors.</Description>
+  </Variable>
+  <Variable name="violationReviewDecision">
+    <Description>Not currently used by this workflow, but included to ensure expected subprocess behaviors.</Description>
+  </Variable>
+  <Variable name="project">
+    <Description>Not currently used by this workflow, but included to ensure expected subprocess behaviors.</Description>
+  </Variable>
+  <Variable name="policyViolations">
+    <Description>Not currently used by this workflow, but included to ensure expected subprocess behaviors.</Description>
+  </Variable>
+  <Variable name="identityRequestId">
+    <Description>Placeholder variable; populated upon subprocess generation of the identityRequestId.</Description>
+  </Variable>
+  <Variable name="lastApprovalState">
+    <Description>OOTB control variable; used in this workflow for conditional behaviors of related EmailTemplate (see managerEmailTemplate).</Description>
+  </Variable>
+  <Variable initializer="Ascension-EmailTemplate-MailboxLicensingNotification" name="managerEmailTemplate" required="true">
+    <Description>Static variable; should be set to Ascension-EmailTemplate-MailboxLicensingNotification.</Description>
+  </Variable>
+  <Variable name="identityLN">
+    <Description>Placeholder variable; populated during Update WorkflowContext step; reflects the lastName attribute of the target Identity.</Description>
+  </Variable>
+  <Variable name="identityFN">
+    <Description>Placeholder variable; populated during Update WorkflowContext step; reflects the firstName attribute of the target Identity.</Description>
+  </Variable>
+  <Variable name="httpSession" transient="true">
+    <Description>httpSession</Description>
+  </Variable>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Rule-Ascension-ExistingAccount-RuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-Ascension-EmailAddress-RuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-GSuite"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="42" posY="26">
+    <Transition to="Determine Action"/>
+  </Step>
+  <Step icon="Approval" name="Determine Action" posX="135" posY="26">
+    <Approval name="Manage Contractor Mailbox License" owner="ref:launcher" return="identityName, requestedAction" send="">
+      <Form name="Manage Contractor Mailbox License">
+        <Attributes>
+          <Map>
+            <entry key="hideIncompleteFields">
+              <value>
+                <Boolean/>
+              </value>
+            </entry>
+            <entry key="includeHiddenFields">
+              <value>
+                <Boolean/>
+              </value>
+            </entry>
+            <entry key="pageTitle" value="Manage Contractor Mailbox License"/>
+          </Map>
+        </Attributes>
+        <Section name="manageUserMailbox">
+          <Field displayName="Identity" filterString="(type.inIgnoreCase({&quot;contractor&quot;,&quot;non-hr contractor&quot;}) &amp;&amp; (inactive == false &amp;&amp; samAccountName.notNull() &amp;&amp; email.notNull()))" helpKey="Please select an Identity." name="identityName" postBack="true" required="true" type="sailpoint.object.Identity">
+            <Attributes>
+              <Map>
+                <entry key="valueProperty" value="name"/>
+              </Map>
+            </Attributes>
+          </Field>
+          <Field displayName="Mailbox Action" displayType="radio" dynamic="true" helpKey="Please select the action you would like to preform against the user's email account. If the only mailbox action listed is Revoke License, the selected Identity already has a mailbox license." name="requestedAction" required="true" type="string">
+            <AllowedValuesDefinition>
+              <Script>
+                <Source><![CDATA[
+					import sailpoint.object.Identity;
+					List returnValues=new ArrayList();
+					if(form.getField("identityName") !=null @and form.getField("identityName").getValue()!=null){
+						String userName=form.getField("identityName").getValue();
+						Identity identityObj=context.getObjectByName(Identity.class,userName);
+                  log.info("REQUEST ACTION: "+identityObj.getAttribute("orgUnitPath")+"  -- "+identityObj.getAttribute("gsuiteStatus")+" --- "+identityObj.getEmail());
+						if(identityObj!=null){
+							if(null !=identityObj.getEmail() @and  
+                  (identityObj.getAttribute("orgUnitPath") !=null @and ("/CWR".equalsIgnoreCase(identityObj.getAttribute("orgUnitPath")) @or "/EMP".equalsIgnoreCase(identityObj.getAttribute("orgUnitPath")))) 
+                  @and (identityObj.getAttribute("gsuiteStatus") !=null @and ("EMP_active".equalsIgnoreCase(identityObj.getAttribute("gsuiteStatus")) @or "CWR_active_mail".equalsIgnoreCase(identityObj.getAttribute("gsuiteStatus")))))
+                  
+                  {
+										returnValues.add("Revoke License");
+									}else{
+									returnValues.add("Request License");
+							}
+							
+						}
+					}
+					return returnValues;
+				]]></Source>
+              </Script>
+            </AllowedValuesDefinition>
+            <Attributes>
+              <Map>
+                <entry key="hidden">
+                  <value>
+                    <Script>
+                      <Source><![CDATA[import sailpoint.object.Form;
+                        import sailpoint.object.Field;
+
+                        Field identityNameField = form.getField("identityName");
+
+                        if (identityNameField.getValue() == null) {
+                        return true;
+                        } else {
+                        return false;
+                        }]]></Source>
+                    </Script>
+                  </value>
+                </entry>
+              </Map>
+            </Attributes>
+          </Field>
+          <Field displayName="Click to Show Help" displayType="radio" dynamic="true" name="showHelp" postBack="true" type="boolean"/>
+          <Field displayName="Help Text" displayType="textarea" name="helpText" type="string">
+            <Attributes>
+              <Map>
+                <entry key="height" value="100"/>
+                <entry key="hidden">
+                  <value>
+                    <Script>
+                      <Source><![CDATA[import sailpoint.object.Form;
+                        import sailpoint.object.Field;
+                        import sailpoint.tools.Util;
+
+                        Field showHelp= form.getField("showHelp");
+                        Field helpText = form.getField("helpText");
+
+                        helpText.setDisplayName("");
+
+                        if (showHelp.getValue() == null || showHelp.getValue() == false) {
+                        showHelp.setDisplayName("Click to Show Help");
+                        return true;
+                        } else if (showHelp.getValue() == true) {
+                        showHelp.setDisplayName("Click to Hide Help");
+                        return false;
+                        }]]></Source>
+                    </Script>
+                  </value>
+                </entry>
+                <entry key="readOnly" value="true"/>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[import java.lang.StringBuilder;
+
+                StringBuilder builder = new StringBuilder();
+                builder.append("Only active contractors can be managed using this form.");
+                builder.append("\r\n");
+                builder.append("\r\n");
+                builder.append("If a contractor you expect to see is not listed for selection; please contact the AIS Service Desk to open a support ticket with the Identity & Access Management team.");
+
+                return builder.toString();]]></Source>
+            </Script>
+          </Field>
+        </Section>
+        <Button action="next" label="Submit"/>
+        <Button action="cancel" label="Cancel"/>
+      </Form>
+    </Approval>
+    <Description>Initial form for mailbox licensing update requests</Description>
+    <Transition to="Confirm Launcher Submission"/>
+  </Step>
+  <Step icon="Analysis" name="Update WorkflowContext" posX="280" posY="26">
+    <Description>Sets various global variables for use in later workflow steps</Description>
+    <Script>
+      <Source><![CDATA[import sailpoint.object.Identity;
+
+        Identity refIdentity = context.getObjectByName(Identity.class, identityName);
+
+        
+        wfcontext.setVariable("identityFN", refIdentity.getFirstname());
+        wfcontext.setVariable("identityLN", refIdentity.getLastname());
+        wfcontext.setVariable("identityDisplayName", refIdentity.getDisplayName());
+        wfcontext.setVariable("identityEmail", refIdentity.getEmail());
+        wfcontext.setVariable("lastApprovalState", null);
+
+        context.decache(refIdentity);
+
+]]></Source>
+    </Script>
+    <Transition to="Build Plan"/>
+  </Step>
+  <Step icon="Analysis" name="Build Plan" posX="374" posY="26" resultVariable="plan">
+    <Description>Complies a provisioning plan using the buildMailLicensingPlan(identityName, samAccountName, requestedAction) method from Rule-Ascension-EmailAddress-RuleLibrary</Description>
+    <Script>
+      <Source><![CDATA[import sailpoint.object.Identity;
+        import sailpoint.object.ProvisioningPlan;
+
+        Identity refIdentity = context.getObjectByName(Identity.class, identityName);
+
+        String samAccountName = refIdentity.getAttribute("samAccountName");
+
+        ProvisioningPlan plan = buildMailLicensingPlan(identityName, samAccountName, requestedAction);
+
+        context.decache(refIdentity);
+
+        return plan;]]></Source>
+    </Script>
+    <Transition to="Notify Requester" when="script:isUsersTrustedRequester"/>
+    <Transition to="Initialize Request"/>
+  </Step>
+  <Step icon="Provision" name="TrustedUserProvision">
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.api.Workflower;
+        import sailpoint.object.WorkflowLaunch;
+        import sailpoint.object.Workflow;
+
+        Map launchArgsMap = new HashMap();
+        launchArgsMap.put("fallbackApprover",launcher);
+        launchArgsMap.put("identityName",identityName);
+        launchArgsMap.put("launcher",launcher);
+        launchArgsMap.put("plan",plan);
+        launchArgsMap.put("trace","false");
+        launchArgsMap.put("flow","AccountsRequest");
+        launchArgsMap.put("approvalScheme","none");
+        launchArgsMap.put("notificationScheme","none");
+        launchArgsMap.put("optimisticProvisioning","false");
+
+  		WorkflowLaunch wflaunch = new WorkflowLaunch();
+		Workflow wf = (Workflow) context.getObjectByName(Workflow.class,"LCM Provisioning");
+		wflaunch.setWorkflowName(wf.getName());
+		wflaunch.setWorkflowRef(wf.getName());
+		wflaunch.setCaseName("ManageContractorMailboxLicense for : " + identityName);
+		wflaunch.setVariables(launchArgsMap);
+
+		Workflower workflower = new Workflower(context);
+		WorkflowLaunch launch = workflower.launch(wflaunch);
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Task" name="Initialize Request" posX="462" posY="26">
+    <Arg name="formTemplate"/>
+    <Arg name="enableRetryRequest"/>
+    <Arg name="allowRequestsWithViolations"/>
+    <Arg name="endOnManualWorkItems"/>
+    <Arg name="policiesToCheck"/>
+    <Arg name="workItemPriority"/>
+    <Arg name="project"/>
+    <Arg name="workItemComments"/>
+    <Arg name="identityRequestId"/>
+    <Arg name="source"/>
+    <Arg name="identityDisplayName"/>
+    <Arg name="requireViolationReviewComments"/>
+    <Arg name="identityRequest"/>
+    <Arg name="trace"/>
+    <Arg name="enableApprovalRecommendations"/>
+    <Arg name="doRefresh" value="false"/>
+    <Arg name="endOnProvisioningForms"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="flow" value="AccountsRequest"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="approvalSet"/>
+    <Arg name="policyViolations"/>
+    <Arg name="violationReviewDecision"/>
+    <Arg name="policyScheme"/>
+    <Arg name="asyncCacheRefresh"/>
+    <Arg name="optimisticProvisioning" value="true"/>
+    <Description>Initializes the identityRequest object</Description>
+    <Return name="approvalSet" to="approvalSet"/>
+    <Return name="identityRequestId" to="identityRequestId"/>
+    <Return name="policyViolations" to="policyViolations"/>
+    <Return name="project" to="project"/>
+    <Return name="violationReviewDecision" to="violationReviewDecision"/>
+    <Return name="workItemComments" to="workItemComments"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Initialize"/>
+    </WorkflowRef>
+    <Transition to="Approval"/>
+  </Step>
+  <Step icon="Approval" name="Approval" posX="558" posY="26">
+    <Approval name="Contractor Mailbox Licensing Approval" owner="ref:launcher" return="" send="isUsersManager, isUsersContractorManager, isUsersTrustedRequester, identityDisplayName, identityEmail, identityName, requestedAction, identityFN, identityLN, managerEmailTemplate, fallbackApprover">
+      <Arg name="workItemNotificationTemplate">
+        <Script>
+          <Source><![CDATA[if (!isUsersManager || !isUsersContractorManager || !isUsersTrustedRequester) {
+
+  return managerEmailTemplate;
+
+} else {
+
+  return "";
+
+}]]></Source>
+        </Script>
+      </Arg>
+      <Form name="Contractor Mailbox Licensing Approval">
+        <Attributes>
+          <Map>
+            <entry key="hideIncompleteFields">
+              <value>
+                <Boolean/>
+              </value>
+            </entry>
+            <entry key="includeHiddenFields">
+              <value>
+                <Boolean/>
+              </value>
+            </entry>
+            <entry key="pageTitle" value="Contractor Mailbox Licensing Approval"/>
+          </Map>
+        </Attributes>
+        <Section name="Section 1" type="text">
+          <Field displayName="Instructions" displayType="textarea" name="approverHeader" type="string">
+            <Attributes>
+              <Map>
+                <entry key="height" value="250"/>
+                <entry key="readOnly" value="true"/>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[import sailpoint.object.Form;
+import sailpoint.object.Field;
+import sailpoint.tools.Util;
+
+Field approverHeader= form.getField("approverHeader");
+
+approverHeader.setDisplayName("");
+
+String htmlBody = "";
+
+if (isUsersManager || isUsersContractorManager || isUsersTrustedRequester) {
+	htmlBody = "<p>Hello,</p>";
+	if(isUsersContractorManager) {
+	htmlBody = htmlBody + "<p>You have been identified as the contractor manager of the user this request is for...</p>";
+	}
+	else if(isUsersTrustedRequester){
+	htmlBody = htmlBody + "<p>You have been identified as the trusted requester of the user this request is for...</p>";
+	}
+	else {	
+	htmlBody = htmlBody + "<p>You have been identified as the manager of the user this request is for...</p>";
+    }	
+	htmlBody=htmlBody + "<p>As a result, related updates will be applied immediately upon your submission of this form.</p><p>If you wish to proceed, select the button labeled \"Approve Request\"; otherwise, select the button labeled \"Reject Request\" to back out.</p><p>Submission of this request doubles as affirmation that you have read and understand <a href=\"https://communities.ascension.org/PoliciesAndProcedures/Email%20Use.pdf\" target=\"_blank\">Ascension Administrative Policy #403</a>.</p><p>Lastly, if this request was opened for an R1 Associate it should be rejected; R1 Associates MUST utilize R1\'s internal email system.</p>";	
+	return htmlBody;
+
+} else {
+
+	htmlBody = "<p>Hello,</p><p>A request has been opened to update the listed contractor\'s mailbox license.</p><p>Please approve or reject this request using the labeled buttons on the bottom of the form.</p><p>Approval of this request doubles as affirmation that you have read and understand <a href=\"https://communities.ascension.org/PoliciesAndProcedures/Email%20Use.pdf\" target=\"_blank\">Ascension Administrative Policy #403</a>.</p><p>Lastly, if this request was opened for an R1 Associate it should be rejected; R1 Associates MUST utilize R1\'s internal email system.</p>";
+	return htmlBody;
+	
+}]]></Source>
+            </Script>
+          </Field>
+        </Section>
+        <Section columns="3" name="Section 2">
+          <Field columnSpan="1" displayName="First Name" name="firstNameField" type="string">
+            <Attributes>
+              <Map>
+                <entry key="readOnly" value="true"/>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[return identityFN;]]></Source>
+            </Script>
+          </Field>
+          <Field columnSpan="1" displayName="Last Name" name="lastNameField" type="string">
+            <Attributes>
+              <Map>
+                <entry key="readOnly" value="true"/>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[return identityLN;]]></Source>
+            </Script>
+          </Field>
+          <Field columnSpan="1" displayName="Display Name" name="requestedDisplayName" type="string">
+            <Attributes>
+              <Map>
+                <entry key="readOnly" value="true"/>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[return identityDisplayName;]]></Source>
+            </Script>
+          </Field>
+          <Field columnSpan="1" displayName="Identity" name="requestedIdentity" type="string">
+            <Attributes>
+              <Map>
+                <entry key="readOnly" value="true"/>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[return identityName;]]></Source>
+            </Script>
+          </Field>
+          <Field columnSpan="1" displayName="Email Address" name="requestedEmail" type="string">
+            <Attributes>
+              <Map>
+                <entry key="readOnly" value="true"/>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[return identityEmail;]]></Source>
+            </Script>
+          </Field>
+          <Field columnSpan="1" displayName="Action" name="action" type="string">
+            <Attributes>
+              <Map>
+                <entry key="readOnly" value="true"/>
+              </Map>
+            </Attributes>
+            <Script>
+              <Source><![CDATA[return requestedAction;]]></Source>
+            </Script>
+          </Field>
+        </Section>
+        <Button action="next" label="Approve Request"/>
+        <Button action="back" label="Reject Request"/>
+      </Form>
+      <OwnerScript>
+        <Source><![CDATA[import sailpoint.object.Identity;
+          import sailpoint.tools.Util;
+
+          if (isUsersManager || isUsersContractorManager) {
+
+          return launcher;
+
+          } else {
+
+          Identity refIdentity = context.getObjectByName(Identity.class, identityName);
+          Identity refManager = refIdentity.getManager();
+
+          if (refManager != null) {
+
+          String managerName = refManager.getName();
+
+          return managerName;
+
+          } else {
+
+          return fallbackApprover;
+
+          }
+
+          }]]></Source>
+      </OwnerScript>
+    </Approval>
+    <Description>Follow up form for handling approvals (when launcher is not user's manager); or confirmation (when launcher is user's manager)</Description>
+    <Transition to="Handle Rejection" when="!approved"/>
+    <Transition to="Provision"/>
+  </Step>
+  <Step icon="Provision" name="Provision" posX="377" posY="117">
+    <Arg name="approvalScheme" value="none"/>
+    <Arg name="formTemplate"/>
+    <Arg name="enableRetryRequest"/>
+    <Arg name="securityOfficerElectronicSignature"/>
+    <Arg name="fallbackApprover" value="ref:fallbackApprover"/>
+    <Arg name="endOnManualWorkItems"/>
+    <Arg name="userEmailTemplate"/>
+    <Arg name="workItemPriority"/>
+    <Arg name="workItemComments" value="ref:workItemComments"/>
+    <Arg name="project"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Arg name="approvalSplitPoint"/>
+    <Arg name="source"/>
+    <Arg name="managerElectronicSignature"/>
+    <Arg name="identityDisplayName"/>
+    <Arg name="foregroundProvisioning"/>
+    <Arg name="ownerElectronicSignature"/>
+    <Arg name="approvalMode"/>
+    <Arg name="batchRequestItemId"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="saveUnmanagedPlan_WithProjectArgument"/>
+    <Arg name="recompile"/>
+    <Arg name="endOnProvisioningForms"/>
+    <Arg name="approvalAssignmentRule"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="flow" value="AccountsRequest"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="manualActionsEmailTemplate"/>
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="policyViolations" value="ref:policyViolations"/>
+    <Arg name="filterRejects"/>
+    <Arg name="ownerEmailTemplate"/>
+    <Arg name="splitProvisioning"/>
+    <Arg name="setPreviousApprovalDecisions"/>
+    <Arg name="clearApprovalDecisions"/>
+    <Arg name="saveUnmanagedPlan"/>
+    <Arg name="noTriggers"/>
+    <Arg name="requesterEmailTemplate"/>
+    <Arg name="approvalEmailTemplate"/>
+    <Arg name="ticketManagementApplication"/>
+    <Arg name="optimisticProvisioning"/>
+    <Arg name="securityOfficerEmailTemplate"/>
+    <Arg name="securityOfficerName"/>
+    <Arg name="approvingIdentities"/>
+    <Arg name="managerEmailTemplate"/>
+    <Description>Provisions the supplied plan; approvalScheme argument must be set to none for this step to function as intended in this workflow.</Description>
+    <Return name="approvalSet" to="approvalSet"/>
+    <Return name="project" to="project"/>
+    <Return name="workItemComments" to="workItemComments"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Approve and Provision Subprocess"/>
+    </WorkflowRef>
+    <Transition to="Notify Requester"/>
+  </Step>
+  <Step icon="Task" name="Finalize Request" posX="700" posY="117">
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="autoVerifyIdentityRequest"/>
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="ticketManagementApplication"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="workItemPriority"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Arg name="ticketDataGenerationRule"/>
+    <Description>Finalizes the identityRequest object</Description>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Finalize"/>
+    </WorkflowRef>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="809" posY="117"/>
+  <Step icon="Undo" name="Handle Rejection" posX="701" posY="22">
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Description>Cleans up the identityRequest object in cases where a rejection has occurred.</Description>
+    <Script>
+      <Source><![CDATA[import sailpoint.object.WorkItem;
+import sailpoint.object.WorkItem.State;
+import sailpoint.object.IdentityRequest;
+import sailpoint.object.IdentityRequestItem;
+
+IdentityRequest identityRequest = context.getObjectByName(IdentityRequest.class, identityRequestId);
+
+List requestItems = identityRequest.getItems();
+
+if (requestItems != null && requestItems.size() > 0) {
+
+   for (IdentityRequestItem requestItem : requestItems) {
+
+       requestItem.setApprovalState(WorkItem.State.Rejected);
+       context.saveObject(requestItem);
+
+   }
+
+}
+
+if(State.Finished != identityRequest.getState()){
+
+  identityRequest.setCompletionStatus(IdentityRequest.CompletionStatus.Failure);
+
+  identityRequest.setEndDate(new Date());
+
+  identityRequest.setExecutionStatus(IdentityRequest.ExecutionStatus.Terminated);
+
+  System.out.println("Identity Request State set to: " + identityRequest.getState());
+
+  context.saveObject(identityRequest);
+
+  context.commitTransaction();
+
+}]]></Source>
+    </Script>
+    <Transition to="Notify Requester"/>
+  </Step>
+  <Step icon="Message" name="Confirm Launcher Submission" posX="207" posY="97">
+    <ConditionScript>
+      <Source><![CDATA[import sailpoint.object.Identity;
+
+boolean isUsersManager = contextIsUsersManager(identityName);
+boolean isUsersContractorManager = contextIsUsersContractorManager(identityName);
+boolean isUsersTrustedRequester = contextIsTrustedRequester(launcher);
+wfcontext.setVariable("isUsersManager", isUsersManager);
+wfcontext.setVariable("isUsersContractorManager", isUsersContractorManager);
+wfcontext.setVariable("isUsersTrustedRequester", isUsersTrustedRequester);
+if (!isUsersManager || !isUsersContractorManager || !isUsersTrustedRequester) { 
+   return true;
+} else {
+
+  return false;
+
+}]]></Source>
+    </ConditionScript>
+    <Description>Displays a FacesMessage upon initial form submission when the launcher of the workflow was not the manager of the target user. Informs them that an approval will be opened.</Description>
+    <Script>
+      <Source><![CDATA[
+        import javax.faces.application.FacesMessage;
+        import sailpoint.tools.Util;
+
+        List currentMessages = httpSession.getAttribute("sailpoint.web.PageCodeBase.sessionMessages");  
+        FacesMessage myMessage = null;
+       
+        String message = null;
+        if(wfcontext.getVariable("isUsersTrustedRequester")){
+			message = "Request submitted";  
+        }else{
+			message = "Requesting approval from user's manager for Mailbox License Update...";
+        }
+		myMessage = new FacesMessage(FacesMessage.SEVERITY_INFO,message+".","Success");  
+
+        List myMessages = new ArrayList();  
+        myMessages.add(myMessage);  
+        httpSession.setAttribute("sailpoint.web.PageCodeBase.sessionMessages", myMessages);]]></Source>
+    </Script>
+    <Transition to="Update WorkflowContext"/>
+  </Step>
+  <Step action="call:sendEmail" icon="Email" name="Notify Requester" posX="491" posY="117">
+    <Arg name="template" value="ref:managerEmailTemplate"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="requestedAction" value="ref:requestedAction"/>
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="to" value="script:getEmail(launcher)"/>
+    <Arg name="identityEmail" value="ref:identityEmail"/>
+    <Arg name="lastApprovalState" value="ref:lastApprovalState"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="flow" value="AccountsRequest"/>
+    <ConditionScript>
+      <Source><![CDATA[if (!isUsersManager || !isUsersContractorManager || !isUsersTrustedRequester) {
+
+return true; 
+
+} else {
+
+return false;
+
+}]]></Source>
+    </ConditionScript>
+    <Description>Notifies the original launcher of the workflow in cases where the launcher was not the manager of the target identity.</Description>
+    <Transition to="Notify Manager"/>
+  </Step>
+  <Step action="call:sendEmail" icon="Email" name="Notify Manager" posX="600" posY="117">
+    <Arg name="template" value="ref:managerEmailTemplate"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="requestedAction" value="ref:requestedAction"/>
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="to" value="script:getManagersEmail(identityName, plan)"/>
+    <Arg name="identityEmail" value="ref:identityEmail"/>
+    <Arg name="lastApprovalState" value="ref:lastApprovalState"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="flow" value="AccountsRequest"/>
+    <Description>Notifies the manager of the target identity following approval or rejection.</Description>
+    <Transition to="TrustedUserProvision" when="script:isUsersTrustedRequester"/>
+    <Transition to="Finalize Request"/>
+  </Step>
+</Workflow>

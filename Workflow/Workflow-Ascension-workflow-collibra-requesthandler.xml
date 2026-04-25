@@ -1,0 +1,309 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Ascension-Workflow-Collibra-RequestHandler" type="LCMProvisioning">
+  <Variable initializer="true" name="trace">
+    <Description>Used for debugging this workflow and when set to true trace
+      will be sent to stdout.</Description>
+  </Variable>
+  <Variable name="errorMsg"/>
+  <Variable name="identityRequestId"/>
+  <Variable input="true" name="requesterPrimaryEmail"/>
+  <Variable input="true" name="groupPrimaryEmail"/>
+  <Variable input="true" name="collibraGUID"/>
+  <Variable initializer="Successfully launched rest call" name="Message" output="true"/>
+  <Variable name="plan"/>
+  <Variable name="project"/>
+  <Variable name="identityName">
+    <Description>The name of the identity being updated.</Description>
+  </Variable>
+  <Variable input="true" name="groupCorrespondingDataset"/>
+  <Variable input="true" name="collibraRequestTimestamp"/>
+  <Variable name="approvalSet">
+    <Description>Placeholder variable; populated upon subprocess generation of the approvalSet.</Description>
+  </Variable>
+  <Variable initializer="none" input="true" name="approvalScheme">
+    <Description>A csv string that specifies how approval items should be generated
+      for the incoming request.
+
+      The value can be &amp;quot;none&amp;quot;, in which case approvals are disabled.
+
+      The value can also be a combination of any of the values below
+      in any order, separated by commas. The order in which they are
+      specified is the order in which they are processed:
+
+      owner
+      The object owner gets the approval item.
+      For Role approvals this is the Role object owner.
+      For Entitlement approvals this is the Entitlement object owner.
+
+      manager
+      The manager gets the approval item.
+
+      securityOfficer
+      The identity in the variable securityOfficerName gets the approval item.
+
+      identity
+      The identities/workgroups in the variable approvingIdentities get the approval item.</Description>
+  </Variable>
+  <Variable initializer="none" input="true" name="notificationScheme">
+    <Description>A string that specifies who should be notified when the request has been complete.
+      The value can be null or a csv of one or more of the following options.
+
+      none or null
+      disable notifications
+
+      user
+      Identity that is being update will be notified.
+
+      manager
+      The manager of the Identity that is being updated will be notified.
+
+      requester
+      The person that has requested the update will be notified.</Description>
+  </Variable>
+  <Variable initializer="Collibra Request" name="flow"/>
+  <Variable initializer="ref:approvalEmailTemplate" name="identityEmailTemplate"/>
+  <Variable initializer="ref:approvalEmailTemplate" name="workItemNotificationTemplate"/>
+  <Variable initializer="Ascension-EmailTemplate-AccessRequestEscalation" name="workItemEscalationTemplate"/>
+  <Variable initializer="Ascension-EmailTemplate-AccessRequestReminder" name="workItemReminderTemplate"/>
+  <Variable initializer="ref:approvalEmailTemplate" name="securityOfficerEmailTemplate"/>
+  <Variable initializer="Pending Manual Changes" name="manualActionsEmailTemplate"/>
+  <Variable initializer="ref:approvalEmailTemplate" name="ownerEmailTemplate"/>
+  <Variable initializer="LCM Manager Notification" name="managerEmailTemplate"/>
+  <Variable initializer="Ascension-EmailTemplate-AccessRequest-RequesterNotification" name="requesterEmailTemplate"/>
+  <Variable initializer="Ascension-EmailTemplate-AccessRequest-RequesterNotification" name="userEmailTemplate"/>
+  <Variable initializer="Ascension-EmailTemplate-AccessRequestApproval" name="approvalEmailTemplate"/>
+  <Variable initializer="WebService" name="source"/>
+  <Variable name="successList"/>
+  <Variable name="failedMap"/>
+  <Variable name="failedList"/>
+  <Variable name="rejectedList"/>
+  <Variable name="workItemComments"/>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-Collibra-RequestHandler"/>
+    <Reference class="sailpoint.object.Rule" name="LCM Workflow Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="74" posY="11">
+    <Transition to="Validate Input"/>
+  </Step>
+  <Step icon="Message" name="Validate Input" posX="200" posY="10" resultVariable="errorMsg">
+    <Script>
+      <Source><![CDATA[String errorMsg=getValidationMessage(context,workflow,getRequiredVariables(workflow));
+        //log.trace("COLLIBRA WORKFLOW ERROR: "+errorMsg);
+        return errorMsg;
+      ]]></Source>
+    </Script>
+    <Transition to="Transform Entitlement Value" when="errorMsg==null"/>
+    <Transition to="Return Error Message (Validation Failed)"/>
+  </Step>
+  <Step icon="Message" name="Return Error Message (Validation Failed)" posX="400" posY="169" resultVariable="Message">
+    <Script>
+      <Source><![CDATA[
+        return errorMsg;
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Analysis" name="Formulate Plan" posX="633" posY="10" resultVariable="plan">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="groupPrimaryEmail" value="ref:groupPrimaryEmail"/>
+    <Arg name="collibraGUID" value="ref:collibraGUID"/>
+    <Arg name="requesterPrimaryEmail" value="ref:requesterPrimaryEmail"/>
+    <Script>
+      <Source><![CDATA[    
+        ProvisioningPlan plan = buildPlan(context,workflow);
+        return plan;
+      ]]></Source>
+    </Script>
+    <Transition to="Audit Plan"/>
+  </Step>
+  <Step icon="Audit" name="Audit Plan" posX="734" posY="10">
+    <Arg name="plan" value="ref:plan"/>
+    <Script>
+      <Source><![CDATA[
+        if(null != plan){
+        createAudit(context,workflow);
+        }
+      ]]></Source>
+    </Script>
+    <Transition to="Initialize Request"/>
+  </Step>
+  <Step icon="Default" name="Append Success Message" posX="1141" posY="10">
+    <Script>
+      <Source><![CDATA[
+        String msgString = getMessageString(context,workflow);
+        workflow.put("Message", msgString);
+        log.trace("Append Success Message project******"+project);
+      ]]></Source>
+    </Script>
+    <Transition to="Notify"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="1253" posY="173"/>
+  <Step icon="Analysis" name="Transform Entitlement Value" posX="392" posY="9">
+    <Description>Collibra will send over the literal primaryEmail value for a group in GWS (group@domain.tld), which will require transforming that value to the matching entitlement value under the hood in IdentityIQ. </Description>
+    <Script>
+      <Source><![CDATA[
+
+        return getModifiedWorkflow(workflow,"groupPrimaryEmail",groupPrimaryEmail);
+      ]]></Source>
+    </Script>
+    <Transition to="Check Group Membership"/>
+  </Step>
+  <Step icon="Analysis" name="Check Group Membership" posX="526" posY="10">
+    <Script>
+      <Source><![CDATA[  
+        import sailpoint.tools.GeneralException;
+        private boolean hasEntitlement(String primaryEmail, String entitlementValue) {
+
+    List groups = new ArrayList();
+
+    Link link = getLinkByPrimaryEmail(primaryEmail);
+
+    if (link != null) {
+			
+      if (link.getAttribute("Groups") != null) {
+
+         if (link.getAttribute("Groups") instanceof List) {
+
+            groups = link.getAttribute("Groups");
+
+         } else if (link.getAttribute("Groups") instanceof String) {
+
+            groups.add(link.getAttribute("Groups"));
+
+         }
+
+         if (groups != null && !groups.isEmpty()) {
+
+           return Util.nullSafeContains(groups, entitlementValue);
+
+         }
+
+      }
+
+    }
+
+    return false;
+
+  }
+        public void checkDup(){
+    			if (hasEntitlement(requesterPrimaryEmail, groupPrimaryEmail)) {
+       	    	throw new Exception(requesterPrimaryEmail + " is already a member of " + groupPrimaryEmail + "; request will not proceed.");
+        	}
+        }
+        checkDup();
+        
+		  ]]></Source>
+    </Script>
+    <Transition to="Formulate Plan"/>
+  </Step>
+  <Step icon="Task" name="Initialize Request" posX="828" posY="10">
+    <Arg name="formTemplate"/>
+    <Arg name="enableRetryRequest"/>
+    <Arg name="allowRequestsWithViolations"/>
+    <Arg name="endOnManualWorkItems"/>
+    <Arg name="policiesToCheck"/>
+    <Arg name="workItemPriority"/>
+    <Arg name="workItemComments"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Arg name="source" value="ref:source"/>
+    <Arg name="identityDisplayName"/>
+    <Arg name="requireViolationReviewComments"/>
+    <Arg name="identityRequest"/>
+    <Arg name="trace"/>
+    <Arg name="enableApprovalRecommendations"/>
+    <Arg name="endOnProvisioningForms"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="approvalSet"/>
+    <Arg name="policyViolations"/>
+    <Arg name="violationReviewDecision"/>
+    <Arg name="policyScheme"/>
+    <Arg name="noFiltering"/>
+    <Arg name="asyncCacheRefresh"/>
+    <Arg name="optimisticProvisioning" value="false"/>
+    <Return name="approvalSet" to="approvalSet"/>
+    <Return name="identityRequestId" to="identityRequestId"/>
+    <Return name="project" to="project"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Initialize"/>
+    </WorkflowRef>
+    <Transition to="Provision"/>
+  </Step>
+  <Step icon="Task" name="Provision" posX="929" posY="10">
+    <Arg name="approvalScheme" value="none"/>
+    <Arg name="formTemplate"/>
+    <Arg name="enableRetryRequest"/>
+    <Arg name="securityOfficerElectronicSignature"/>
+    <Arg name="fallbackApprover"/>
+    <Arg name="endOnManualWorkItems"/>
+    <Arg name="userEmailTemplate"/>
+    <Arg name="workItemPriority"/>
+    <Arg name="workItemComments"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="approvalSplitPoint"/>
+    <Arg name="identityRequestId"/>
+    <Arg name="source"/>
+    <Arg name="managerElectronicSignature"/>
+    <Arg name="identityDisplayName"/>
+    <Arg name="foregroundProvisioning" value="true"/>
+    <Arg name="ownerElectronicSignature"/>
+    <Arg name="approvalMode"/>
+    <Arg name="batchRequestItemId"/>
+    <Arg name="trace"/>
+    <Arg name="saveUnmanagedPlan_WithProjectArgument"/>
+    <Arg name="endOnProvisioningForms"/>
+    <Arg name="approvalAssignmentRule"/>
+    <Arg name="plan" value="ref:plan"/>
+    <Arg name="flow" value="ref:flow"/>
+    <Arg name="requireCommentsForApproval"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="manualActionsEmailTemplate"/>
+    <Arg name="approvalSet" value="ref:approvalSet"/>
+    <Arg name="policyViolations"/>
+    <Arg name="filterRejects"/>
+    <Arg name="ownerEmailTemplate"/>
+    <Arg name="splitProvisioning"/>
+    <Arg name="setPreviousApprovalDecisions"/>
+    <Arg name="clearApprovalDecisions"/>
+    <Arg name="noFiltering" value="false"/>
+    <Arg name="noTriggers"/>
+    <Arg name="requireCommentsForDenial"/>
+    <Arg name="requesterEmailTemplate"/>
+    <Arg name="approvalEmailTemplate"/>
+    <Arg name="ticketManagementApplication"/>
+    <Arg name="optimisticProvisioning" value="false"/>
+    <Arg name="securityOfficerEmailTemplate"/>
+    <Arg name="securityOfficerName"/>
+    <Arg name="approvingIdentities"/>
+    <Arg name="managerEmailTemplate"/>
+    <Return name="approvalSet" to="approvalSet"/>
+    <Return name="identityRequestId" to="identityRequestId"/>
+    <Return name="project" to="project"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Ascension-Workflow-AccessRequest-ApproveAndProvisionSubprocess"/>
+    </WorkflowRef>
+    <Transition to="Finalize Request"/>
+  </Step>
+  <Step icon="Task" name="Finalize Request" posX="1024" posY="10">
+    <Arg name="trace"/>
+    <Arg name="autoVerifyIdentityRequest"/>
+    <Arg name="approvalSet"/>
+    <Arg name="ticketManagementApplication"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="workItemPriority"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Arg name="ticketDataGenerationRule"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Finalize"/>
+    </WorkflowRef>
+    <Transition to="Append Success Message"/>
+  </Step>
+  <Step action="sendEmail" icon="Email" name="Notify" posX="1252" posY="10">
+    <Arg name="template" value="Ascension-EmailTemplate-Collibra-AfterProvisioning"/>
+    <Arg name="to" value="ref:requesterPrimaryEmail"/>
+    <Transition to="Stop"/>
+  </Step>
+</Workflow>

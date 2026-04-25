@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Ascension-Workflow-ReconcileDuoADGroups-Subprocess" type="Subprocess">
+  <Variable input="true" name="thisApp" required="true">
+    <Description>Application passed in from parent workflow</Description>
+  </Variable>
+  <Variable input="true" name="activeLinkIds">
+    <Description>Placeholder variable of active account link IDs</Description>
+  </Variable>
+  <Variable initializer="script:countActiveLinksByApp(thisApp);" name="totalActiveLinks">
+    <Description>Overall count of active account links under the application</Description>
+  </Variable>
+  <Variable name="orphanLinks">
+    <Description>Used for tally of orphan account links during workflow execution</Description>
+    <Script>
+      <Source><![CDATA[int orphanLinks = 0;
+return orphanLinks;]]></Source>
+    </Script>
+  </Variable>
+  <Variable name="compliantLinks">
+    <Description>Used for tally of compliant account links during workflow execution</Description>
+    <Script>
+      <Source><![CDATA[int compliantLinks = 0;
+return compliantLinks;]]></Source>
+    </Script>
+  </Variable>
+  <Variable name="noncompliantLinks">
+    <Description>Used for tally of noncompliant account links during workflow execution</Description>
+    <Script>
+      <Source><![CDATA[int noncompliantLinks = 0;
+return noncompliantLinks;]]></Source>
+    </Script>
+  </Variable>
+  <Variable initializer="script:context.getObjectByName(Custom.class, &quot;Ascension-Custom-AD-DomainMapping&quot;);" name="custom">
+    <Description>Ascension-Custom-AD-DomainMapping, used for Duo group lookup per domain</Description>
+  </Variable>
+  <Variable name="outOfScopeLinks">
+    <Description>Used for tally of out of scope account links during workflow execution</Description>
+    <Script>
+      <Source><![CDATA[int outOfScopeLinks = 0;
+return outOfScopeLinks;]]></Source>
+    </Script>
+  </Variable>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-ReconcileDuoADGroups"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="20" posY="21">
+    <Transition to="Update TaskDefinition"/>
+  </Step>
+  <Step action="script:getActiveLinkIdsByApp(thisApp);" icon="Default" name="Get Active Links" posX="218" posY="21" resultVariable="activeLinkIds">
+    <Transition to="Iterate Account Links"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="466" posY="22"/>
+  <Step icon="Default" name="Iterate Account Links" posX="344" posY="22">
+    <Arg name="activeLinkIds" value="ref:activeLinkIds"/>
+    <Script>
+      <Source><![CDATA[iterateActiveLinks(activeLinkIds);
+
+wfcontext.getTaskResult().setAttribute(thisApp.getName() + "-orphanLinks", orphanLinks);
+wfcontext.getTaskResult().setAttribute(thisApp.getName() + "-compliantLinks", compliantLinks);
+wfcontext.getTaskResult().setAttribute(thisApp.getName() + "-noncompliantLinks", noncompliantLinks);
+wfcontext.getTaskResult().setAttribute(thisApp.getName() + "-outOfScopeLinks", outOfScopeLinks);
+
+Util.flushIterator(activeLinkIds);]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Default" name="Update TaskDefinition" posX="105" posY="21">
+    <Script>
+      <Source><![CDATA[import sailpoint.object.Argument;
+import sailpoint.object.Signature;
+import sailpoint.object.TaskDefinition;
+
+//Add Arguments to Returns in TaskDefinition
+
+Argument arg1 = new Argument();
+arg1.setName(thisApp.getName() + "-totalActiveLinks");
+arg1.setType("int");
+arg1.setPrompt(thisApp.getName() + " - Total Active Links");
+
+Argument arg2 = new Argument();
+arg2.setName(thisApp.getName() + "-compliantLinks");
+arg2.setType("int");
+arg2.setPrompt(thisApp.getName() + " - Total Compliant Links");
+
+Argument arg3 = new Argument();
+arg3.setName(thisApp.getName() + "-noncompliantLinks");
+arg3.setType("int");
+arg3.setPrompt(thisApp.getName() + " - Total Noncompliant Links");
+
+Argument arg4 = new Argument();
+arg4.setName(thisApp.getName() + "-orphanLinks");
+arg4.setType("int");
+arg4.setPrompt(thisApp.getName() + " - Total Orphan Links (Ignored)");
+
+Argument arg5 = new Argument();
+arg5.setName(thisApp.getName() + "-outOfScopeLinks");
+arg5.setType("int");
+arg5.setPrompt(thisApp.getName() + " - Total Out of Scope Links (Ignored)");
+
+Signature sig = wfcontext.getTaskResult().getDefinition().getSignature();
+sig.getReturns().add(arg1);
+sig.getReturns().add(arg2);
+sig.getReturns().add(arg3);
+sig.getReturns().add(arg4);
+sig.getReturns().add(arg5);
+
+//Add Total Active Links to TaskResult
+
+wfcontext.getTaskResult().setAttribute(thisApp.getName() + "-totalActiveLinks", totalActiveLinks);]]></Source>
+    </Script>
+    <Transition to="Get Active Links"/>
+  </Step>
+</Workflow>

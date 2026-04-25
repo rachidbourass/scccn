@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Ascension-Workflow-UpdateManualTerm" taskType="LCM" type="LCMProvisioning">
+  <Variable initializer="false" name="trace">
+    <Description>Used for debugging this workflow and when set to true trace
+      will be sent to stdout.</Description>
+  </Variable>
+  <Variable initializer="true" name="transient"/>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity being updated.</Description>
+  </Variable>
+  <Variable name="identityModel">
+    <Description>The custom model that is used to house and pass application data.</Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>The displayName of the identity being updated.h
+      Query for this using a projection query and fall back to the name.</Description>
+  </Variable>
+  <Variable input="true" name="launcher">
+    <Description>requester of the form</Description>
+  </Variable>
+  <Variable name="plan">
+    <Description>The provisioning plan, which is built by a service method.</Description>
+  </Variable>
+  <Variable name="matchingUsers">
+    <Description>list of users matching MDSTAFF - Ascension application and immediately terminated</Description>
+    <Script>
+      <Source><![CDATA[
+        return (new ArrayList());
+      ]]></Source>
+    </Script>
+  </Variable>
+  <Description>Update manual term attribute Workflow</Description>
+  <Step icon="Start" name="Start">
+    <Transition to="Initialize"/>
+  </Step>
+  <Step action="call:getIdentityModel" name="Initialize" posX="15" posY="115" resultVariable="identityModel">
+    <Description>
+      Initialize the data for the identity that we are about to terminate.
+    </Description>
+    <Script>
+      <Source><![CDATA[
+	    
+        import sailpoint.transformer.IdentityTransformer;
+        Map identityModel = new HashMap();
+        if(null != identityModel){
+          identityModel.put("launcher",launcher);     
+        }    
+        IdentityTransformer transformer = new IdentityTransformer(context);
+        identityModel.put(IdentityTransformer.ATTR_TRANSFORMER_CLASS, transformer.getClass().getName());
+        identityModel.put(IdentityTransformer.ATTR_TRANSFORMER_OPTIONS, "");
+        return identityModel;
+		
+		
+      ]]></Source>
+    </Script>
+    <Transition to="Get Users"/>
+  </Step>
+  <Step name="Get Users" posX="802" posY="10" resultVariable="matchingUsers">
+    <Description>
+      Get all list of users whose has mdstaff ascension application and immediately terminated
+    </Description>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Filter;
+        import sailpoint.tools.Util;
+        import sailpoint.object.Link;
+        import sailpoint.object.QueryOptions;
+
+
+        Filter appFilter = Filter.eq("links.application.name", "MDStaff - Ascension");
+        Filter inactiveFilter = Filter.eq("inactive", true);        
+
+        QueryOptions qo = new QueryOptions();
+        qo.add(appFilter, inactiveFilter);
+
+        List properties = new ArrayList();
+        properties.add("name");
+        Iterator iter = context.search(Identity.class, qo, properties);
+				Identity identity = null;
+        Object[] currentUser;
+        
+        while(iter.hasNext()) {
+          currentUser = iter.next();
+
+          if(currentUser != null && currentUser.length > 0 && null != currentUser[0]) {
+        
+            identity = context.getObjectByName(Identity.class, currentUser[0]);
+        
+            if(null != identity && Util.nullSafeCaseInsensitiveEq(identity.getAttribute("manualTerm") , "yes")){
+              matchingUsers.add(currentUser[0]);        		
+            }       
+        
+          }
+        }
+
+        if(null != iter){
+        Util.flushIterator(iter);
+        }
+
+        return matchingUsers;
+
+      ]]></Source>
+    </Script>
+    <Transition to="User Search Form"/>
+  </Step>
+  <Step icon="Approval" name="User Search Form" posX="208" posY="10">
+    <Approval mode="serial" owner="ref:launcher" return="identityModel" send="matchingUsers">
+      <Arg name="workItemType" value="Form"/>
+      <Arg name="workItemDescription" value="Update Manual Term"/>
+      <Arg name="workItemForm" value="Ascension-Form-UpdateManualTerm"/>
+      <Arg name="workItemFormBasePath" value="identityModel"/>
+    </Approval>
+    <Description>
+      Display the Search user form
+    </Description>
+    <Transition to="Update Identity Attributes" when="approved"/>
+    <Transition to="Stop" when="!approved"/>
+  </Step>
+  <Step icon="identity update" name="Update Identity Attributes">
+    <Arg name="identityModel" value="ref:identityModel"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Identity;
+        import sailpoint.tools.Util;
+        import sailpoint.object.ProvisioningPlan;
+        import sailpoint.object.ProvisioningPlan.AccountRequest;
+        import sailpoint.object.ProvisioningPlan.AttributeRequest;
+		import sailpoint.api.Provisioner;
+
+        ProvisioningPlan plan = new ProvisioningPlan();
+        Identity identityObject = null; 
+
+        wfcontext.getWorkflowCase().getTaskResult().setName("Ascension-Workflow-UpdateManualTerm");
+        if(null != identityModel){
+        	identityName = identityModel.get("userName");
+        }
+
+        if(null !=identityName){ 
+          identityObject = context.getObjectByName(Identity.class, identityName);
+
+          if(null != identityObject){       		
+            AccountRequest iiqAcctReq = new AccountRequest();
+            iiqAcctReq.setApplication("IIQ");
+            iiqAcctReq.setNativeIdentity(identityName);
+            iiqAcctReq.setOperation(AccountRequest.Operation.Modify);                     	       				    
+            iiqAcctReq.add(new AttributeRequest("manualTerm", ProvisioningPlan.Operation.Set, "No")); 
+            plan.add(iiqAcctReq);
+            plan.setIdentity(identityObject);
+            //comment decache //context.decache(identityObject);
+            if(null != plan && !plan.isEmpty()){
+              Provisioner provisioner= new Provisioner(context);
+              provisioner.setNoLocking(true);
+              provisioner.setOptimisticProvisioning(true);
+              provisioner.execute(plan);
+             	   
+            }
+          }
+        }
+
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="1215" posY="12"/>
+</Workflow>

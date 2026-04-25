@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" libraries="Identity" name="Ascension-Workflow-Remove-Additional-AD-Role" type="IdentityLifecycle">
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable input="true" name="roleName">
+    <Description>The name of the Role.</Description>
+  </Variable>
+  <Description>Process a new employee.</Description>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+    <Transition to="Remove Additional Role"/>
+  </Step>
+  <Step icon="Task" name="Remove Additional Role" posX="148" posY="10" wait="1">
+    <Description>Process the user that joined.</Description>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Identity;
+        import sailpoint.object.ProvisioningPlan;
+        import sailpoint.object.ProvisioningPlan.Operation;  
+        import sailpoint.tools.Util;
+        import org.apache.commons.logging.Log;
+        import org.apache.commons.logging.LogFactory;	
+        import sailpoint.object.ProvisioningResult;
+        import sailpoint.api.Provisioner;
+
+        Log logger = LogFactory.getLog("Ascension-Workflow-Remove-Additional-AD-Role");
+        logger.debug("Ascension-Workflow-Remove-Additional-AD-Role start");
+
+        ProvisioningPlan plan = new ProvisioningPlan();
+		Identity identityObj = context.getObjectByName(Identity.class, identityName);
+		if(identityObj!=null){
+			plan.setIdentity(identityObj);
+
+			plan.add("IIQ", identityName, "assignedRoles", ProvisioningPlan.Operation.Remove, roleName);
+
+			Provisioner provisioner = new Provisioner(context);
+
+			// if you want to remove the assignment without de-provisioning the entitlements set this
+
+			provisioner.setNoRoleExpansion(true);
+
+			provisioner.execute(plan);
+		}
+        logger.debug("Ascension-Workflow-Remove-Additional-AD-Role End");
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="268" posY="10"/>
+</Workflow>

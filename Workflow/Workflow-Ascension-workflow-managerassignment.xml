@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" libraries="Identity,LCM" name="Ascension-Workflow-ManagerAssignment">
+  <Variable initializer="true" name="transient">
+    <Description>
+      Set to false to cause workflow-related objects, such as approval work items, to be saved in the database even if they are only viewed by the person registering.
+    </Description>
+  </Variable>
+  <Variable input="true" name="requester">
+    <Description>Identity of the user who launched the workflow. Only an IIQ Administrator can launch this workflow. </Description>
+  </Variable>
+  <Variable name="launcher"/>
+  <Variable initializer="false" name="exitWorkflow">
+    <Description>Exit Workflow</Description>
+  </Variable>
+  <Variable editable="true" name="optimisticProvisioning"/>
+  <Variable editable="true" initializer="false" name="foregroundProvisioning"/>
+  <Variable editable="true" initializer="true" name="backgroundProvisioning"/>
+  <Variable name="currentManager"/>
+  <Variable name="proposedManager"/>
+  <Variable name="proposedManagerEmail"/>
+  <Variable name="currentManagerEmail"/>
+  <Variable name="selectedReportees"/>
+  <Variable name="noneSelected"/>
+  <Description>A Workflow to modify the reporting relationship, i.e. from one manager to another one</Description>
+  <Step icon="Start" name="Start">
+    <Transition to="Show Managers and Reportees"/>
+  </Step>
+  <Step icon="Task" name="Show Managers and Reportees" posX="202" posY="80">
+    <Approval name="Select Managers" owner="ref:launcher" return="currentManager,proposedManager,selectedReportees,allReportees" send="launcher,userName">
+      <Arg name="workItemType" value="Form"/>
+      <Arg name="workItemDescription" value="Show Managers and Reportees"/>
+      <Arg name="workItemForm" value="Ascension-Form-ManagerAssignment"/>
+    </Approval>
+    <Description>Present the administrator with a form to select the current and future managers.</Description>
+    <Transition to="Change Manager" when="approved"/>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Task" name="Change Manager">
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.QueryOptions;
+        import sailpoint.object.Filter;
+        import sailpoint.object.Identity;
+        import sailpoint.tools.Util;
+        import java.util.List;
+		     
+        Identity currentManagerObject=context.getObjectByName(Identity.class,currentManager);
+        Identity newManager=context.getObjectByName(Identity.class,proposedManager);
+        if(currentManagerObject!=null && newManager!=null){
+          workflow.put("proposedManagerEmail",newManager.getEmail());
+          workflow.put("currentManagerEmail",currentManagerObject.getEmail());
+          boolean noneSelected=false;
+          List finalUsersList=new ArrayList();
+          if(allReportees!=null && allReportees==true){
+            Filter filterInactive=Filter.eq("inactive",false);
+            Filter filterManager=Filter.eq("manager.name",currentManager);
+            QueryOptions qo=new QueryOptions();
+            qo.addFilter(filterInactive);
+            qo.addFilter(filterManager);
+            Iterator itr=context.search(Identity.class,qo);
+            while(itr!=null && itr.hasNext()){
+              Identity reportee=(Identity) itr.next();
+              if(reportee!=null){
+                finalUsersList.add(reportee);
+              }
+            }
+            Util.flushIterator(itr);
+          }
+          else if(selectedReportees!=null && !selectedReportees.isEmpty()){
+            for(String user:selectedReportees){
+              Identity selectedReportee=context.getObjectById(Identity.class,user);
+              if(selectedReportee!=null){
+                finalUsersList.add(selectedReportee);
+              }
+            }
+          }
+          workflow.put("finalUsersList",finalUsersList);
+          if(finalUsersList==null || finalUsersList.isEmpty()){
+            noneSelected=true;
+          }  
+          workflow.put("noneSelected",noneSelected);
+          int count=0;
+          for(Identity finalReportee: finalUsersList){
+            finalReportee.setManager(newManager);
+            context.saveObject(finalReportee);
+            if(count%50 == 0){
+              context.commitTransaction();
+            }
+            count++;
+          }
+          context.commitTransaction();
+        }
+        
+      ]]></Source>
+    </Script>
+    <Transition to="Notify Managers"/>
+  </Step>
+  <Step action="call:sendEmail" icon="Email" name="Notify Managers" posX="712" posY="240">
+    <Arg name="userList">
+      <Script>
+        <Source><![CDATA[
+	 import sailpoint.object.Identity;
+	
+	 List userList=new ArrayList();
+	 
+	List tempUserList=workflow.get("finalUsersList");
+	 if(tempUserList!=null){
+		 for(Identity user: tempUserList){
+			 userList.add(user.getDisplayName());	
+		}
+	 }
+	 return userList;
+	]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="to" value="script:workflow.get(&quot;proposedManagerEmail&quot;)"/>
+    <Arg name="template" value="Ascension Modified Manager Reporting Notification"/>
+    <Transition to="Display Message"/>
+  </Step>
+  <Step name="Display Message">
+    <Script>
+      <Source><![CDATA[
+        import javax.faces.application.FacesMessage; 
+        import sailpoint.tools.Util;
+        List currentMessages = httpSession.getAttribute("sailpoint.web.PageCodeBase.sessionMessages");  
+        FacesMessage myMessage = null;
+        if(!noneSelected){
+					String message = "Manager change successful for selected reportees";
+					myMessage = new FacesMessage(FacesMessage.SEVERITY_INFO,message+".","Success");  
+        }
+        else{
+					String message = "No Reportees Selected";
+					myMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR,message+".","Failure"); 
+        }
+        List myMessages = new ArrayList();  
+        myMessages.add(myMessage);  
+        httpSession.setAttribute("sailpoint.web.PageCodeBase.sessionMessages", myMessages);	
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="712"/>
+</Workflow>

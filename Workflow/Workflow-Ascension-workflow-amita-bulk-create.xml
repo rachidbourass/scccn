@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Ascension-Workflow-AMITA-Bulk-Create" type="Subprocess">
+  <Step icon="Start" name="Start" posX="37" posY="17">
+    <Transition to="Displaying form"/>
+  </Step>
+  <Step icon="Default" name="Displaying form" posX="208" posY="62">
+    <Approval name="Ascension_or_AMITA_Bulk_Create" owner="ref:launcher" return="filePath" send="">
+      <Form name="Ascension_or_AMITA_Bulk_Create">
+        <Attributes>
+          <Map>
+            <entry key="hideIncompleteFields">
+              <value>
+                <Boolean/>
+              </value>
+            </entry>
+            <entry key="includeHiddenFields">
+              <value>
+                <Boolean/>
+              </value>
+            </entry>
+            <entry key="pageTitle" value="Ascension or AMITA Bulk Create"/>
+          </Map>
+        </Attributes>
+        <Section label="" name="Section 1">
+          <Field displayName="Enter File Path" helpKey="Example File Path: \\ANDC1WAPP0147.ds.sjhs.com\AppAggregation\Bulk Upload File.csv" name="filePath" required="true" type="string"/>
+        </Section>
+        <Button action="cancel" label="Cancel"/>
+        <Button action="next" label="Next"/>
+      </Form>
+    </Approval>
+    <Transition to="Launching Task"/>
+  </Step>
+  <Step icon="Default" name="Launching Task" posX="510" posY="32">
+    <Description>This step is to launch "test" task</Description>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.api.TaskManager;
+        import sailpoint.object.Attributes;
+        import sailpoint.object.TaskDefinition;
+
+        TaskManager tm = new TaskManager(context);
+        TaskDefinition taskDefObj = context.getObject(TaskDefinition.class, "Ascension or AMITA Bulk Create");
+        if(taskDefObj != null){
+          Attributes arguments = taskDefObj.getArguments();
+          arguments.put("filePath", filePath);
+          tm.run(taskDefObj, arguments);
+        }
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="741" posY="76"/>
+</Workflow>
