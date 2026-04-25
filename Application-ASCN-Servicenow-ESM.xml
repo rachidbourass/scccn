@@ -1,0 +1,1128 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application connector="sailpoint.connector.OpenConnectorAdapter"  featuresString="PROVISIONING, SYNC_PROVISIONING, UNLOCK, ENABLE, SEARCH, PASSWORD, ACCOUNT_ONLY_REQUEST, ADDITIONAL_ACCOUNT_REQUEST" icon="internetIcon" name="ServiceNow ESM" profileClass="" type="ServiceNow">
+  <AccountCorrelationConfig>
+    <Reference class="sailpoint.object.CorrelationConfig" name="Ascension-Correlation-ServiceNow-ESM"/>
+  </AccountCorrelationConfig>
+  <Attributes>
+    <Map>
+      <entry key="ManageRolesforGroup" value="true"/>
+      <entry key="acceleratorPackEnabled"/>
+      <entry key="access_token" value="%%ASC_SERVICENOW__ESM_CONN_ACCESSTOKEN%%"/>
+      <entry key="access_token_create_time"/>
+      <entry key="accountAggPartitions">
+        <value>
+          <List>
+            <String>sys_idSTARTSWITH0</String>
+            <String>sys_idSTARTSWITH1</String>
+            <String>sys_idSTARTSWITH2</String>
+            <String>sys_idSTARTSWITH3</String>
+            <String>sys_idSTARTSWITH4</String>
+            <String>sys_idSTARTSWITH5</String>
+            <String>sys_idSTARTSWITH6</String>
+            <String>sys_idSTARTSWITH7</String>
+            <String>sys_idSTARTSWITH8</String>
+            <String>sys_idSTARTSWITH9</String>
+            <String>sys_idSTARTSWITHa</String>
+            <String>sys_idSTARTSWITHb</String>
+            <String>sys_idSTARTSWITHc</String>
+            <String>sys_idSTARTSWITHd</String>
+            <String>sys_idSTARTSWITHe</String>
+            <String>sys_idSTARTSWITHf</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="accountCorrelationAttrExpression"/>
+      <entry key="accountCreateConditionalRule"/>
+      <entry key="accountCreateEntitlements"/>
+      <entry key="accountDisableAttrExpression"/>
+      <entry key="accountFilterAttribute"/>
+      <entry key="accountLockAttrExpression"/>
+      <entry key="acctAggregationEnd"/>
+      <entry key="acctAggregationStart"/>
+      <entry key="additionalAppBusApprovalRule"/>
+      <entry key="additionalAppBusApprovers"/>
+      <entry key="afterProvisioningRule"/>
+      <entry key="aggregationPartitioned">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="aggregationType" value="account"/>
+      <entry key="apAdditionalApplicationAfterProvisioningRule"/>
+      <entry key="apAdditionalApplicationCorrelationRule"/>
+      <entry key="apAdditionalApplicationCreationRule"/>
+      <entry key="apAdditionalApplicationCustomizationRule"/>
+      <entry key="apAdditionalApplicationMCustomizationRule"/>
+      <entry key="apAdditionalApplicationMGroupRefreshRule"/>
+      <entry key="apAdditionalApplicationPreIterateRule"/>
+      <entry key="apAfterMoverJoiner">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="apAfterRehireAttrSync">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="apAttributeSyncEligibleRule"/>
+      <entry key="apBeforeMoverAttrSync">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="apPopulationReverseLeaverOptions"/>
+      <entry key="appBusApprovalRule"/>
+      <entry key="appBusApprovers"/>
+      <entry key="ascBusinessApplication"/>
+      <entry key="authoritativeEmployee"/>
+      <entry key="authoritativeNonEmployee"/>
+      <entry key="authtype" value="OAuth2"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="beforemoverPrimaryaccount">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="birthrightEntAttrExpression"/>
+      <entry key="busApp">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="clientId" value="%%ASC_SERVICENOW__ESM_CONN_CLIENTID%%"/>
+      <entry key="clientSecret" value="%%ASC_SERVICENOW__ESM_CONN_CLIENTSECRET%%"/>
+      <entry key="commentsAttr"/>
+      <entry key="commentsValue"/>
+      <entry key="compositeDefinition"/>
+      <entry key="connectorClass" value="openconnector.connector.servicenow.ServiceNowConnector"/>
+      <entry key="displayFormRule"/>
+      <entry key="encrypted" value="clientSecret,refreshToken,access_token"/>
+      <entry key="evaluateCreateprovpolicy"/>
+      <entry key="expires_in" value="1799"/>
+      <entry key="grant_type" value="refresh_token"/>
+      <entry key="groupFilterAttribute"/>
+      <entry key="groupProvisioning">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="hardPolicyviolations"/>
+      <entry key="joinerEnabled"/>
+      <entry key="joinerPopulationRegex"/>
+      <entry key="joinerRoles"/>
+      <entry key="lastAggrgationDateTime"/>
+      <entry key="manageInheritedRole">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="moveAccountContainer"/>
+      <entry key="moverExtendedRule"/>
+      <entry key="moverProcess" value="Do Nothing"/>
+      <entry key="moverRevocation" value="Do Nothing"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="noGroupPermissions">
+        <value>
+          <Map>
+            <entry key="group">
+              <value>
+                <Boolean>true</Boolean>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="noPermissions" value="true"/>
+      <entry key="operations" value="Create, Modify, Delete, Enable, Disable, Unlock, SetPassword"/>
+      <entry key="pageSize" value="1000"/>
+      <entry key="password" value="%%ASC_SERVICENOW__ESM_CONN_PW%%"/>
+      <entry key="primarySyncaccounts">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="primarypasswordSyncaccounts">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="privilegedAccountAttrExpression"/>
+      <entry key="privilegedEntAttrExpression"/>
+      <entry key="refreshToken" value="%%ASC_SERVICENOW__ESM_CONN_REFRESH_TOKEN%%"/>
+      <entry key="rehireExtendedRule"/>
+      <entry key="rehirePrimaryaccount">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="rehireProcess" value="Do Nothing"/>
+      <entry key="removeEntitlementLeaverExceptionExpression"/>
+      <entry key="renameLDAPaccount">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="requestParamMap">
+        <value>
+          <Map>
+            <entry key="sysparm_display_value" value="true"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="requestorFormRole"/>
+      <entry key="restEndPointMap">
+        <value>
+          <Map>
+            <entry key="oauth_token" value="/oauth_token.do"/>
+            <entry key="sys_group_has_role" value="sys_group_has_role"/>
+            <entry key="sys_user" value="sys_user"/>
+            <entry key="sys_user_grmember" value="sys_user_grmember"/>
+            <entry key="sys_user_group" value="sys_user_group"/>
+            <entry key="sys_user_has_role" value="sys_user_has_role"/>
+            <entry key="sys_user_role" value="sys_user_role"/>
+            <entry key="sys_user_role_contains" value="sys_user_role_contains"/>
+            <entry key="u_sailpointsysgrouphasrole" value="u_sailpointsysgrouphasrole"/>
+            <entry key="u_sailpointsysgrouphasrole_d" value="u_sailpointsysgrouphasrole_d"/>
+            <entry key="u_sailpointsysuser" value="u_sailpointsysuser"/>
+            <entry key="u_sailpointsysuser_d" value="u_sailpointsysuser_d"/>
+            <entry key="u_sailpointsysusergrmember" value="u_sailpointsysusergrmember"/>
+            <entry key="u_sailpointsysusergrmember_d" value="u_sailpointsysusergrmember_d"/>
+            <entry key="u_sailpointsysusergroup" value="u_sailpointsysusergroup"/>
+            <entry key="u_sailpointsysusergroup_d" value="u_sailpointsysusergroup_d"/>
+            <entry key="u_sailpointsysuserhasrole" value="u_sailpointsysuserhasrole"/>
+            <entry key="u_sailpointsysuserhasrole_d" value="u_sailpointsysuserhasrole_d"/>
+            <entry key="x_sapo_iiq_connect_sysgrouphasrole" value="x_sapo_iiq_connect_sysgrouphasrole"/>
+            <entry key="x_sapo_iiq_connect_sysgrouphasrole_d" value="x_sapo_iiq_connect_sysgrouphasrole_d"/>
+            <entry key="x_sapo_iiq_connect_sysuser" value="x_sapo_iiq_connect_sysuser"/>
+            <entry key="x_sapo_iiq_connect_sysuser_d" value="x_sapo_iiq_connect_sysuser_d"/>
+            <entry key="x_sapo_iiq_connect_sysusergrmember" value="x_sapo_iiq_connect_sysusergrmember"/>
+            <entry key="x_sapo_iiq_connect_sysusergrmember_d" value="x_sapo_iiq_connect_sysusergrmember_d"/>
+            <entry key="x_sapo_iiq_connect_sysusergroup" value="x_sapo_iiq_connect_sysusergroup"/>
+            <entry key="x_sapo_iiq_connect_sysusergroup_d" value="x_sapo_iiq_connect_sysusergroup_d"/>
+            <entry key="x_sapo_iiq_connect_sysuserhasrole" value="x_sapo_iiq_connect_sysuserhasrole"/>
+            <entry key="x_sapo_iiq_connect_sysuserhasrole_d" value="x_sapo_iiq_connect_sysuserhasrole_d"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="retryableErrors">
+        <value>
+          <List>
+            <String>Unknown Host</String>
+            <String>Service Unavailable</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="reverseTerminationExtendedRule"/>
+      <entry key="reverseleaverProcess" value="Do Nothing"/>
+      <entry key="roleFilterAttribute"/>
+      <entry key="schemaProvisioningMap">
+        <value>
+          <Map>
+            <entry key="group">
+              <value>
+                <Boolean>true</Boolean>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="scramblePasswordAttr"/>
+      <entry key="serviceNowContextUrl" value="/api/now/"/>
+      <entry key="serviceNowRestTableApi" value="/table/"/>
+      <entry key="sessionPoolSize" value="15"/>
+      <entry key="sessionRetryCounter" value="15"/>
+      <entry key="skipSupervisorApproval"/>
+      <entry key="snowAssignmentGroup"/>
+      <entry key="snowAssignmentGroupName"/>
+      <entry key="softPolicyviolations"/>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="ServiceNow"/>
+      <entry key="terminationExtendedRule"/>
+      <entry key="terminationProcess" value="Do Nothing"/>
+      <entry key="token_type" value="Bearer"/>
+      <entry key="token_url"/>
+      <entry key="unlockOnEnableAccount">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="url" value="%%ASC_SERVICENOW__ESM_CONN_URL%%"/>
+      <entry key="username" value="%%ASC_SERVICENOW__ESM_CONN_USERNAME%%"/>
+      <entry key="xDays"/>
+      <entry key="xDeleteDays"/>
+    </Map>
+  </Attributes>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <ProvisioningForms>
+    <Form name="account" objectType="account" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="account"/>
+        </Map>
+      </Attributes>
+      <Section>
+        <Field displayName="con_prov_policy_servicenow_userID" name="user_name" type="string">
+          <Script>
+            <Source>
+              return identity.getStringAttribute("samAccountName");
+            </Source>
+          </Script>
+        </Field>
+        <Field displayName="con_prov_policy_servicenow_first_name" name="first_name" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("firstname");</Source>
+          </Script>
+        </Field>
+        <Field displayName="con_prov_policy_servicenow_last_name" name="last_name" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("lastname");</Source>
+          </Script>
+        </Field>
+        <Field displayName="middle_name" name="middle_name" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("middleName");</Source>
+          </Script>
+        </Field>
+        <Field displayName="cost_center" name="cost_center" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("departmentNumber");</Source>
+          </Script>
+        </Field>
+        <Field displayName="con_prov_policy_servicenow_title" name="title" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("title");</Source>
+          </Script>
+        </Field>
+        <Field displayName="con_prov_policy_servicenow_password" name="password" type="secret"/>
+        <Field displayName="con_prov_policy_servicenow_password_need_reset" name="password_needs_reset" type="boolean"/>
+        <Field displayName="con_prov_policy_servicenow_locked_out" name="locked_out" type="boolean"/>
+        <Field displayName="con_prov_policy_servicenow_active" name="active" type="boolean" value="true"/>
+        <Field displayName="con_prov_policy_servicenow_calender_integration" name="calendar_integration" type="string" value="Outlook"/>
+        <Field displayName="con_prov_policy_servicenow_time_zone" name="time_zone" type="string" value="GMT"/>
+        <Field displayName="con_prov_policy_servicenow_email" name="email" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("email");</Source>
+          </Script>
+        </Field>
+        <Field displayName="con_prov_policy_servicenow_business_phone" name="phone" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("telephoneNumber");</Source>
+          </Script>
+        </Field>
+        <Field displayName="company" name="company" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Link;
+              import sailpoint.object.Identity;
+              import sailpoint.object.Application;
+              import sailpoint.tools.Util;
+              import sailpoint.api.IdentityService;
+
+              String companyVal = null;
+              List appLinks = null;
+              IdentityService idService = new IdentityService(context);
+              Application app = context.getObjectByName(Application.class,"DB-Peoplesoft-HCM-Primary");     
+
+              if(null != app && !Util.isEmpty((appLinks = idService.getLinks( identity, app)))){    
+              if( null != appLinks && appLinks.get(0) != null){
+              companyVal = appLinks.get(0).getAttribute("COMPANY");
+              if(Util.isNotNullOrEmpty(companyVal)){
+
+              return companyVal;
+
+              }
+              }
+              }
+
+
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="position_type" name="u_position_type" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("employeeClass");</Source>
+          </Script>
+        </Field>
+        <Field displayName="u_work_mobile" name="u_work_mobile" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("mobile");</Source>
+          </Script>
+        </Field>
+        <Field displayName="u_work_phone" name="u_work_phone" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("telephoneNumber");</Source>
+          </Script>
+        </Field>
+        <Field displayName="employment_start_date" name="u_hire_date" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("hireDate");</Source>
+          </Script>
+        </Field>
+        <Field displayName="employment_end_date" name="u_term_date" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("termDate");</Source>
+          </Script>
+        </Field>
+        <Field displayName="location_type" name="u_location_type" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("locationDescription")</Source>
+          </Script>
+        </Field>
+        <Field displayName="location_description" name="u_location_description" type="string">
+          <Script>
+            <Source>
+              return identity.getStringAttribute("locationDescription");</Source>
+          </Script>
+        </Field>
+        <Field displayName="location" name="location" type="string">
+          <Script>
+            <Source><![CDATA[
+                import sailpoint.object.Link;
+              import sailpoint.object.Identity;
+              import sailpoint.object.Application;
+              import sailpoint.tools.Util;
+              import sailpoint.api.IdentityService;
+
+              String locationVal = null;
+              List appLinks = null;
+              IdentityService idService = new IdentityService(context);
+              Application app = context.getObjectByName(Application.class,"DB-Peoplesoft-HCM-Primary");     
+
+              if(null != app && !Util.isEmpty((appLinks = idService.getLinks( identity, app)))){    
+              if( null != appLinks && appLinks.get(0) != null){
+              locationVal = appLinks.get(0).getAttribute("LOCATION");
+              if(Util.isNotNullOrEmpty(locationVal)){
+
+              return locationVal;
+
+              }
+              }
+              }
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="employee_number" type="string">
+          <Script>
+            <Source>
+              return  identity.getStringAttribute("employeeId");            
+            </Source>
+          </Script>
+        </Field>
+        <Field displayName="Location ERP ID" name="Location ERP ID" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Link;
+              import sailpoint.object.Identity;
+              import sailpoint.object.Application;
+              import sailpoint.tools.Util;
+              import sailpoint.api.IdentityService;
+
+              String locationVal = null;
+              List appLinks = null;
+              IdentityService idService = new IdentityService(context);
+              Application app = context.getObjectByName(Application.class,"DB-Peoplesoft-HCM-Primary");     
+
+              if(null != app && !Util.isEmpty((appLinks = idService.getLinks( identity, app)))){    
+              if( null != appLinks && appLinks.get(0) != null){
+              locationVal = appLinks.get(0).getAttribute("LOCATION");
+              if(Util.isNotNullOrEmpty(locationVal)){
+
+              return locationVal;
+
+              }
+              }
+              }
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="u_ps_location" name="u_ps_location" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Link;
+              import sailpoint.object.Identity;
+              import sailpoint.object.Application;
+              import sailpoint.tools.Util;
+              import sailpoint.api.IdentityService;
+
+              String locationVal = null;
+              List appLinks = null;
+              IdentityService idService = new IdentityService(context);
+              Application app = context.getObjectByName(Application.class,"DB-Peoplesoft-HCM-Primary");     
+
+              if(null != app && !Util.isEmpty((appLinks = idService.getLinks( identity, app)))){    
+              if( null != appLinks && appLinks.get(0) != null){
+              locationVal = appLinks.get(0).getAttribute("LOCATION");
+              if(Util.isNotNullOrEmpty(locationVal)){
+
+              return locationVal;
+
+              }
+              }
+              }
+
+
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="con_prov_policy_servicenow_manager" name="manager" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Application;
+              import sailpoint.object.Identity;
+              import sailpoint.object.Link;
+              import sailpoint.tools.Util;
+
+              boolean flag = false;
+
+              String result ="";
+              Identity managerIdentity = identity.getManager();
+              if(managerIdentity!=null){
+              List links = managerIdentity.getLinks();
+              if(!Util.isEmpty(links)){
+              for(Link link : links){
+              if(link !=null && link.getApplication() !=null){
+              if(Util.nullSafeCaseInsensitiveEq(link.getApplication().getName(),"DB-Peoplesoft-HCM-Primary")){
+              result = managerIdentity.getStringAttribute("employeeId");
+              break;
+              }
+              }
+              }
+              }
+              if(Util.isNullOrEmpty(result)){
+              result = managerIdentity.getStringAttribute("internalId");
+              }
+              }
+
+              // get contractormanager internalid for amita non hr contractor 
+              if(Util.nullSafeCaseInsensitiveEq("AMITA Health",identity.getStringAttribute("ministry"))){
+              if(Util.nullSafeCaseInsensitiveEq("non-hr contractor",identity.getStringAttribute("type"))){
+              if(Util.isNotNullOrEmpty(identity.getStringAttribute("contractorManager"))){
+              Identity contractorManagerObj = context.getObjectByName(Identity.class,identity.getStringAttribute("contractorManager"));
+              if(contractorManagerObj !=null && Util.isNotNullOrEmpty(contractorManagerObj.getStringAttribute("internalId"))){
+              result = contractorManagerObj.getStringAttribute("internalId");
+              }
+              }
+              }
+              }
+              return result;
+              ]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="zip" name="zip" type="string">
+          <Script>
+            <Source>return identity.getStringAttribute("postalCode");</Source>
+          </Script>
+        </Field>
+        <Field displayName="SSN" name="u_ssn_last_four" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Rule-FieldValue-SSN"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="birthday" name="u_birthday_mm_dd" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Rule-FieldValue-DOB"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="u_business_unit" name="u_business_unit" type="string">
+          <Script>
+            <Source>
+              return identity.getStringAttribute("businessUnit");
+            </Source>
+          </Script>
+        </Field>
+        <Field displayName="u_user_id" name="u_user_id" type="string">
+          <Script>
+            <Source>
+              return identity.getStringAttribute("samAccountName");
+            </Source>
+          </Script>
+        </Field>
+        <Field displayName="introduction" name="introduction" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Application;
+              import sailpoint.object.Identity;
+              import sailpoint.object.Link;
+              import sailpoint.tools.Util;
+
+              boolean flag = false;
+
+              String result ="";
+              List links = identity.getLinks();
+              if(!Util.isEmpty(links)){
+              for(Link link : links){
+              if(link !=null && link.getApplication() !=null){
+              if(Util.nullSafeCaseInsensitiveEq(link.getApplication().getName(),"DB-Peoplesoft-HCM-Primary")){
+              result = link.getAttribute("NAME_PREFIX");
+              break;
+              }
+              }
+              }
+              }
+
+              return result;
+              ]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="u_suffix" name="u_suffix" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Application;
+              import sailpoint.object.Identity;
+              import sailpoint.object.Link;
+              import sailpoint.tools.Util;
+
+              boolean flag = false;
+
+              String result ="";
+              List links = identity.getLinks();
+              if(!Util.isEmpty(links)){
+              for(Link link : links){
+              if(link !=null && link.getApplication() !=null){
+              if(Util.nullSafeCaseInsensitiveEq(link.getApplication().getName(),"DB-Peoplesoft-HCM-Primary")){
+              result = link.getAttribute("NAME_SUFFIX");
+              break;
+              }
+              }
+              }
+              }
+
+              return result;
+              ]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="u_status_type" name="u_status_type" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Application;
+              import sailpoint.object.Identity;
+              import sailpoint.object.Link;
+              import sailpoint.tools.Util;
+
+              boolean flag = false;
+
+              String result ="";
+              List links = identity.getLinks();
+              if(!Util.isEmpty(links)){
+              for(Link link : links){
+              if(link !=null && link.getApplication() !=null){
+              if(Util.nullSafeCaseInsensitiveEq(link.getApplication().getName(),"DB-Peoplesoft-HCM-Primary")){
+              result = link.getAttribute("PER_ORG");
+              break;
+              }
+              }
+              }
+              }
+
+              return result;
+              ]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="u_preferred_name" name="u_preferred_name" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Application;
+              import sailpoint.object.Identity;
+              import sailpoint.object.Link;
+              import sailpoint.tools.Util;
+
+              boolean flag = false;
+
+              String result ="";
+              List links = identity.getLinks();
+              if(!Util.isEmpty(links)){
+              for(Link link : links){
+              if(link !=null && link.getApplication() !=null){
+              if(Util.nullSafeCaseInsensitiveEq(link.getApplication().getName(),"DB-Peoplesoft-HCM-Primary")){
+              result = link.getAttribute("PREF_FIRST_NAME");
+              break;
+              }
+              }
+              }
+              }
+
+              return result;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="u_sailpoint_id" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Rule-FieldValue-InternalId"/>
+          </RuleRef>
+        </Field>
+        <Field name="u_sex" type="string">
+          <Script>
+            <Source>
+
+              return identity.getStringAttribute("sex");            
+            </Source>
+          </Script>
+        </Field>
+        <Field name="u_traveler_type" type="string">
+          <Script>
+            <Source>
+
+              return identity.getStringAttribute("travelerType");
+            </Source>
+          </Script>
+        </Field>
+        <Field name="department" type="string">
+          <Script>
+            <Source>
+
+              return identity.getStringAttribute("department");
+            </Source>
+          </Script>
+        </Field>
+        <Field name="u_manager_employee_id" type="string">
+          <Script>
+            <Source><![CDATA[
+              import sailpoint.object.Identity;
+              import sailpoint.tools.Util;
+              String result ="";
+              Identity managerIdentity = identity.getManager();
+              if(managerIdentity!=null){
+
+              result = managerIdentity.getStringAttribute("employeeId");
+              }
+
+              // get contractormanager employeeId for amita non hr contractor 
+              if(Util.nullSafeCaseInsensitiveEq("AMITA Health",identity.getStringAttribute("ministry"))){
+              if(Util.nullSafeCaseInsensitiveEq("non-hr contractor",identity.getStringAttribute("type"))){
+              if(Util.isNotNullOrEmpty(identity.getStringAttribute("contractorManager"))){
+              Identity contractorManagerObj = context.getObjectByName(Identity.class,identity.getStringAttribute("contractorManager"));
+              if(contractorManagerObj !=null && Util.isNotNullOrEmpty(contractorManagerObj.getStringAttribute("employeeId"))){
+              result = contractorManagerObj.getStringAttribute("employeeId");
+              }
+              }
+              }
+              }
+
+              return result;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="u_manager_internal_id" type="string">
+          <Script>
+            <Source><![CDATA[
+
+              import sailpoint.object.Identity;
+              import sailpoint.tools.Util;
+              String result ="";
+              Identity managerIdentity = identity.getManager();
+              if(managerIdentity!=null){
+
+              result = managerIdentity.getStringAttribute("internalId");
+              }
+              // get contractormanager internalId for amita non hr contractor 
+              if(Util.nullSafeCaseInsensitiveEq("AMITA Health",identity.getStringAttribute("ministry"))){
+              if(Util.nullSafeCaseInsensitiveEq("non-hr contractor",identity.getStringAttribute("type"))){
+              if(Util.isNotNullOrEmpty(identity.getStringAttribute("contractorManager"))){
+              Identity contractorManagerObj = context.getObjectByName(Identity.class,identity.getStringAttribute("contractorManager"));
+              if(contractorManagerObj !=null && Util.isNotNullOrEmpty(contractorManagerObj.getStringAttribute("internalId"))){
+              result = contractorManagerObj.getStringAttribute("internalId");
+              }
+              }
+              }
+              }                         
+              return result;
+            ]]></Source>
+          </Script>
+        </Field>
+      </Section>
+    </Form>
+    <Form name="Snow Enable" objectType="account" type="Enable">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="Snow Enable"/>
+        </Map>
+      </Attributes>
+      <Section name="Section 1">
+        <Field name="u_termdate" type="string" value="enable"/>
+        <Field name="active" type="boolean" value="true"/>
+        <Field displayName="company" name="company" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Rule-FieldValue-Snow-Company"/>
+          </RuleRef>
+        </Field>
+      </Section>
+    </Form>
+    <Form name="Snow Disable" objectType="account" type="Disable">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="Snow Disable"/>
+        </Map>
+      </Attributes>
+      <Section name="Section 1">
+        <Field name="u_termdate" type="string">
+          <Script>
+            <Source><![CDATA[
+              import java.text.SimpleDateFormat;
+              import java.util.Date;
+              String format = "yyyy-MM-dd hh:mm:ss";
+              SimpleDateFormat sdf = new SimpleDateFormat(format);
+              return sdf.format(new Date());
+
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="u_action" type="string">
+          <Script>
+            <Source><![CDATA[
+
+              import sailpoint.object.Application;
+              import sailpoint.object.Identity;
+              import sailpoint.object.Link;
+              import sailpoint.tools.Util;
+
+              boolean flag = false;
+
+              String result ="";
+              List links = identity.getLinks();
+              if(!Util.isEmpty(links)){
+              for(Link link : links){
+              if(link !=null && link.getApplication() !=null){
+              if(Util.nullSafeCaseInsensitiveEq(link.getApplication().getName(),"DB-Peoplesoft-HCM-Primary")){
+              result = link.getAttribute("ACTION");
+              break;
+              }
+              }
+              }
+              }
+
+              return result;
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field name="u_action_reason" type="string">
+          <Script>
+            <Source><![CDATA[
+
+              import sailpoint.object.Application;
+              import sailpoint.object.Identity;
+              import sailpoint.object.Link;
+              import sailpoint.tools.Util;
+
+              boolean flag = false;
+
+              String result ="";
+              List links = identity.getLinks();
+              if(!Util.isEmpty(links)){
+              for(Link link : links){
+              if(link !=null && link.getApplication() !=null){
+              if(Util.nullSafeCaseInsensitiveEq(link.getApplication().getName(),"DB-Peoplesoft-HCM-Primary")){
+              result = link.getAttribute("ACTION_REASON");
+              break;
+              }
+              }
+              }
+              }
+
+              return result;
+            ]]></Source>
+          </Script>
+        </Field>
+      </Section>
+    </Form>
+    <Form name="create group" objectType="group" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="create group"/>
+        </Map>
+      </Attributes>
+      <Section>
+        <Field displayName="con_prov_policy_servicenow_group_name" name="name" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_groupr_email" name="email" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_manager" name="manager" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_roles" filterString="type == &quot;role&quot;" multi="true" name="roles" reviewRequired="true" type="ManagedAttribute"/>
+        <Field displayName="con_prov_policy_servicenow_parent" name="parent" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_group_active" name="active" reviewRequired="true" type="boolean"/>
+        <Field displayName="con_prov_policy_servicenow_cost_centre" name="cost_center" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_default_asignee" name="default_assignee" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_description" name="description" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_exclude_manager" name="exclude_manager" reviewRequired="true" type="boolean"/>
+      </Section>
+    </Form>
+    <Form name="update group" objectType="group" type="Update">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="update group"/>
+        </Map>
+      </Attributes>
+      <Section>
+        <Field displayName="con_prov_policy_servicenow_group_name" name="name" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_groupr_email" name="email" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_manager" name="manager" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_roles" filterString="type == &quot;role&quot;" multi="true" name="roles" reviewRequired="true" type="ManagedAttribute"/>
+        <Field displayName="con_prov_policy_servicenow_parent" name="parent" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_group_active" name="active" reviewRequired="true" type="boolean"/>
+        <Field displayName="con_prov_policy_servicenow_cost_centre" name="cost_center" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_default_asignee" name="default_assignee" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_description" name="description" reviewRequired="true" type="string"/>
+        <Field displayName="con_prov_policy_servicenow_exclude_manager" name="exclude_manager" reviewRequired="true" type="boolean"/>
+      </Section>
+    </Form>
+  </ProvisioningForms>
+  <Schemas>
+    <Schema displayAttribute="user_name" identityAttribute="sys_id" instanceAttribute="" nativeObjectType="User" objectType="account">
+      <AttributeDefinition name="first_name" remediationModificationType="None" required="true" type="string">
+        <Description>First name of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="last_name" remediationModificationType="None" required="true" type="string">
+        <Description>Last name of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="email" remediationModificationType="None" required="true" type="string">
+        <Description>Email ID of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="user_name" remediationModificationType="None" required="true" type="string">
+        <Description>Name of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="department" remediationModificationType="None" required="true" type="string">
+        <Description>The user's department name</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="title" remediationModificationType="None" required="true" type="string">
+        <Description>Title(designation) of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_id" remediationModificationType="None" required="true" type="string">
+        <Description>Unique ID generated by system for user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="phone" remediationModificationType="None" required="true" type="string">
+        <Description>Phone number of user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="calendar_integration" remediationModificationType="None" required="true" type="string">
+        <Description>Determines whether change requests assigned to that user are sent to their Outlook calendar</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_class_name" remediationModificationType="None" required="true" type="string">
+        <Description>Class name of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="company" remediationModificationType="None" required="true" type="string">
+        <Description>The user's company</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="cost_center" remediationModificationType="None" required="true" type="string">
+        <Description>Cost centre of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_created_on" remediationModificationType="None" required="true" type="string">
+        <Description>Date this user is created in ServiceNow</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_created_by" remediationModificationType="None" required="true" type="string">
+        <Description>Administrator who created the user in ServiceNow</Description>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" multi="true" name="groups" remediationModificationType="None" type="string">
+        <Description>List of groups the user is part of</Description>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" multi="true" name="roles" remediationModificationType="None" type="string">
+        <Description>List of roles the user is part of</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="active" remediationModificationType="None" required="true" type="string">
+        <Description>Determines whether the user account has been staged for use</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="building" remediationModificationType="None" required="true" type="string">
+        <Description>The building of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="city" remediationModificationType="None" required="true" type="string">
+        <Description>The city of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="country" remediationModificationType="None" required="true" type="string">
+        <Description>The country of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="location" remediationModificationType="None" required="true" type="string">
+        <Description>The location of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="manager" remediationModificationType="None" required="true" type="string">
+        <Description>The manager of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="middle_name" remediationModificationType="None" type="string">
+        <Description>Middle name of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="name" remediationModificationType="None" required="true" type="string">
+        <Description>Name of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="password_needs_reset" remediationModificationType="None" required="true" type="string">
+        <Description>Determines should the user be prompted to change password at next login</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="default_perspective" remediationModificationType="None" required="true" type="string">
+        <Description>Default perspective for the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_domain" remediationModificationType="None" required="true" type="string">
+        <Description>Domain of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="employee_number" remediationModificationType="None" required="true" type="string">
+        <Description>Employee number of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="failed_attempts" remediationModificationType="None" required="true" type="string">
+        <Description>Number of login failed attempts</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="gender" remediationModificationType="None" required="true" type="string">
+        <Description>Gender of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="home_phone" remediationModificationType="None" required="true" type="string">
+        <Description>Home phone number of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="ldap_server" remediationModificationType="None" required="true" type="string">
+        <Description>LDAP server the user has an account. Identifies which LDAP server authenticates the user when there are multiple LDAP servers</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="preferred_language" remediationModificationType="None" required="true" type="string">
+        <Description>Language spoken by the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="last_login" remediationModificationType="None" required="true" type="string">
+        <Description>Last login date of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="last_login_time" remediationModificationType="None" required="true" type="string">
+        <Description>Time of the last login time for the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="locked_out" remediationModificationType="None" required="true" type="string">
+        <Description>Determines if user account is locked</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="mobile_phone" remediationModificationType="None" required="true" type="string">
+        <Description>Mobile number of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="notification" remediationModificationType="None" required="true" type="string">
+        <Description>Determines if the user should be notified for any changes made on his account.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="schedule" remediationModificationType="None" required="true" type="string">
+        <Description>Schedule of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="state" remediationModificationType="None" required="true" type="string">
+        <Description>The state for the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="source" remediationModificationType="None" required="true" type="string">
+        <Description>Identifies whether LDAP is used to validate a user. If the Source field starts with ldap, then the user is validated via LDAP. If the Source field does not start with ldap, then the password on the user record is used to validate the user upon login</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="street" remediationModificationType="None" required="true" type="string">
+        <Description>The street for the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="time_format" remediationModificationType="None" required="true" type="string">
+        <Description>Time format selected for user to display time fields</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="time_zone" remediationModificationType="None" required="true" type="string">
+        <Description>The timezone for the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_updated_on" remediationModificationType="None" required="true" type="string">
+        <Description>Last updated time for the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_updated_by" remediationModificationType="None" required="true" type="string">
+        <Description>The last update for the user occurred from</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_mod_count" remediationModificationType="None" required="true" type="string">
+        <Description>Number of updates for the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="vip" remediationModificationType="None" required="true" type="string">
+        <Description>Determines if the user is treated as VIP</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="zip" remediationModificationType="None" required="true" type="string">
+        <Description>Zip for the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="active_directory_username" type="string">
+        <Description>Active Directory user name</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="effective_date" type="string">
+        <Description>Effective date</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="u_termdate" type="string">
+        <Description>u_termdate</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="user_sys_id" type="string">
+        <Description>user_sys_id</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="u_sex" type="string">
+        <Description>sex</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="u_traveler_type" type="string">
+        <Description>travelerType</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="u_sailpoint_id" type="string">
+        <Description>SailPoint internalId</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="u_action" type="string">
+        <Description>action</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="u_action_reason" type="string">
+        <Description>actionReason</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="u_manager_employee_id" type="string">
+        <Description>Manager internalid</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="u_manager_internal_id" type="string"/>
+      <AttributeDefinition name="u_position_type" type="string"/>
+      <AttributeDefinition name="u_location_type" type="string"/>
+      <AttributeDefinition name="u_location_description" type="string"/>
+      <CustomizationRule>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-ResourceObject-Customization-ServiceNow"/>
+      </CustomizationRule>
+    </Schema>
+    <Schema descriptionAttribute="description" displayAttribute="name" featuresString="PROVISIONING" identityAttribute="sys_id" instanceAttribute="" nativeObjectType="group" objectType="group">
+      <AttributeDefinition name="name" remediationModificationType="None" required="true" type="string">
+        <Description>Name of the user group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="email" remediationModificationType="None" required="true" type="string">
+        <Description>Email of the user group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="manager" remediationModificationType="None" required="true" type="string">
+        <Description>Manager of the user group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" multi="true" name="roles" remediationModificationType="None" required="true" type="string">
+        <Description>Roles the user group is having</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="parent" remediationModificationType="None" required="true" type="string">
+        <Description>Parent group of this user group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="active" remediationModificationType="None" required="true" type="string">
+        <Description>Determines whether the user account has been staged for use</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="cost_center" remediationModificationType="None" required="true" type="string">
+        <Description>Cost centre of the user group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="default_assignee" remediationModificationType="None" required="true" type="string">
+        <Description>Default assignee for the user group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="description" remediationModificationType="None" required="true" type="string">
+        <Description>Description of the user group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="exclude_manager" remediationModificationType="None" required="true" type="string">
+        <Description>Determines if the manager should be excluded for the user group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_created_on" remediationModificationType="None" required="true" type="string">
+        <Description>Date the user group is created in ServiceNow</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_created_by" remediationModificationType="None" required="true" type="string">
+        <Description>Administrator who created the user in ServiceNow</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="source" remediationModificationType="None" required="true" type="string">
+        <Description>Source of the user group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_id" remediationModificationType="None" required="true" type="string">
+        <Description>Unique ID generated by system for user group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="type" remediationModificationType="None" required="true" type="string">
+        <Description>Type of the user group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_updated_on" remediationModificationType="None" required="true" type="string">
+        <Description>Last updated time for the user group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_updated_by" remediationModificationType="None" required="true" type="string">
+        <Description>The last update for the user group occurred from</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sys_mod_count" remediationModificationType="None" required="true" type="string">
+        <Description>Number of updates for the user group</Description>
+      </AttributeDefinition>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>

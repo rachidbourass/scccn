@@ -1,0 +1,1643 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application connector="sailpoint.connector.DelimitedFileConnector" featuresString="DIRECT_PERMISSIONS, NO_RANDOM_ACCESS, DISCOVER_SCHEMA, ACCOUNT_ONLY_REQUEST, ADDITIONAL_ACCOUNT_REQUEST" icon="enterpriseIcon" name="Cerner-Service Now" profileClass="" type="DelimitedFile">
+  <Attributes>
+    <Map>
+      <entry key="PassphraseForPrivateKey"/>
+      <entry key="PrivateKeyFilePath"/>
+      <entry key="User Group.columnNames"/>
+      <entry key="User Group.commentCharacter"/>
+      <entry key="User Group.delimiter"/>
+      <entry key="User Group.file" value="\\andc1wapp0147.ds.sjhs.com\AppAggregation\CernerServiceNow.csv"/>
+      <entry key="User Group.fileEncoding"/>
+      <entry key="User Group.filterEmptyRecords">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="User Group.filterString"/>
+      <entry key="User Group.hasHeader">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="User Group.indexColumn"/>
+      <entry key="User Group.isCaseInsensitiveMerge">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="User Group.isSortedByIndexColumn">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="User Group.mergeColumns"/>
+      <entry key="User Group.mergeRows">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="User Group.numberOfLinesToSkip"/>
+      <entry key="User Group.regularExpression"/>
+      <entry key="User Group.stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="acceleratorPackEnabled"/>
+      <entry key="accountCorrelationAttrExpression"/>
+      <entry key="accountCreateConditionalRule"/>
+      <entry key="accountCreateEntitlements"/>
+      <entry key="accountDisableAttrExpression"/>
+      <entry key="accountLockAttrExpression"/>
+      <entry key="acctAggregationEnd">
+        <value>
+          <Date>1734589952864</Date>
+        </value>
+      </entry>
+      <entry key="acctAggregationStart">
+        <value>
+          <Date>1734588001320</Date>
+        </value>
+      </entry>
+      <entry key="additionalAppBusApprovalRule"/>
+      <entry key="additionalAppBusApprovers"/>
+      <entry key="afterProvisioningRule"/>
+      <entry key="aggregationPartitioned">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="aggregationType" value="account"/>
+      <entry key="apAdditionalApplicationAfterProvisioningRule"/>
+      <entry key="apAdditionalApplicationCorrelationRule"/>
+      <entry key="apAdditionalApplicationCreationRule"/>
+      <entry key="apAdditionalApplicationCustomizationRule"/>
+      <entry key="apAdditionalApplicationMCustomizationRule"/>
+      <entry key="apAdditionalApplicationMGroupRefreshRule"/>
+      <entry key="apAdditionalApplicationPreIterateRule"/>
+      <entry key="apAfterMoverJoiner">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAfterRehireAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAttributeSyncEligibleRule"/>
+      <entry key="apBeforeMoverAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apPopulationReverseLeaverOptions"/>
+      <entry key="appBusApprovalRule"/>
+      <entry key="appBusApprovers"/>
+      <entry key="ascBusinessApplication" value="Cerner-Service Now"/>
+      <entry key="authoritativeEmployee"/>
+      <entry key="authoritativeNonEmployee"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="beforemoverPrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="birthrightEntAttrExpression"/>
+      <entry key="busApp">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="commentsAttr"/>
+      <entry key="commentsValue"/>
+      <entry key="compositeDefinition"/>
+      <entry key="delimiter" value=","/>
+      <entry key="displayFormRule"/>
+      <entry key="evaluateCreateprovpolicy"/>
+      <entry key="file" value="\\andc1wapp0147.ds.sjhs.com\AppAggregation\Cerner.csv"/>
+      <entry key="filetransport" value="local"/>
+      <entry key="filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="ftpsClientCertificateFilePath"/>
+      <entry key="ftpsClientCertificatePassphrase"/>
+      <entry key="group.delimiter" value=","/>
+      <entry key="group.file" value="\\andc1wapp0147.ds.sjhs.com\AppAggregation\Cerner.csv"/>
+      <entry key="group.filetransport" value="local"/>
+      <entry key="group.filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.hasHeader">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.isCaseInsensitiveMerge">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.isSortedByIndexColumn">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.mergeRows">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.partitionMode" value="auto"/>
+      <entry key="group.stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="hardPolicyviolations"/>
+      <entry key="hasHeader">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="isCaseInsensitiveMerge">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="isSortedByIndexColumn">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="joinerEnabled"/>
+      <entry key="joinerPopulationRegex"/>
+      <entry key="joinerRoles"/>
+      <entry key="mergeRows">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="moveAccountContainer"/>
+      <entry key="moverExtendedRule"/>
+      <entry key="moverProcess" value="Do Nothing"/>
+      <entry key="moverRevocation" value="Do Nothing"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="parseType" value="delimited"/>
+      <entry key="partitionMode" value="auto"/>
+      <entry key="port"/>
+      <entry key="primarySyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="primarypasswordSyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="privilegedAccountAttrExpression"/>
+      <entry key="privilegedEntAttrExpression"/>
+      <entry key="rehireExtendedRule"/>
+      <entry key="rehirePrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="rehireProcess" value="Do Nothing"/>
+      <entry key="removeEntitlementLeaverExceptionExpression"/>
+      <entry key="renameLDAPaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="requestorFormRole"/>
+      <entry key="reverseTerminationExtendedRule"/>
+      <entry key="reverseleaverProcess" value="Do Nothing"/>
+      <entry key="scramblePasswordAttr"/>
+      <entry key="sftpAuthMethod" value="password"/>
+      <entry key="skipSupervisorApproval"/>
+      <entry key="snowAssignmentGroup" value="ca6f83bfdb36af0c1f54de865e961926"/>
+      <entry key="snowAssignmentGroupName" value="AHNAT/OPS/SOLUTIONS IMP/IAM/Access Mgmt/Mgmt ARC"/>
+      <entry key="softPolicyviolations"/>
+      <entry key="stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="DelimitedFile Template"/>
+      <entry key="terminationExtendedRule"/>
+      <entry key="terminationProcess" value="Do Nothing"/>
+      <entry key="xDays"/>
+      <entry key="xDeleteDays"/>
+    </Map>
+  </Attributes>
+  <CorrelationRule>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Correlation-CernerSnow"/>
+  </CorrelationRule>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="10173842"/>
+  </Owner>
+  <ProvisioningForms>
+    <Form name="Cerner-CreatePolicy" objectType="account" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="Cerner-CreatePolicy"/>
+        </Map>
+      </Attributes>
+      <Section name="Section 1">
+        <Field displayName="First Name" name="First Name" required="true" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("firstname"))){
+              return identity.getAttribute("firstname");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Last Name" name="Last Name" required="true" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("lastname"))){
+              return identity.getAttribute("lastname");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Middle Name" name="Middle Name" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("middleName"))){
+              return identity.getAttribute("middleName");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="employee ID" name="employeeID" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+				  import sailpoint.tools.Util;
+				  String userType = identity.getAttribute("type");
+
+				  if(Util.nullSafeCaseInsensitiveEq("employee",userType)){
+					field.setRequired(true);
+				  }
+				  return false;
+					]]></Source>
+                  </Script>
+                </value>
+              </entry>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("employeeId"))){
+              return identity.getAttribute("employeeId");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="NPI" name="NPI" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+				  import sailpoint.tools.Util;
+				  String userType = identity.getAttribute("type");
+
+				  if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+					field.setRequired(true);
+				  }
+				  return false;
+					]]></Source>
+                  </Script>
+                </value>
+              </entry>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("npiNumber"))){
+              return identity.getAttribute("npiNumber");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="DEA" name="DEA" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("deaNumber"))){
+              return identity.getAttribute("deaNumber");
+              }
+              else{
+              return null;
+              }
+            ]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Invision Alias" name="Invision Alias" reviewRequired="true" type="string"/>
+        <Field displayName="Business Address" name="BusinessAddress" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+				  import sailpoint.tools.Util;
+				  String userType = identity.getAttribute("type");
+
+				  if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+					field.setRequired(true);
+				  }
+				  return false;
+					]]></Source>
+                  </Script>
+                </value>
+              </entry>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("streetAddress"))){
+              return identity.getAttribute("streetAddress");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Fax" name="Fax" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+				  import sailpoint.tools.Util;
+				  String userType = identity.getAttribute("type");
+
+				  if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+					field.setRequired(true);
+				  }
+				  return false;
+					]]></Source>
+                  </Script>
+                </value>
+              </entry>
+            </Map>
+          </Attributes>
+          <ValidationScript>
+            <Source><![CDATA[
+
+              import sailpoint.tools.Util;
+
+			  if( Util.isNotNullOrEmpty(Fax) && !(Fax.matches("(?:\\d{3}-){2}\\d{4}") || Fax.matches("\\d{10}"))){   
+              return "Please enter a valid fax number (i.e. 123-456-7890 or 1234567890)";
+              }
+            ]]></Source>
+          </ValidationScript>
+        </Field>
+        <Field displayName="Phone" name="Phone" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+                  import sailpoint.tools.Util;
+                  String userType = identity.getAttribute("type");
+
+                  if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+                    field.setRequired(true);
+                  }
+                  return false;
+               		]]></Source>
+                  </Script>
+                </value>
+              </entry>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("telephoneNumber"))){
+              return identity.getAttribute("telephoneNumber");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Non-provider Credentials" multi="true" name="Non-provider Credentials" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>ACLS</String>
+                <String>ARDMS</String>
+                <String>ARRT</String>
+                <String>ASCP</String>
+                <String>BCLS</String>
+                <String>BLS</String>
+                <String>BSN</String>
+                <String>CCP</String>
+                <String>CCS</String>
+                <String>CES</String>
+                <String>CHS(ABHI)</String>
+                <String>CLS(NCA)</String>
+                <String>CMA</String>
+                <String>CNA</String>
+                <String>CNOR</String>
+                <String>CNS</String>
+                <String>COTA</String>
+                <String>CPht</String>
+                <String>CPMA</String>
+                <String>CPR</String>
+                <String>CRT</String>
+                <String>CST</String>
+                <String>CT(ASCP)</String>
+                <String>CTR</String>
+                <String>CTRS</String>
+                <String>DPT</String>
+                <String>EMT</String>
+                <String>HT(ASCP)</String>
+                <String>LBSW</String>
+                <String>LCSW</String>
+                <String>LD</String>
+                <String>LMSW</String>
+                <String>LPN</String>
+                <String>MA</String>
+                <String>MHSA</String>
+                <String>MPH</String>
+                <String>MS</String>
+                <String>MT</String>
+                <String>MT(ASCP)</String>
+                <String>NMTCB</String>
+                <String>NRP</String>
+                <String>PBT(ASCP)</String>
+                <String>PharmD</String>
+                <String>RHIA</String>
+                <String>RHIT</String>
+                <String>RMA</String>
+                <String>RN</String>
+                <String>RPh</String>
+                <String>RRT</String>
+                <String>RT</String>
+                <String>Scribe</String>
+                <String>SRNA</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Provider Credentials" name="Provider Credentials" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <RuleRef>
+              <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AllowedValues-DocType"/>
+            </RuleRef>
+          </AllowedValuesDefinition>
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+				  import sailpoint.tools.Util;
+				  String userType = identity.getAttribute("type");
+
+				  if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+					field.setRequired(true);
+				  }
+				  return false;
+					]]></Source>
+                  </Script>
+                </value>
+              </entry>
+            </Map>
+          </Attributes>
+        </Field>
+        <Field displayName="User ID" name="User ID" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+				  import sailpoint.tools.Util;
+				  String userType = identity.getAttribute("type");
+
+				  if(Util.nullSafeCaseInsensitiveEq("non-hr contractor",userType)){
+					field.setRequired(true);
+				  }
+				  return false;
+					]]></Source>
+                  </Script>
+                </value>
+              </entry>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("samAccountName"))){
+              return identity.getAttribute("samAccountName");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Organization" name="Organization" required="true" type="string" value="Patient Care Organizations">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+        </Field>
+        <Field displayName="Email address" name="Email address" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+				  import sailpoint.tools.Util;
+				  
+					boolean isHidden = false;
+				  if(Util.isNotNullOrEmpty(identity.getAttribute("email"))){
+					field.setRequired(true);
+					isHidden = false;
+				  }else{
+					field.setRequired(false);
+					isHidden = true;
+				  }
+				  return isHidden;
+					]]></Source>
+                  </Script>
+                </value>
+              </entry>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("email"))){
+              return identity.getAttribute("email");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Physician indicator " name="Physician indicator " reviewRequired="true" type="boolean"/>
+        <Field displayName="Contractor" name="Contractor" reviewRequired="true" type="boolean"/>
+        <Field displayName="Primary Specialty" name="PrimarySpecialty" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+				  import sailpoint.tools.Util;
+				  String userType = identity.getAttribute("type");
+
+				  if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+					field.setRequired(true);
+				  }
+				  return false;
+					]]></Source>
+                  </Script>
+                </value>
+              </entry>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("primarySpeciality"))){
+              return identity.getAttribute("primarySpeciality");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Provider Group" helpKey="Medical Staff Use Only" multi="true" name="Provider Group" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Practice Name</String>
+                <String>360care of Tennessee</String>
+                <String>493 Internal Medicine</String>
+                <String>A Brighter Day Pediatrics</String>
+                <String>Acacia Dermatology, PLLC</String>
+                <String>Academy Children's Clinic</String>
+                <String>Adams Place</String>
+                <String>Advanced Cardiovascular &amp; Thoracic Surgery-Dickerson</String>
+                <String>Advanced Diagnostic Imaging, PC, d/b/a David Dyer MD</String>
+                <String>Advanced Foot &amp; Ankle Care Center (Columbia)</String>
+                <String>Advanced Health</String>
+                <String>Advanced Health Partners</String>
+                <String>Advanced Health/Fleming Plastic Surgery</String>
+                <String>Advanced Neurology and Sleep (ADI)</String>
+                <String>Advanced Neurosciences Institute</String>
+                <String>Advanced Orthopaedic &amp; Spine-Hermitage</String>
+                <String>Advanced Sports Medicine</String>
+                <String>Advanced Surgical Associates (ADI)-Skyline</String>
+                <String>Advanced Women's Care</String>
+                <String>Advanced Women's Health of Nashville</String>
+                <String>Advantage Support Services, Inc.</String>
+                <String>Aero Anesthesia PLLC</String>
+                <String>Akin, Harold, MD</String>
+                <String>Alive Hospice (Murfreesboro)</String>
+                <String>Allergy &amp; Asthma Centers, PC</String>
+                <String>Allergy &amp; Asthma Specialists, PLLC-Murfreesboro</String>
+                <String>Anatomic &amp; Clinical Laboratory Assoc PC</String>
+                <String>Anesthesia Medical Group, Inc.</String>
+                <String>Anesthesia Pain Management</String>
+                <String>Ankle &amp; Foot Centers of America</String>
+                <String>AP Health</String>
+                <String>Apex Medical Services, Inc.</String>
+                <String>Archmasters</String>
+                <String>Arizons Obstetrics &amp; Gynecology, PLLC</String>
+                <String>Ascension Medical Group Middle TN Center for Lung Disease</String>
+                <String>Ascension Medical Group Midtown Sleep Specialists</String>
+                <String>Ascension Medical Group Saint Thomas Antioch</String>
+                <String>Ascension Medical Group Saint Thomas Bellevue</String>
+                <String>Ascension Medical Group Saint Thomas Breast Surgery - Midtown</String>
+                <String>Ascension Medical Group Saint Thomas Brentwood</String>
+                <String>Ascension Medical Group Saint Thomas Center for Female Pelvic Medicine</String>
+                <String>Ascension Medical Group Saint Thomas Cookeville at 120 Walnut Commons Ln Suite D</String>
+                <String>Ascension Medical Group Saint Thomas Depaul Gastroenterology</String>
+                <String>Ascension Medical Group Saint Thomas Depaul Infectious Disease</String>
+                <String>Ascension Medical Group Saint Thomas Franklin</String>
+                <String>Ascension Medical Group Saint Thomas Franklin Neurology</String>
+                <String>Ascension Medical Group Saint Thomas Gallatin Sumner Medical Group at 300 Steam Plan Road</String>
+                <String>Ascension Medical Group Saint Thomas Gallatin Sumner Medical Group Gallatin General Surgery</String>
+                <String>Ascension Medical Group Saint Thomas Hendersonville</String>
+                <String>Ascension Medical Group Saint Thomas Howell Allen Clinic - Murfreesboro</String>
+                <String>Ascension Medical Group Saint Thomas Howell Allen Elliston Pl Neurosurgery</String>
+                <String>Ascension Medical Group Saint Thomas Howell Allen Midtown Neurosurgery</String>
+                <String>Ascension Medical Group Saint Thomas Howell Allen West Neurosurgery</String>
+                <String>Ascension Medical Group Saint Thomas Lenox Village</String>
+                <String>Ascension Medical Group Saint Thomas McMinnville General Surgery</String>
+                <String>Ascension Medical Group Saint Thomas McMinnville Primary Care</String>
+                <String>Ascension Medical Group Saint Thomas McMinnville Women's Health</String>
+                <String>Ascension Medical Group Saint Thomas Midtown (7th FL)</String>
+                <String>Ascension Medical Group Saint Thomas Midtown (8th FL)</String>
+                <String>Ascension Medical Group Saint Thomas Midtown (9th Floor)</String>
+                <String>Ascension Medical Group Saint Thomas Midtown Endocrinology</String>
+                <String>Ascension Medical Group Saint Thomas Midtown Gynecologic Oncology</String>
+                <String>Ascension Medical Group Saint Thomas Mt. Juliet</String>
+                <String>Ascension Medical Group Saint Thomas Murfreesboro Surgical Specialists</String>
+                <String>Ascension Medical Group Saint Thomas Neurology-DePaul</String>
+                <String>Ascension Medical Group Saint Thomas New Salem</String>
+                <String>Ascension Medical Group Saint Thomas Saint Louise Oak Creek</String>
+                <String>Ascension Medical Group Saint Thomas Sparta General Surgery</String>
+                <String>Ascension Medical Group Saint Thomas Sparta Orthopedics</String>
+                <String>Ascension Medical Group Saint Thomas Sparta Primary Care</String>
+                <String>Ascension Medical Group Saint Thomas Sparta Women's Health</String>
+                <String>Ascension Medical Group Saint Thomas Sumner Medical Group &amp; Express Care Gallatin</String>
+                <String>Ascension Medical Group Saint Thomas UT Internal Medicine Center</String>
+                <String>Ascension Medical Group Saint Thomas UT OBGYN Center</String>
+                <String>Ascension Medical Group Saint Thomas West Thoracic and Breast Surgery</String>
+                <String>Ascension Medical Group Specialty Clinic West</String>
+                <String>Ascension Saint Thomas Comprehensive Heart Failure Clinic-Turkey Creek</String>
+                <String>Ascension Saint Thomas Diabetes Center</String>
+                <String>Ascension Saint Thomas Heart </String>
+                <String>Ascension Saint Thomas Heart - Heart, Lung &amp; Vascular Surgery</String>
+                <String>Ascension Saint Thomas Heart Comprehensive Heart Failure </String>
+                <String>Ascension Saint Thomas Heart West Cardiovascular Surgery</String>
+                <String>Ascension Saint Thomas Hickman</String>
+                <String>Ascension Saint Thomas Hickman Medical Clinic</String>
+                <String>Ascension Saint Thomas Highlands</String>
+                <String>Ascension Saint Thomas Hospital Midtown Administration</String>
+                <String>Ascension Saint Thomas Hospital Midtown Diabetes Center</String>
+                <String>Ascension Saint Thomas Hospital Midtown Emergency Department</String>
+                <String>Ascension Saint Thomas Hospital Midtown Joint Replacement Institute</String>
+                <String>Ascension Saint Thomas Hospital Midtown Labor &amp; Delivery</String>
+                <String>Ascension Saint Thomas Hospital Midtown Neuro Hospitalist Program</String>
+                <String>Ascension Saint Thomas Hospital Midtown Palliative Care</String>
+                <String>Ascension Saint Thomas Hospital Midtown Surgical Services - Inpatient</String>
+                <String>Ascension Saint Thomas Hospital Midtown Surgical Services - Outpatient</String>
+                <String>Ascension Saint Thomas Hospital West Cardiac Nocturnists</String>
+                <String>Ascension Saint Thomas Hospital West Cardiac Surgery</String>
+                <String>Ascension Saint Thomas Hospital West General/Vascular Surgery</String>
+                <String>Ascension Saint Thomas Hospital West Hospitalist Group</String>
+                <String>Ascension Saint Thomas Hospital West Joint Replacement Institute</String>
+                <String>Ascension Saint Thomas Hospital West Kidney Transplant Program</String>
+                <String>Ascension Saint Thomas Hospital West Main OR</String>
+                <String>Ascension Saint Thomas Hospital West Medical Education Office</String>
+                <String>Ascension Saint Thomas Hospital West Orthopedic Unit</String>
+                <String>Ascension Saint Thomas Hospital West Palliative Care Program</String>
+                <String>Ascension Saint Thomas Hospital West Psychiatric Services</String>
+                <String>Ascension Saint Thomas Hospital West-Executive Office</String>
+                <String>Ascension Saint Thomas Midtown Center for Surgical and Medical Weight Loss</String>
+                <String>Ascension Saint Thomas River Park</String>
+                <String>Ascension Saint Thomas Rutherford Hospitalist Services, LLC</String>
+                <String>Ascension Saint Thomas Rutherford Internal Medicine-Gastroenterology</String>
+                <String>Ascension Saint Thomas Rutherford Surgical First Assists</String>
+                <String>Ascension Saint Thomas Rutherford Surgical Services</String>
+                <String>Assoc Psychiatrists of Nashville-Burton Hills</String>
+                <String>Associated Urologists of Nashville-Harding</String>
+                <String>Baker Jr., Dr. Robert F.</String>
+                <String>Barnett, Donald R MD</String>
+                <String>Be Well Integrative Health Partners</String>
+                <String>Beck Oral &amp; Maxillofacial Surgery, PLLC, Nolensville Rd</String>
+                <String>Beckman Family Medical</String>
+                <String>Boston Scientific</String>
+                <String>Brentwood Children's Clinic</String>
+                <String>Brentwood Family Care Center, Inc.-Thoroughbred</String>
+                <String>Brentwood Pediatrics</String>
+                <String>Brock, William B., MD</String>
+                <String>Burbank, Sally W., M.D. (ADI)</String>
+                <String>Cardiovascular Anesthesiologists, P.C.</String>
+                <String>Carl E. Wingo, MD, PC</String>
+                <String>Carter, Kenneth B., M.D.</String>
+                <String>Cayce Family Clinic</String>
+                <String>Cedar Grove Medical Associates</String>
+                <String>Centennial Heart, LLC-Patterson St.</String>
+                <String>Centennial Women's Group</String>
+                <String>Center for Diagnostic &amp; Therapeutic Cardiology</String>
+                <String>Center for Inflammatory Disease</String>
+                <String>Center for Pelvic Health</String>
+                <String>Center Hill Medical PLLC</String>
+                <String>Central Tennessee Foot &amp; Ankle Center - Sparta</String>
+                <String>Children's Clinic East </String>
+                <String>Children's Dentistry and Orthodontics</String>
+                <String>Children's Hearts</String>
+                <String>Children's Medical Group</String>
+                <String>Childrens Eye Care of the South, Inc.</String>
+                <String>ClearPath Outpatient Behavioral Health</String>
+                <String>Cockrell, Gary W DPM Brentwood</String>
+                <String>Colon &amp; Rectal Surgical Assoc. of Nashville</String>
+                <String>Columbia Anesthesia Associates</String>
+                <String>Community Wellness Clinic</String>
+                <String>CompHealth</String>
+                <String>Comprehensive Pain &amp; Neurology Center, PLLC-M'Boro</String>
+                <String>Connectus Health </String>
+                <String>Cookeville Medical Clinic</String>
+                <String>Cookeville Regional Medical Group - Gastroenterology</String>
+                <String>Cookeville VA Clinic</String>
+                <String>Cool Springs OB/GYN</String>
+                <String>Cool Springs Surgical Associates-Murfreesboro</String>
+                <String>Cornea Consultants of Nashville, PLCC</String>
+                <String>Cornerstone Anesthesia Group, Pllc</String>
+                <String>Cornerstone Family Medicine</String>
+                <String>Cornerstone Medical Group</String>
+                <String>Covenant Healthcare For Women</String>
+                <String>Craig Center for Advanced Wound Healing</String>
+                <String>Cumberland Adult Medicine</String>
+                <String>Cumberland Anesthesia PLLC</String>
+                <String>Cumberland Family Care</String>
+                <String>Curcio Dermatology, PC</String>
+                <String>D. Phillips Altenbern, MD (ADI)</String>
+                <String>Darkhorse Orthopedics, INC</String>
+                <String>Delozier III, Joseph B., M.D.</String>
+                <String>Dickson Medical Associates, PC</String>
+                <String>Dicorleto, Peter, M.D.</String>
+                <String>Dowins's Pediatric Clinic</String>
+                <String>Dr's Meadors &amp; Hayslett</String>
+                <String>Drake, Alan R., MD</String>
+                <String>Drs Rice, Burnes &amp; Associates</String>
+                <String>Drs. Cheij &amp; Skelo</String>
+                <String>East Nashville Family Medicine, PLLC</String>
+                <String>Elite Sports Med &amp; Ortho Ctr-Nashville</String>
+                <String>Eluhu, Marcel Y., M.D.</String>
+                <String>Endocrinology-Diabetes Associates Harding Pike</String>
+                <String>Eric K. Egli, MD</String>
+                <String>Eye Centers of Tennessee-McMinnville</String>
+                <String>Faith Family Clinic</String>
+                <String>Family Health Assoc</String>
+                <String>Family Health Center of Ashland City</String>
+                <String>Family Medical Center - Smithville</String>
+                <String>Family Practice - Woodbury</String>
+                <String>Family Practice Partners, PC</String>
+                <String>Female Urology of Nashville, PC</String>
+                <String>Foot &amp; Ankle Specialists of Middle Tennessee - Murfreesboro</String>
+                <String>Foot &amp; Ankle Specialists with Surgical Clinic</String>
+                <String>Fresenius Medical Care</String>
+                <String>Frist Clinic, P.C., The-23rd Ave</String>
+                <String>Fullerton Medical Clinic PLLC</String>
+                <String>Garner, James, M.D.</String>
+                <String>Gastrointestinal Health</String>
+                <String>Gateway Foot &amp; Ankle Center</String>
+                <String>Genesis Anesthesia Services, PLLC</String>
+                <String>Genesys Family Medicine, PC</String>
+                <String>Glover Primary Care</String>
+                <String>Gold Skin Care Center</String>
+                <String>Good Health Associates, PLLC</String>
+                <String>Good Samaritan Family Health Center-McMinnville</String>
+                <String>Goodlettsville Pediatrics</String>
+                <String>Grace Pediatrics</String>
+                <String>Graham Jr.,  Robert P., M.D.</String>
+                <String>Greater Nashville Perinatology, PLC (Smyrna)</String>
+                <String>Green Hills Pediatric Associates</String>
+                <String>Gresham Cardiology &amp; Welless Ctr of Murfreesboro</String>
+                <String>Group not found</String>
+                <String>Guardian Eye Associates, PLC</String>
+                <String>Gunn, Michael C., M.D.</String>
+                <String>Hall, Alicia MD d/b/a Advanced Care Centers</String>
+                <String>Hancock Diabetes &amp; Endocrine Center, PLLC</String>
+                <String>Harpeth Pediatrics</String>
+                <String>Harris, Gamal M.D.</String>
+                <String>Health Group of McMinnville, P.C.</String>
+                <String>Hendersonville Obstetrics &amp; Gynecology</String>
+                <String>Henson, Dr. Lorrie</String>
+                <String>Heritage Medical Associates, PC </String>
+                <String>Hickman Medical Clinic</String>
+                <String>Hicks, Kenneth H., M.D.</String>
+                <String>Hope Clinic</String>
+                <String>Horowitz, David H., M.D.</String>
+                <String>Huang, Lloyd K., MD</String>
+                <String>Hughston Clinic</String>
+                <String>Implant &amp; General Dentistry</String>
+                <String>Infectious Disease-Saint Thomas West Hospital</String>
+                <String>Inpatient Medical Services</String>
+                <String>Inpatient OB Services</String>
+                <String>Inpatient Rehab Services</String>
+                <String>Integrated Health Cooperative, LLC - Cumberland Bend</String>
+                <String>Integrative Kidney Specialists</String>
+                <String>Integrative Medical Doctors, PC</String>
+                <String>Interventional Spine and Pain Center</String>
+                <String>Isaac Spine, Joint &amp; Pain Institute</String>
+                <String>Jackson Cothren, MD</String>
+                <String>John W. Macey, Jr., MD, PLLC</String>
+                <String>Joseph M. Sharpe, MD</String>
+                <String>Journey Pure - Franklin</String>
+                <String>Kemkar, Abhaykumar M.D.</String>
+                <String>Kenna Williams, MD (Pulaski)</String>
+                <String>Kim Frances B. Frigon, MD</String>
+                <String>Maria Frexes-Steed, MD (ADI)</String>
+                <String>Maryland Farms Pediatrics</String>
+                <String>Matthew Walker Comprehensive - 14th Ave</String>
+                <String>Matthew Walker Comprehensive Health Ctr - OB/Gyn Assoc.</String>
+                <String>Maxwell Aesthetics, PLLC</String>
+                <String>McCabe Vision Center</String>
+                <String>McCollum Hometown Healthcare, PLLC</String>
+                <String>McCord, David H., M.D., PC - Spine Specialist</String>
+                <String>McFarland, Ronald E., M.D.</String>
+                <String>McMinnville Medical Associates</String>
+                <String>Med Point - New Salem Clinic Providers</String>
+                <String>Medical Dictations, LLC</String>
+                <String>Meharry Community Wellness Center</String>
+                <String>Meharry Medical Group </String>
+                <String>Merrell, Tracy A., DPM</String>
+                <String>Methodist Univ Hosp Inst Transplant Surgery</String>
+                <String>Metro Center Healthcare Group</String>
+                <String>Mid South Gastroenterology Assoc</String>
+                <String>Mid State ENT-Hendersonville</String>
+                <String>Mid State Gastroenterology</String>
+                <String>MID TN GYN, PLLC</String>
+                <String>Mid-State Podiatry</String>
+                <String>Mid-State Pulmonary Associates (ADI)</String>
+                <String>Middle Tennessee Anesthesia Provides, PLLC</String>
+                <String>Middle Tennessee Center for Lung Disease, P.C.</String>
+                <String>Middle Tennessee Ear, Nose &amp; Throat-Murfreesboro</String>
+                <String>Middle Tennessee Family Medicine</String>
+                <String>Middle Tennessee Oral &amp; Implant Surgery, PLLC</String>
+                <String>Middle Tennessee Oral &amp; Maxillofacial Surgery, PLLC</String>
+                <String>Middle Tennessee Plastic Surgery, PC</String>
+                <String>Middle Tennessee Surgical Associates</String>
+                <String>Middle Tennessee Urology Specialist</String>
+                <String>Middle TN Emergency Physicians</String>
+                <String>Militana, Gary A., MD</String>
+                <String>Mobius Health</String>
+                <String>Morehead, John A., MD</String>
+                <String>Mountain View Medical - Woodbury</String>
+                <String>MTMC Laborist Services</String>
+                <String>MTSU-Student Health Service</String>
+                <String>Murfreesboro Anesthesia Group, P.A.</String>
+                <String>Murfreesboro Medical Clinic</String>
+                <String>Murfreesboro Oral Surgery</String>
+                <String>Murfreesboro Radiology &amp; Nuc. Med. Inc dba Mid-State Rad</String>
+                <String>Murfreesboro Surgical Associates</String>
+                <String>Murfreesboro Vascular &amp; Interventional</String>
+                <String>Murphy, Wayne M.D.</String>
+                <String>N. Rao Chunduru MD</String>
+                <String>Namaste OB/GYN PLLC</String>
+                <String>Nandigam Neurology, PLC</String>
+                <String>Nashville Arthritis &amp; Rheumatology</String>
+                <String>Nashville Breast Center - Hayes</String>
+                <String>Nashville Digestive Disease Center</String>
+                <String>Nashville ENT-St. Thomas Medical Grp</String>
+                <String>Nashville Family Foot Care, PLLC</String>
+                <String>Nashville Fertility Center, Nashville</String>
+                <String>Nashville Foot and Ankle Group</String>
+                <String>Nashville Gastro Consulting, PLLC</String>
+                <String>Nashville Gastroenterology and Hepatology, PC</String>
+                <String>Nashville Gastrointestinal Spec</String>
+                <String>Nashville Healthcare Center</String>
+                <String>Nashville Hip Institute (ADI)</String>
+                <String>Nashville Kidney Care</String>
+                <String>Nashville Knee and Shoulder-23rd Ave</String>
+                <String>Nashville Lung Center</String>
+                <String>Nashville Neuroscience Group (ADI)</String>
+                <String>Nashville Neurosurgery Associates, PLLC</String>
+                <String>Nashville Oncology  Associates, PC</String>
+                <String>Nashville Pain &amp; Wellness Center, PLLC</String>
+                <String>Nashville Pediatric Cardiology</String>
+                <String>Nashville Pediatric Surgery</String>
+                <String>Nashville Plastic and Reconstructive Surgery, PLC</String>
+                <String>Nashville Skin and Cancer-21st</String>
+                <String>Nashville Sports Medicine &amp; Orthopaedic Ctr (ADI)</String>
+                <String>Nashville Surgical Associates-Harding</String>
+                <String>Nashville Vascular and Vein Institute, PLLC-25th Ave</String>
+                <String>Nashville Vision Associates, PLC-Harding</String>
+                <String>Neighborhood Health</String>
+                <String>Nephrology Associates, P.C.</String>
+                <String>Neuhaus Foot &amp; Ankle</String>
+                <String>Neurohospitalist at West</String>
+                <String>Nova Pediatrics</String>
+                <String>O'Quinn Jr. Bancroft, MD</String>
+                <String>Oculoplastic Specialists of TN</String>
+                <String>Odom, Stephen M.D.</String>
+                <String>Old Harding Pediatric Assoc</String>
+                <String>OMS Nashville, PLLC - Hendersonville</String>
+                <String>Oral &amp; Facial Surgery Group., P.C.</String>
+                <String>Oral &amp; Maxillofacial Surgery Affiliates-Brentwood</String>
+                <String>OrthoGo - Downtown</String>
+                <String>Orthopaedic Specialists</String>
+                <String>Oslin Plastic Surgery, PLLC</String>
+                <String>Otolaryngology Associates of Tennessee-Hayes St</String>
+                <String>Ours, David E., MD</String>
+                <String>Pacific Companies</String>
+                <String>Pain and Spine Consultants - Brentwood</String>
+                <String>Palliative Care</String>
+                <String>Paschall, Naomi MD</String>
+                <String>Path Lab of Middle Tennessee</String>
+                <String>Pathology Assoc of St. Thomas-Harding</String>
+                <String>Pazona MD, LLC</String>
+                <String>Peak Neuromonitoring Associates</String>
+                <String>Pediatric Associates of Davidson County</String>
+                <String>Pediatric Associates of Franklin-Bakers Bridge</String>
+                <String>Pediatric Dentistry of Middle Tennessee, PLLC</String>
+                <String>Pediatric Partners of Nashville</String>
+                <String>Pediatrix Medical Group of Tennessee</String>
+                <String>Perales, Maria I, MD</String>
+                <String>Perioperative Medicine</String>
+                <String>Phase4 Plastic Surgery &amp; Reconstructive Surgery</String>
+                <String>Physician Director of Surgical Services</String>
+                <String>Pilkinton Eye Center</String>
+                <String>Pinnacle Dermatology</String>
+                <String>Pinnacle Medical Group-23rd</String>
+                <String>Pinnacle Orthopaedics</String>
+                <String>Pinnacle Surgical Partners</String>
+                <String>Pioneer Pediatrics, PLLC</String>
+                <String>Plastic Surgery Center of Nashville</String>
+                <String>Post-Acute Physicians of Tennessee PLLC</String>
+                <String>Precision Men's Health, PLLC (dba The Billups Center)</String>
+                <String>Premier Radiology-Belle Meade</String>
+                <String>Price, Ann H., M.D.</String>
+                <String>Prikhojan, Alexander MD</String>
+                <String>Proscan Imaging</String>
+                <String>Puckett, Karen J., MD</String>
+                <String>Quality Perfusion Services, LLC</String>
+                <String>Real Time Neuromonitoring Associates of CA, PC</String>
+                <String>Regina J. Elkins, O.D.</String>
+                <String>Regional Rehabilitation Center</String>
+                <String>Renal Consultants</String>
+                <String>Retief Skin Center</String>
+                <String>Retina Consultants of Nashville-Church</String>
+                <String>Richard, Floyd A., MD</String>
+                <String>Richland Creek Psychiatric Assoc.-Cargile</String>
+                <String>Rishi K. Saxena MD, PC</String>
+                <String>Ritz Med Spa</String>
+                <String>River Park Hospitalists</String>
+                <String>Rivergate Pediatrics</String>
+                <String>Robbins Plastic Surgery</String>
+                <String>Rodier, Jacqueline L., MD</String>
+                <String>Rogers, Judson E., M.D.</String>
+                <String>Rosenblum, Howard H., M.D.</String>
+                <String>Rutherford Care Management</String>
+                <String>Rutherford County Primary Care</String>
+                <String>Saint Francis Medical Partners</String>
+                <String>Saint Thomas Hospital for Specialty Surgery</String>
+                <String>Sarviaria, Sunil MD</String>
+                <String>SASH Healthcare</String>
+                <String>Schuler, Sheila, D.P.M.</String>
+                <String>Sherman, Deborah D., M.D.</String>
+                <String>Shiao, Wen T., MD</String>
+                <String>Shofner, R. Stewart, M.D.</String>
+                <String>Siragusa Vein and Laser (ADI)-Hermitage</String>
+                <String>Skin &amp; Allergy Center Murfreesboro</String>
+                <String>Skyline Women's Health Associates</String>
+                <String>Sleep Centers of Middle Tennessee</String>
+                <String>Smith, Gary J.  MD</String>
+                <String>Snow, S. Steve, M.D.</String>
+                <String>Solace OMS, PC</String>
+                <String>Somers Jr, Paul J DPM-White Bridge</String>
+                <String>South East Eye Specialist</String>
+                <String>South Street Family Medical Center</String>
+                <String>SouthEast Eye Specialists PLLC</String>
+                <String>Southern Hills Surgical Consultants</String>
+                <String>Southern Joint Replacement Institute - Patterson</String>
+                <String>Southern Kidney Specialists</String>
+                <String>SpecialtyCare</String>
+                <String>Spine and Orthopedic Solutions #230</String>
+                <String>Spivey, Oscar MD</String>
+                <String>St. Thomas Medical Group</String>
+                <String>Stephens, Lopasteeda, OD</String>
+                <String>Sterling Primary Care-Patterson</String>
+                <String>Stones River Dermatology-Williams Dr</String>
+                <String>Stones River Eye Center</String>
+                <String>Stones River Surgical Group, PLLC</String>
+                <String>Stroke &amp; Heart Attack Prevention Center</String>
+                <String>Sulkowski Family Medicine</String>
+                <String>Summit Obstetrics and Womens Health, PLLC</String>
+                <String>Swan Urogynecology-21st Ave</String>
+                <String>Sweet Dreams Anesthesia, Inc.</String>
+                <String>T. Michael Helton, MD</String>
+                <String>Tarola Plastic Surgery</String>
+                <String>Tennessee Breast Care Center</String>
+                <String>Tennessee Maternal Fetal Medicine-Nashville</String>
+                <String>Tennessee Med &amp; Pediatrics - Smyrna</String>
+                <String>Tennessee Oculoplastics</String>
+                <String>Tennessee Oncology</String>
+                <String>Tennessee Orthopaedic Alliance</String>
+                <String>Tennessee Pediatrics</String>
+                <String>Tennessee Perfusion Associates-Harding</String>
+                <String>Tennessee Retina, PC</String>
+                <String>Tennessee Women's Care P.C. </String>
+                <String>Terrace Pediatric Group</String>
+                <String>The Allergy, Asthma &amp; Sinus Center - Franklin</String>
+                <String>The Children's Clinic of Nashville</String>
+                <String>The Colorectal Center</String>
+                <String>The Heart and Vascular Clinic-Patterson</String>
+                <String>The Neurology Group, PC - Goodlettsville</String>
+                <String>The Radiology Group</String>
+                <String>The Surgical Clinic, P.L.L.C.</String>
+                <String>Tierney Plastic Surgery, PLC</String>
+                <String>Trabue, Anthony E. MD</String>
+                <String>Traceside Dermatology &amp; Allergy</String>
+                <String>Tri-Star Gynecology Oncology</String>
+                <String>TrustPoint Hospital</String>
+                <String>United Neighborhood Health Services</String>
+                <String>Urology Associates, P.C.</String>
+                <String>US Physiatry</String>
+                <String>Vanderbilt Children's Hospital #7100</String>
+                <String>Vanderbilt Eye Institute</String>
+                <String>Vanderbilt Heart - Murfreesboro</String>
+                <String>Vanderbilt Heart &amp; Vascular Inst</String>
+                <String>Vanderbilt Internal Medicine </String>
+                <String>Vanderbilt Medical Group</String>
+                <String>Vanderbilt Pediatric Heart Institute</String>
+                <String>Vanderbilt Pediatric Neurology Clinic</String>
+                <String>Vanderbilt Pediatric Surgery</String>
+                <String>Vanderbilt Plastic Surgery</String>
+                <String>Vanderbilt Univ Medical Center-Pediatric Otolaryngology</String>
+                <String>Vanderbilt University Medical Center-Pediatric Cardiology</String>
+                <String>Vanderbilt Voice Clinic-Childrens Way</String>
+                <String>Vanguard Direct Family Medicine</String>
+                <String>Venkat Reddy, MD, PC</String>
+                <String>Virtual Medical Staff LLC</String>
+                <String>VUMC Dept of Pediatric Urology</String>
+                <String>VUMC Orthopaedic Institute</String>
+                <String>VUMC Orthopaedic Surgery-Hand Surgery</String>
+                <String>VUMC Pediatric Cardiology</String>
+                <String>VUMC-Pediatric Urology</String>
+                <String>W. Garrison Strickland, MD, PC</String>
+                <String>Wagstrom, Lois, MD, P.C.</String>
+                <String>Wall, James C., M.D.</String>
+                <String>Webb Anesthesia Services, PLLC</String>
+                <String>Wesley and Klippenstein, P.C.</String>
+                <String>West Sports Medicine &amp; Orthopaedics</String>
+                <String>Williams Foot Center (Murfreesboro)</String>
+                <String>Wolohon, Charles MD</String>
+                <String>Women Obstetrics &amp; Gynecology, PLC</String>
+                <String>Women's and Children's Specialists</String>
+                <String>Women's Health Specialists-M'Boro</String>
+                <String>Women's Medical Associates of Nashville (ADI)</String>
+                <String>Woodbury Medical Center</String>
+                <String>Woodlee Family Practice</String>
+                <String>Woods Gynecology, PC</String>
+                <String>Worthy, Artmas, DDS</String>
+                <String>Wound Care Center</String>
+                <String>Wright, Wycliffe, MD</String>
+                <String>Xai Family Medical Clinic</String>
+                <String>Young, Larry C., MD</String>
+                <String>Yu, Mi MD-Nashville</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Please provide provider group name if not found" name="Please provide provider group name if not found" reviewRequired="true" type="string"/>
+        <Field displayName="ST. DeKalb Location ID" name="ST. DeKalb Location ID" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("midasDekalbOrgID"))){
+              return identity.getAttribute("midasDekalbOrgID");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="ST. DeKalb Location Type" name="ST. DeKalb Location Type" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Admitting/Attending</String>
+                <String>Allied Health TN with CPOE</String>
+                <String>Consulting/Community Care</String>
+                <String>External Direct</String>
+                <String>N/A</String>
+                <String>Ordering (NP, PA, or CRNA)</String>
+                <String>Referring</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+                      import sailpoint.tools.Util;
+                      String userType = identity.getAttribute("type");
+
+                      if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+                      if(Util.isNotNullOrEmpty(identity.getStringAttribute("midasDekalbOrgID"))){
+                      field.setRequired(true);
+                      }
+                      }
+                      return false;
+                    ]]></Source>
+                  </Script>
+                </value>
+              </entry>
+            </Map>
+          </Attributes>
+        </Field>
+        <Field displayName="ST. Hickman Location ID" name="ST. Hickman Location ID" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("midasHickmanOrgID"))){
+              return identity.getAttribute("midasHickmanOrgID");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="ST. Hickman Location Type" name="ST. Hickman Location Type" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Admitting/Attending</String>
+                <String>Allied Health TN with CPOE</String>
+                <String>Consulting/Community Care</String>
+                <String>External Direct</String>
+                <String>N/A</String>
+                <String>Ordering (NP, PA, or CRNA)</String>
+                <String>Referring</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+                      import sailpoint.tools.Util;
+                      String userType = identity.getAttribute("type");
+
+                      if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+                      if(Util.isNotNullOrEmpty(identity.getStringAttribute("midasHickmanOrgID"))){
+                      field.setRequired(true);
+                      }
+                      }
+                      return false;
+                    ]]></Source>
+                  </Script>
+                </value>
+              </entry>
+            </Map>
+          </Attributes>
+        </Field>
+        <Field displayName="ST. Highlands Location ID" name="ST. Highlands Location ID" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("midasHighlandsOrgID"))){
+              return identity.getAttribute("midasHighlandsOrgID");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="ST. Highlands Location Type" name="ST. Highlands Location Type" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Admitting/Attending</String>
+                <String>Allied Health TN with CPOE</String>
+                <String>Consulting/Community Care</String>
+                <String>External Direct</String>
+                <String>N/A</String>
+                <String>Ordering (NP, PA, or CRNA)</String>
+                <String>Referring</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+                      import sailpoint.tools.Util;
+                      String userType = identity.getAttribute("type");
+
+                      if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+                      if(Util.isNotNullOrEmpty(identity.getStringAttribute("midasHighlandsOrgID"))){
+                      field.setRequired(true);
+                      }
+                      }
+                      return false;
+                    ]]></Source>
+                  </Script>
+                </value>
+              </entry>
+            </Map>
+          </Attributes>
+        </Field>
+        <Field displayName="ST. Midtown Location ID" name="ST. Midtown Location ID" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("midasMidtownOrgID"))){
+              return identity.getAttribute("midasMidtownOrgID");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="ST. Midtown Location Type" name="ST. Midtown Location Type" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Admitting/Attending</String>
+                <String>Allied Health TN with CPOE</String>
+                <String>Consulting/Community Care</String>
+                <String>External Direct</String>
+                <String>N/A</String>
+                <String>Ordering (NP, PA, or CRNA)</String>
+                <String>Referring</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+                      import sailpoint.tools.Util;
+                      String userType = identity.getAttribute("type");
+
+                      if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+                      if(Util.isNotNullOrEmpty(identity.getStringAttribute("midasMidtownOrgID"))){
+                      field.setRequired(true);
+                      }
+                      }
+                      return false;
+                    ]]></Source>
+                  </Script>
+                </value>
+              </entry>
+            </Map>
+          </Attributes>
+        </Field>
+        <Field displayName="ST. Riverpark Location ID" name="ST. Riverpark Location ID" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("midasRiverParkOrgID"))){
+              return identity.getAttribute("midasRiverParkOrgID");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="ST. Riverpark Location Type" name="ST. Riverpark Location Type" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Admitting/Attending</String>
+                <String>Allied Health TN with CPOE</String>
+                <String>Consulting/Community Care</String>
+                <String>External Direct</String>
+                <String>N/A</String>
+                <String>Ordering (NP, PA, or CRNA)</String>
+                <String>Referring</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+                      import sailpoint.tools.Util;
+                      String userType = identity.getAttribute("type");
+
+                      if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+                      if(Util.isNotNullOrEmpty(identity.getStringAttribute("midasRiverParkOrgID"))){
+                      field.setRequired(true);
+                      }
+                      }
+                      return false;
+                    ]]></Source>
+                  </Script>
+                </value>
+              </entry>
+            </Map>
+          </Attributes>
+        </Field>
+        <Field displayName="ST. Rutherford Location ID" name="ST. Rutherford Location ID" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("midasRutherfordOrgID"))){
+              return identity.getAttribute("midasRutherfordOrgID");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="ST. Rutherford Location Type" name="ST. Rutherford Location Type" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Admitting/Attending</String>
+                <String>Allied Health TN with CPOE</String>
+                <String>Consulting/Community Care</String>
+                <String>External Direct</String>
+                <String>N/A</String>
+                <String>Ordering (NP, PA, or CRNA)</String>
+                <String>Referring</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+                      import sailpoint.tools.Util;
+                      String userType = identity.getAttribute("type");
+
+                      if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+                      if(Util.isNotNullOrEmpty(identity.getStringAttribute("midasRutherfordOrgID"))){
+                      field.setRequired(true);
+                      }
+                      }
+                      return false;
+                    ]]></Source>
+                  </Script>
+                </value>
+              </entry>
+            </Map>
+          </Attributes>
+        </Field>
+        <Field displayName="ST. Stones Location ID" name="ST. Stones Location ID" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("midasStonesRiverOrgID"))){
+              return identity.getAttribute("midasStonesRiverOrgID");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="ST. Stones Location Type" name="ST. Stones Location Type" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Admitting/Attending</String>
+                <String>Allied Health TN with CPOE</String>
+                <String>Consulting/Community Care</String>
+                <String>External Direct</String>
+                <String>N/A</String>
+                <String>Ordering (NP, PA, or CRNA)</String>
+                <String>Referring</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+                      import sailpoint.tools.Util;
+                      String userType = identity.getAttribute("type");
+
+                      if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+                      if(Util.isNotNullOrEmpty(identity.getStringAttribute("midasStonesRiverOrgID"))){
+                      field.setRequired(true);
+                      }
+                      }
+                      return false;
+                    ]]></Source>
+                  </Script>
+                </value>
+              </entry>
+            </Map>
+          </Attributes>
+        </Field>
+        <Field displayName="ST. West Location ID" name="ST. West Location ID" reviewRequired="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("midasWestOrgID"))){
+              return identity.getAttribute("midasWestOrgID");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="ST. West Location Type" name="ST. West Location Type" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Admitting/Attending</String>
+                <String>Allied Health TN with CPOE</String>
+                <String>Consulting/Community Care</String>
+                <String>External Direct</String>
+                <String>N/A</String>
+                <String>Ordering (NP, PA, or CRNA)</String>
+                <String>Referring</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+          <Attributes>
+            <Map>
+              <entry key="hidden">
+                <value>
+                  <Script>
+                    <Source><![CDATA[
+                      import sailpoint.tools.Util;
+                      String userType = identity.getAttribute("type");
+
+                      if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+                      if(Util.isNotNullOrEmpty(identity.getStringAttribute("midasWestOrgID"))){
+                      field.setRequired(true);
+                      }
+                      }
+                      return false;
+                    ]]></Source>
+                  </Script>
+                </value>
+              </entry>
+            </Map>
+          </Attributes>
+        </Field>
+        <Field displayName="Suffix" name="Suffix" reviewRequired="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Jr.</String>
+                <String>Sr.</String>
+                <String>I</String>
+                <String>II</String>
+                <String>III</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+      </Section>
+    </Form>
+  </ProvisioningForms>
+  <Schemas>
+    <Schema displayAttribute="User ID" identityAttribute="User ID" instanceAttribute="" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="FIRST_NAME" type="string"/>
+      <AttributeDefinition name="LAST_NAME" type="string"/>
+      <AttributeDefinition name="MIDDLE_NAME" type="string"/>
+      <AttributeDefinition name="employee ID" type="string"/>
+      <AttributeDefinition name="NPI" type="string"/>
+      <AttributeDefinition name="DEA" type="string"/>
+      <AttributeDefinition name="Invision Alias" type="string"/>
+      <AttributeDefinition name="Business Address" type="string"/>
+      <AttributeDefinition name="Fax" type="string"/>
+      <AttributeDefinition name="Phone" type="string"/>
+      <AttributeDefinition entitlement="true" managed="true" name="Users Cerner Position" schemaObjectType="group" type="string"/>
+      <AttributeDefinition name="Users credentials" type="string"/>
+      <AttributeDefinition name="User ID" type="string"/>
+      <AttributeDefinition name="External ID" type="string"/>
+      <AttributeDefinition name="Organization" type="string"/>
+      <AttributeDefinition name="Email address" type="string"/>
+      <AttributeDefinition entitlement="true" managed="true" name="User Group" schemaObjectType="User Group" type="string"/>
+      <AttributeDefinition name="endEffectiveDateTime" type="string"/>
+    </Schema>
+    <Schema aggregationType="group" descriptionAttribute="" displayAttribute="" identityAttribute="User Group" instanceAttribute="" nativeObjectType="User Group" objectType="User Group" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="User Group" type="string"/>
+    </Schema>
+    <Schema descriptionAttribute="" displayAttribute="Users Cerner Position" identityAttribute="Users Cerner Position" instanceAttribute="" nativeObjectType="group" objectType="group" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="Users Cerner Position" type="string"/>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>

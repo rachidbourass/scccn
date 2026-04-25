@@ -1,0 +1,472 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application authoritative="true" connector="sailpoint.connector.JDBCConnector" featuresString="DISCOVER_SCHEMA, PROVISIONING, SYNC_PROVISIONING, DIRECT_PERMISSIONS, SEARCH, ENABLE, UNLOCK" icon="databaseIcon" name="DB-Peoplesoft-HCM-Secondary" profileClass="" type="JDBC">
+  <AccountCorrelationConfig>
+    <Reference class="sailpoint.object.CorrelationConfig" name="Ascension-PeopleSoftDB-Correlation-Rule"/>
+  </AccountCorrelationConfig>
+  <Attributes>
+    <Map>
+      <entry key="SQL" value="Select * from PS_AHHR_SAILP_A_VW A&#13;&#10;where&#13;&#10;JOB_INDICATOR='S' and&#13;&#10;A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD&#13;&#10;                  and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH'))))&#13;&#10;  and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD&#13;&#10;                  and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH'))))  &#13;&#10;   and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR')"/>
+      <entry key="acceleratorPackEnabled"/>
+      <entry key="accountCorrelationAttrExpression"/>
+      <entry key="accountCreateConditionalRule"/>
+      <entry key="accountCreateEntitlements"/>
+      <entry key="accountDisableAttrExpression"/>
+      <entry key="accountLockAttrExpression"/>
+      <entry key="additionalAppBusApprovalRule"/>
+      <entry key="additionalAppBusApprovers"/>
+      <entry key="afterProvisioningRule"/>
+      <entry key="aggregationMode">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAdditionalApplicationAfterProvisioningRule"/>
+      <entry key="apAdditionalApplicationCorrelationRule"/>
+      <entry key="apAdditionalApplicationCreationRule"/>
+      <entry key="apAdditionalApplicationCustomizationRule"/>
+      <entry key="apAdditionalApplicationMCustomizationRule"/>
+      <entry key="apAdditionalApplicationMGroupRefreshRule"/>
+      <entry key="apAdditionalApplicationPreIterateRule"/>
+      <entry key="apAfterMoverJoiner">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAfterRehireAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAttributeSyncEligibleRule"/>
+      <entry key="apBeforeMoverAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apPopulationReverseLeaverOptions"/>
+      <entry key="appBusApprovalRule"/>
+      <entry key="appBusApprovers"/>
+      <entry key="ascBusinessApplication"/>
+      <entry key="authoritativeEmployee"/>
+      <entry key="authoritativeNonEmployee"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="beforemoverPrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="birthrightEntAttrExpression"/>
+      <entry key="buildMapRule" value="Ascension-Rule-Buildmap-PeopleSoftDB"/>
+      <entry key="busApp">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="commentsAttr"/>
+      <entry key="commentsValue"/>
+      <entry key="compositeDefinition"/>
+      <entry key="deltaTable"/>
+      <entry key="displayFormRule"/>
+      <entry key="driverClass" value="oracle.jdbc.driver.OracleDriver"/>
+      <entry key="evaluateCreateprovpolicy"/>
+      <entry key="getDeltaSQL"/>
+      <entry key="hardPolicyviolations"/>
+      <entry key="isPermissionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="jdbcExceptionBucketing">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="joinerEnabled"/>
+      <entry key="joinerPopulationRegex"/>
+      <entry key="joinerRoles"/>
+      <entry key="managerCorrelationFilter">
+        <value>
+          <Filter operation="EQ" property="employeeId" value="SUPERVISOR_ID"/>
+        </value>
+      </entry>
+      <entry key="mergeRows">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="moveAccountContainer"/>
+      <entry key="moverExtendedRule"/>
+      <entry key="moverProcess" value="Do Nothing"/>
+      <entry key="moverRevocation" value="Do Nothing"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="partitionMode">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="partitionStatements">
+        <value>
+          <List>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10010000 and EMPLID &gt;= 10000000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10020000 and EMPLID &gt;= 10010000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10030000 and EMPLID &gt;= 10020000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10040000 and EMPLID &gt;= 10030000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10050000 and EMPLID &gt;= 10040000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10060000 and EMPLID &gt;= 10050000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10070000 and EMPLID &gt;= 10060000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10080000 and EMPLID &gt;= 10070000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10090000 and EMPLID &gt;= 10080000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10100000 and EMPLID &gt;= 10090000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10110000 and EMPLID &gt;= 10100000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10120000 and EMPLID &gt;= 10110000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10130000 and EMPLID &gt;= 10120000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10140000 and EMPLID &gt;= 10130000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10150000 and EMPLID &gt;= 10140000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10160000 and EMPLID &gt;= 10150000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10170000 and EMPLID &gt;= 10160000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10180000 and EMPLID &gt;= 10170000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10190000 and EMPLID &gt;= 10180000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10200000 and EMPLID &gt;= 10190000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10210000 and EMPLID &gt;= 10200000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10220000 and EMPLID &gt;= 10210000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10230000 and EMPLID &gt;= 10220000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10240000 and EMPLID &gt;= 10230000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10250000 and EMPLID &gt;= 10240000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10260000 and EMPLID &gt;= 10250000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10270000 and EMPLID &gt;= 10260000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10280000 and EMPLID &gt;= 10270000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10290000 and EMPLID &gt;= 10280000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10300000 and EMPLID &gt;= 10290000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10310000 and EMPLID &gt;= 10300000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10320000 and EMPLID &gt;= 10310000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10330000 and EMPLID &gt;= 10320000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10340000 and EMPLID &gt;= 10330000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10350000 and EMPLID &gt;= 10340000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10360000 and EMPLID &gt;= 10350000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10370000 and EMPLID &gt;= 10360000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10380000 and EMPLID &gt;= 10370000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10390000 and EMPLID &gt;= 10380000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10400000 and EMPLID &gt;= 10390000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10410000 and EMPLID &gt;= 10400000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10420000 and EMPLID &gt;= 10410000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10430000 and EMPLID &gt;= 10420000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10440000 and EMPLID &gt;= 10430000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10450000 and EMPLID &gt;= 10440000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10460000 and EMPLID &gt;= 10450000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10470000 and EMPLID &gt;= 10460000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10480000 and EMPLID &gt;= 10470000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10490000 and EMPLID &gt;= 10480000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10500000 and EMPLID &gt;= 10490000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10510000 and EMPLID &gt;= 10500000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10520000 and EMPLID &gt;= 10510000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10530000 and EMPLID &gt;= 10520000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10540000 and EMPLID &gt;= 10530000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10550000 and EMPLID &gt;= 10540000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10560000 and EMPLID &gt;= 10550000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10570000 and EMPLID &gt;= 10560000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10580000 and EMPLID &gt;= 10570000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10590000 and EMPLID &gt;= 10580000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &lt; 10600000 and EMPLID &gt;= 10590000 order by EMPLID ASC</String>
+            <String>Select * from PS_AHHR_SAILP_A_VW A where JOB_INDICATOR='S' and A.EFFDT = (Select max(A_ED.EFFDT) from PS_AHHR_SAILP_A_VW A_ED where A.EMPLID = A_ED.EMPLID and A.EMPL_RCD = A_ED.EMPL_RCD and (A_ED.EFFDT &lt;= sysdate or ((A_ED.EFFDT &lt;= sysdate + 45) and A_ED.EFFDT &gt; sysdate and A_ED.ACTION in('HIR','REH')))) and A.EFFSEQ = (Select max(A_ES.EFFSEQ) from PS_AHHR_SAILP_A_VW A_ES where A.EMPLID = A_ES.EMPLID and A.EMPL_RCD = A_ES.EMPL_RCD and A_ES.EFFDT = A.EFFDT and (A_ES.EFFDT &lt;= sysdate or ((A_ES.EFFDT &lt;= sysdate + 45) and A_ES.EFFDT &gt; sysdate and A_ES.ACTION in('HIR','REH')))) and not (SETID_LOCATION = 'ILARL' and PER_ORG = 'CWR') and EMPLID &gt;= 10600000 order by EMPLID ASC</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="password" value="3:ACP:8Uh+HmXtSgOHJ4pCs4FKUXMXx2AQFo2guCXVZ9yVvZw="/>
+      <entry key="primarySyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="primarypasswordSyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="privilegedAccountAttrExpression"/>
+      <entry key="privilegedEntAttrExpression"/>
+      <entry key="provisionRule" value="globalRule"/>
+      <entry key="rehireExtendedRule"/>
+      <entry key="rehirePrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="rehireProcess" value="Do Nothing"/>
+      <entry key="removeEntitlementLeaverExceptionExpression"/>
+      <entry key="renameLDAPaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="requestorFormRole"/>
+      <entry key="reverseTerminationExtendedRule"/>
+      <entry key="reverseleaverProcess" value="Do Nothing"/>
+      <entry key="scramblePasswordAttr"/>
+      <entry key="skipSupervisorApproval"/>
+      <entry key="snowAssignmentGroup"/>
+      <entry key="snowAssignmentGroupName"/>
+      <entry key="softPolicyviolations"/>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="JDBC Template"/>
+      <entry key="terminationExtendedRule"/>
+      <entry key="terminationProcess" value="Do Nothing"/>
+      <entry key="testConnSQL" value="select EMPLID  from PS_AHHR_SAILP_A_VW WHERE ROWNUM &lt;= 5"/>
+      <entry key="url" value="jdbc:oracle:thin:@ascnexa03pr-vwbip-scan.opc.oracleoutsourcing.com:1521/ASCNHPRD"/>
+      <entry key="useExecuteQuery">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="useStoredProcedureDelta">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="useStoredProcedureDirectPermission">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="useStoredProcedureGetObject">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="useStoredProcedurePartition">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="useStoredProcedureSqlStmt">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="useStoredProcedureTestConn">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="user" value="AH_ERP_SBT"/>
+      <entry key="xDays"/>
+      <entry key="xDeleteDays"/>
+    </Map>
+  </Attributes>
+  <CreationRule>
+    <Reference class="sailpoint.object.Rule" name="Ascension-DB-PeopleSoft-IdentityCreation-Rule"/>
+  </CreationRule>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Schemas>
+    <Schema displayAttribute="" identityAttribute="EMPLID" instanceAttribute="" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="OPRID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EMPLID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EMPL_RCD" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="FIRST_NAME" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="LAST_NAME" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="MIDDLE_NAME" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NAME_SUFFIX" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NAME_PREFIX" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NAME" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="PREF_FIRST_NAME" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="NAME_TITLE" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="E_ADDR_TYPE" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EMAIL_ADDR" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="PHONE_TYPE" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="PHONE" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="AHHR_NPI" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="AHHR_SSN_LAST4" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="AH_DOB_DDMM" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="LASTUPDT_DTTM" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EFFDT" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EFFSEQ" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="POSITION_NBR" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="BUSINESS_UNIT" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="SETID_JOBCODE" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="JOBCODE" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="JOB_INDICATOR" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="SETID_LOCATION" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="LOCATION" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="SETID_DEPT" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="DEPTID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="PER_ORG" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EMPL_STATUS" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ACTION" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="JOB_FAMILY" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EMPL_CLASS" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="MANAGER_LEVEL" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="AH_MANAGER_FLAG" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="COMPANY" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="SUPERVISOR_ID" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="HIRE_DT" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="HR_STATUS" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ACTION_REASON" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="FULL_PART_TIME" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="OFFICER_CD" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ACCT_CD" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="LAST_HIRE_DT" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="TERMINATION_DT" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EXPECTED_END_DATE" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="LOCATION_DESCR" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ADDRESS1" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ADDRESS2" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ADDRESS3" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="CITY" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="STATE" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="COUNTRY" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="POSTAL" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="DEPT_DESCR" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="JOBCODE_DESCR" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="POSITION_NBR_DESCR" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="LASTUPDDTTM_J" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="LASTUPDDTTM" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="EMPL_TYPE" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="AH_BUS_UNIT_DESCR" type="string">
+        <Description/>
+      </AttributeDefinition>
+      <AttributeDefinition name="ASGN_END_DT" type="string">
+        <Description/>
+      </AttributeDefinition>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>

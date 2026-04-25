@@ -1,0 +1,287 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application connector="sailpoint.connector.DelimitedFileConnector" featuresString="DIRECT_PERMISSIONS, NO_RANDOM_ACCESS, DISCOVER_SCHEMA" icon="enterpriseIcon" name="CashPro" profileClass="" type="DelimitedFile">
+  <AccountCorrelationConfig>
+    <Reference class="sailpoint.object.CorrelationConfig" name="Ascension-Correlation-CashPro"/>
+  </AccountCorrelationConfig>
+  <Attributes>
+    <Map>
+      <entry key="PassphraseForPrivateKey"/>
+      <entry key="PrivateKeyFilePath"/>
+      <entry key="acceleratorPackEnabled"/>
+      <entry key="accountCorrelationAttrExpression"/>
+      <entry key="accountCreateConditionalRule"/>
+      <entry key="accountCreateEntitlements"/>
+      <entry key="accountDisableAttrExpression"/>
+      <entry key="accountLockAttrExpression"/>
+      <entry key="acctAggregationEnd">
+        <value>
+          <Date>1734573361270</Date>
+        </value>
+      </entry>
+      <entry key="acctAggregationStart">
+        <value>
+          <Date>1734573360157</Date>
+        </value>
+      </entry>
+      <entry key="additionalAppBusApprovalRule"/>
+      <entry key="additionalAppBusApprovers"/>
+      <entry key="afterProvisioningRule"/>
+      <entry key="aggregationPartitioned">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="aggregationType" value="account"/>
+      <entry key="apAdditionalApplicationAfterProvisioningRule"/>
+      <entry key="apAdditionalApplicationCorrelationRule"/>
+      <entry key="apAdditionalApplicationCreationRule"/>
+      <entry key="apAdditionalApplicationCustomizationRule"/>
+      <entry key="apAdditionalApplicationMCustomizationRule"/>
+      <entry key="apAdditionalApplicationMGroupRefreshRule"/>
+      <entry key="apAdditionalApplicationPreIterateRule"/>
+      <entry key="apAfterMoverJoiner">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAfterRehireAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAttributeSyncEligibleRule"/>
+      <entry key="apBeforeMoverAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apPopulationReverseLeaverOptions"/>
+      <entry key="appBusApprovalRule"/>
+      <entry key="appBusApprovers"/>
+      <entry key="authoritativeEmployee"/>
+      <entry key="authoritativeNonEmployee"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="beforemoverPrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="birthrightEntAttrExpression"/>
+      <entry key="busApp">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="commentsAttr"/>
+      <entry key="commentsValue"/>
+      <entry key="compositeDefinition"/>
+      <entry key="delimiter" value=","/>
+      <entry key="displayFormRule"/>
+      <entry key="evaluateCreateprovpolicy"/>
+      <entry key="file" value="\\andc1wapp0147.ds.sjhs.com\AppAggregation\CashPro.csv"/>
+      <entry key="filetransport" value="local"/>
+      <entry key="filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.delimiter" value=","/>
+      <entry key="group.file" value="\\andc1wapp0147.ds.sjhs.com\AppAggregation\CashPro.csv"/>
+      <entry key="group.filetransport" value="local"/>
+      <entry key="group.filterEmptyRecords">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.hasHeader">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.isCaseInsensitiveMerge">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.isSortedByIndexColumn">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.mergeRows">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="group.partitionMode" value="auto"/>
+      <entry key="group.stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="hardPolicyviolations"/>
+      <entry key="hasHeader">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="isCaseInsensitiveMerge">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="isSortedByIndexColumn">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="joinerEnabled"/>
+      <entry key="joinerPopulationRegex"/>
+      <entry key="joinerRoles"/>
+      <entry key="mergeRows">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="moveAccountContainer"/>
+      <entry key="moverExtendedRule"/>
+      <entry key="moverProcess" value="Do Nothing"/>
+      <entry key="moverRevocation" value="Do Nothing"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="parseType" value="delimited"/>
+      <entry key="partitionMode" value="auto"/>
+      <entry key="port"/>
+      <entry key="postIterateRule" value="Ascension-Rule-PostIterate-Rename"/>
+      <entry key="primarySyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="primarypasswordSyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="privilegedAccountAttrExpression"/>
+      <entry key="privilegedEntAttrExpression"/>
+      <entry key="rehireExtendedRule"/>
+      <entry key="rehirePrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="rehireProcess" value="Do Nothing"/>
+      <entry key="removeEntitlementLeaverExceptionExpression"/>
+      <entry key="renameLDAPaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="requestorFormRole"/>
+      <entry key="reverseTerminationExtendedRule"/>
+      <entry key="reverseleaverProcess" value="Do Nothing"/>
+      <entry key="scramblePasswordAttr"/>
+      <entry key="sftpAuthMethod" value="password"/>
+      <entry key="skipSupervisorApproval"/>
+      <entry key="softPolicyviolations"/>
+      <entry key="stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="DelimitedFile Template"/>
+      <entry key="terminationExtendedRule"/>
+      <entry key="terminationProcess" value="Do Nothing"/>
+      <entry key="xDays"/>
+      <entry key="xDeleteDays"/>
+    </Map>
+  </Attributes>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="10018837"/>
+  </Owner>
+  <ProvisioningForms>
+    <Form name="CashPro-CreatePolicy" objectType="account" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="CashPro-CreatePolicy"/>
+        </Map>
+      </Attributes>
+      <Section name="Section 1">
+        <Field displayName="User Name (ID)" name="User Name (ID)" required="true" type="string">
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+			  String lastname=identity.getAttribute("lastname");
+			  String firstname=identity.getAttribute("firstname");
+			  String networkid=identity.getAttribute("samAccountName");
+			  if(Util.isNotNullOrEmpty(lastname) && Util.isNotNullOrEmpty(firstname) && Util.isNotNullOrEmpty(networkid)){
+				return lastname+","+firstname+" ("+networkid+")";
+			  }
+			 else{
+			return null;}]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Email Address" name="Email Address" required="true" type="string">
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+			if(Util.isNotNullOrEmpty(identity.getAttribute("email"))){
+			return identity.getAttribute("email");
+			}
+			else{
+			return null;
+			}]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Phone" name="Phone" required="true" type="string">
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+			if(Util.isNotNullOrEmpty(identity.getAttribute("telephoneNumber"))){
+			return identity.getAttribute("telephoneNumber");
+			}
+			else{
+			return null;
+		  }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Mobile" name="Mobile" type="string">
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+			if(Util.isNotNullOrEmpty(identity.getAttribute("mobile"))){
+			return identity.getAttribute("mobile");
+			}
+			else{
+			return null;
+			}]]></Source>
+          </Script>
+        </Field>
+      </Section>
+    </Form>
+  </ProvisioningForms>
+  <Schemas>
+    <Schema displayAttribute="Email Address" identityAttribute="Email Address" instanceAttribute="" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="User Name (ID)" type="string"/>
+      <AttributeDefinition entitlement="true" managed="true" name="User Type" schemaObjectType="group" type="string"/>
+      <AttributeDefinition name="Email Address" type="string"/>
+      <AttributeDefinition name="Phone" type="string"/>
+      <AttributeDefinition name="Mobile" type="string"/>
+    </Schema>
+    <Schema descriptionAttribute="" displayAttribute="User Type" identityAttribute="User Type" instanceAttribute="" nativeObjectType="group" objectType="group" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="User Type" type="string"/>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>

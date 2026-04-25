@@ -1,0 +1,813 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application connector="sailpoint.connector.OpenConnectorAdapter" featuresString="PROVISIONING, SYNC_PROVISIONING, PASSWORD, ENABLE, SEARCH" icon="internetIcon" name="GSuite" profileClass="" type="G Suite">
+  <AccountCorrelationConfig>
+    <Reference class="sailpoint.object.CorrelationConfig" name="Ascension - Mail Based Account Correlation"/>
+  </AccountCorrelationConfig>
+  <Attributes>
+    <Map>
+      <entry key="acceleratorPackEnabled"/>
+      <entry key="accessToken" value="3:ACP:tLYSOsjRqzkX39cJuWUqMxfNLmwFiTE/c5cScS2sKYaJsEn2wrMHDc8umU36AbnJ679lXSAJv9U1QIJeGUS1c4Rhrah2FdOt4f/uN7RQx3EXoKesaGeY/zzanyOPRWlXj3LrbyTQsdwD4+rSwUBLZSWowN8ZJ0w7Jzjl9+0eEHJwFj1UjwH4xCgDhjr5S3LJjKGfzmrXTArPpqBIasTyMQyMBb9ri7ZoVWrhsu0IaxayN+PqpSmRHwxrriGyud8849V02GleHOaPw2ry1xRQGV+m/fh8bxYx5itHmxnamP5OO7eQZ/9Br3ueEyAYmctBjVfxHU51FoRbFOqBH0pQZA=="/>
+      <entry key="accessToken_configHashCode" value="1210626058"/>
+      <entry key="accessToken_type" value="Bearer"/>
+      <entry key="accessToken_validity" value="1734635583394"/>
+      <entry key="accountCorrelationAttrExpression"/>
+      <entry key="accountCreateConditionalRule"/>
+      <entry key="accountCreateEntitlements"/>
+      <entry key="accountDeltaTimeStamp" value="2024-12-19T06:20:52.319Z"/>
+      <entry key="accountDisableAttrExpression"/>
+      <entry key="accountLockAttrExpression"/>
+      <entry key="acctAggregationEnd">
+        <value>
+          <Date>1734616344256</Date>
+        </value>
+      </entry>
+      <entry key="acctAggregationStart">
+        <value>
+          <Date>1734616344256</Date>
+        </value>
+      </entry>
+      <entry key="additionalAppBusApprovalRule"/>
+      <entry key="additionalAppBusApprovers"/>
+      <entry key="afterProvisioningRule" value="Ascension-GSuite-AfterProvisioning-Rule"/>
+      <entry key="aggregationPartitioned">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="aggregationType" value="account"/>
+      <entry key="apAdditionalApplicationAfterProvisioningRule"/>
+      <entry key="apAdditionalApplicationCorrelationRule"/>
+      <entry key="apAdditionalApplicationCreationRule"/>
+      <entry key="apAdditionalApplicationCustomizationRule"/>
+      <entry key="apAdditionalApplicationMCustomizationRule"/>
+      <entry key="apAdditionalApplicationMGroupRefreshRule"/>
+      <entry key="apAdditionalApplicationPreIterateRule"/>
+      <entry key="apAfterMoverJoiner">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAfterRehireAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAppendApplicationName">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAttributeSyncEligibleRule"/>
+      <entry key="apBeforeMoverAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apPopulationReverseLeaverOptions"/>
+      <entry key="appBusApprovalRule" value="Rule-GSuite-gcpApproval"/>
+      <entry key="appBusApprovers"/>
+      <entry key="ascBusinessApplication"/>
+      <entry key="authenticationMethod" value="OAuth2.0"/>
+      <entry key="authoritativeEmployee"/>
+      <entry key="authoritativeNonEmployee"/>
+      <entry key="beforeProvisioningRule" value="Ascension-GSuite-BeforeProvisioning-Rule"/>
+      <entry key="beforemoverPrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="birthrightEntAttrExpression"/>
+      <entry key="busApp">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="clientID" value="486412863982-n1ddl138irsovs9k42e998np2ouk15cc.apps.googleusercontent.com"/>
+      <entry key="clientSecret" value="3:ACP:zZ4QVkc9g6MT5ORHkR/cAshhnpRt8OjkTYcNO8P5yfFkyzJw959kWhC0eI+5i8N7"/>
+      <entry key="commentsAttr"/>
+      <entry key="commentsValue"/>
+      <entry key="compositeDefinition"/>
+      <entry key="connectorClass" value="openconnector.connector.GoogleAppsDirect"/>
+      <entry key="connectorRetryableErrors">
+        <value>
+          <List>
+            <String>Quota limit exceeded for the day</String>
+            <String>Timeout waiting for lock on object</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="createAccountTimelag" value="70"/>
+      <entry key="displayFormRule"/>
+      <entry key="enableDataTransferOnDelete">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="enablepsaValidation">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="encrypted" value="refreshToken,clientSecret,accessToken,private_key,private_key_password"/>
+      <entry key="entDir">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="evaluateCreateprovpolicy"/>
+      <entry key="excludeAppsFromTransfer">
+        <value>
+          <List>
+            <String>None</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="grantType" value="CLIENT_CREDENTIALS"/>
+      <entry key="groupDeltaTimeStamp" value="2024-12-19T04:03:48.055Z"/>
+      <entry key="groupDetails" value="N"/>
+      <entry key="groupPageSize" value="200"/>
+      <entry key="groupProvisioning">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="hardPolicyviolations"/>
+      <entry key="isContinueOnError" value="true"/>
+      <entry key="isSkipAlias" value="false"/>
+      <entry key="joinerEnabled" value="TRUE"/>
+      <entry key="joinerPopulationRegex"/>
+      <entry key="joinerRoles"/>
+      <entry key="jwt_issuer"/>
+      <entry key="jwt_scope"/>
+      <entry key="jwt_subject"/>
+      <entry key="loaProcess" value="Do Nothing"/>
+      <entry key="load-by-sysclassloader">
+        <value>
+          <List>
+            <String>velocity.jar</String>
+            <String>org.apache.velocity</String>
+            <String>org.apache.bsf.engines.jacl.BSFCommand.class</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="ltdProcess" value="Do Nothing"/>
+      <entry key="maxReadRetryCount" value="3"/>
+      <entry key="maxThreadCount" value="8"/>
+      <entry key="moveAccountContainer"/>
+      <entry key="moverExtendedRule"/>
+      <entry key="moverProcess" value="Do Nothing"/>
+      <entry key="moverRevocation" value="Do Nothing"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="userDefined"/>
+      <entry key="nativeChangeDetectionAttributes">
+        <value>
+          <List>
+            <String>Groups</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations">
+        <value>
+          <List>
+            <String>Modify</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="nativeChangeProcess" value="Do Nothing"/>
+      <entry key="noGroupPermissions">
+        <value>
+          <Map>
+            <entry key="Role">
+              <value>
+                <Boolean>true</Boolean>
+              </value>
+            </entry>
+            <entry key="group">
+              <value>
+                <Boolean>true</Boolean>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="noPermissions" value="true"/>
+      <entry key="omitmanagerPrivgaccess">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="operations" value="Create, Modify, Delete, Enable, Disable, SetPassword"/>
+      <entry key="pageSize" value="500"/>
+      <entry key="partitionEmail">
+        <value>
+          <List>
+            <String>a*</String>
+            <String>b*</String>
+            <String>c*</String>
+            <String>d*</String>
+            <String>e*</String>
+            <String>f*</String>
+            <String>g*</String>
+            <String>h*</String>
+            <String>i*</String>
+            <String>j*</String>
+            <String>k*</String>
+            <String>l*</String>
+            <String>m*</String>
+            <String>n*</String>
+            <String>o*</String>
+            <String>p*</String>
+            <String>q*</String>
+            <String>r*</String>
+            <String>s*</String>
+            <String>t*</String>
+            <String>u*</String>
+            <String>v*</String>
+            <String>w*</String>
+            <String>x*</String>
+            <String>y*</String>
+            <String>z*</String>
+            <String>0*</String>
+            <String>1*</String>
+            <String>2*</String>
+            <String>3*</String>
+            <String>4*</String>
+            <String>5*</String>
+            <String>6*</String>
+            <String>7*</String>
+            <String>8*</String>
+            <String>9*</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="partitionFamilyName"/>
+      <entry key="partitionGivenName"/>
+      <entry key="partitionMode">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="policyType" value="Do Nothing"/>
+      <entry key="primarySyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="primarypasswordSyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="private_key_password" value="3:ACP:uXzrP7UHGjeLiXgl24R2cbGOonFua+0rOlqbWF+Dxvk="/>
+      <entry key="private_key_to_update"/>
+      <entry key="privilegedAccountAttrExpression"/>
+      <entry key="privilegedEntAttrExpression"/>
+      <entry key="provisioningMaxRetries" value="5"/>
+      <entry key="refreshToken" value="3:ACP:c/B1VA07ZQhJlicCMuiD+QCUzIw3AWYk6Gq2cIDjNF6aZdUS+MwroEiAZPVRYCczMC/f14TXEFOEYXxt2DUKTarXvcM+/Mqcam1lthHoPAKMAikWOUKj0MOo74Q/vzF7bEIDFQ7B6qmpi8Enxcq/5JfRJ77L/c6HBQ7Or+8MTa0="/>
+      <entry key="rehireExtendedRule"/>
+      <entry key="rehirePrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="rehireProcess" value="Enable Immediately and Reset Password"/>
+      <entry key="relationsForDataTransfer">
+        <value>
+          <List>
+            <String>manager</String>
+            <String>assistant</String>
+            <String>father</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="removeEntitlementLeaverExceptionExpression"/>
+      <entry key="renameLDAPaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="requestorFormRole"/>
+      <entry key="reverseTerminationExtendedRule"/>
+      <entry key="reverseleaverProcess" value="Do Nothing"/>
+      <entry key="rolePageSize" value="100"/>
+      <entry key="rtwloaProcess" value="Do Nothing"/>
+      <entry key="rtwltdProcess" value="Do Nothing"/>
+      <entry key="schemaProvisioningMap">
+        <value>
+          <Map>
+            <entry key="Role">
+              <value>
+                <Boolean>true</Boolean>
+              </value>
+            </entry>
+            <entry key="group">
+              <value>
+                <Boolean>true</Boolean>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="scramblePasswordAttr" value="password"/>
+      <entry key="skipPreloadingMemberships" value="true"/>
+      <entry key="skipSupervisorApproval"/>
+      <entry key="snowAssignmentGroup"/>
+      <entry key="snowAssignmentGroupName"/>
+      <entry key="softPolicyviolations"/>
+      <entry key="subscribedGoogleApps">
+        <value>
+          <Map>
+            <entry key="Calendar">
+              <value>
+                <Long>435070579839</Long>
+              </value>
+            </entry>
+            <entry key="Drive and Docs">
+              <value>
+                <Long>55656082996</Long>
+              </value>
+            </entry>
+            <entry key="Google+">
+              <value>
+                <Long>553547912911</Long>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="G Suite"/>
+      <entry key="terminationExtendedRule"/>
+      <entry key="terminationProcess" value="Do Nothing"/>
+      <entry key="waitBeforeProvisioningRetry" value="5"/>
+      <entry key="xDays"/>
+      <entry key="xDeleteDays"/>
+    </Map>
+  </Attributes>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <PasswordPolicies>
+    <PasswordPolicyHolder>
+      <PolicyRef>
+        <Reference class="sailpoint.object.PasswordPolicy" name="Ascension-PasswordPolicy-Gsuite"/>
+      </PolicyRef>
+    </PasswordPolicyHolder>
+  </PasswordPolicies>
+  <ProvisioningForms>
+    <Form name="account" objectType="account" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="account"/>
+        </Map>
+      </Attributes>
+      <Section>
+        <Field displayName="Username" helpKey="Prefix for the GSuite Account (i.e. prefix@domain)" name="prefixField" required="true" type="string">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-FieldValue-Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="Domain" helpKey="Note -  Per policy, contractors are not provided mailbox functionality by default. If mailbox functionality is needed please use the &quot;Manage Contractor&quot; -&gt; &quot;Manage Mailbox License&quot; Quicklink following fulfillment of this request. This does not apply to users identified as working for HCL." name="suffixField" postBack="true" required="true" type="string">
+          <AllowedValuesDefinition>
+            <RuleRef>
+              <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-AllowedValues-Domain-Rule"/>
+            </RuleRef>
+          </AllowedValuesDefinition>
+          <OwnerDefinition>
+            <RuleRef>
+              <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-Domain-Owner-Rule"/>
+            </RuleRef>
+          </OwnerDefinition>
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-FieldValue-Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="con_form_GAR_last_name" helpKey="help_con_form_GAR_family_name" name="familyName" required="true" type="string">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-FieldValue-Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="con_form_GAR_first_name" helpKey="help_con_form_GAR_given_name" name="givenName" required="true" type="string">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-FieldValue-Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="con_form_GAR_password" helpKey="help_con_form_GAR_password_user" name="password" required="true" type="secret">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-FieldValue-Rule"/>
+          </RuleRef>
+        </Field>
+        <Field dependencies="prefixField,suffixField" displayName="con_form_GAR_primary_email" helpKey="help_con_form_GAR_primary_user_email" name="primaryEmail" required="true" type="string">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-FieldValue-PrimaryEmail-Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="Full Name" name="name" type="string">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-FieldValue-Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="Is Admin" name="isAdmin" type="string">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-FieldValue-Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="Active" name="active" type="string">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-FieldValue-Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="orgUnitPath" name="orgUnitPath" required="true" type="string">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-FieldValue-Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="includeInGlobalAddressList" name="includeInGlobalAddressList" type="string">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-FieldValue-Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="isMailboxSetup" name="isMailboxSetup" type="string">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Gsuite-FieldValue-Rule"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="relation" name="relation" type="string">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+          <Script>
+            <Source><![CDATA[import sailpoint.object.Identity;
+
+              Identity manager = identity.getManager();
+              if(manager != null)
+              {
+              return manager.getEmail();
+              }
+              return null;]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="relationType" name="relationType" type="string" value="manager">
+          <OwnerDefinition value="IIQApplicationOwner"/>
+        </Field>
+        <Field displayName="objectID" name="objectID" type="string"/>
+      </Section>
+    </Form>
+    <Form name="group" objectType="group" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="group"/>
+        </Map>
+      </Attributes>
+      <Section>
+        <Field displayName="con_form_GAR_group_email" helpKey="help_con_form_GAR_primary_group_email" name="Email" required="true" type="string"/>
+        <Field displayName="con_form_GAR_group_name" helpKey="help_con_form_GAR_primary_group_name" name="name" reviewRequired="true" type="string"/>
+      </Section>
+    </Form>
+    <Form name="role" objectType="Role" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="role"/>
+        </Map>
+      </Attributes>
+      <Section>
+        <Field displayName="con_form_GAR_role_name" helpKey="help_con_form_GAR_role_name" name="roleName" required="true" type="string"/>
+        <Field displayName="con_form_GAR_role_privileges" helpKey="help_con_form_GAR_role_privileges" multi="true" name="rolePrivileges" required="true" type="string"/>
+        <Field displayName="con_form_GAR_role_discription" helpKey="help_con_form_GAR_role_description" name="roleDescription" reviewRequired="true" type="string"/>
+      </Section>
+    </Form>
+    <Form name="Ascension-Form-Gsuite-Disable" objectType="account" type="Disable">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="Ascension-Form-Gsuite-Disable"/>
+        </Map>
+      </Attributes>
+      <Section label="Disable Attributes" name="disableAttributes">
+        <Field displayName="includeInGlobalAddressList" name="includeInGlobalAddressList" type="string" value="false"/>
+      </Section>
+    </Form>
+    <Form name="Ascension-Form-Gsuite-Enable" objectType="account" type="Enable">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="Ascension-Form-Gsuite-Enable"/>
+        </Map>
+      </Attributes>
+      <Section label="Enable Attributes" name="disableAttributes">
+        <Field displayName="Org Unit Path" name="orgUnitPath" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Rule-FieldValue-Gsuite"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="Active" name="active" type="string" value="true"/>
+        <Field displayName="includeInGlobalAddressList" name="includeInGlobalAddressList" type="string">
+          <RuleRef>
+            <Reference class="sailpoint.object.Rule" name="Ascension-Rule-FieldValue-Gsuite"/>
+          </RuleRef>
+        </Field>
+        <Field displayName="suspended" name="suspended" type="string" value="false"/>
+      </Section>
+    </Form>
+  </ProvisioningForms>
+  <Schemas>
+    <Schema displayAttribute="primaryEmail" identityAttribute="objectID" instanceAttribute="" nativeObjectType="account" objectType="account">
+      <AttributeDefinition name="objectID" remediationModificationType="None" required="true" type="string">
+        <Description>Unique ID of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="primaryEmail" remediationModificationType="None" required="true" type="string">
+        <Description>Primary E-mail ID of user.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="name" remediationModificationType="None" required="true" type="string">
+        <Description>Full name of the user in JSON format.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="isAdmin" remediationModificationType="None" required="true" type="string">
+        <Description>Is user an administrator.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="isDelegatedAdmin" remediationModificationType="None" required="true" type="string">
+        <Description>Is user a delegated administrator.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="lastLoginTime" remediationModificationType="None" required="true" type="string">
+        <Description>Last login time of user.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="suspended" remediationModificationType="None" required="true" type="string">
+        <Description>Is user suspended.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="suspensionReason" remediationModificationType="None" required="true" type="string">
+        <Description>Reason for suspension.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="changePasswordAtNextLogin" remediationModificationType="None" required="true" type="string">
+        <Description>Indicates if the user is forced to change password at next login.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="ipWhitelisted" remediationModificationType="None" required="true" type="string">
+        <Description>Indicate if user's IP address is white listed.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="ims" remediationModificationType="None" required="true" type="string">
+        <Description>The user's Instant Messenger (IM) accounts.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="emails" remediationModificationType="None" required="true" type="string">
+        <Description>A list of the user's E-mail addresses.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="externalIds" remediationModificationType="None" required="true" type="string">
+        <Description>A list of external IDs for the user, such as an employee or network ID.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="relations" remediationModificationType="None" required="true" type="string">
+        <Description>A list of the user's relationships to other users.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="addresses" remediationModificationType="None" required="true" type="string">
+        <Description>A list of the user's addresses.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="organizations" remediationModificationType="None" type="string">
+        <Description>List of organizations the user belongs to</Description>
+      </AttributeDefinition>
+      <AttributeDefinition multi="true" name="phones" remediationModificationType="None" required="true" type="string">
+        <Description>A list of the user's phone numbers.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition multi="true" name="aliases" remediationModificationType="None" required="true" type="string">
+        <Description>List of the user's alias E-mail addresses.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="nonEditableAliases" remediationModificationType="None" required="true" type="string">
+        <Description>List of the user's non-editable alias E-mail addresses.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customerId" remediationModificationType="None" required="true" type="string">
+        <Description>The customer ID to retrieve all account users.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="orgUnitPath" remediationModificationType="None" required="true" type="string">
+        <Description>The full path of the parent organization associated with the user.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="isMailboxSetup" remediationModificationType="None" required="true" type="string">
+        <Description>Indicates if the user's Google mailbox is created.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="includeInGlobalAddressList" remediationModificationType="None" required="true" type="string">
+        <Description>Indicates if the user's profile is visible in Global Address List when the contact sharing feature is enabled for the domain.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="thumbnailPhotoUrl" remediationModificationType="None" required="true" type="string">
+        <Description>Photo Url of the user</Description>
+      </AttributeDefinition>
+      <AttributeDefinition multi="true" name="contacts" remediationModificationType="None" required="true" type="string">
+        <Description>Contacts</Description>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" multi="true" name="Groups" remediationModificationType="None" schemaObjectType="group" type="string">
+        <Description>Groups connected to the user.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" multi="true" name="Roles" remediationModificationType="None" schemaObjectType="Role" type="string">
+        <Description>Roles assigned to the user.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="fullName" remediationModificationType="None" required="true" type="string">
+        <Description>Full Name of the user.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="givenName" remediationModificationType="None" required="true" type="string">
+        <Description>First Name of the user.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="familyName" remediationModificationType="None" required="true" type="string">
+        <Description>Last Name of the user.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="locations" type="string">
+        <Description>List of locations</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="notes" type="string">
+        <Description>Info attribute from AD connector</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.ntAccountName" type="string">
+        <Description>SamAccountName</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Business_Unit" type="string">
+        <Description>Business Unit</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.City" type="string">
+        <Description>city</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.State" type="string">
+        <Description>State</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Employee_Class" type="string">
+        <Description>Employee Class</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Department_ID" type="string">
+        <Description>Department ID</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Work_Location_Code" type="string">
+        <Description>Work Location Code</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Manager_Level" type="string">
+        <Description>Manager Level</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Hire_Date" type="string">
+        <Description>Hire Date</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Associate_Level" type="string">
+        <Description>Associate Level</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Company_Code" type="string">
+        <Description>Company Code</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Department_Description" type="string">
+        <Description>Department Description</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Business_Unit_Description" type="string">
+        <Description>Business Unit Description</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Is_Manager" type="string">
+        <Description>Is Manager</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Job_Code" type="string">
+        <Description>Job Code</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Job_Code_Description" type="string">
+        <Description>Job Code Description</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Ministry_Market" type="string">
+        <Description>Ministry Market</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customSchemas.User_Info.Employee_Number" type="string">
+        <Description>EMPLID</Description>
+      </AttributeDefinition>
+      <CustomizationRule>
+        <Reference class="sailpoint.object.Rule" name="Ascension-GSuite-Customization-Rule"/>
+      </CustomizationRule>
+    </Schema>
+    <Schema aggregationType="group" descriptionAttribute="" displayAttribute="roleName" featuresString="PROVISIONING" identityAttribute="objectID" instanceAttribute="" nativeObjectType="role" objectType="Role">
+      <AttributeDefinition name="objectID" remediationModificationType="None" required="true" type="string">
+        <Description>roleId of role</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="roleName" remediationModificationType="None" required="true" type="string">
+        <Description>Name of the role.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="roleDescription" remediationModificationType="None" required="true" type="string">
+        <Description>Description of role</Description>
+      </AttributeDefinition>
+      <AttributeDefinition multi="true" name="rolePrivileges" remediationModificationType="None" required="true" type="string">
+        <Description>Privileges of the role</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="isSystemRole" remediationModificationType="None" required="true" type="string">
+        <Description>isSystemRole</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="isSuperAdminRole" remediationModificationType="None" required="true" type="string">
+        <Description>isSuperAdminRole</Description>
+      </AttributeDefinition>
+    </Schema>
+    <Schema descriptionAttribute="" displayAttribute="name" featuresString="PROVISIONING" identityAttribute="objectID" instanceAttribute="" nativeObjectType="group" objectType="group">
+      <AttributeDefinition name="name" remediationModificationType="None" required="true" type="string">
+        <Description>Name of the group.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="nonEditableAliases" remediationModificationType="None" required="true" type="string">
+        <Description>List of the group's non-editable alias E-mail addresses that are outside of the account's primary domain or sub domains. These are functioning E-mail addresses used by the group. This is a read-only property.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="objectID" remediationModificationType="None" required="true" type="string">
+        <Description>ID of group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="description" remediationModificationType="None" required="true" type="string">
+        <Description>Description of the group.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="adminCreated" remediationModificationType="None" required="true" type="string">
+        <Description>Whether it is created by administrator.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition multi="true" name="aliases" remediationModificationType="None" required="true" type="string">
+        <Description>Group aliases.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="email" remediationModificationType="None" required="true" type="string">
+        <Description>Group E-mail address.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="directMembersCount" remediationModificationType="None" required="true" type="string">
+        <Description>Number of group members.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="whoCanJoin" remediationModificationType="None" required="true" type="string">
+        <Description>Permissions to join the group.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="whoCanViewMembership" remediationModificationType="None" required="true" type="string">
+        <Description>Permissions to view membership.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="whoCanViewGroup" remediationModificationType="None" required="true" type="string">
+        <Description>Permissions to view group.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="whoCanInvite" remediationModificationType="None" required="true" type="string">
+        <Description>Permissions to invite members.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="allowExternalMembers" remediationModificationType="None" required="true" type="string">
+        <Description>A Boolean indicating if Google Apps users external to your account can view or become members of this group.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="whoCanPostMessage" remediationModificationType="None" required="true" type="string">
+        <Description>Permissions to post messages to the group.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="allowWebPosting" remediationModificationType="None" required="true" type="string">
+        <Description>A Boolean indicating if any member allowed to post to the group web forum.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="primaryLanguage" remediationModificationType="None" required="true" type="string">
+        <Description>Language tag for a group's primary language.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="maxMessageBytes" remediationModificationType="None" required="true" type="string">
+        <Description>The maximum size of a message.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="isArchived" remediationModificationType="None" required="true" type="string">
+        <Description>A Boolean indicating if the contents of the group to be archived.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="archiveOnly" remediationModificationType="None" required="true" type="string">
+        <Description>A Boolean indicating if the group to be only archived.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="messageModerationLevel" remediationModificationType="Freetext" required="true" type="string">
+        <Description>Moderation level for messages.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="spamModerationLevel" remediationModificationType="Freetext" required="true" type="string">
+        <Description>Moderation levels for messages detected as spam.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="replyTo" remediationModificationType="None" required="true" type="string">
+        <Description>The default reply to a message is sent here.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="customReplyTo" remediationModificationType="None" required="true" type="string">
+        <Description>An E-mail address used when replying to a message.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="sendMessageDenyNotification" remediationModificationType="None" required="true" type="string">
+        <Description>A Boolean indicating if the members are notified if his message is denied by owner.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="defaultMessageDenyNotificationText" remediationModificationType="None" required="true" type="string">
+        <Description>Text sent to the message's author as part of rejection notification.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="showInGroupDirectory" remediationModificationType="None" required="true" type="string">
+        <Description>A Boolean indicating if group is listed in the Groups directory.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="allowGoogleCommunication" remediationModificationType="None" required="true" type="string">
+        <Description>A Boolean allowing Google to contact group administrators.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="membersCanPostAsTheGroup" remediationModificationType="None" required="true" type="string">
+        <Description>A Boolean indicating if members can post using the group E-mail address.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="messageDisplayFont" remediationModificationType="None" required="true" type="string">
+        <Description>Default message's display font.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="includeInGlobalAddressList" remediationModificationType="None" required="true" type="string">
+        <Description>A Boolean indicating if group is included in the Global Address List</Description>
+      </AttributeDefinition>
+      <AttributeDefinition multi="true" name="MANAGERS" remediationModificationType="None" type="string">
+        <Description>Managers of a group.</Description>
+      </AttributeDefinition>
+      <AttributeDefinition multi="true" name="OWNERS" remediationModificationType="None" type="string">
+        <Description>Owners of a group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" multi="true" name="childGroups" type="string">
+        <Description>Nested groups</Description>
+      </AttributeDefinition>
+      <CustomizationRule>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Customization-GSuite-group"/>
+      </CustomizationRule>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>

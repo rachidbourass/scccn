@@ -1,0 +1,477 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application connector="sailpoint.connector.DelimitedFileConnector" featuresString="DIRECT_PERMISSIONS, NO_RANDOM_ACCESS, DISCOVER_SCHEMA, ACCOUNT_ONLY_REQUEST, ADDITIONAL_ACCOUNT_REQUEST" icon="enterpriseIcon" name="INEVA/ININD - Net Health Therapy" type="DelimitedFile">
+  <Attributes>
+    <Map>
+      <entry key="PassphraseForPrivateKey"/>
+      <entry key="PrivateKeyFilePath"/>
+      <entry key="acceleratorPackEnabled"/>
+      <entry key="accountCorrelationAttrExpression"/>
+      <entry key="accountCreateConditionalRule"/>
+      <entry key="accountCreateEntitlements"/>
+      <entry key="accountDisableAttrExpression"/>
+      <entry key="accountLockAttrExpression"/>
+      <entry key="additionalAppBusApprovalRule"/>
+      <entry key="additionalAppBusApprovers"/>
+      <entry key="afterProvisioningRule"/>
+      <entry key="apAdditionalApplicationAfterProvisioningRule"/>
+      <entry key="apAdditionalApplicationCorrelationRule"/>
+      <entry key="apAdditionalApplicationCreationRule"/>
+      <entry key="apAdditionalApplicationCustomizationRule"/>
+      <entry key="apAdditionalApplicationMCustomizationRule"/>
+      <entry key="apAdditionalApplicationMGroupRefreshRule"/>
+      <entry key="apAdditionalApplicationPreIterateRule"/>
+      <entry key="apAfterMoverJoiner">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAfterRehireAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apAttributeSyncEligibleRule"/>
+      <entry key="apBeforeMoverAttrSync">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="apPopulationReverseLeaverOptions"/>
+      <entry key="appBusApprovalRule"/>
+      <entry key="appBusApprovers"/>
+      <entry key="ascBusinessApplication" value="INEVA/ININD - Net Health Therapy"/>
+      <entry key="authoritativeEmployee"/>
+      <entry key="authoritativeNonEmployee"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="beforemoverPrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="birthrightEntAttrExpression"/>
+      <entry key="busApp">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="commentsAttr"/>
+      <entry key="commentsValue"/>
+      <entry key="compositeDefinition"/>
+      <entry key="delimiter" value=","/>
+      <entry key="displayFormRule"/>
+      <entry key="evaluateCreateprovpolicy"/>
+      <entry key="file" value="\\andc1wapp0147.ds.sjhs.com\AppAggregation\DisconnectedApps.csv"/>
+      <entry key="filetransport" value="local"/>
+      <entry key="filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="ftpsAuthMethod" value="password"/>
+      <entry key="ftpsClientCertificateFilePath"/>
+      <entry key="ftpsClientCertificatePassphrase"/>
+      <entry key="group.filetransport" value="local"/>
+      <entry key="group.filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.partitionMode" value="auto"/>
+      <entry key="hardPolicyviolations"/>
+      <entry key="hasHeader">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="isCaseInsensitiveMerge">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="isSortedByIndexColumn">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="joinerEnabled"/>
+      <entry key="joinerPopulationRegex"/>
+      <entry key="joinerRoles"/>
+      <entry key="mergeRows">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="moveAccountContainer"/>
+      <entry key="moverExtendedRule"/>
+      <entry key="moverProcess" value="Do Nothing"/>
+      <entry key="moverRevocation" value="Do Nothing"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="parseType" value="delimited"/>
+      <entry key="partitionMode" value="auto"/>
+      <entry key="port"/>
+      <entry key="primarySyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="primarypasswordSyncaccounts">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="privilegedAccountAttrExpression"/>
+      <entry key="privilegedEntAttrExpression"/>
+      <entry key="rehireExtendedRule"/>
+      <entry key="rehirePrimaryaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="rehireProcess" value="Do Nothing"/>
+      <entry key="removeEntitlementLeaverExceptionExpression"/>
+      <entry key="renameLDAPaccount">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="requestorFormRole"/>
+      <entry key="reverseTerminationExtendedRule"/>
+      <entry key="reverseleaverProcess" value="Do Nothing"/>
+      <entry key="scramblePasswordAttr"/>
+      <entry key="sftpAuthMethod" value="password"/>
+      <entry key="skipSupervisorApproval"/>
+      <entry key="snowAssignmentGroup" value="f9526547dbf8e78c9dddde865e96196f"/>
+      <entry key="snowAssignmentGroupName" value="AHNAT/PROD/CLIN/AMB/Redoc"/>
+      <entry key="softPolicyviolations"/>
+      <entry key="stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="DelimitedFile Template"/>
+      <entry key="terminationExtendedRule"/>
+      <entry key="terminationProcess" value="Do Nothing"/>
+      <entry key="xDays"/>
+      <entry key="xDeleteDays"/>
+    </Map>
+  </Attributes>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <ProvisioningForms>
+    <Form name="INEVA/ININD - Net Health Therapy-CreatePolicy" objectType="account" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="INEVA/ININD - Net Health Therapy-CreatePolicy"/>
+        </Map>
+      </Attributes>
+      <Section name="Section 1">
+        <Field displayName="Username" name="Username" required="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[return identity.getName();]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Firstname" name="Firstname" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("firstname"))){
+              return identity.getAttribute("firstname");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Lastname" name="Lastname" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("lastname"))){
+              return identity.getAttribute("lastname");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="EmployeeNumber" name="EmployeeNumber" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("employeeId"))){
+              return identity.getAttribute("employeeId");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="EmailAddress" name="EmailAddress" required="true" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("email"))){
+              return identity.getAttribute("email");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Department" name="Department" type="string">
+          <Attributes>
+            <Map>
+              <entry key="readOnly" value="true"/>
+            </Map>
+          </Attributes>
+          <Script>
+            <Source><![CDATA[import sailpoint.tools.Util;
+              if(Util.isNotNullOrEmpty(identity.getAttribute("department"))){
+              return identity.getAttribute("department");
+              }
+              else{
+              return null;
+              }]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="License Number" name="License Number" reviewRequired="true" type="string"/>
+        <Field displayName="NPI Number" name="NPI Number" reviewRequired="true" type="string">
+          <Script>
+            <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+                    import sailpoint.object.Application;
+                    import sailpoint.tools.Util;
+                    import sailpoint.api.IdentityService;
+                    
+                    String attributeValue = "";
+
+                    IdentityService idService = new IdentityService(context);
+                    if( null != identity){
+                    	Application app = context.getObjectByName(Application.class,"MDStaff - Ascension");
+                      if( null != app){
+                        if( !Util.isEmpty((appLinks = idService.getLinks( identity, app)))){
+                          attributeValue = appLinks.get(0).getAttribute("NPI");
+                        }
+                      }
+                    }
+
+                    return attributeValue;
+                  ]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Provider ID" name="Provider ID" reviewRequired="true" type="string">
+          <Script>
+            <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+                    import sailpoint.object.Application;
+                    import sailpoint.tools.Util;
+                    import sailpoint.api.IdentityService;
+                    
+                    String attributeValue = "";
+
+                    IdentityService idService = new IdentityService(context);
+                    if( null != identity){
+                    	Application app = context.getObjectByName(Application.class,"MDStaff - Ascension");
+                      if( null != app){
+                        if( !Util.isEmpty((appLinks = idService.getLinks( identity, app)))){
+                          attributeValue = appLinks.get(0).getAttribute("ProviderID");
+                        }
+                      }
+                    }
+
+                    return attributeValue;
+                  ]]></Source>
+          </Script>
+        </Field>
+        <Field displayName="Primary Location" name="Primary Location" required="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>AMG- St. Vincent- Brownsburg PT</String>
+                <String>AMG- St. Vincent- Crawfordsville</String>
+                <String>AMG- St. Vincent- Plainfield PT</String>
+                <String>St. Vincent Anderson- Erskine Rehabilitation CIO</String>
+                <String>St. Vincent Anderson- Erskine Rehabilitation Meridian</String>
+                <String>St. Vincent Carmel- Carmel Adult</String>
+                <String>St. Vincent Carmel- Carmel Clay Schools</String>
+                <String>St. Vincent Carmel- Carmel Peds</String>
+                <String>St. Vincent Carmel- Carmel Women's</String>
+                <String>St. Vincent Dunn</String>
+                <String>St. Vincent Evansville- Northside Crossing Rehab</String>
+                <String>St. Vincent Evansville- Washington Square Rehab</String>
+                <String>St. Vincent Evansville- YMCA</String>
+                <String>St. Vincent Fishers- Fishers Therapies</String>
+                <String>St. Vincent Fishers- YMCA Fishers</String>
+                <String>St. Vincent Indy- Anson PT</String>
+                <String>St. Vincent Indy- Broad Ripple PT</String>
+                <String>St. Vincent Indy- Northwest Blvd PT</String>
+                <String>St. Vincent Indy- Pediatric Therapy Center</String>
+                <String>St. Vincent Indy- Physicians Medical Plaza</String>
+                <String>St. Vincent Jennings</String>
+                <String>St. Vincent Kokomo- FCA Family Health and Wellness</String>
+                <String>St. Vincent Kokomo- Forest Park</String>
+                <String>St. Vincent Kokomo- Peru</String>
+                <String>St. Vincent Kokomo- Southway Blvd</String>
+                <String>St. Vincent Mercy Rehab Services</String>
+                <String>St. Vincent Randolph Rehabilitation</String>
+                <String>St. Vincent Salem</String>
+                <String>St. Vincent Warrick Rehab Services</String>
+                <String>St. Vincent Williamsport</String>
+                <String>St. Vincent Evansville- Pediatric Therapy</String>
+                <String>St. Vincent Indy- Burn Clinic</String>
+                <String>St. Vincent- Noblesville</String>
+                <String>St. Vincent- Westfield</String>
+                <String>St. Vincent- Zionsville</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Additional Facilities" multi="true" name="Additional Facilities" required="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>AMG- St. Vincent- Brownsburg PT</String>
+                <String>AMG- St. Vincent- Crawfordsville</String>
+                <String>AMG- St. Vincent- Plainfield PT</String>
+                <String>St. Vincent Anderson- Erskine Rehabilitation CIO</String>
+                <String>St. Vincent Anderson- Erskine Rehabilitation Meridian</String>
+                <String>St. Vincent Carmel- Carmel Adult</String>
+                <String>St. Vincent Carmel- Carmel Clay Schools</String>
+                <String>St. Vincent Carmel- Carmel Peds</String>
+                <String>St. Vincent Carmel- Carmel Women's</String>
+                <String>St. Vincent Dunn</String>
+                <String>St. Vincent Evansville- Northside Crossing Rehab</String>
+                <String>St. Vincent Evansville- Washington Square Rehab</String>
+                <String>St. Vincent Evansville- YMCA</String>
+                <String>St. Vincent Fishers- Fishers Therapies</String>
+                <String>St. Vincent Fishers- YMCA Fishers</String>
+                <String>St. Vincent Indy- Anson PT</String>
+                <String>St. Vincent Indy- Broad Ripple PT</String>
+                <String>St. Vincent Indy- Northwest Blvd PT</String>
+                <String>St. Vincent Indy- Pediatric Therapy Center</String>
+                <String>St. Vincent Indy- Physicians Medical Plaza</String>
+                <String>St. Vincent Jennings</String>
+                <String>St. Vincent Kokomo- FCA Family Health and Wellness</String>
+                <String>St. Vincent Kokomo- Forest Park</String>
+                <String>St. Vincent Kokomo- Peru</String>
+                <String>St. Vincent Kokomo- Southway Blvd</String>
+                <String>St. Vincent Mercy Rehab Services</String>
+                <String>St. Vincent Randolph Rehabilitation</String>
+                <String>St. Vincent Salem</String>
+                <String>St. Vincent Warrick Rehab Services</String>
+                <String>St. Vincent Williamsport</String>
+                <String>St. Vincent Evansville- Pediatric Therapy</String>
+                <String>St. Vincent Indy- Burn Clinic</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Work Status" name="Work Status" required="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Full Time</String>
+                <String>Part Time</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Access Level" name="Access Level" required="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Facility User</String>
+                <String>Read Only User</String>
+                <String>Report Only User</String>
+                <String>Facility Admin User (IT Approval Needed)</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Application Role" name="Application Role" required="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Clerical</String>
+                <String>Therapist</String>
+                <String>Therapy Assistant</String>
+                <String>Therapist Intern</String>
+                <String>Therapy Assistant Intern</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Additional Access" multi="true" name="Additional Access" required="true" type="string">
+          <AllowedValuesDefinition>
+            <Value>
+              <List>
+                <String>Exercise Pro (for Therapist Role Only)</String>
+                <String>Net HealthU (Training Webinars)</String>
+                <String>TEST Domain</String>
+                <String>Scheduler Admin</String>
+              </List>
+            </Value>
+          </AllowedValuesDefinition>
+        </Field>
+        <Field displayName="Discipline" name="Discipline" reviewRequired="true" type="string"/>
+      </Section>
+    </Form>
+  </ProvisioningForms>
+  <Schemas>
+    <Schema displayAttribute="Username" identityAttribute="Username" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="Username" type="string"/>
+      <AttributeDefinition name="Firstname" type="string"/>
+      <AttributeDefinition name="Lastname" type="string"/>
+      <AttributeDefinition name="EmployeeNumber" type="string"/>
+      <AttributeDefinition name="EmailAddress" type="string"/>
+      <AttributeDefinition name="Department" type="string"/>
+      <AttributeDefinition entitlement="true" managed="true" multi="true" name="Role" type="string"/>
+      <AttributeDefinition name="Primary Location" type="string"/>
+      <AttributeDefinition multi="true" name="Additional Facilities" type="string"/>
+      <AttributeDefinition name="Work Status" type="string"/>
+      <AttributeDefinition name="Access Level" type="string"/>
+      <AttributeDefinition name="Application Role" type="string"/>
+      <AttributeDefinition multi="true" name="Additional Access" type="string"/>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>
