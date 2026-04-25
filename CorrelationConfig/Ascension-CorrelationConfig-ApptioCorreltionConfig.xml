@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE CorrelationConfig PUBLIC "sailpoint.dtd" "sailpoint.dtd">
-<CorrelationConfig name="Apptio - Correlation Configuration">
-  <AttributeAssignments>
-    <Filter operation="EQ" property="name" value="Username"/>
-    <Filter operation="EQ" property="email" value="Username"/>
-  </AttributeAssignments>
-</CorrelationConfig>
