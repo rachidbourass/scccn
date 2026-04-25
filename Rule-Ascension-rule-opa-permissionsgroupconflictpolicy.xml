@@ -1,0 +1,199 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-OPA-PermissionsGroupConflictPolicy" type="Policy">
+  <Description>This Rule for identities should not have more than on role at same time, in violation of a policy that prohibits stale users.</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-ForOPAPolicies"/>
+  </ReferencedRules>
+  <Signature returnType="PolicyViolation">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+          The Identity being inspected.
+        </Description>
+      </Argument>
+      <Argument name="policy">
+        <Description>
+          The Policy being evaluated.
+        </Description>
+      </Argument>
+      <Argument name="constraint">
+        <Description>
+          The Constraint being evaluated.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="violation">
+        <Description>
+          The PolicyViolation object.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+import sailpoint.api.SailPointContext;
+import sailpoint.object.Attributes;
+
+import sailpoint.object.Custom;
+import sailpoint.object.Application;
+import sailpoint.object.Filter;
+import sailpoint.object.Identity;
+import sailpoint.object.Bundle;
+import sailpoint.object.QueryOptions;
+import sailpoint.object.Policy;
+import sailpoint.object.PolicyViolation;
+import sailpoint.object.Link;
+import sailpoint.tools.Util;
+
+import sailpoint.tools.GeneralException;
+import sailpoint.tools.Message;
+
+
+		
+	String identityName;
+	String assignedRoleName = null;
+	String detectedRoleName = null;
+	String conflictingOPARoles = "OPA Admin Access,OPA Analyst Access,OPA Consumer Access,OPA Executive Access";
+	String appNames = "OPA,AD-DS",roleNameStartsWith="OPA";
+    String currentAssignedRoleName,futureAssignedRoleName,conflictingRoleNames;
+	
+	
+	Boolean conflictViolation=false;
+	Boolean currentAssignedViolation=false,futureAssignedViolation=false,currentDetectedViolation=false;
+	List conflictingOPARolesList = Util.stringToList(conflictingOPARoles);
+	List appNamesList = Util.stringToList(appNames);
+	int roleAssignedCount = 0,existingAssignedRolesCount=0,newAssignedRolesCount=0,existingDetectedRolesCount=0,newDetectedRolesCount=0,conflictRolesCount=0,newOPAUserFutureAssignedRolesCount=0;
+	int inflightOPARequiredRolesCount=0,opaNewAssignedRolesCount=0,currentOPAAssignedRolesCount=0,futureOPAAssignedRolesCount=0,existingOPAReqAssignedRolesCount=0,opaFutureAssignedRolesCount=0;
+	int futureOPAAssignedConflictRolesCount=0,existingOPADetectedConflictRolesCount=0;detectedRequiredRolesCount=0;
+	Set assignedDetectedRolesSet = new HashSet();
+	Map conflictRolesMap = new HashMap();
+	Map userRolesMap = new HashMap();
+	List conflictingRolesList = new ArrayList();
+	List existingAssignedRolesList = new ArrayList();
+	List newAssignedRolesList = new ArrayList();
+	List existingDetectedRolesList = new ArrayList();
+	List newDetectedRolesList = new ArrayList();
+	List opaNewAssignedRoleNamesList = new ArrayList();
+	List opaExistingAssignedRoleNamesList = new ArrayList();
+	List opaDetectedRoleNamesList = new ArrayList();
+	List existingOPADetetedRolesNamesList = new ArrayList();
+	
+	identityName = identity.getName();
+	Identity existingIdentity = context.getObjectByName(Identity.class,identityName);	
+	userRolesMap = getUserAssignedDetectedRoles(existingIdentity,identity);
+	if(userRolesMap.get("currentassigned")!=null){
+		existingAssignedRolesList = userRolesMap.get("currentassigned");
+		existingAssignedRolesCount = existingAssignedRolesList.size();
+	}	
+	if(userRolesMap.get("futureassigned")!=null){
+		newAssignedRolesList = userRolesMap.get("futureassigned");
+		newAssignedRolesCount = newAssignedRolesList.size();
+		log.error("OPA Permissions Group Conflict Policy Future Assigned Roles Count--"+newAssignedRolesCount);
+	}	
+	if(userRolesMap.get("currentdetected")!=null){
+		existingDetectedRolesList = userRolesMap.get("currentdetected");
+		existingDetectedRolesCount= existingDetectedRolesList.size();
+		log.error("OPA Permissions Group Conflict Policy Current Detected Roles Count--"+existingDetectedRolesCount);
+	}	
+    	if(userRolesMap.get("futuredetected")!=null){
+		newDetectedRolesList = userRolesMap.get("futuredetected");
+		newDetectedRolesCount = newDetectedRolesList.size();
+		log.error("OPA Permissions Group Conflict Policy Future Detected Roles Count--"+newDetectedRolesCount);
+	}		
+	if(newDetectedRolesCount != existingDetectedRolesCount){
+		log.error("Begin OPA Permissions Group Conflict Policy Check for the Detected Roles of The User--"+identityName);
+		log.error("Existing Detected Roles Count--"+existingDetectedRolesCount);
+		//Get the OPA Role names from the existing detected roles 
+		if(existingDetectedRolesCount >0){
+			existingOPADetetedRolesNamesList = getOPARoleNamesList(existingDetectedRolesList,roleNameStartsWith,appNamesList);
+			if(existingOPADetetedRolesNamesList!=null && !existingOPADetetedRolesNamesList.isEmpty()){
+				int existingOPADetetedRolesCount = existingOPADetetedRolesNamesList.size();
+				log.error("Existing Detected OPA Roles Count--"+existingOPADetetedRolesCount);
+				if(existingOPADetetedRolesCount > 0){
+					existingOPADetectedConflictRolesCount = getCountOfOPARequiredRoles(existingOPADetetedRolesNamesList,conflictingOPARolesList);
+					log.error("Existing Detected OPA Conflicting Roles Count--"+existingOPADetectedConflictRolesCount);
+				}
+				//currentDetectedViolation=existingOPADetectedConflictRolesCount>1?true:false;
+			}
+		}	
+	}
+	if(newAssignedRolesCount != existingAssignedRolesCount){
+		log.error("Begin OPA Permissions Group Conflict Policy Checking the Assigned Roles of The User--"+identityName);
+		log.error("Future Assigned Roles Count As Per The Request--"+newAssignedRolesCount);
+		log.error("Current Assigned Roles Count Prior To The Request--"+existingAssignedRolesCount);
+		//Check for the inflight requests status
+		inflightOPARequiredRolesCount = getCountOfInflightOPARequiredRoles(existingIdentity,conflictingOPARolesList);
+		opaNewAssignedRoleNamesList = getOPARoleNamesList(newAssignedRolesList,roleNameStartsWith,appNamesList);
+		opaExistingAssignedRoleNamesList = getOPARoleNamesList(existingAssignedRolesList,roleNameStartsWith,appNamesList);
+		//Check if the user has current assigned OPA roles
+		if(opaExistingAssignedRoleNamesList!=null && !opaExistingAssignedRoleNamesList.isEmpty()){
+			int opaExistingAssignedRolesCount = opaExistingAssignedRoleNamesList.size();
+			log.error("Existing Assigned OPA Roles Count Before The Request--"+opaExistingAssignedRolesCount);
+			existingOPAReqAssignedRolesCount = getCountOfOPARequiredRoles(opaExistingAssignedRoleNamesList,conflictingOPARolesList);
+			log.error("Required OPA roles currently assigned to the user--"+existingOPAReqAssignedRolesCount);
+			//Check if user has requested OPA roles
+			if(opaNewAssignedRoleNamesList!=null && !opaNewAssignedRoleNamesList.isEmpty()){
+				opaNewAssignedRoleNamesList.removeAll(opaExistingAssignedRoleNamesList);
+				opaFutureAssignedRolesCount = opaNewAssignedRoleNamesList.size();
+				log.error("Future OPA Assigned Roles Count As Per The Request--"+opaFutureAssignedRolesCount);
+				if(opaFutureAssignedRolesCount > 0){
+					futureOPAAssignedConflictRolesCount = getCountOfOPARequiredRoles(opaNewAssignedRoleNamesList,conflictingOPARolesList);
+					log.error("Future OPA Conflict Roles Count--"+futureOPAAssignedConflictRolesCount);
+				}  
+			}	
+		}
+		//If user doesn't have current assigned OPA roles then they're the requesting role first time
+		else if(opaNewAssignedRoleNamesList!=null && !opaNewAssignedRoleNamesList.isEmpty()){
+			opaNewAssignedRolesCount = opaNewAssignedRoleNamesList.size();
+			log.error("New OPA User Future Assigned Roles Count As Per The Request--"+opaNewAssignedRolesCount);
+			futureOPAAssignedConflictRolesCount = getCountOfOPARequiredRoles(opaNewAssignedRoleNamesList,conflictingOPARolesList);
+			//futureAssignedViolation=futureOPAAssignedRolesCount>1?true:false;
+		}
+		//Check for the OPA required roles policy violation when user is requesting OPA roles as new user
+		if(opaNewAssignedRolesCount >0 && futureOPAAssignedConflictRolesCount >1){
+			log.error("Current Selected OPA Permissions Group Conflict For The New User");	
+			String violationDesc="Please select one access level listed in the policy decription section below.";
+			return triggerPolicyViolation(identity,policy,constraint,violationDesc);
+		} 
+        if(opaNewAssignedRolesCount >0 && futureOPAAssignedConflictRolesCount >1 && inflightOPARequiredRolesCount >1){
+			log.error("Current OPA Permissions Group Conflicts With The Inflight Requests Found For The New User ");	
+			String violationDesc="Please remove the access selected and ensure only one value is selcted from the policy decription section.";
+			return triggerPolicyViolation(identity,policy,constraint,violationDesc);
+		}  		
+		//Check for the OPA required roles policy violation when user is requesting OPA roles as returning user
+		if(opaFutureAssignedRolesCount > 0){
+			futureAssignedViolation=futureOPAAssignedConflictRolesCount>0?true:false;
+			currentAssignedViolation=existingOPAReqAssignedRolesCount>1?true:false;
+			currentDetectedViolation=existingOPADetectedConflictRolesCount>0?true:false;  
+			if(currentDetectedViolation && futureAssignedViolation){
+				log.error("User Selected OPA Permissions Group Has Conflict With The Groups Already Assigned To Them");
+				String violationDesc="Please select one access level listed in the policy decription section below.";
+				return triggerPolicyViolation(identity,policy,constraint,violationDesc);		   
+			}
+			if(currentDetectedViolation && currentAssignedViolation && inflightOPARequiredRolesCount>0){
+				log.error("Conflicting OPA Permissions Group Not Found In The Current Detected and Assigned Roles");
+				String violationDesc="Please select one access level listed in the policy decription section below.";
+				return triggerPolicyViolation(identity,policy,constraint,violationDesc);		   
+			}
+			if(futureAssignedViolation && currentAssignedViolation && inflightOPARequiredRolesCount>0)  {
+				log.error("Conflicting OPA Permissions Group Not Found In The Futured and Current Assigned Roles");
+				String violationDesc="Please select one access level listed in the policy decription section below.";
+				return triggerPolicyViolation(identity,policy,constraint,violationDesc);		   
+			}
+		}
+	}		
+	log.error("End Of OPA Permissions Group Conflict Policy Rule");
+		
+	]]></Source>
+</Rule>

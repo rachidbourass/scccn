@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Invision-Fields" type="FieldValue">
+  <Description>This rule can be used to generate a field value (eg - an account name) using data from the given Identity. If this rule is run in the context of a workflow step then the arguments passed into the step will also be available. Also, any field values that have been processed so far from the policy related to the Application/Role will be available.</Description>
+  <Signature returnType="String">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The Identity object that represents the user needing the field value.
+        </Description>
+      </Argument>
+      <Argument name="link" type="Link">
+        <Description>
+          The sailpoint.object.Link that is being acted upon. If the link is not applicable,
+          this value will be null.
+        </Description>
+      </Argument>
+      <Argument name="group" type="ManagedAttribute">
+        <Description>
+          The sailpoint.object.ManagedAttribute that is being acted upon. If the managed attribute
+          is not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="project" type="ProvisioningProject">
+        <Description>
+          The provisioning project being acted upon. If a provisioning project is not applicable,
+          the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="accountRequest" type="ProvisioningPlan.AccountRequest">
+        <Description>
+          The account request. If an account request is not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="objectRequest" type="ProvisioningPlan.ObjectRequest">
+        <Description>
+          The object request. If an object request is not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="role" type="Bundle">
+        <Description>
+          The role with the template we are compiling. If the role is
+          not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="application" type="Application">
+        <Description>
+          The sailpont.object.Application with the template we are compiling. If the application
+          is not applicable, the value will be null.
+        </Description>
+      </Argument>
+      <Argument name="template" type="Template">
+        <Description>
+          The Template that contains this field.
+        </Description>
+      </Argument>
+      <Argument name="field" type="Field">
+        <Description>
+          The current field being computed.
+        </Description>
+      </Argument>
+      <Argument name="current" type="Object">
+        <Description>
+          The current value corresponding to the identity or account attribute that the field represents.
+          If no current value is set, this value will be null.
+        </Description>
+      </Argument>
+      <Argument name="operation" type="ProvisioningPlan.Operation">
+        <Description>
+          The operation being performed.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="value">
+        <Description>
+          The string value created.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+  import sailpoint.tools.Util;
+  import sailpoint.object.Identity;
+  import sailpoint.object.ManagedAttribute;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Field;
+  import sailpoint.object.ProvisioningPlan.AccountRequest; 
+  import sailpoint.object.ProvisioningPlan.AttributeRequest; 
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  Log logger = LogFactory.getLog("rule.Invision.Field.Values");
+
+  logger.debug("Entering RACF-Invision Provisioning Policy Form Rule for field "+field.getName());
+  String fieldVal = "";
+  String profileCode = "";
+  if(accountRequest != null){
+
+    AttributeRequest attrRequest = accountRequest.getAttributeRequest("entitlement");
+    if(attrRequest != null && null != attrRequest.getValue()){
+      String groupName = attrRequest.getValue();
+      if(groupName != null){
+        ManagedAttribute existingGroup = null;
+
+        QueryOptions qo = new QueryOptions();
+        qo.addFilter(Filter.eq("application", application));
+        qo.addFilter(Filter.eq("value", groupName));
+        qo.addFilter(Filter.eq("attribute", "entitlement"));
+
+        List foundGroup = context.getObjects(ManagedAttribute.class, qo);
+        if (foundGroup.size() == 1) {
+          existingGroup = foundGroup.get(0);
+        }
+
+        if(existingGroup != null){
+
+          StringTokenizer ministryNameSplit = new StringTokenizer(groupName, "-");
+          if(null != ministryNameSplit){
+            int count = ministryNameSplit.countTokens(); 
+            for (int i = 0; i < count; i++) {
+              profileCode = ministryNameSplit.nextToken();
+              if (i == 2){
+                break;
+              }
+            }
+          }
+
+          String profileName = "Profile"+profileCode.trim();
+
+          if(field.getName().equalsIgnoreCase("CashGrp") && existingGroup.getAttribute(field.getName()) != null){
+            fieldVal = existingGroup.getAttribute("CashGrp");
+          }
+          else if(field.getName().equalsIgnoreCase("MenuGrp") && existingGroup.getAttribute(field.getName()) != null){
+            fieldVal = existingGroup.getAttribute(field.getName());
+          }
+          else if( field.getName().equalsIgnoreCase("PROUT") && existingGroup.getAttribute(field.getName()) != null){
+            fieldVal = "1";
+          }
+          else if(field.getName().equalsIgnoreCase("PRCOL") && existingGroup.getAttribute(field.getName()) != null){
+            fieldVal = "1";
+          }
+          else if(field.getName().equalsIgnoreCase("TCL") && existingGroup.getAttribute(field.getName()) != null){
+            fieldVal = existingGroup.getAttribute(field.getName());
+          }        
+          else if( field.getName().equalsIgnoreCase("Comment2") && existingGroup.getAttribute(field.getName()) != null){
+            fieldVal = existingGroup.getAttribute(field.getName());
+          }
+          else if(groupName.contains("Production") && field.getName().equalsIgnoreCase("Need"+profileCode.trim())){
+            fieldVal = "1";
+          }
+          else if(groupName.contains("Test") && field.getName().equalsIgnoreCase("NeedTest"+profileCode.trim())){
+            fieldVal = "1";
+          }
+          else if (field.getName().contains("Need")){
+            fieldVal = "0";
+          }
+          else if( field.getName().equalsIgnoreCase(profileName) && existingGroup.getAttribute(profileName) != null){
+
+            fieldVal = existingGroup.getAttribute(profileName);
+          }
+          else if (field.getName().contains("Profile")){
+            fieldVal = "";
+          }
+        }
+      }      
+    }
+  }
+  logger.debug("Exiting RACF-Invision Provisioning Policy Form Rule for field "+field.getName());
+  return fieldVal;
+  ]]></Source>
+</Rule>

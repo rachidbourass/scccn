@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-RCAPullGroups">
+  <Description>Pull RCA groups from RCA databases.</Description>
+  <Source><![CDATA[
+    
+	import java.sql.Connection;
+	import java.sql.DriverManager;
+	import java.sql.ResultSet;
+	import java.sql.SQLException;
+	import java.sql.Statement;
+	import java.util.ArrayList;
+	import java.util.List;
+	import java.util.Map;
+	import java.util.Map.Entry;
+
+	import org.apache.commons.logging.Log;
+	import org.apache.commons.logging.LogFactory;
+
+	import sailpoint.object.Attributes;
+	import sailpoint.object.Custom;
+	import sailpoint.tools.GeneralException;
+	import sailpoint.tools.Message;
+	import sailpoint.object.TaskResult;
+
+	
+	Log logger = LogFactory.getLog("rule.Ascension.fodLocation.PullRCAGroups");
+	String RCA_GROUP_STORE_CUSTOMOBJ_NAME = "Ascension-Custom-RCAGroups";
+	String RCA_GROUP_QUERY = "select GroupName from Security.Groups;";
+	TaskResult taskResult = context.getObjectByName(TaskResult.class, "RCA-PullGroups");
+  Object args = new Object();
+	
+	public String pullRCAGroups() throws GeneralException
+	{
+      
+      Custom rcaSecGroupStore = context.getObjectByName(Custom.class, RCA_GROUP_STORE_CUSTOMOBJ_NAME);
+      if (rcaSecGroupStore == null)
+         throw new RuntimeException("Custom object does not exists! Custom obj: " + RCA_GROUP_STORE_CUSTOMOBJ_NAME);
+      Map rcaURLMap = rcaSecGroupStore.get("RCA_URLs");
+      if (rcaURLMap == null || rcaURLMap.isEmpty())
+         throw new RuntimeException("URLs of RCA DB does not exist!");
+      Map rcaCreds = rcaSecGroupStore.get("RCA_Credentials");
+      if (rcaCreds == null || rcaCreds.isEmpty())
+         throw new RuntimeException("Credentials of RCA DB does not exist!");
+      Attributes rcaGroupsToEnvMap = new Attributes();
+      try
+      {
+         Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+
+         for (Entry urlEntry : rcaURLMap.entrySet())
+         {
+            Connection conn = DriverManager.getConnection(urlEntry.getValue(), rcaCreds.get("userName"), context.decrypt(rcaCreds.get("password")));
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(RCA_GROUP_QUERY);
+            List groupNames = new ArrayList();
+            while (rs.next())
+            {
+               groupNames.add(rs.getString("GroupName"));
+			   
+            }
+            rcaGroupsToEnvMap.put(urlEntry.getKey(), groupNames);
+         }
+      }
+      catch (ClassNotFoundException e)
+      {
+         logger.error("ClassNotFoundException || " + e.getLocalizedMessage());
+		 taskResult.addMessage(Message.error("ClassNotFoundException || " + e.getLocalizedMessage(), ""));
+      }
+      catch (SQLException e)
+      {
+         logger.error("SQLException || " + e.getLocalizedMessage());
+		 taskResult.addMessage(Message.error("ClassNotFoundException || " + e.getLocalizedMessage(), ""));
+      }
+	  rcaGroupsToEnvMap.putAll(rcaSecGroupStore.getAttributes());
+      rcaSecGroupStore.setAttributes(rcaGroupsToEnvMap);
+	  context.saveObject(rcaSecGroupStore);
+      context.commitTransaction();
+      return rcaGroupsToEnvMap.toString();
+	}
+	
+	pullRCAGroups();
+	 
+  ]]></Source>
+</Rule>

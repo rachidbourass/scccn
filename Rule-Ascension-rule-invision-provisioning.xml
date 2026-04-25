@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Invision-Provisioning" type="JDBCProvision">
+  <Description>This rule is used by the JDBC connector to do provisioning of the data.</Description>
+  <Signature returnType="ProvisioningResult">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application whose data file is being processed.
+        </Description>
+      </Argument>
+      <Argument name="schema">
+        <Description>
+          The Schema currently in use.
+        </Description>
+      </Argument>
+      <Argument name="connection">
+        <Description>
+          A connection object to connect to database.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan created against the JDBC application.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="result">
+        <Description>
+          A Provisioning Result object is desirable to return the status.IT can be a new object or part of  Provisioning Plan
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[ 
+  import java.sql.Connection;
+  import java.sql.DriverManager;
+  import java.sql.PreparedStatement;
+  import java.sql.SQLException;
+  import java.sql.Types;
+  import java.sql.Date;
+  import sailpoint.object.Identity;
+  import sailpoint.object.EmailOptions;
+  import sailpoint.object.EmailTemplate;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.connector.JDBCConnector;
+  import sailpoint.object.Application;
+  import sailpoint.object.Custom;
+  import sailpoint.object.ManagedAttribute;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.ProvisioningPlan.PermissionRequest;
+  import sailpoint.object.ProvisioningResult;
+  import sailpoint.object.Schema;
+  import sailpoint.tools.Util;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import sailpoint.object.Link;
+  import sailpoint.api.IdentityService;
+
+  Log logger = LogFactory.getLog("rule.Ascension.Rule.JDBC.ProvisioningRule");
+  /**
+	 * Check Plan for user account creation
+	 * @param Accountrequest 
+	 * @return result Success/Failure
+	 */
+  logger.debug("Entering RACF-Invision JDBC application Global Provisioning Rule");
+  ProvisioningResult result = new ProvisioningResult();
+  PreparedStatement statement = null;
+  void sendEmail(AccountRequest accountRequest,ProvisioningPlan invisionPlan){
+    String toEmail = "";
+    String ccEmail = "";
+    String tpxID = "";
+    Identity owner = null;
+    String idDisplayName = null;
+    String ownerDisplayName = null;
+    String identityEmail = null;
+    String ownerEmail = null;
+    List requesters = new ArrayList();
+
+    if( null != accountRequest && null != invisionPlan){
+      AttributeRequest attrReq = accountRequest.getAttributeRequest("GenTPXID");        
+      if (null != attrReq){
+        tpxID = attrReq.getValue();
+      }                            
+
+      if(null != invisionPlan.getIdentity() && null != invisionPlan.getIdentity().getManager()){
+        owner = invisionPlan.getIdentity().getManager();
+        if(null != owner){
+          ccEmail = owner.getAttribute("email");
+        }
+        idDisplayName = invisionPlan.getIdentity().getDisplayableName();
+        identityEmail = invisionPlan.getIdentity().getAttribute("email");
+        ownerDisplayName = invisionPlan.getIdentity().getManager().getDisplayableName();
+      }                 
+
+      EmailTemplate template = context.getObjectByName(EmailTemplate.class, "Ascension-EmailTemplate-Invision-ManagerNotification");
+      EmailOptions options = new EmailOptions();
+
+      requesters = plan.getRequesters();
+      if(null != requesters){
+        for(Identity requester : requesters){
+          toEmail = requester.getAttribute("email");
+        }        
+      }
+      options.setTo(toEmail);
+      options.setCc(ccEmail);
+
+      Map args = new HashMap();
+      args.put("TPXID",tpxID);
+      args.put("identityDisplayName",idDisplayName);
+      args.put("ownerDisplayName",ownerDisplayName);
+      args.put("ownerEmail",toEmail);
+      args.put("identityEmail",identityEmail);
+      options.setVariables(args);
+      if(Util.isNotNullOrEmpty(toEmail) && template != null){
+        context.sendEmailNotification(template,options);
+//        context.decache(template);
+      }
+    }
+  }
+
+  void executeSQLQuery(String query, List attrNames, HashMap finalRequestMap){
+    int i = 1;
+    statement = connection.prepareStatement(query);
+	
+    if(null != attrNames && !attrNames.isEmpty() && !finalRequestMap.isEmpty()){
+		for(String attrName : attrNames){
+			
+			if (finalRequestMap.containsKey(attrName) && finalRequestMap.get(attrName) != null) {
+				statement.setString(i, finalRequestMap.get(attrName));
+				logger.debug("Setting " +attrName + " in SQL query: " + finalRequestMap.get(attrName));
+			} 
+			else{
+				statement.setString(i,"");
+			}
+			
+			i++;
+		}                      
+    }
+	statement.executeUpdate();
+  }
+
+  public String buildQuery(ArrayList attrNames, String tableName){
+    String queryValue2 = "";
+    String queryValue1 = "";
+    String query = "";
+
+    StringBuilder sb = new StringBuilder();
+    StringBuilder sbValue = new StringBuilder();
+	
+	logger.debug("inside buildQuery method");
+
+    if(null != attrNames && !attrNames.isEmpty()){
+      for(String attrName : attrNames){
+        sb.append(attrName).append(",");
+        sbValue.append("?").append(",");
+
+      }
+    }
+    if(null != sb && null != sbValue) {
+      queryValue1 = sb.deleteCharAt(sb.length() - 1).toString();
+      queryValue2 = sbValue.deleteCharAt(sbValue.length() - 1).toString();
+    }
+    if(Util.isNotNullOrEmpty(queryValue2) && Util.isNotNullOrEmpty(queryValue1)){
+      query = "insert into "+tableName+" ("+queryValue1+") values ("+queryValue2+")";
+    }
+	
+	//logger.debug("Query: " + query);
+    return query;
+  }
+  
+  public Map setEntitlementAttributeRequestValues(String groupName, Application application) {
+
+	  List foundGroup = new ArrayList();
+	  ManagedAttribute existingGroup = null;
+	  Map groupRequestMap = new HashMap();
+	  groupRequestMap.clear();//just making sure that object is empty
+	  logger.debug("inside setEntitlementAttributeRequestValues method");
+
+		if(groupName != null && null != application){
+
+			QueryOptions qo = new QueryOptions();
+			qo.addFilter(Filter.eq("application", application));
+			qo.addFilter(Filter.eq("value", groupName));
+			//qo.addFilter(Filter.eq("attribute", "entitlement"));
+
+			foundGroup = context.getObjects(ManagedAttribute.class, qo);
+			if (foundGroup != null && foundGroup.size() == 1) {
+			  existingGroup = foundGroup.get(0);
+			} else {
+				logger.debug("no entitlements found");
+			}
+
+			if(existingGroup != null){
+				logger.debug("found entitlement before getting attributes");
+				if (existingGroup.getAttributes() != null) {
+					groupRequestMap.putAll(existingGroup.getAttributes().getMap());
+					groupRequestMap.put("entitlement", groupName);
+					if (groupRequestMap.containsKey("sysDescriptions")) {
+						groupRequestMap.remove("sysDescriptions");
+					}
+				}
+			}
+		}
+		return groupRequestMap;
+	}
+  
+  public Map setGroupRequestRemoveValues(String groupName, Link racfLink) {
+	List foundGroup = new ArrayList();
+	ManagedAttribute existingGroup = null;
+	Map groupRequestMap = new HashMap();
+	groupRequestMap.clear();//just making sure that object is empty
+	logger.debug("inside setGroupRequestRemoveValues method");
+	
+	String [] ministryNameSplit = groupName.split("-");
+			  
+	String environment = ministryNameSplit[0].trim(); //1st element, such as Production, Test
+	String profileCode = ministryNameSplit[2].trim(); //3rd element of groupName or roleName is profileCode
+	String siteValue = ministryNameSplit[3].trim(); // 4th element 
+	
+	groupRequestMap.put("entitlement", groupName);
+	
+	String invIDAttr="";
+	
+	logger.debug("environment: "+environment+ " ;profileCode: " + profileCode);
+	
+	if (Util.isNotNullOrEmpty(profileCode) && Util.isNotNullOrEmpty(environment) && environment.equalsIgnoreCase("Production")) {
+		invIDAttr = "InvID"+profileCode.trim();
+	} else if(Util.isNotNullOrEmpty(profileCode) && Util.isNotNullOrEmpty(environment) && environment.equalsIgnoreCase("Test")){
+		invIDAttr = "TestInvID"+profileCode.trim();
+	}
+	
+	logger.debug("InvID Attribute: " + invIDAttr);
+	groupRequestMap.put(invIDAttr, racfLink.getAttribute("GenA2KID"));
+	
+	return groupRequestMap;
+  }
+  
+  if(plan != null){
+	logger.debug("Plan XML: " + plan.toXml()); //added log statement for debugging
+    
+    List accountRequests = null;
+	List attrNames = null;
+	Map baseRequestMap = new HashMap(); 
+	Map groupRequestMap = new HashMap();
+	Map finalRequestMap = new HashMap();
+	
+	Identity identity = plan.getIdentity();
+	
+	if(null != application){
+		logger.debug("Application: " + application.getName());
+		accountRequests = plan.getAccountRequests(application.getName());
+
+		Schema schemaValues = application.getAccountSchema();
+		if(null != schemaValues){
+		   attrNames = schemaValues.getAttributeNames(); 
+			logger.debug("account attrNames: " + attrNames.toString());
+		}
+	} 
+	
+    if ((accountRequests != null ) && ( accountRequests.size() > 0 ) ) {
+      for ( AccountRequest accountRequest : accountRequests) { 
+        try {
+          if ((accountRequest  != null && AccountRequest.Operation.Create.equals( accountRequest.getOperation())) || ( accountRequest  != null && AccountRequest.Operation.Modify.equals( accountRequest.getOperation() ) && null != accountRequest.getAttributeRequest("entitlement") && null != accountRequest.getAttributeRequest("entitlement").getOperation() && ProvisioningPlan.Operation.Add.equals(accountRequest.getAttributeRequest("entitlement").getOperation()))){
+            List attrReqs = accountRequest.getAttributeRequests("entitlement");
+            int countAttr = 1;
+			
+			Custom customApp = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");   
+            List listOfAttrs =new ArrayList();
+			if(null != customApp && null != customApp.get("RACFInvisionInsertAttributes")){
+			  listOfAttrs=customApp.get("RACFInvisionInsertAttributes");
+//			  context.decache(customApp);
+			}
+			
+            if(null != attrReqs && !attrReqs.isEmpty()){
+				
+				baseRequestMap.clear();
+				groupRequestMap.clear();
+				finalRequestMap.clear(); //making sure that map is empty at start of each iteration	  
+							
+				for (String attrName : attrNames) {
+					AttributeRequest attrReq = accountRequest.getAttributeRequest(attrName);
+
+					if ( attrReq != null  && null != attrReq.getValue()) {		
+					  if(attrReq.getValue() instanceof String){
+						baseRequestMap.put(attrName, attrReq.getValue());
+					  }
+					}	
+				}
+				
+				logger.debug("baseRequestMap: " + baseRequestMap.toString());
+				
+				for(AttributeRequest attriReq : attrReqs){
+					if(attriReq != null && null != attriReq.getValue()){
+					  String groupName = "";
+					  
+					  Object roleName  = attriReq.getValue();
+
+					  if(roleName!=null && roleName instanceof String){
+						groupName = roleName;
+						logger.debug("procesing String roleName : " + groupName);
+						
+						groupRequestMap.clear();//making sure that group Request Map is empty at start of each iteration
+						groupRequestMap.putAll(setEntitlementAttributeRequestValues(groupName, application));
+						logger.debug("groupRequestMap: " + groupRequestMap.toString());
+						
+						if (!(groupRequestMap.isEmpty()) && !(baseRequestMap.isEmpty())) {
+							
+							//logger.debug("baseRequestMap: " + baseRequestMap.toString());
+							//logger.debug("groupRequestMap: " + groupRequestMap.toString());
+							String tableName ="InvisionRequests";
+							
+							finalRequestMap.putAll(baseRequestMap);
+							finalRequestMap.putAll(groupRequestMap);
+							//logger.debug("finalRequestMap: " + finalRequestMap.toString());
+							
+							String queryVal = buildQuery(listOfAttrs,tableName); 
+							logger.debug("Query : " + queryVal);
+							executeSQLQuery(queryVal, listOfAttrs, finalRequestMap);
+							result.setStatus(ProvisioningResult.STATUS_COMMITTED );
+							finalRequestMap.clear();//clearing map after commit
+							groupRequestMap.clear();
+							countAttr++;
+						}
+					  } 
+					  else if(roleName!=null &&  roleName instanceof List){
+						logger.debug("entitlement is a list");
+						List tempList = (List)roleName;
+						if(!Util.isEmpty(tempList)){
+							for (Object role : tempList) {
+								groupName = role.toString(); 
+								logger.debug("procesing List roleName : " + groupName);
+								groupRequestMap.clear();
+								groupRequestMap.putAll(setEntitlementAttributeRequestValues(groupName, application));
+								logger.debug("groupRequestMap: " + groupRequestMap.toString());
+								if (!(groupRequestMap.isEmpty()) && !(baseRequestMap.isEmpty())) {
+									//logger.debug("baseRequestMap: " + baseRequestMap.toString());
+									//logger.debug("groupRequestMap: " + groupRequestMap.toString());
+									String tableName ="InvisionRequests";
+									
+									finalRequestMap.putAll(baseRequestMap);
+									finalRequestMap.putAll(groupRequestMap);
+									//logger.debug("finalRequestMap: " + finalRequestMap.toString());
+									
+									String queryVal = buildQuery(listOfAttrs,tableName); 
+									logger.debug("Query : " + queryVal);
+									executeSQLQuery(queryVal, listOfAttrs, finalRequestMap);
+									finalRequestMap.clear();//clearing map after commit
+									groupRequestMap.clear();
+									countAttr++;
+								}
+							}
+							result.setStatus(ProvisioningResult.STATUS_COMMITTED );
+						}
+					  }              
+					}                
+				}
+            }
+            sendEmail(accountRequest,plan);
+          }
+
+          else if (accountRequest  != null && (AccountRequest.Operation.Modify.equals( accountRequest.getOperation()) && null != accountRequest.getAttributeRequest("entitlement") && null != accountRequest.getAttributeRequest("entitlement").getOperation() && ProvisioningPlan.Operation.Remove.equals(accountRequest.getAttributeRequest("entitlement").getOperation()))) {
+
+            Custom customApp = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");   
+            List listOfAttrs =new ArrayList();
+			Link racfLink = null;
+			
+			logger.debug("Removing Entitlements");
+			
+			//get invision link
+			IdentityService identityService =new IdentityService(context); 
+			List racfLinks = identityService.getLinks(identity,application);
+			if(null != racfLinks && !racfLinks.isEmpty()){
+				racfLink=racfLinks.get(0);
+			}
+			
+			if (racfLink != null) {
+
+				if(null != customApp && null != customApp.get("RACFInvisionTermAttributes")){
+				  listOfAttrs=customApp.get("RACFInvisionTermAttributes");
+//				  context.decache(customApp);
+				}
+				String tableName ="IIQ_Requests";
+				
+				Map baseRequestMap = new HashMap(); 
+				baseRequestMap.clear();
+
+				for (String attrName : listOfAttrs) {
+					AttributeRequest attrReq = accountRequest.getAttributeRequest(attrName);
+
+					if ( attrReq != null  && null != attrReq.getValue()) {		
+					  if(attrReq.getValue() instanceof String){
+						baseRequestMap.put(attrName, attrReq.getValue());
+					  }
+					}	
+				}
+				
+				String queryVal = buildQuery(listOfAttrs,tableName); 
+				//logger.debug("Query : " + queryVal);
+				//logger.debug("baseRequestMap: " + baseRequestMap.toString());
+
+				List attrReqs = accountRequest.getAttributeRequests("entitlement");
+				if (attrReqs != null) {
+					for(AttributeRequest attriReq : attrReqs){
+						if(attriReq != null && null != attriReq.getValue()){
+						  String groupName = "";
+						  
+						  Object roleName  = attriReq.getValue();
+
+						  if(roleName!=null && roleName instanceof String){
+							groupName = roleName;
+							
+							groupRequestMap.clear(); //making sure that group requestmap is blank
+							
+							groupRequestMap.putAll(setGroupRequestRemoveValues(groupName,racfLink));
+							
+							finalRequestMap.putAll(baseRequestMap);
+							finalRequestMap.putAll(groupRequestMap);
+							//logger.debug("finalRequestMap: " + finalRequestMap.toString());
+							executeSQLQuery(queryVal, listOfAttrs, finalRequestMap);
+							finalRequestMap.clear();
+							groupRequestMap.clear();
+							result.setStatus(ProvisioningResult.STATUS_COMMITTED );
+							
+						  } 
+						  else if(roleName!=null &&  roleName instanceof List){
+							logger.debug("entitlement is a list");
+							List tempList = (List)roleName;
+							if(!Util.isEmpty(tempList)){
+								for (Object role : tempList) {
+									groupName = role.toString(); 
+									groupRequestMap.clear(); //making sure that group requestmap is blank
+									
+									groupRequestMap.putAll(setGroupRequestRemoveValues(groupName,racfLink));
+									
+									finalRequestMap.putAll(baseRequestMap);
+									finalRequestMap.putAll(groupRequestMap);
+									//logger.debug("finalRequestMap: " + finalRequestMap.toString());
+									executeSQLQuery(queryVal, listOfAttrs, finalRequestMap);
+									finalRequestMap.clear();
+									groupRequestMap.clear();
+									
+								}
+							}
+							result.setStatus(ProvisioningResult.STATUS_COMMITTED );
+						  }              
+						}                
+					}
+				} 
+			}
+          }
+		  else if (accountRequest  != null && (AccountRequest.Operation.Disable.equals(accountRequest.getOperation()))) {
+			  //account disable
+			List listOfAttrs =new ArrayList();
+			Link racfLink = null;
+			logger.debug("account disable");
+			Custom customApp = context.getObjectByName(Custom.class, "Ascension-custom-generalConfiguration");   
+            if(null != customApp && null != customApp.get("RACFInvisionTermAttributes")){
+			  listOfAttrs=customApp.get("RACFInvisionTermAttributes");
+//			  context.decache(customApp);
+			}
+							
+			String tableName ="IIQ_Requests";
+			
+			Map baseRequestMap = new HashMap(); 
+			baseRequestMap.clear();
+
+			for (String attrName : listOfAttrs) {
+				AttributeRequest attrReq = accountRequest.getAttributeRequest(attrName);
+
+				if ( attrReq != null  && null != attrReq.getValue()) {		
+				  if(attrReq.getValue() instanceof String){
+					baseRequestMap.put(attrName, attrReq.getValue());
+				  }
+				}	
+			}
+			String queryVal = buildQuery(listOfAttrs,tableName); 
+			//logger.debug("Query : " + queryVal);
+			//logger.debug("baseRequestMap: " + baseRequestMap.toString());
+			executeSQLQuery(queryVal, listOfAttrs, baseRequestMap);
+			result.setStatus(ProvisioningResult.STATUS_COMMITTED );
+		  }
+		  
+        }
+        catch( SQLException e ) {
+          result.setStatus( ProvisioningResult.STATUS_FAILED );
+          result.addError(e );
+          logger.debug("JDBC Global Provisioning Rule : SQLException Ocuured"+e);
+        }
+        finally {
+          try {
+            if (statement != null) {
+              statement.close();
+            }
+            if (connection != null) {
+              connection.close();
+            }
+          } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            result.addError(e.getMessage());
+          }
+        }
+      }
+    }
+  }
+
+  logger.debug("Exiting RACF-Invision JDBC application Global Provisioning Rule");
+  return result;
+  ]]></Source>
+</Rule>

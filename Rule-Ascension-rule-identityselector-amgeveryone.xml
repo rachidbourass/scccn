@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-IdentitySelector-AMGEveryone" type="IdentitySelector">
+  <Description>This rule is used to select an Identity that is related to the given Identity</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The identity.
+        </Description>
+      </Argument>
+      <Argument name="roleName" type="String">
+        <Description>
+          The name of the sailpoint.object.Bundle (role) that is being selected for the Identity. 
+          If roles are not applicable to this Identity selection, this value will be void.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="success">
+        <Description>
+            True if the selection was successful; false otherwise.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+      import sailpoint.object.Identity;
+      import sailpoint.tools.Util;
+      import java.util.List;
+      
+      List managerNames = new ArrayList();
+      managerNames.add("10102203"); //Aaron Shoemaker
+      managerNames.add("10083327"); //Beau Higginbotham
+      managerNames.add("10037761"); //Bill Mayher
+      managerNames.add("10104829"); //Brad McNabb
+      managerNames.add("10237005"); //Claudio Ferraro
+      managerNames.add("10064245"); //Clayton Carsner
+      managerNames.add("10130500"); //Estrellita Redmon
+      managerNames.add("10006489"); //Ijaz Iqbal
+      managerNames.add("10081831"); //Joseph Cook
+      managerNames.add("10004219"); //Justin Labrato
+      managerNames.add("10233494"); //Dr. Jason Lepak
+      managerNames.add("10022717"); //Jagraj Rai
+      managerNames.add("10060706"); //Jason Reichenberg
+      managerNames.add("10022407"); //Laura Pascucci
+      managerNames.add("10135591"); //Michael Wiemann
+      managerNames.add("10239322"); //Philip Newlin
+      managerNames.add("10233691"); //Ramona Miller
+      managerNames.add("10422690"); //Robert Culling
+      managerNames.add("10388986"); //Robert Sundelius
+      managerNames.add("10178331"); //Shadi Soufi
+      managerNames.add("10365010"); //Summer Tappan
+      managerNames.add("10179335"); //Yvette Doran
+      managerNames.add("10307892"); //Reinhold Llerena -- Amita Health
+      managerNames.add("10306226"); //Andrew Palumbo -- Amita Health
+      managerNames.add("10003680"); //Carol Schmidt
+      managerNames.add("10377858"); //Baligh Yehia
+      managerNames.add("10410209"); //Thomas Graf
+      managerNames.add("10019691"); //Brian Wilcox
+      managerNames.add("10470726"); //Latriece Prince-Wheeler
+      managerNames.add("10270480"); //Timothy Bode
+      
+      if(identity != null && !identity.isInactive()){
+        String email = identity.getAttribute("primaryEmail");
+        if(Util.isNotNullOrEmpty(email)){
+            Identity manager = identity.getManager();
+            int i=1;
+
+            while (null != manager){
+              if(null!=manager && managerNames.contains(manager.getName())){
+                return true;
+              }
+              i++;
+              Identity ident=manager;
+              manager = ident.getManager();  
+              
+              //failsafe in case of loop in chain
+              if(i > 50)
+                break;
+            }
+        }
+      }
+      
+      return false;
+      ]]></Source>
+</Rule>

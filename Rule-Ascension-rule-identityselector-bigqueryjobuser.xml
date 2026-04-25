@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-IdentitySelector-BigQueryJobUser" type="IdentitySelector">
+  <Description>This rule is used to select an Identity that is related to the given Identity</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log" type="org.apache.commons.logging.Log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The identity.
+        </Description>
+      </Argument>
+      <Argument name="roleName" type="String">
+        <Description>
+          The name of the sailpoint.object.Bundle (role) that is being selected for the Identity. 
+          If roles are not applicable to this Identity selection, this value will be void.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="success">
+        <Description>
+          True if the selection was successful; false otherwise.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+  import sailpoint.object.Identity;
+  import sailpoint.tools.Util;
+  import sailpoint.server.Environment;
+  import java.sql.Connection;
+  import java.sql.ResultSet;
+  import java.sql.Statement;
+
+  private List queryIIQDBForColumn(String sql) {
+
+    ResultSet resultSet = null;
+    List resultList = new ArrayList();
+
+    Connection con = Environment.getEnvironment().getSpringDataSource().getConnection();
+    
+    Statement statement = null;
+    
+    try {
+
+    if (con != null) {
+
+       statement = con.prepareStatement(sql);
+
+      if (statement != null) {
+
+        resultSet = statement.executeQuery();
+
+      }
+
+    }
+
+    if (resultSet != null) {
+
+      while (resultSet.next()) {
+
+        resultList.add(resultSet.getString(1));
+
+      }
+
+    }
+
+    } catch (Exception e) {
+
+       log.error(e.getMessage());
+
+    } finally {
+
+			resultSet.close();
+      statement.close();
+
+    }
+
+    return resultList;
+
+  }
+
+  String sql = "SELECT DISTINCT iden.name FROM identityiq.identityiq.spt_identity_entitlement idenEnt INNER JOIN identityiq.spt_managed_attribute ma ON idenEnt.value = ma.value INNER JOIN identityiq.spt_identity iden ON idenEnt.identity_id = iden.id INNER JOIN identityiq.spt_application app ON idenEnt.application = app.id WHERE app.name = 'GSuite' AND (ma.display_name like 'gcp-DaaS%' AND ma.display_name != 'gcp-DaaS-misc-prd-Job_User')";
+  List resultList = null;
+
+  if (Util.isNotNullOrEmpty(sql)) {
+
+    resultList = queryIIQDBForColumn(sql);
+
+  }
+
+  if (identity != null) {
+
+    String identityName = identity.getName();
+    String primaryEmail = identity.getAttribute("primaryEmail");
+
+    if (Util.isNotNullOrEmpty(identityName) && Util.isNotNullOrEmpty(primaryEmail) && !identity.isInactive()) {
+
+      if (Util.containsComparable(resultList, identityName, false)) {
+
+        return true;
+
+      }
+
+    }
+
+  }
+
+  return false;
+
+  ]]></Source>
+</Rule>

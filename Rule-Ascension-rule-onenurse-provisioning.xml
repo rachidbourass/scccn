@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-OneNurse-Provisioning" type="CompositeRemediation">
+  <Description>This rule is called when provisioning needs to be performed against logical accounts. It gets the plan built up by the plan compiler and the rule needs to return a list of Plans to fan out the request across all tiers.</Description>
+  <Signature returnType="ProvisioningPlan">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application associated with the connector.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+           The Identity object that is going to be remediated.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan created against the logical application.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="provisioningPlan">
+        <Description>
+          A converted provisioning plan that targets the applications
+          that make up the logical application.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[import sailpoint.tools.GeneralException;
+	import sailpoint.tools.Util;
+	import sailpoint.object.Identity;
+	import sailpoint.object.ProvisioningPlan;
+	import sailpoint.object.ProvisioningPlan.AccountRequest;
+	import sailpoint.object.ProvisioningPlan.AttributeRequest;
+	ProvisioningPlan updatedPlan = null;
+	log.error("Initial plan generated for plan****"+plan.toXml());
+System.out.println("Initial plan generated for plan****"+plan.toXml());
+	List totalEntRequested = new ArrayList();
+	if (plan != null) {
+		// Get the account request for the composite application from the plan by app name
+		log.error("Initial appName****"+application.getName());
+                System.out.println("Initial appName****"+application.getName());
+		AccountRequest compositeRequest = plan.getAccountRequest(application.getName());
+		log.error("Initial plan generated for compositeRequest****"+compositeRequest.toXml());
+                System.out.println("Initial plan generated for compositeRequest****"+compositeRequest.toXml());
+		if (compositeRequest != null) {
+			List convertedAttributeRequests = new ArrayList();
+			// Convert the attribute requests that reference groupMember to just groups
+			List attributeRequests = compositeRequest.getAttributeRequests();
+			if (Util.size(attributeRequests) > 0) {
+				for (AttributeRequest request: attributeRequests) {
+					log.error("Initial plan generated for request****"+request.toXml());
+					String attributeName = request.getName();
+					String attributeVal = request.getValue();
+          AttributeRequest req = new AttributeRequest(request);
+					if ("memberOf".compareTo(attributeName) == 0) {
+						
+						req.setName("memberOf");
+						convertedAttributeRequests.add(req);
+					} else {
+						convertedAttributeRequests.add(new AttributeRequest(req));
+					}
+					totalEntRequested.add(attributeVal);
+				}
+			}
+			List updatedAccountRequests = new ArrayList();
+			// add in any other request that are part of the plan if any
+			List accountRequests = plan.getAccountRequests();
+			//Rules in IdentityIQ Page 136 of 170
+			if (Util.size(accountRequests) > 0) {
+				for (AccountRequest accountRequest: accountRequests) {
+					String appName = accountRequest.getApplication();
+					if (application.getName().compareTo(appName) != 0) {
+						updatedAccountRequests.add(accountRequest);
+					}
+				}
+			}
+			// Convert the "OneNurse" request to "AD-DS"
+			// and add it to the updated account requests
+			AccountRequest convertedRequest = new AccountRequest(compositeRequest);
+			convertedRequest.setApplication("AD-DS");
+			convertedRequest.setAttributeRequests(convertedAttributeRequests);
+			updatedAccountRequests.add(convertedRequest);
+			// create new plan and add the list of account requests to it
+			updatedPlan = new ProvisioningPlan(plan);
+			updatedPlan.setAccountRequests(updatedAccountRequests);
+			log.error("Final plan generated for updatedPlan****"+updatedPlan.toXml());
+		}
+	}
+	
+	log.error("Final Ent Requested****"+totalEntRequested);
+       System.out.println("Final Ent Requested****"+totalEntRequested);
+	return updatedPlan;]]></Source>
+</Rule>

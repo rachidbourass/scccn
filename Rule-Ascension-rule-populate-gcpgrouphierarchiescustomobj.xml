@@ -1,0 +1,258 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Populate-GCPGroupHierarchiesCustomObj">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Rule-GSuite-AccessToken"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+
+  import sailpoint.object.Attributes;
+  import sailpoint.object.AuditEvent;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Filter;
+  import sailpoint.object.ManagedAttribute;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.Util;
+  import org.json.JSONArray;
+  import org.json.JSONException;
+  import org.json.JSONObject;
+
+  private String nextPageTokenGroupMembersSummary = "";
+
+  private Iterator getGCPGroups() {
+
+    QueryOptions ops = new QueryOptions();
+    ops.addFilter(Filter.eq("application.name","GSuite"));
+    ops.addFilter(Filter.eq("type","group"));
+    ops.addFilter(Filter.ignoreCase(Filter.like("displayName","gcp-",Filter.MatchMode.START)));
+
+    if (ops != null) {
+
+      return context.search(ManagedAttribute.class, ops, "value");
+
+    }
+
+    return null;
+
+  }
+
+  private String getGroupMembersSummaryAPIUrl(String nextPageTokenGroupMembersSummary, String groupKey){
+
+    //System.out.println("In Method: getGroupMembersSummaryAPIUrl");
+
+    String fields = "members(id,type),nextPageToken";
+    String urlStr = null;
+    if(nextPageTokenGroupMembersSummary == null || nextPageTokenGroupMembersSummary == ""){
+      urlStr = "https://admin.googleapis.com/admin/directory/v1/groups/" + groupKey + "/members" + "?fields=" + fields;
+    }else{
+      urlStr = "https://admin.googleapis.com/admin/directory/v1/groups/" + groupKey + "/members" + "?fields=" + fields + "&pageToken=" + nextPageTokenGroupMembersSummary;
+      nextPageTokenGroupMembersSummary = "";
+    }
+    return urlStr;
+  }
+
+  private JSONObject getGSuiteGroupMembersSummary(String groupKey, String urlStr) {
+
+    //System.out.println("In Method: getGSuiteGroupMembersSummary");
+
+    org.json.JSONObject jsonObject = null;
+    token = context.decrypt(jobj); //Passed in via global variable (Rule-GSuite-AccessToken).
+
+    try {
+
+      URL url = new URL(urlStr);
+
+      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn.setDoOutput(true);
+      conn.setRequestMethod("GET");
+      conn.setRequestProperty("Content-Type", "application/json");
+      conn.setRequestProperty("Authorization", "Bearer "+ token);
+
+      BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+      String output = "";
+      String lineOutput = "";
+
+      while ((lineOutput = br.readLine()) != null) {
+        output = output + lineOutput;
+      } 
+
+      if (output != null) {
+
+        jsonObject = new org.json.JSONObject(output);
+
+      }
+
+    } catch (FileNotFoundException e) {
+
+      //Handle but do nothing
+
+    } catch (java.io.IOException e) {
+
+      //Handle but do nothing
+
+    }
+
+    return jsonObject;
+
+  }
+
+  private List parseGroupMembersSummaryOrgJson(JSONObject jsonObject, List<String> rollingList) throws IOException, JSONException {
+
+    //System.out.println("In Method: parseGroupMembersSummaryOrgJson");
+
+    if(jsonObject.has("members") && !jsonObject.isNull("members")){
+
+      org.json.JSONArray jsonArray = jsonObject.getJSONArray("members");
+
+      for(int i = 0 ; i < jsonArray.length(); i++) {
+
+        rollingList.add(jsonArray.getJSONObject(i).getString("id") + "|" + jsonArray.getJSONObject(i).getString("type"));
+
+      }
+
+    }
+
+    return rollingList;
+
+  }
+
+  private List executeGroupMembersSummaryJSONCall(String groupKey){
+
+    //System.out.println("In Method: executeGroupMembersSummaryJSONCall");
+
+    org.json.JSONObject jo = null;
+    String urlStr = null;
+    List parsedList = new ArrayList();
+    List rollingList = new ArrayList();
+    try{
+      do {
+        if(nextPageTokenGroupMembersSummary == null || nextPageTokenGroupMembersSummary == ""){
+          //System.out.println("In Method: executeGroupMembersSummaryJSONCall - do if");
+
+          urlStr = getGroupMembersSummaryAPIUrl("", groupKey);
+          jo = getGSuiteGroupMembersSummary(groupKey, urlStr);
+
+          if(jo.has("nextPageToken") && !jo.isNull("nextPageToken")){
+            nextPageTokenGroupMembersSummary = jo.getString("nextPageToken");
+          }
+
+          parsedList = parseGroupMembersSummaryOrgJson(jo, rollingList);
+
+        }else{
+          //System.out.println("In Method: executeGroupMembersSummaryJSONCall - do else");
+          urlStr = getGroupMembersSummaryAPIUrl(nextPageTokenGroupMembersSummary, groupKey);
+          jo = getGSuiteGroupMembersSummary(groupKey, urlStr);
+
+          if(jo.has("nextPageToken") && !jo.isNull("nextPageToken")){
+            nextPageTokenGroupMembersSummary = jo.getString("nextPageToken");
+          } else {
+            nextPageTokenGroupMembersSummary = "";
+          }
+
+          parsedList = parseGroupMembersSummaryOrgJson(jo, rollingList);
+
+        }
+      }while(nextPageTokenGroupMembersSummary != "");
+    }catch(Exception e){
+      //Handle but do nothing
+    }
+    return parsedList;
+  }
+
+  private String getGroupsFromGroupMembersSummaryList(String groupKey, List parsedList) {
+
+    String outStr = groupKey + "|";
+    String member = null;
+
+    for (int i = 0; i < parsedList.size(); i++) {
+
+      member = parsedList.get(i);
+
+      if (member.endsWith("|GROUP")) {
+
+        if (i == parsedList.size() - 1) {
+
+          outStr = outStr.concat(member.replace("|GROUP",""));
+
+        } else {
+
+          outStr = outStr.concat(member.replace("|GROUP","") + ";");
+
+        }
+
+      }
+
+    }
+
+    if (outStr.endsWith("|")) {
+
+      outStr = null;
+
+    }
+
+    return outStr;
+
+  }
+
+  private List getGCPGroupHierarchies(Iterator gcpGroupsItr) {
+
+    List outList = new ArrayList();
+    List groupMembersSummaryList = new ArrayList();
+    String groupKey = null;
+    String hierarchy = null;
+
+    while (gcpGroupsItr.hasNext()) {
+
+      groupKey = gcpGroupsItr.next()[0];
+
+      if (Util.isNotNullOrEmpty(groupKey)) {
+
+        groupMembersSummaryList = executeGroupMembersSummaryJSONCall(groupKey);
+
+        if (!groupMembersSummaryList.isEmpty()) {
+
+          hierarchy = getGroupsFromGroupMembersSummaryList(groupKey, groupMembersSummaryList);
+
+          if (Util.isNotNullOrEmpty(hierarchy)) {
+
+            outList.add(hierarchy);
+
+          }
+
+        }
+
+      }
+
+    }
+
+    Util.flushIterator(gcpGroupsItr);
+
+    return outList;
+
+  }
+
+  Custom custom = context.getObjectByName(Custom.class, "Ascension-Custom-GCPGroupHierarchies");
+  Attributes attrs = new Attributes();
+
+  if (custom != null) {
+
+    for (String hierarchy : getGCPGroupHierarchies(getGCPGroups())) {
+
+      String[] hierarchiesStrArray = hierarchy.split("\\|");
+
+      String parent = hierarchiesStrArray[0];
+      String children = hierarchiesStrArray[1];
+
+      attrs.put(parent, children);
+
+    }
+
+    custom.setAttributes(attrs);
+
+    context.saveObject(custom);
+    context.commitTransaction();
+
+  }
+
+  ]]></Source>
+</Rule>

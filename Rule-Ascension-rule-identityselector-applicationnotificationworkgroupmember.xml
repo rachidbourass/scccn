@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-IdentitySelector-ApplicationNotificationWorkgroupMember" type="IdentitySelector">
+  <Description>This rule is used to select an Identity that is related to the given Identity</Description>
+  <Signature returnType="boolean"/>
+  <Source><![CDATA[import sailpoint.object.Identity;
+
+//Provide any Identity in the referenced workgroup with the relevant role.
+
+String workgroupName = "Application Notifications Workgroup";
+
+Identity workgroup = context.getObjectByName(Identity.class, workgroupName);
+
+if (workgroup != null && workgroup.isWorkgroup()) {
+
+   if (identity.isInWorkGroup(workgroup)) {
+
+     return true;
+
+   } 
+
+}
+
+return false;
+
+
+]]></Source>
+</Rule>

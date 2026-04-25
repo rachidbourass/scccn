@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-IdentitySelector-CareStudio" type="IdentitySelector">
+  <Description>This rule is used to select an Identity that is related to the given Identity</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The identity.
+        </Description>
+      </Argument>
+      <Argument name="roleName" type="String">
+        <Description>
+          The name of the sailpoint.object.Bundle (role) that is being selected for the Identity. 
+          If roles are not applicable to this Identity selection, this value will be void.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="success">
+        <Description>
+            True if the selection was successful; false otherwise.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[import sailpoint.api.IdentityService;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Application;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.Util;
+
+  private List getADLinks(Identity identity, SailPointContext context) {
+
+    IdentityService iService = new IdentityService(context);
+    QueryOptions ops = new QueryOptions();
+
+    ops.addFilter(Filter.eq("type", "Active Directory - Direct"));
+
+    List adApps = context.getObjects(Application.class, ops);
+
+    List adLinks = iService.getLinks(identity, adApps, null);
+
+    return adLinks;
+
+  }
+
+  if (Util.nullSafeCaseInsensitiveEq(roleName, "EHRSearch Viewer")) {
+
+    if (identity != null && !identity.isInactive()) {
+
+      List adGroups = Util.delimToList(";", "CN=ACMHO-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=mistrhghts,DC=abs-tpa,DC=com;CN=AHMFM-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=medxcelfm,DC=com;CN=AHSCN-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=ABSM,DC=alexian,DC=corp;CN=ALEXIAN-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=alexian,DC=net;CN=AHCHM-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=AHCHM,DC=DS,DC=SJHS,DC=com;CN=AHDOC-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=ahdoc,DC=DS,DC=SJHS,DC=com;CN=AHIS-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=ahis,DC=DS,DC=SJHS,DC=com;CN=AHNAT-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=AHNAT,DC=DS,DC=SJHS,DC=com;CN=AHSCN-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=AHSCN,DC=DS,DC=SJHS,DC=com;CN=ALBIR-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=albir,DC=DS,DC=SJHS,DC=com;CN=ALMOB-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=almob,DC=DS,DC=SJHS,DC=com;CN=CTBRI-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=ctbri,DC=DS,DC=SJHS,DC=com;CN=DCWAS-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=dcwas,DC=DS,DC=SJHS,DC=com;CN=FLJAC-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=fljac,DC=DS,DC=SJHS,DC=com;CN=FLPEN-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=FLPEN,DC=DS,DC=SJHS,DC=com;CN=ILARL-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=ilarl,DC=DS,DC=SJHS,DC=com;CN=INEVA-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=INEVA,DC=DS,DC=SJHS,DC=com;CN=ININD-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=inind,DC=DS,DC=SJHS,DC=com;CN=INMSC-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=inmsc,DC=DS,DC=SJHS,DC=com;CN=MDBAL-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=mdbal,DC=DS,DC=SJHS,DC=com;CN=MIGRA-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=MIGRA,DC=DS,DC=SJHS,DC=com;CN=MIKAL-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=mikal,DC=DS,DC=SJHS,DC=com;CN=MISAG-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=misag,DC=DS,DC=SJHS,DC=com;CN=MOSTL-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=mostl,DC=DS,DC=SJHS,DC=com;CN=NYAMS-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=NYAMS,DC=DS,DC=SJHS,DC=com;CN=NYBIN-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=nybin,DC=DS,DC=SJHS,DC=com;CN=DS-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com;CN=MIDET-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=SJHS,DC=DS,DC=SJHS,DC=com;CN=TNNAS-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=TNNAS,DC=DS,DC=SJHS,DC=com;CN=TXAUS-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=txaus,DC=DS,DC=SJHS,DC=com;CN=TXWAC-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=txwac,DC=DS,DC=SJHS,DC=com;CN=WIMIL-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=wimil,DC=DS,DC=SJHS,DC=com;CN=KSWIC-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=mrhc,DC=via-christi,DC=org;CN=KSWIC-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=mtc,DC=via-christi,DC=org;CN=KSWIC-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=via-christi,DC=org;CN=MIROC-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=crittenton,DC=net;CN=OKTUL-212403693128-gcp-ehrsearch-viewers-all,OU=SecurityGroups,OU=Managed,DC=fr,DC=sjhs;CN=OKTUL-212403693128-gcp-ehrsearch-viewers-all,OU=SecurityGroups,OU=Managed,DC=jpmmc,DC=org;CN=OKTUL-212403693128-gcp-ehrsearch-viewers-all,OU=SecurityGroups,OU=Managed,DC=sjmc,DC=org;CN=WIAPP-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=Affinityhealth,DC=net;CN=WIAPP-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=corproot,DC=adroot;CN=WIAPP-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=ministryhealth,DC=net;CN=WIGLE-212403693128-gcp-ehrsearch-viewers-all,OU=Groups,OU=Managed,DC=wfsi,DC=priv", true);
+
+      List adLinks = getADLinks(identity, context);
+
+      for (Link adLink : adLinks) {
+
+        List memberOf = adLink.getAttribute("memberOf");
+
+        if (Util.containsAny(adGroups, memberOf)) {
+
+          return true;
+
+        }
+
+      }
+
+    }
+
+  }
+
+  if (Util.nullSafeCaseInsensitiveEq(roleName, "EHRSearch UATester")) {
+
+    if (identity != null && !identity.isInactive()) {
+
+      List adGroups = Util.delimToList(";", "CN=ACMHO-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=mistrhghts,DC=abs-tpa,DC=com;CN=AHMFM-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=medxcelfm,DC=com;CN=AHSCN-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=ABSM,DC=alexian,DC=corp;CN=ALEXIAN-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=alexian,DC=net;CN=AHCHM-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=AHCHM,DC=DS,DC=SJHS,DC=com;CN=AHDOC-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=ahdoc,DC=DS,DC=SJHS,DC=com;CN=AHIS-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=ahis,DC=DS,DC=SJHS,DC=com;CN=AHNAT-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=AHNAT,DC=DS,DC=SJHS,DC=com;CN=AHSCN-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=AHSCN,DC=DS,DC=SJHS,DC=com;CN=ALBIR-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=albir,DC=DS,DC=SJHS,DC=com;CN=ALMOB-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=almob,DC=DS,DC=SJHS,DC=com;CN=CTBRI-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=ctbri,DC=DS,DC=SJHS,DC=com;CN=DCWAS-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=dcwas,DC=DS,DC=SJHS,DC=com;CN=FLJAC-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=fljac,DC=DS,DC=SJHS,DC=com;CN=FLPEN-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=FLPEN,DC=DS,DC=SJHS,DC=com;CN=ILARL-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=ilarl,DC=DS,DC=SJHS,DC=com;CN=INEVA-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=INEVA,DC=DS,DC=SJHS,DC=com;CN=ININD-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=inind,DC=DS,DC=SJHS,DC=com;CN=INMSC-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=inmsc,DC=DS,DC=SJHS,DC=com;CN=MDBAL-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=mdbal,DC=DS,DC=SJHS,DC=com;CN=MIGRA-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=MIGRA,DC=DS,DC=SJHS,DC=com;CN=MIKAL-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=mikal,DC=DS,DC=SJHS,DC=com;CN=MISAG-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=misag,DC=DS,DC=SJHS,DC=com;CN=MOSTL-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=mostl,DC=DS,DC=SJHS,DC=com;CN=NYAMS-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=NYAMS,DC=DS,DC=SJHS,DC=com;CN=NYBIN-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=nybin,DC=DS,DC=SJHS,DC=com;CN=DS-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com;CN=MIDET-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=SJHS,DC=DS,DC=SJHS,DC=com;CN=TNNAS-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=TNNAS,DC=DS,DC=SJHS,DC=com;CN=TXAUS-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=txaus,DC=DS,DC=SJHS,DC=com;CN=TXWAC-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=txwac,DC=DS,DC=SJHS,DC=com;CN=WIMIL-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=wimil,DC=DS,DC=SJHS,DC=com;CN=KSWIC-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=mrhc,DC=via-christi,DC=org;CN=KSWIC-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=mtc,DC=via-christi,DC=org;CN=KSWIC-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=via-christi,DC=org;CN=MIROC-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=crittenton,DC=net;CN=OKTUL-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=fr,DC=sjhs;CN=OKTUL-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=jpmmc,DC=org;CN=OKTUL-212403693128-gcp-ehrsearch-uatesters-all,OU=SecurityGroups,OU=Managed,DC=sjmc,DC=org;CN=WIAPP-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=Affinityhealth,DC=net;CN=WIAPP-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=corproot,DC=adroot;CN=WIAPP-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=ministryhealth,DC=net;CN=WIGLE-212403693128-gcp-ehrsearch-uatesters-all,OU=Groups,OU=Managed,DC=wfsi,DC=priv", true);
+
+      List adLinks = getADLinks(identity, context);
+
+      for (Link adLink : adLinks) {
+
+        List memberOf = adLink.getAttribute("memberOf");
+
+        if (Util.containsAny(adGroups, memberOf)) {
+
+          return true;
+
+        }
+
+      }
+
+    }
+
+  }
+
+  if (Util.nullSafeCaseInsensitiveEq(roleName, "EHRSearch Experimenter")) {
+
+    if (identity != null && !identity.isInactive()) {
+
+      List adGroups = Util.delimToList(";", "CN=ACMHO-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=mistrhghts,DC=abs-tpa,DC=com;CN=AHMFM-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=medxcelfm,DC=com;CN=AHSCN-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=ABSM,DC=alexian,DC=corp;CN=ALEXIAN-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=alexian,DC=net;CN=AHCHM-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=AHCHM,DC=DS,DC=SJHS,DC=com;CN=AHDOC-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=ahdoc,DC=DS,DC=SJHS,DC=com;CN=AHIS-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=ahis,DC=DS,DC=SJHS,DC=com;CN=AHNAT-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=AHNAT,DC=DS,DC=SJHS,DC=com;CN=AHSCN-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=AHSCN,DC=DS,DC=SJHS,DC=com;CN=ALBIR-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=albir,DC=DS,DC=SJHS,DC=com;CN=ALMOB-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=almob,DC=DS,DC=SJHS,DC=com;CN=CTBRI-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=ctbri,DC=DS,DC=SJHS,DC=com;CN=DCWAS-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=dcwas,DC=DS,DC=SJHS,DC=com;CN=FLJAC-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=fljac,DC=DS,DC=SJHS,DC=com;CN=FLPEN-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=FLPEN,DC=DS,DC=SJHS,DC=com;CN=ILARL-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=ilarl,DC=DS,DC=SJHS,DC=com;CN=INEVA-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=INEVA,DC=DS,DC=SJHS,DC=com;CN=ININD-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=inind,DC=DS,DC=SJHS,DC=com;CN=INMSC-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=inmsc,DC=DS,DC=SJHS,DC=com;CN=MDBAL-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=mdbal,DC=DS,DC=SJHS,DC=com;CN=MIGRA-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=MIGRA,DC=DS,DC=SJHS,DC=com;CN=MIKAL-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=mikal,DC=DS,DC=SJHS,DC=com;CN=MISAG-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=misag,DC=DS,DC=SJHS,DC=com;CN=MOSTL-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=mostl,DC=DS,DC=SJHS,DC=com;CN=NYAMS-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=NYAMS,DC=DS,DC=SJHS,DC=com;CN=NYBIN-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=nybin,DC=DS,DC=SJHS,DC=com;CN=DS-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com;CN=MIDET-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=SJHS,DC=DS,DC=SJHS,DC=com;CN=TNNAS-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=TNNAS,DC=DS,DC=SJHS,DC=com;CN=TXAUS-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=txaus,DC=DS,DC=SJHS,DC=com;CN=TXWAC-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=txwac,DC=DS,DC=SJHS,DC=com;CN=WIMIL-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=wimil,DC=DS,DC=SJHS,DC=com;CN=KSWIC-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=mrhc,DC=via-christi,DC=org;CN=KSWIC-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=mtc,DC=via-christi,DC=org;CN=KSWIC-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=via-christi,DC=org;CN=MIROC-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=crittenton,DC=net;CN=OKTUL-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=SecurityGroups,OU=Managed,DC=fr,DC=sjhs;CN=OKTUL-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=SecurityGroups,OU=Managed,DC=jpmmc,DC=org;CN=OKTUL-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=SecurityGroups,OU=Managed,DC=sjmc,DC=org;CN=WIAPP-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=Affinityhealth,DC=net;CN=WIAPP-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=corproot,DC=adroot;CN=WIAPP-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=ministryhealth,DC=net;CN=WIGLE-212403693128-gcp-ehrsearch-uxrexperimenters-all,OU=Groups,OU=Managed,DC=wfsi,DC=priv", true);
+
+      List adLinks = getADLinks(identity, context);
+
+      for (Link adLink : adLinks) {
+
+        List memberOf = adLink.getAttribute("memberOf");
+
+        if (Util.containsAny(adGroups, memberOf)) {
+
+          return true;
+
+        }
+
+      }
+
+    }
+
+  }
+
+  return false;]]></Source>
+</Rule>

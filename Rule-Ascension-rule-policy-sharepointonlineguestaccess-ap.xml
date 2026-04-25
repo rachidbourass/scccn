@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Policy-SharePointOnlineGuestAccess-AP" type="Policy">
+  <Description>This Rule for identities should not have more than on role at same time, in violation of a policy that prohibits stale users.</Description>
+  <Signature returnType="PolicyViolation">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+          The Identity being inspected.
+        </Description>
+      </Argument>
+      <Argument name="policy">
+        <Description>
+          The Policy being evaluated.
+        </Description>
+      </Argument>
+      <Argument name="constraint">
+        <Description>
+          The Constraint being evaluated.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="violation">
+        <Description>
+          The PolicyViolation object.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[import sailpoint.rapidapponboarding.rule.PolicyViolationsRuleLibrary;
+
+return PolicyViolationsRuleLibrary.isEligibleViolation(context, identity, "SharePoint Online Guest Access (not for Communities SharePoint)","Ineligible For SharePoint Online Guest Access", "Users with @ascension.org or @ascension-external.org email addresses are prohibited from requesting SharePoint Online Guest Access");]]></Source>
+</Rule>

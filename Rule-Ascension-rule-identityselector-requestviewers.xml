@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-IdentitySelector-RequestViewers" type="IdentitySelector">
+  <Description>This rule is used to select an Identity that is related to the given Identity</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The identity.
+        </Description>
+      </Argument>
+      <Argument name="roleName" type="String">
+        <Description>
+          The name of the sailpoint.object.Bundle (role) that is being selected for the Identity. 
+          If roles are not applicable to this Identity selection, this value will be void.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="success">
+        <Description>
+            True if the selection was successful; false otherwise.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[import sailpoint.object.Filter;
+    import sailpoint.object.Identity;
+    import sailpoint.object.GroupDefinition;
+    import sailpoint.object.QueryOptions;
+    import sailpoint.tools.Util;
+
+    if (!identity.isInactive()) {
+    
+        // Get Population
+        
+        GroupDefinition requestViewers = context.getObjectByName(GroupDefinition.class,"Pop-RequestViewers");
+        
+        //Construct QueryOptions
+        
+        QueryOptions ops = new QueryOptions();
+        
+        //Supply Filter of Population to QueryOptions
+        
+        ops.addFilter(requestViewers.getFilter());
+        
+        //Get Objects Matching Supplied Filter
+        
+        List requestViewersList = context.getObjects(Identity.class, ops);
+        
+        //Determine if requestViewersList contains passed in Identity
+        
+        if (Util.nullSafeContains(requestViewersList, identity)) {
+        
+            //If passed in Identity is in Population (i.e. requestViewersList), assign role
+        
+            return true;
+        
+        }
+
+    }
+    
+    //Do not assign otherwise
+    
+    return false;]]></Source>
+</Rule>

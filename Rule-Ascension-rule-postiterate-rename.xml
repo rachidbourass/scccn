@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-PostIterate-Rename" type="PostIterate">
+  <Description>This rule is called after the connector processes the data in a file.
+
+Stats is a Map passed in by the connector with the information it has gathered. Custom keys can be added here if necessary for validation.</Description>
+  <Signature returnType="void">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          Application being iterated.
+        </Description>
+      </Argument>
+      <Argument name="schema">
+        <Description>
+          Schema requested during iteration.
+        </Description>
+      </Argument>
+      <Argument name="stats">
+        <Description>
+          A map of the stats for the current file that was just iterated.
+          Contains keys:
+            fileName : (String) filename of the file about to be processed
+            absolutePath : (String) absolute filename
+            length : (Long) length in bytes
+            lastModified : (Long) last time the file was updated Java GMT
+            columnNames : (List) column names that were used during the iteration
+            objectsIterated : (Long) total number of objects iterated during this run
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[import sailpoint.tools.Util;
+  import java.io.File;
+  import java.io.FileNotFoundException;
+  import java.util.Date;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+ /* Log logger = LogFactory.getLog("rule.Ascension.Rule.PostIterate.Rename");
+  logger.info("Entering Ascension-Rule-PostIterate-Rename ");
+  String appFile = "";
+	try {
+		if (application != null) {
+			appFile = (String) application.getAttributeValue("file");
+			File oldfile = new File(appFile);
+			if (Util.isNotNullOrEmpty(appFile)) {
+				if (oldfile != null && oldfile.exists()) {
+					String[] tokens = oldfile.getName().split("\\.(?=[^\\.]+$)");
+					String newFilePath = "";
+					if (tokens != null && tokens.length > 0) {
+						newFilePath = tokens[0] + "_" + new Date().getTime();
+						if (tokens.length > 1) {
+							newFilePath = newFilePath + "." + tokens[1];
+						}
+					}
+					newFilePath = oldfile.getParent() + "\\Archive\\" + newFilePath;
+					File newfile = new File(newFilePath);
+					if (newfile != null && oldfile.renameTo(newfile)) {
+						logger.debug("File name changed successfully");
+					} else {
+						logger.debug("Rename failed");
+					}
+				}
+			}
+		}
+	} catch (Exception ex) {
+		logger.error("Exception in file Archive " + ex.getMessage());
+	}
+  logger.info(" Exiting Ascension-Rule-PostIterate-Rename ");*/]]></Source>
+</Rule>

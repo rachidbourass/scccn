@@ -1,0 +1,242 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-PreIterate-Morrisey" type="PreIterate">
+  <Description>This rule is called before the connector processes the data in a file.</Description>
+  <Signature returnType="void">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          Application being iterated.
+        </Description>
+      </Argument>
+      <Argument name="schema">
+        <Description>
+          Schema representing the data being iterated.
+        </Description>
+      </Argument>
+      <Argument name="stats">
+        <Description>
+          A map passed by the connector of the stats for the file about to be iterated.
+          Contains keys:
+            fileName : (String) filename of the file about to be processed
+            absolutePath : (String) absolute filename
+            length : (Long) length in bytes
+            lastModified : (Long) last time the file was updated Java GMT
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+  
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Scanner;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import sailpoint.tools.Util;
+
+  Log logger = LogFactory.getLog("Rule.PreIterate.Morrisey");
+  
+  String fileName = application.getAttributeValue("file");
+  String pathOut = "\\\\ANDC1WAPP0147.ds.sjhs.com\\AppAggregation\\Morrisey_Temp.csv";
+  
+
+  
+  if(Util.isNotNullOrEmpty(fileName)){
+      StringBuffer stringBufferObj = new StringBuffer();
+    
+			File file = new File(fileName);
+			if (file.exists()) {
+				Scanner sc = null;
+				try {
+					sc = new Scanner(file);
+				} catch (FileNotFoundException e1) {
+					logger.error("FileNotFoundException : "+e1.getMessage());
+				}
+				Map identityMap = new HashMap();
+				int lineCount = 0;
+				String headerString = null;
+				int dateIndex = 0;
+				int idIndex = 0;
+				int facilityIndex = 0;
+				int statusIndex = 0;
+				int headerLength = 0;
+
+				String empKey = null;
+				String date = null;
+				String newRecordFacility = null;
+				String newRecordStatus = null;
+
+				String existingID = null;
+				String existingDate = null;
+				String existingFacility = null;
+				String existingRecordStatus = null;
+        
+				while (sc.hasNextLine()) {
+					String line = sc.nextLine();
+					logger.debug("Line : " + line);
+       
+					if (lineCount == 0) {
+						headerString = line;
+						lineCount++;
+						logger.debug("headerString : " + headerString);
+						if (Util.isNotNullOrEmpty(headerString) && headerString.contains("|")) {
+							String[] headerSplit = headerString.split("\\|");
+							if (headerSplit != null) {
+                headerLength = headerSplit.length;
+								for (int i = 0; i < headerLength; i++) {
+									String headerValue = headerSplit[i];
+									if (Util.isNotNullOrEmpty(headerValue)) {
+										if (Util.nullSafeCaseInsensitiveEq(headerValue,"IDNumber")) {
+											idIndex = i;
+										} else if (Util.nullSafeCaseInsensitiveEq(headerValue,"DateOnStaff")) {
+											dateIndex = i;
+										} else if (Util.nullSafeCaseInsensitiveEq(headerValue,"facility")) {
+											facilityIndex = i;
+										} else if (Util.nullSafeCaseInsensitiveEq(headerValue,"Status")) {
+											statusIndex = i;
+										}
+									}
+								}
+							}
+						}
+						continue;
+					}
+					logger.debug("lineCount : " + lineCount + " id: " + idIndex + " dateIndex : " + dateIndex);
+					if (Util.isNotNullOrEmpty(line) && line.contains("|")) {
+						String[] eachLineSplit = line.split("\\|");
+						if (eachLineSplit != null && eachLineSplit.length == headerLength) {
+							empKey = eachLineSplit[idIndex];
+							date = eachLineSplit[dateIndex];
+							newRecordFacility = eachLineSplit[facilityIndex];
+							newRecordStatus = eachLineSplit[statusIndex];
+							if (identityMap != null && identityMap.containsKey(empKey)) {
+								String existingLine = (String) identityMap.get(empKey);
+								if (Util.isNotNullOrEmpty(existingLine) && existingLine.contains("|")) {
+									logger.debug("Duplicate record data for this user : " + empKey);
+									String[] splitExistingLine = existingLine.split("\\|");
+									if (splitExistingLine != null && splitExistingLine.length == headerLength) {
+										existingID = splitExistingLine[idIndex];
+										existingDate = splitExistingLine[dateIndex];
+										existingFacility = splitExistingLine[facilityIndex];
+										existingRecordStatus = splitExistingLine[statusIndex];
+										logger.debug("existingID : " + existingID + " existingDate : "
+												+ existingDate +" date : "+date+ " existingStatus : " + existingRecordStatus
+												+ " status: " + newRecordStatus);
+										if (Util.isNotNullOrEmpty(newRecordStatus) && Util.isNotNullOrEmpty(existingRecordStatus)) {
+											// Both Status is not null
+											if ((Util.nullSafeCaseInsensitiveEq(newRecordStatus,"Active")
+													&& Util.nullSafeCaseInsensitiveEq(existingRecordStatus,"Active"))
+                          || (Util.nullSafeCaseInsensitiveEq(newRecordStatus,"Inactive")
+															&& Util.nullSafeCaseInsensitiveEq(existingRecordStatus,"Inactive")) ) {
+
+												if (Util.isNotNullOrEmpty(existingDate)  && Util.isNotNullOrEmpty(date) ) {
+													SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+													Date existingRecordDate = null;
+													Date newRecordDate = null;
+													try {
+														existingRecordDate = dateFormat.parse(existingDate);
+														newRecordDate = dateFormat.parse(date);
+														logger.debug("existingRecordDate : " + existingRecordDate
+																+ " actualDate: " + newRecordDate);
+													} catch (ParseException e) {
+														// TODO Auto-generated catch block
+														logger.error("ParseException : "+e.getMessage());
+													}
+													if (newRecordDate != null && existingRecordDate != null
+															&& newRecordDate.compareTo(existingRecordDate) > 0) {
+														logger.debug("ISNIDE OVERRIDE");
+														identityMap.put(empKey, line);
+													}
+												} else if (existingDate.isEmpty() || date.isEmpty()) {
+													logger.debug("Existing date or date is empty : for : "+empKey);
+													
+													if (Util.isNotNullOrEmpty(existingFacility) && Util.isNotNullOrEmpty(newRecordFacility)) {
+														logger.debug("existingFacility : "+existingFacility + " newRecordFacility:  "+newRecordFacility);
+														if (newRecordFacility.compareTo(existingFacility) < 0) {
+															logger.debug("STRING NOW IS Greater");
+															// identityMap.remove(empKey);
+															identityMap.put(empKey, line);
+														}
+													}
+												}
+
+											} else if (Util.nullSafeCaseInsensitiveEq(newRecordStatus,"Active")
+													&& Util.nullSafeCaseInsensitiveEq(existingRecordStatus,"Inactive")) {
+												identityMap.put(empKey, line);
+
+											} else if (Util.nullSafeCaseInsensitiveEq(newRecordStatus,"Inactive")
+													&& Util.nullSafeCaseInsensitiveEq(existingRecordStatus,"Active")) {
+												// Do nothing
+											}
+
+										}
+									}
+								}
+							} else {
+							
+								identityMap.put(empKey, line);
+							}
+
+						}
+					}
+					lineCount++;
+				}
+				
+				logger.debug("identityMap : " + identityMap);
+				sc.close(); // closes the scanner
+				if (identityMap != null && !identityMap.isEmpty()) {
+					Iterator<String> it = identityMap.keySet().iterator();
+					if (it != null) {
+						stringBufferObj.append(headerString);
+						stringBufferObj.append("\n");
+						while (it.hasNext()) {
+							stringBufferObj.append(identityMap.get(it.next()));
+							stringBufferObj.append("\n");
+						}
+					}
+				}
+
+			} 
+     
+        BufferedWriter outputFile = null;
+        try {
+            outputFile =new BufferedWriter(new FileWriter(pathOut));
+            outputFile.append(stringBufferObj.toString());
+           
+        } catch (IOException e) {
+          logger.error("IOException : "+e.getMessage());
+        } finally {
+          try {
+            outputFile.flush();  
+            outputFile.close();
+          } catch (IOException e) {
+            logger.error("IOException : "+e.getMessage());
+          }
+        }
+    	 BufferedInputStream bis = new BufferedInputStream(new FileInputStream(new File(pathOut)));
+       logger.debug("End of Test PreIterate Rule");
+       return bis;
+  }
+  
+  ]]></Source>
+</Rule>

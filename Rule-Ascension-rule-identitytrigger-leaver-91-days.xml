@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-IdentityTrigger-Leaver-91-Days" type="IdentityTrigger">
+  <Description>This rule can be used for Certification Events that use rule triggers. The previousIdentity and newIdentity hold snapshots of the identity before the update has occurred and the state of the identity after the update, respectively.</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="previousIdentity">
+        <Description>
+          The identity before the refresh/aggregation (this will be null when an
+          identity is created).
+        </Description>
+      </Argument>
+      <Argument name="newIdentity">
+        <Description>
+          The identity after the refresh/aggregation (this will be null when an
+          identity is deleted).
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="result">
+        <Description>
+          A boolean describing the result of the rule.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+  	import sailpoint.object.Identity;
+		import sailpoint.object.Link;
+		import sailpoint.object.Application;
+		import sailpoint.api.IdentityService;
+		import sailpoint.object.QueryOptions;
+		import java.text.SimpleDateFormat;
+    import java.util.Calendar;
+    import java.util.Date;
+    import sailpoint.object.Filter;
+    import sailpoint.tools.Util;
+  	import org.apache.commons.logging.Log;
+		import org.apache.commons.logging.LogFactory;
+  	static Log logger = LogFactory.getLog("rule.identity.trigger.leaver.91.days");
+		logger.debug("Entering IdentityTrigger-Leaver-91-Days");
+  	
+		/* 
+      Business Requirement:
+      Check 1: If leaverDate  + 90 days is greater than current date 
+        AND
+      Check 2: User has disabled AD 
+    */
+	
+		try
+    {
+		  //Void Check
+		  if (!(previousIdentity instanceof Identity) || !(newIdentity instanceof Identity)) 
+		  {     
+				return false; 
+		  }
+
+		  
+      //Initialize Variables
+		  String previousLeaverDate = previousIdentity.getAttribute("leaverDate");
+		  String newLeaverDate = newIdentity.getAttribute("leaverDate");
+
+      //Check leaverDate alignment between Identity snapshots
+		  if (!Util.nullSafeCaseInsensitiveEq(previousLeaverDate, newLeaverDate)) 
+		  {
+			 	return false; 
+		  }
+		  
+		  //Check if user is onhold user
+    if(Util.nullSafeCaseInsensitiveEq(newIdentity.getAttribute("legalHold"),"true") || Util.nullSafeCaseInsensitiveEq(previousIdentity.getAttribute("legalHold"),"true")){
+      
+      return false;
+    }
+		 		  
+		  boolean hasDisabledAD = false;
+		  boolean is90DaysPostDisableFlag = false;
+		  
+      String identityName = newIdentity.getName();
+		  QueryOptions ops = new QueryOptions();
+		  ops.addFilter(Filter.eq("type", "Active Directory - Direct"));
+		  List adApps = context.getObjects(Application.class, ops);
+		  IdentityService identityService = new IdentityService(context);
+		  
+		  Identity identity = context.getObjectByName(Identity.class, identityName);
+		  if(null!=identity)
+		  {
+        //Get All AD Links on Identity
+        List refLinks = identityService.getLinks(identity, adApps, null);
+        if(refLinks!=null && !refLinks.isEmpty())
+        {
+          for(Link adLink: refLinks)
+          {
+            if(null!=adLink && adLink.isDisabled())
+            {
+              hasDisabledAD = true;
+              break;
+            }
+          }
+				}
+		   }
+		   //Calculate Dates
+		   Date currentDate = new Date();
+		   SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+		   Date newLeaverDateObj = sf.parse(newLeaverDate);    
+       Calendar calendar = new GregorianCalendar(Locale.getDefault());
+	     calendar.setTime(newLeaverDateObj);
+	     calendar.add(Calendar.DATE, 90);
+	     Date disabledPlus90Days = calendar.getTime();
+		   if(currentDate.after(disabledPlus90Days))
+		   {
+				is90DaysPostDisableFlag = true;
+		   }
+      
+       //Take decision to launch the workflow
+		   if(newIdentity.isInactive() && hasDisabledAD && is90DaysPostDisableFlag)
+		   {
+					return true;
+		   }
+	  }
+	  catch(Exception e)
+	  {
+		  logger.error("An error occurred processing the Leaver+91 days trigger. Details:\n"+e.getMessage());
+		  return false;
+	  }
+	  return false;
+	  logger.debug("Exiting IdentityTrigger-Leaver-91-Days");
+  ]]></Source>
+</Rule>

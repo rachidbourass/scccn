@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Process-HRI200-Feed">
+  <Source><![CDATA[
+
+  import java.io.FileInputStream;
+  import java.io.FileNotFoundException;
+  import java.io.IOException;
+  import java.util.Scanner;
+
+  import org.apache.log4j.Logger;
+
+  import sailpoint.api.Provisioner;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Filter;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.Util;
+  import sailpoint.api.ObjectUtil;
+  import sailpoint.tools.Message;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+ /*
+  *The method used to udpate identity attribute given in map
+  *map key is the employeeId attribute and will be used to search identity in IIQ
+  */
+  public void  updateIdentity(Map feedMap){
+    Identity identity = null;
+    Identity managerIdentity = null;
+    Identity contractorManIdentity = null;
+    QueryOptions opEmpID = new QueryOptions();
+    try{
+      if(feedMap!=null && !feedMap.isEmpty()){
+        if(feedMap.get(pivotColumn)!=null){
+          opEmpID.add(Filter.ignoreCase(Filter.eq("employeeId", feedMap.get(pivotColumn) )));
+          Iterator itrEmpID = context.search(Identity.class, opEmpID);
+          if (!Util.isEmpty(itrEmpID)) {
+            while (itrEmpID.hasNext()) {
+              identity = (Identity) itrEmpID.next();
+              break;
+            }
+            Util.flushIterator(itrEmpID);
+          }
+          if(identity!=null && !identity.isInactive()){  
+            Identity idCube = ObjectUtil.lockIdentity(context, identity.getName());
+
+            for(String attributeName : feedMap.keySet()){
+              if(pivotColumn.equalsIgnoreCase(attributeName)){
+                continue;
+              }
+              idCube.setAttribute(attributeName, feedMap.get(attributeName));
+              identitiesUpdatedSet.add(feedMap.get(pivotColumn));
+            }
+            context.saveObject(idCube);
+            ObjectUtil.unlockIdentity(context, idCube);
+            //comment decache //context.decache(idCube);
+
+
+          }else{
+            errorListSet.add(feedMap.get(pivotColumn)+" = invalid Identity");
+            identitiesNotUpdated.add(feedMap.get(pivotColumn));
+          }
+          if(identity!=null){
+            //comment decache //context.decache(identity);
+          }
+        }
+      }
+    }catch(Exception e){
+      logger.error("Error in update user "+e.getMessage());
+      taskResult.addMessage(new Message(Message.Type.Error, "Exception: "+e.getMessage(), null));
+    }
+  }
+
+ /*
+  *The method convert string to List object.
+  *@return : List 
+  */
+  public List delimToList(String delimiter,String lineString){
+    String delPrefix = "\\";
+    List result = new ArrayList();
+    if(Util.isNotNullOrEmpty(lineString)){
+      if(Util.isNotNullOrEmpty(delimiter) && delimiter.equals(",")){
+        List tempList = Util.csvToList(lineString);
+        for(String str : tempList){
+          if(Util.isNullOrEmpty(str)){
+            str = "";
+          }
+          result.add(str.trim());
+        }
+      }else{
+        String []str = lineString.split(delPrefix+delimiter);
+        for(String s : str){
+          if(Util.isNullOrEmpty(s)){
+            s = "";
+          }
+          result.add(s.trim());
+        }
+        if(lineString.endsWith(delimiter)){
+          result.add("");
+        }
+      }
+    }
+    return result;
+  }
+
+
+  /*
+  *Rule starts here
+  */
+
+  Log logger = LogFactory.getLog("Ascension.Rule.Process.HRI200.Feed");
+  logger.debug("Entering Ascension.Rule.Process.HRI200.Feed");
+
+  Set errorListSet = new HashSet();
+
+  Set identitiesUpdatedSet = new HashSet();
+  List identitiesNotUpdated = new ArrayList();
+
+  String manager = "manager";
+  String contractorManager = "contractorManager";
+  String pivotColumn = "Emplid";
+
+
+  String DELIMITER = "|";
+  String inputFileName = "";
+  boolean isHeader = true;
+  String lineString ="";
+  FileInputStream inputFile = null;
+  Scanner scanner = null;
+  List headerList = new ArrayList();
+  List dataList = new ArrayList();
+
+  Map feedMap =null;
+  Map includeAttMap = new HashMap();
+   //add HRI200 file column name to update identity attribute,
+   //key as HRI200 column name value as identity att name , Emplid is default
+   
+  includeAttMap.put("Disability Benefit Effective Date","hri200_u_std_eff_dt");
+  includeAttMap.put("DisabilityBenefits Coverage Begin Date","hri200_u_std_cov_beg");
+  includeAttMap.put("Disability Benefits Coverage Elect","hri200_u_std_cov_elect");
+  includeAttMap.put("Disability Benefits Plan Description","hri200_u_std_desc");
+  includeAttMap.put("Elimination Period","hri200_u_std_elim");
+  includeAttMap.put("Emplid","Emplid");
+  includeAttMap.put("Sex","sex");
+  includeAttMap.put("TRAVELER TYPE","travelerType");
+  includeAttMap.put("Time Zone","timeZone");
+  
+  try {
+    
+    if(config!=null){
+      inputFileName = config.get("filePath");
+    } 
+
+    inputFile = new FileInputStream(inputFileName);
+
+    scanner = new Scanner(inputFile); 
+
+    while (scanner!=null && scanner.hasNextLine()) {
+      lineString = scanner.nextLine();
+      if(Util.isNotNullOrEmpty(lineString)){
+        if(isHeader){
+          isHeader = false;
+          headerList = delimToList(DELIMITER , lineString);
+          continue;
+        }
+        feedMap = null;
+        feedMap = new HashMap();
+        int counter = 0;
+        for( String col : headerList){
+          dataList = delimToList(DELIMITER , lineString); 
+          if(dataList!=null && dataList.size() == headerList.size() && includeAttMap.containsKey(col)){
+            feedMap.put(includeAttMap.get(col), dataList.get(counter));
+          }
+          counter++;
+        }
+
+        if(feedMap !=null){
+          updateIdentity(feedMap);
+        }
+      }
+    }
+    context.commitTransaction();
+  }catch (FileNotFoundException e) {
+    logger.error("Exception in update user "+e.getMessage());
+    taskResult.addMessage(new Message(Message.Type.Error, "Exception: "+e.getMessage(), null));
+  }catch (GeneralException e) {
+    logger.error("Exception in update user "+e.getMessage());
+    taskResult.addMessage(new Message(Message.Type.Error, "Exception: "+e.getMessage(), null));
+
+  }finally{
+    if(scanner!=null){
+      scanner.close();
+    }
+    if(inputFile!=null){
+      try {
+        inputFile.close();
+      } catch (IOException e) {
+        logger.error("Exception in "+e.getMessage());
+        taskResult.addMessage(new Message(Message.Type.Error, "Exception: "+e.getMessage(), null));
+      }
+    }
+  }
+
+  taskResult.setAttribute("identitiesUpdated",identitiesUpdatedSet);  
+  taskResult.setAttribute("identitiesNotUpdated",identitiesNotUpdated);  
+  taskResult.setAttribute("identitiesErrors",errorListSet);
+
+  logger.debug("Exiting Ascension.Rule.Process.HRI200.Feed");
+  return ""+errorListSet;
+
+
+
+  ]]></Source>
+</Rule>

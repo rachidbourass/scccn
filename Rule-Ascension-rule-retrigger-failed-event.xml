@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Retrigger-Failed-Event">
+  <Description>An IdentityIQ server-side rule that is executed after the connector's provisioning method is called. This gives the customer the ability to customize or react to anything in the ProvisioningPlan AFTER it has been sent out to the specific applications. 
+
+    This rule will be called for any application found in a plan that also has a configured 'afterProvisioningRule' configured.</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Library"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+  import sailpoint.object.Filter;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.WorkItem;
+  import sailpoint.object.Identity;
+  import sailpoint.tools.Util;
+  import sailpoint.object.ApprovalSet;
+  import sailpoint.object.ApprovalItem;
+  import sailpoint.object.Identity;
+  import sailpoint.object.TaskResult;
+  import sailpoint.api.Workflower;
+  import sailpoint.tools.Message;
+
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.commons.logging.Log;
+
+  Log logger = LogFactory.getLog("ascension.Rule.Retrigger.failed.events");
+  Set processedIdentities = new HashSet();
+  Set unProcessedIdentities = new HashSet();
+
+  Map attributesMap = new HashMap();
+  attributesMap.put("processTriggers",true);
+
+  QueryOptions qo = new QueryOptions();
+  //qo.add(Filter.like("description", "Failed Workflow Alert: Ascension-LifecycleEvent-Persona-Joiner", Filter.MatchMode.START));
+  qo.add(Filter.eq("description", "Failed Workflow Alert: Ascension-LifecycleEvent-Persona-Joiner FOR LSull041 [A00017459]"));
+  qo.setOrderBy("created");
+  qo.setOrderAscending(false);
+  qo.setCloneResults(true);
+
+  int total = context.countObjects(WorkItem.class, qo);
+  int counter = 0;
+  int failedCount = 0;
+  Identity identity;
+
+  Workflower workflower = new Workflower(context);
+
+  Iterator it = context.search(WorkItem.class, qo);
+  while (it!=null && it.hasNext()){
+
+    WorkItem wi = it.next();
+    String name = wi.getAttribute("identityName");
+
+    try{
+      identity = context.getObjectByName(Identity.class,name);
+
+      if(null != identity){
+        identity.removeAttribute("personaType");
+        identity.setNeedsCreateProcessing(true,Identity.CreateProcessingStep.Trigger);
+
+        context.saveObject(identity);
+        context.commitTransaction();
+        //comment decache //context.decache(identity);
+      }
+
+      refreshIdentityCube(name,attributesMap);
+      processedIdentities.add(name);
+      counter++;
+
+      logger.debug(counter + "|" + total + "\t" + wi.getName() + "\t" + wi.getDescription());
+      wi.setCompleter(context.getUserName());
+      wi.setState(WorkItem.State.Finished);
+      workflower.process(wi, false);
+    }
+    catch(Exception e){
+      ++failedCount;
+      unProcessedIdentities.add(name);
+      logger.error("Error for identity: "+name);
+      taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+      taskResult.addMessage(Message.error("General Exception "+e.getMessage()));
+    }
+  }
+
+  Util.flushIterator(it);
+
+  if(!Util.isEmpty(processedIdentities)){
+
+    String resultMsg = "Event retriggered for identities : "+processedIdentities;
+    taskResult.addMessage(Message.info(resultMsg,null));
+  }
+
+
+  if(!Util.isEmpty(unProcessedIdentities)){
+    String resultFailedMsg = "Event triggered is failed for identities : "+unProcessedIdentities;
+    taskResult.addMessage(Message.info(resultFailedMsg,null));
+  }
+
+
+  return counter;
+  ]]></Source>
+</Rule>

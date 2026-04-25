@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-LaunchWorkflow-ReconcileDuoADGroups">
+  <Description>Rule for initalizing Ascension-Workflow-ReconcileDuoADGroups</Description>
+  <Signature returnType="Object"/>
+  <Source><![CDATA[
+
+  import java.util.HashMap;
+  import sailpoint.api.SailpointContext;
+  import sailpoint.api.Workflower;
+  import sailpoint.object.Workflow;
+  import sailpoint.object.WorkflowLaunch;
+
+  HashMap argsMap = new HashMap();
+
+  argsMap.put("allowProvisioning","false");
+
+  Workflow workflow = context.getObjectByName(Workflow.class,"Ascension-Workflow-ReconcileDuoADGroups");
+
+  if (workflow != null) {
+
+    WorkflowLaunch workflowLaunch = new WorkflowLaunch();
+
+    workflowLaunch.setWorkflowName(workflow.getName());
+
+    workflowLaunch.setWorkflowRef(workflow.getName());
+
+    workflowLaunch.setCaseName("Ascension-Workflow-ReconcileDuoADGroups");
+
+    workflowLaunch.setVariables(argsMap);
+
+    if (workflowLaunch != null) {
+
+      Workflower workflower = new Workflower(context);
+
+      WorkflowLaunch launch = workflower.launch(workflowLaunch);
+
+    }
+
+  }
+
+  ]]></Source>
+</Rule>

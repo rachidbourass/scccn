@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-ManagerBubbleUp">
+  <Source><![CDATA[
+  import sailpoint.object.Identity;
+  import sailpoint.object.Filter;
+  import sailpoint.object.QueryOptions;
+  import java.util.ArrayList;
+  import java.util.List;
+
+  import sailpoint.object.EmailTemplate;
+  import sailpoint.object.EmailOptions;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Filter;
+  import sailpoint.api.Terminator;
+  import sailpoint.object.TaskDefinition;
+  import sailpoint.object.TaskResult;
+  import sailpoint.object.WorkItem;
+  import sailpoint.object.ApprovalItem;
+  import sailpoint.object.ApprovalSet;
+  import sailpoint.object.Attributes;
+  import sailpoint.tools.Util;
+  import sailpoint.persistence.Sequencer; 
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  
+  static Log logger = LogFactory.getLog("rule.Ascension-Rule-ManagerBubbleUp");
+  
+  logger.debug("Ascension-Rule-ManagerBubbleUp Starting");
+  boolean noneSelected=false;
+  HashMap map = new HashMap();
+  String workgroupName = "IDM Team";
+  if (config != null && config != void && Util.isNotNullOrEmpty(config.get("workgroupName")) ) {
+    workgroupName = config.get("workgroupName");
+  }
+  List contractorTypes = new ArrayList();
+  String emailTemplateName = "Ascension-EmailTemplate-ManagerBubbleUpNotification";
+  Custom contractorCustom = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration" );
+  if (contractorCustom != null) {
+    contractorTypes = contractorCustom.get("ContractorType");
+    emailTemplateName = contractorCustom.get("ManagerBubbleUpNotificationTemplate");
+  }
+
+
+  Identity reportee;
+  Identity superManager;
+  Filter filterInactive=Filter.eq("inactive",false);
+  Filter filterUserType=Filter.ignoreCase(Filter.in("type",contractorTypes));
+
+  QueryOptions qo=new QueryOptions();
+  qo.addFilter(filterInactive);
+  qo.addFilter(filterUserType);
+  qo.setCloneResults(true);
+  Iterator itr=context.search(Identity.class,qo);
+  while(itr!=null && itr.hasNext()){
+    reportee=(Identity) itr.next();
+    if(reportee != null && reportee.getManager() != null){
+
+      if(reportee.getManager().isInactive()){
+
+        superManager = reportee.getManager().getManager();
+
+        if(superManager!=null){
+          if( !(superManager.isInactive()) ){
+            reportee.setManager(superManager);
+            context.saveObject(reportee);
+            context.commitTransaction();
+          } else {
+            map.put(reportee.getName(), reportee.getManager().getName());
+          }
+					context.decache(superManager);
+        }else{
+          map.put(reportee.getName(), reportee.getManager().getName() + " Manager is inactive and Manager's Manager not found");
+        }
+      }
+     
+      context.decache(reportee);
+    } else if (reportee != null && reportee.getManager() == null) {
+      //Adding to map if manager is null
+      map.put(reportee.getName(), "Manager not found");
+    }
+  }
+  Util.flushIterator(itr);
+	logger.debug("Bubbleup successfully completed.");
+
+  Identity workgroup=context.getObjectByName(Identity.class,workgroupName);
+
+  if (workgroup != null && map != null && !map.isEmpty()) {
+
+    //WorkItem creation
+    WorkItem item = new WorkItem();  
+    item.setType(WorkItem.Type.ManualAction);  
+    item.setOwner(workgroup);  
+    item.setRequester(workgroup);  
+    Sequencer sequencer = new Sequencer();  
+    item.setName(sequencer.generateId(context, item));  
+    item.setRenderer("lcmManualActionsRenderer.xhtml");  
+    item.setLevel(WorkItem.Level.Normal);  
+    item.setTarget(workgroup);  
+    item.setTargetClass(Identity.class.getName());  
+    item.setDescription("Manager Relationship Update Required for Users: Total Count" + map.size());  
+    item.setHandler("sailpoint.api.Workflower");  
+
+    Attributes attributes = new Attributes();  
+    item.setAttributes(attributes);  
+
+    ApprovalSet approvalSet = new ApprovalSet(); 
+    for(String reporteeName : map.keySet()){
+      ApprovalItem approvalItem = new ApprovalItem();  
+      approvalItem.setApplication("Non-HR User Management");  
+      approvalItem.setNativeIdentity(reporteeName);  
+      approvalItem.setOperation("Modify");  
+      approvalItem.setValue("Manager " + map.get(reporteeName) + " is inactive" );  
+      approvalSet.add(approvalItem);  
+    }
+    attributes.put("approvalSet", approvalSet); 
+    attributes.put("identityDisplayName", "Non-HR Users");  
+    attributes.put("identityName", workgroup.getName());  
+
+
+    context.startTransaction();  
+    context.saveObject(item);  
+    context.commitTransaction(); 
+	logger.debug("BubbleUp workitem created successfully.");
+    //Mail Notification
+    EmailTemplate emailTemplate = context.getObjectByName(EmailTemplate.class, emailTemplateName);
+
+    if (emailTemplate != null && workgroup != null) {
+      Map args=new HashMap();
+      args.put("userlist",map);
+      if( Util.isNotNullOrEmpty(workgroup.getEmail()) ){
+        EmailOptions ops = new EmailOptions(workgroup.getEmail() ,args);
+        context.sendEmailNotification(emailTemplate, ops);
+      }
+    }
+  }
+  logger.debug("Ascension-Rule-ManagerBubbleUp Ending");
+  ]]></Source>
+</Rule>

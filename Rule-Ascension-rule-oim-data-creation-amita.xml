@@ -1,0 +1,471 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-OIM-Data-Creation-AMITA">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Library-OIM Data"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+  import sailpoint.tools.Util;
+  import java.io.File;
+  import java.io.FileNotFoundException;
+  import java.util.Scanner;
+  import sailpoint.object.Custom;
+
+  import sailpoint.tools.Message;
+
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.commons.logging.Log;
+
+  import java.text.SimpleDateFormat;
+  import java.util.Date;
+  import java.time.LocalDate;
+  import java.time.format.DateTimeFormatter;
+  import java.time.temporal.ChronoUnit;
+  import java.util.Iterator; 
+
+  Log logger = LogFactory.getLog("Ascension-Rule-OIM-Data-Creation-AMITA");
+
+  List errorMessages = new ArrayList();
+
+  String customObjectName = "Ascension-Custom-OIM-Data-AMITA";
+  List<Map> updatedDataList = new ArrayList();
+  List personIDsProcessedFromDeltaFile = new ArrayList();
+
+  /**
+   * Method to read the full file and collect the data
+     * @param filePath
+     * @return
+     */
+  public Map readFullDataFile(String filePath) {
+    logger.debug("Entering method readFullDataFile ");
+    int lineCount = 0;
+    String headerString = null;
+    int headerLength = 0;
+    Map allUsersMap = new HashMap();
+    Map validUsersMap = new HashMap();
+    Map invalidUsersMap = new HashMap();
+    String[] headerSplit = null;
+    Map identityMap = null;
+    Scanner sc = null;
+    try {
+      if (Util.isNotNullOrEmpty(filePath)){
+        File file = new File(filePath);
+        if ((!file.exists()) || (file.isDirectory())) {
+          logger.error("File doesn't exist");
+          taskResult.addMessage(new Message(Message.Type.Error, "The file " + file + " does not exist.", null));
+          taskResult.setCompletionStatus(sailpoint.object.TaskResult.CompletionStatus.Error);
+          return allUsersMap; 
+        } else {
+          try {
+            sc = new Scanner(file);
+          } catch (FileNotFoundException e1) {
+            logger.error("FileNotFoundException : "+e1.getMessage());
+          }
+          while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+            if(Util.isNotNullOrEmpty(line) && line.endsWith("|")){
+              line = line+" ";
+            }
+            if (lineCount == 0) {
+              headerString = line;
+              lineCount++;
+              if (Util.isNotNullOrEmpty(headerString) && headerString.contains("|")) {
+                headerSplit = headerString.split("\\|");
+                if (headerSplit != null) {
+                  headerLength = headerSplit.length;
+                }
+              }
+              continue;
+            }
+            if (Util.isNotNullOrEmpty(line) && line.contains("|")) {
+              identityMap = new HashMap();
+              String[] eachLineSplit = line.split("\\|");
+              if (eachLineSplit != null && eachLineSplit.length == headerLength) {
+                for(int headerStart = 0; headerStart < headerLength; headerStart++){
+                  identityMap.put(headerSplit[headerStart], eachLineSplit[headerStart]);
+                }
+              }
+            }
+
+            // if Primary Job Indicator is Y and Termination Date is NULL, record is considered to be valid
+            if(!Util.isEmpty(identityMap) && Util.nullSafeCaseInsensitiveEq("Y",identityMap.get("Primary Job Indicator")) && Util.isEmpty(identityMap.get("Termination Date"))){
+              validUsersMap.put(identityMap.get("Person ID"),identityMap);
+            } else{
+              invalidUsersMap.put(identityMap.get("Person ID"),identityMap);
+            }
+
+            lineCount++;
+          }
+          allUsersMap.put("Valid Users", validUsersMap);
+          allUsersMap.put("Invalid Users", invalidUsersMap);
+        }
+      }
+    }catch(Exception ex){
+      logger.error("Exception readInputFile :: "+ex.getMessage());
+      taskResult.addMessage(new Message(Message.Type.Error, "Exception : "+ex.getMessage(), null));
+    } finally {
+      if(sc != null)
+        sc.close();
+    }
+    logger.debug("Exiting method readFullDataFile ");
+    return allUsersMap;
+  }
+
+
+  /**
+   * Method to read the input file
+     * @param filePath
+     * @return
+     */
+  public List readInputFile(String filePath) {
+    logger.debug("Entering method readInputFile ");
+    int lineCount = 0;
+    String headerString = null;
+    int headerLength = 0;
+    List allUsersList = new ArrayList();
+    String[] headerSplit = null;
+    Map identityMap = null;
+    Scanner sc = null;
+    try {
+      if (Util.isNotNullOrEmpty(filePath)){
+        File file = new File(filePath);
+        if ((!file.exists()) || (file.isDirectory())) {
+          logger.error("File doesn't exist");
+          taskResult.addMessage(new Message(Message.Type.Error, "The file " + file + " does not exist.", null));
+          taskResult.setCompletionStatus(sailpoint.object.TaskResult.CompletionStatus.Error);
+        } else {
+          try {
+            sc = new Scanner(file);
+          } catch (FileNotFoundException e1) {
+            logger.error("FileNotFoundException : "+e1.getMessage());
+          }
+          while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+            if(Util.isNotNullOrEmpty(line) && line.endsWith("|")){
+              line = line+" ";
+            }
+            if (lineCount == 0) {
+              headerString = line;
+              lineCount++;
+              if (Util.isNotNullOrEmpty(headerString) && headerString.contains("|")) {
+                headerSplit = headerString.split("\\|");
+                if (headerSplit != null) {
+                  headerLength = headerSplit.length;
+                }
+              }
+              continue;
+            }
+            if (Util.isNotNullOrEmpty(line) && line.contains("|")) {
+              identityMap = new HashMap();
+              String[] eachLineSplit = line.split("\\|");
+              if (eachLineSplit != null && eachLineSplit.length == headerLength) {
+                for(int headerStart = 0; headerStart < headerLength; headerStart++){
+                  identityMap.put(headerSplit[headerStart], eachLineSplit[headerStart]);
+                }
+              }
+            }
+            allUsersList.add(identityMap);
+            lineCount++;
+          }
+        }
+      }
+    }catch(Exception ex){
+      logger.error("Exception readInputFile :: "+ex.getMessage());
+      taskResult.addMessage(new Message(Message.Type.Error, "Exception : "+ex.getMessage(), null));
+    } finally {
+      if(sc != null)
+        sc.close();
+    }
+    logger.debug("Exiting method readInputFile ");
+    if(!Util.isEmpty(allUsersList)){
+      taskResult.setAttribute("deltaRecordsCount",allUsersList.size()-1); 
+    }else{
+      taskResult.setAttribute("deltaRecordsCount",0); 
+    }
+    return allUsersList;
+  }
+
+  /**
+   * Method to process the UserID and Email Changes List from Custom Object
+     * @param identityList, fullDataMap
+     * @return resultMap
+     */
+  public Map processUserIDandEmailChangesList(List identityList, Map fullDataMap){
+    logger.debug("Entering method processUserIDandEmailChangesList");
+    Map resultMap = new HashMap();
+    List tobeRemovedList = new ArrayList();
+    List processedIdentitiesList = new ArrayList();
+    List unprocessedIdentitiesList = new ArrayList();
+    List identitiesTobeReviewed = new ArrayList();
+    List identitiesPendingDateThreshold = new ArrayList();
+
+    Custom custom = context.getObjectByName(Custom.class, customObjectName);
+
+    Map validDataMap = fullDataMap.get("Valid Users");
+    Map invalidDataMap = fullDataMap.get("Invalid Users");
+
+    for(String identityName : identityList){
+      String errorMessage = "";
+
+      logger.debug("Processing Identity: " + identityName);
+
+      //Check if the identity is already processed in the Delta File. If so, remove it from the list
+      if(personIDsProcessedFromDeltaFile.contains(identityName)){
+        errorMessages.add(identityName + " : Identity is already processed in the Delta File");
+        tobeRemovedList.add(identityName);
+        continue;
+      }
+
+      //Check if the identity has a valid record in the full feed file
+      if(!Util.isEmpty(validDataMap) && validDataMap.containsKey(identityName)){
+        Map addInputMap = validDataMap.get(identityName);
+        //Check if the identity is eligible to be processed now
+        String message = isIdentityEligible(identityName);
+        if(message.equals("true")){          
+          if(!Util.isEmpty(addInputMap) && addInputMap.containsKey("Oprid")) {
+            addInputMap.remove("Oprid");
+            Map processedMap = processIdentities(addInputMap,customObjectName);
+
+            if(!Util.isEmpty(processedMap)){
+
+              //add AMITA Email value same as Email Address and AD User as OprId
+              processedMap.put("AMITA Email",processedMap.get("Email Address"));
+              processedMap.put("AD User",processedMap.get("OprId"));
+
+              updatedDataList.add(processedMap);
+              processedIdentitiesList.add(identityName);
+              tobeRemovedList.add(identityName);
+            } else {
+              errorMessage = "Empty object is returned while processing the identity";
+            }
+          } else if(!addInputMap.containsKey("Oprid")){
+            errorMessage = "Header doesn't contain Oprid in the Full Feed File";
+            unprocessedIdentitiesList.add(identityName);
+          } else if(Util.isEmpty(addInputMap)){
+            errorMessage = "No data found for this Person ID in the feed file";
+            unprocessedIdentitiesList.add(identityName);
+          }
+        } else if(message.equals("Identity doesn't exist in SailPoint")){
+          tobeRemovedList.add(identityName);
+          errorMessage = "Identity doesn't exist in SailPoint";
+        } else{
+          int hourLimit = custom.getInt("IDENTITY_CREATION_HOUR_LIMIT");
+
+          String effectiveDate = addInputMap.get("Effective Date");
+          //Parse the effective date string
+          DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+          LocalDate formattedDate = LocalDate.parse(effectiveDate, formatter);
+
+          //Get the current date
+          LocalDate currentDate = LocalDate.now();
+
+          //Calculate the difference in days between the effective date and the current date
+          long daysDifference = ChronoUnit.DAYS.between(currentDate, formattedDate);
+          logger.debug("Difference between the effective start date and the current date: " + daysDifference);
+
+          //Calculate the difference in hours between the identity creation date and the current date
+          Identity idObj = context.getObjectByName(Identity.class, identityName);
+          //Created Date in Milliseconds
+          Date createdDate = idObj.getCreated();
+          //Converting the created date to format mm-dd-yyyy
+          SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
+          String formattedCreatedDate = sdf.format(createdDate);
+          //Calculating the difference between the created date and current date in Milliseconds
+          long currentTimeMillis = System.currentTimeMillis();
+          Date currentDateMillis = new Date(currentTimeMillis);
+          long difference = currentDateMillis.getTime()-createdDate.getTime();
+          //converting the difference in Milliseconds to Hours
+          difference = difference/(1000*60*60);
+
+          //If it has been more than 48hrs since the identity is created, it's added to the identitiesTobeReviewed list or identitiesPendingDateThreshold list based on its start date
+          if(difference > hourLimit){
+            if(daysDifference > 45){
+              errorMessage  = "Identity is Pending Date Threshold - ";
+              identitiesPendingDateThreshold.add(identityName);
+            }
+            else{
+              errorMessage = "Identity needs review - ";
+              identitiesTobeReviewed.add(identityName);
+            }
+          } else{
+            errorMessage = "Identity is not processed - ";
+            unprocessedIdentitiesList.add(identityName);
+          }
+          errorMessage = errorMessage + message + " (Effective Date: " + effectiveDate + " and Identity Created Date: " + formattedCreatedDate + ")";
+        }
+      } else if(!Util.isEmpty(invalidDataMap) && invalidDataMap.containsKey(identityName)){
+        Map addInputMap = invalidDataMap.get(identityName);
+
+        if(!Util.isEmpty(addInputMap)){
+          //identites with termination date are removed from the exception list to eliminate reprocessing
+          if(addInputMap.containsKey("Termination Date") && !Util.isEmpty(addInputMap.get("Termination Date"))){
+            errorMessage = "Identity has termination date in the feed file - " + addInputMap.get("Termination Date");
+            tobeRemovedList.add(identityName);
+          } else if(addInputMap.containsKey("Primary Job Indicator") && Util.nullSafeCaseInsensitiveEq("N", addInputMap.get("Primary Job Indicator"))){
+            errorMessage = "Record present in the full feed file but primary job indicator is not set";
+            tobeRemovedList.add(identityName);
+          }
+        } else{
+          errorMessage = "No data found for this Person ID in the feed file";
+          unprocessedIdentitiesList.add(identityName);
+        }
+      } else{        
+        errorMessage = "Identity doesn't exist in full feed file";
+        tobeRemovedList.add(identityName);
+      }
+      if(!Util.isEmpty(errorMessage)){
+        errorMessages.add(identityName + " : " + errorMessage);
+      }
+    }
+    resultMap.put("tobeRemovedList", tobeRemovedList);
+    resultMap.put("processedIdentities", processedIdentitiesList);
+    resultMap.put("unprocessedIdentities", unprocessedIdentitiesList);
+    resultMap.put("identitiesTobeReviewed", identitiesTobeReviewed);
+    resultMap.put("identitiesPendingDateThreshold", identitiesPendingDateThreshold);
+    logger.debug("Exiting method processUserIDandEmailChangesList");
+    return resultMap;
+  }
+  if((void != config) && (null != config) && (config instanceof Map)){
+    String fileLocation = config.get("filePath");
+
+    if(Util.isNotNullOrEmpty(fileLocation) && Util.isNotNullOrEmpty(customObjectName)){
+
+      String headerString = null;
+      String outputFilePath = null;
+      StringBuffer data = new StringBuffer();
+      String fullFeedFilePath = null;
+      List userIDandEmailChangedIDs = new ArrayList();
+      Map fullDataMap = new HashMap();
+
+
+      Custom custom = context.getObjectByName(Custom.class, customObjectName);
+
+      //Read all the data from the file and add each line as a Map ; All lines ared added as a List
+      List<Map> allUsersList = readInputFile(fileLocation);
+
+      if(custom !=  null){
+        headerString = custom.get("Output File Header");
+        outputFilePath  = custom.get("Delta Output Path");
+
+        fullFeedFilePath = custom.get("Full Feed File Path");
+        if(Util.isNotNullOrEmpty(fullFeedFilePath)){
+          fullDataMap =  readFullDataFile(fullFeedFilePath);
+        }
+
+        //Get the User ID and Email Changes List from the custom object and remove duplicates
+        userIDandEmailChangedIDs = custom.get("User ID and Email Changes");
+        if(!Util.isEmpty(userIDandEmailChangedIDs)){
+          Util.removeDuplicates(userIDandEmailChangedIDs); 
+          taskResult.setAttribute("identitiesFromEventsCount",userIDandEmailChangedIDs.size());
+        } else{
+          taskResult.setAttribute("identitiesFromEventsCount",0); 
+        }
+      }
+
+      //Processing the Delta File
+      if(!Util.isEmpty(allUsersList)){
+        //Iterate through all the lines in the input file and process them based on email and OprId availability
+        for(Map inputMap : allUsersList){
+          Map processedMap = processIdentities(inputMap, customObjectName);
+          if(!Util.isEmpty(processedMap)){
+
+            //add AMITA Email value same as Email Address and AD User as OprId
+            processedMap.put("AMITA Email",processedMap.get("Email Address"));
+            processedMap.put("AD User",processedMap.get("OprId"));
+
+            personIDsProcessedFromDeltaFile.add(processedMap.get("Person ID"));
+
+            updatedDataList.add(processedMap);
+          }
+        }
+      }
+
+      logger.debug("Identities from custom before processing: " +  userIDandEmailChangedIDs);
+
+      //Processing userIDandEmailChangedIDs List
+      List processedIdentitiesList = new ArrayList();
+      if(!Util.isEmpty(fullDataMap)){
+        if(!Util.isEmpty(userIDandEmailChangedIDs)){
+          logger.debug("Process User ID and Email Changed Users");
+          Map resultMap = processUserIDandEmailChangesList(userIDandEmailChangedIDs, fullDataMap);
+          List tobeRemovedList = resultMap.get("tobeRemovedList");
+          userIDandEmailChangedIDs.removeAll(resultMap.get("tobeRemovedList"));
+          if(!Util.isEmpty(tobeRemovedList)){
+            tobeRemovedList.removeAll(resultMap.get("processedIdentities"));
+          }
+          processedIdentitiesList = resultMap.get("processedIdentities");
+          taskResult.setAttribute("identitiesRemovedFromIdentitiesChangedList", tobeRemovedList);
+          taskResult.setAttribute("processedIdentitiesFromIdentitiesChangedList", processedIdentitiesList);
+          taskResult.setAttribute("identitiesTobeReviewed", resultMap.get("identitiesTobeReviewed"));
+          taskResult.setAttribute("identitiesPendingDateThreshold", resultMap.get("identitiesPendingDateThreshold"));
+          taskResult.setAttribute("unprocessedIdentitiesFromIdentitiesChangedList", resultMap.get("unprocessedIdentities"));
+        }
+      }
+
+      if(custom != null){
+        List identityChangedList = custom.get("User ID and Email Changes");
+        if(!Util.isEmpty(identityChangedList)){
+          identityChangedList.addAll(userIDandEmailChangedIDs);
+          Util.removeDuplicates(identityChangedList);
+          custom.put("User ID and Email Changes", identityChangedList);
+        } else{
+          custom.put("User ID and Email Changes", userIDandEmailChangedIDs);
+        }
+        context.saveObject(custom);
+        context.commitTransaction();
+        //comment decache //context.decache(custom);
+      }
+
+      //logging the error messages in the custom object
+      logger.debug("logging the error messages : " + errorMessages);
+
+      List addMessagesToCustom = new ArrayList();
+      if(!Util.isEmpty(errorMessages)){
+        //appending the current date to the error message
+        SimpleDateFormat sf = new SimpleDateFormat("MM-dd-yyyy");
+        String dateFormat = sf.format(new Date());
+        for(String message : errorMessages){
+          message = dateFormat + " : " + message;
+          addMessagesToCustom.add(message);
+        }
+      }
+
+      List<String> errorMessagesFromCustom = custom.get("Error Messages");
+      if(!Util.isEmpty(errorMessagesFromCustom)){
+        Iterator<String> iterator = errorMessagesFromCustom.iterator();
+        while(iterator.hasNext()){
+          String errorMessage = iterator.next();
+          String idNameFromMessage = "";
+          String[] partsOfErrorMessage = errorMessage.split(":");
+          if(partsOfErrorMessage.length >= 2){
+            idNameFromMessage = partsOfErrorMessage[1].trim();
+          } 
+          if(!Util.isEmpty(idNameFromMessage)){
+            if(personIDsProcessedFromDeltaFile.contains(idNameFromMessage) || processedIdentitiesList.contains(idNameFromMessage)){
+              iterator.remove(); 
+            }
+          }
+        }
+        errorMessagesFromCustom.addAll(addMessagesToCustom);
+        custom.put("Error Messages", errorMessagesFromCustom);
+      } else{
+        custom.put("Error Messages", addMessagesToCustom);
+      }
+
+      taskResult.setAttribute("outputFileRecordsCount", updatedDataList.size());
+      logger.debug("updatedDataList " + updatedDataList);
+      taskResult.setAttribute("errorMessages", errorMessages); 
+
+      //If there is update data - Convert that to StringBuffer to add to the output file at the end
+      if(!Util.isEmpty(updatedDataList) && Util.isNotNullOrEmpty(headerString)){
+        data = convertData(updatedDataList, headerString);
+      }
+
+      //Create file using this method
+      if(data != null && Util.isNotNullOrEmpty(outputFilePath)){
+        createOutputFile(data, outputFilePath);
+      }
+    }
+  }
+  ]]></Source>
+</Rule>

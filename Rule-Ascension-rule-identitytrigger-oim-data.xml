@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-IdentityTrigger-OIM-Data" type="IdentityTrigger">
+  <Description>This rule can be used for Certification Events that use rule triggers. The previousIdentity and newIdentity hold snapshots of the identity before the update has occurred and the state of the identity after the update, respectively.</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log" type="org.apache.commons.logging.Log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="previousIdentity">
+        <Description>
+          The identity before the refresh/aggregation (this will be null when an
+          identity is created).
+        </Description>
+      </Argument>
+      <Argument name="newIdentity">
+        <Description>
+          The identity after the refresh/aggregation (this will be null when an
+          identity is deleted).
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="result">
+        <Description>
+          A boolean describing the result of the rule.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[import sailpoint.object.Identity;
+    import sailpoint.tools.Util;
+    import sailpoint.object.Link;
+    import sailpoint.object.Application;
+    import sailpoint.api.IdentityService;
+    import sailpoint.object.Custom;
+   
+    import org.apache.commons.logging.LogFactory;
+    import org.apache.commons.logging.Log;
+	
+	  Log logger = LogFactory.getLog("Rule-IdentityTrigger-OIM-Data");
+    
+    //Void Check
+    if (!(previousIdentity instanceof Identity) || !(newIdentity instanceof Identity)) {     
+        return false; 
+    }
+  
+	
+	String type = newIdentity.getStringAttribute("type");
+	boolean isInactive = newIdentity.isInactive();
+	String personaType = newIdentity.getStringAttribute("personaType");
+	if (Util.nullSafeCaseInsensitiveEq(type,"contractor") || isInactive || Util.nullSafeCaseInsensitiveEq(personaType,"child")) {     
+        return false; 
+    }
+	
+   Custom custom = context.getObjectByName(Custom.class, "Ascension-Custom-OIM-Data-AMITA");
+   boolean hasPeopleSoftAccount = false;
+  
+   if(custom != null){
+      String peopleSoftAppName = custom.get("Peoplesoft App Name");
+      if(Util.isNotNullOrEmpty(peopleSoftAppName)){
+        Application application = context.getObjectByName(Application.class, peopleSoftAppName);
+        if(newIdentity != null && application != null){
+          IdentityService identityService = new IdentityService(context);
+          List links = Util.filterNulls(identityService.getLinks(newIdentity, application));
+          if(!Util.isEmpty(links)){
+            for (Object object : links) {
+              Link link = (Link) object;
+              if(link!=null){
+                hasPeopleSoftAccount = true;
+              }
+            }
+          }
+          //comment decache //context.decache(application);
+        }
+      }
+      //comment decache //context.decache(custom);
+   }
+      
+    //Initialize Variables
+	String ministry = newIdentity.getStringAttribute("ministry");
+    String previousEmailID = previousIdentity.getAttribute("email");
+    String newEmailID = newIdentity.getAttribute("email");
+	
+    String previousOperID =  previousIdentity.getAttribute("operId");
+    String newOperID = newIdentity.getAttribute("operId");
+	
+	if(Util.nullSafeCaseInsensitiveEq(ministry,"AMITA Health") && Util.isNotNullOrEmpty(previousIdentity.getStringAttribute("initialOperId")) ){
+		previousOperID =  previousIdentity.getStringAttribute("initialOperId");
+	}
+  
+    logger.debug("previousOperID : "+previousOperID + " newOperID : "+newOperID +" for identity : "+newIdentity.getName());
+    logger.debug("previousEmailID : "+previousEmailID + " newEmailID : "+newEmailID +" for identity : "+newIdentity.getName());
+    logger.debug("hasPeopleSoftAccount : "+hasPeopleSoftAccount +" for identity : "+newIdentity.getName());
+    if ((!Util.nullSafeCaseInsensitiveEq(previousEmailID, newEmailID) || ( !Util.nullSafeCaseInsensitiveEq(previousOperID, newOperID) && Util.nullSafeCaseInsensitiveEq(ministry,"AMITA Health") ) ) &&  hasPeopleSoftAccount) {
+       logger.debug("Before returning true for IdentityTrigger for OIM Data : "+newIdentity.getName());
+       return true; 
+    }]]></Source>
+</Rule>

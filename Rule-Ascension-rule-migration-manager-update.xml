@@ -1,0 +1,241 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Migration-Manager-Update">
+  <Source><![CDATA[
+
+  import java.io.FileInputStream;
+  import java.io.FileNotFoundException;
+  import java.io.IOException;
+  import java.util.Scanner;
+  import sailpoint.tools.Util;
+  import sailpoint.api.Provisioner;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Identity;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.Util;
+  import sailpoint.api.ObjectUtil;
+  import sailpoint.tools.Message;
+  import sailpoint.object.Filter;
+  import sailpoint.object.QueryOptions;
+
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+
+
+
+  public String getIdentityName(String attrName,String attrVal){
+    String currentData=null;
+    if( Util.isNotNullOrEmpty( attrName) && Util.isNotNullOrEmpty( attrVal) ){
+      Filter contractorFilter = Filter.ignoreCase(Filter.eq(attrName, attrVal));
+      QueryOptions qo=new QueryOptions();
+      qo.addFilter(contractorFilter);
+      Iterator it=context.search(Identity.class, qo, "name");
+      int count =0;
+      Object[] currentDataArray=null;
+      if(null!=it){
+        while(it.hasNext()) {
+          currentDataArray=(Object[]) it.next();
+          count++;
+        }
+        Util.flushIterator(it);
+      }
+      if(count ==1){
+        currentData=(String) currentDataArray[0];
+      } else if(count > 1) {
+        if(Util.nullSafeCaseInsensitiveEq(inputManagerSam,attrName)){
+          throw new GeneralException("Duplicate Manager for the ::"+attrVal);
+        }else{
+          throw new GeneralException("Duplicate identity for the ::"+attrVal);
+        }
+      }
+    }
+    return currentData;
+  }
+
+  public void  updateIdentity(Map feedMap){
+ 
+    Identity identity = null;
+    Identity managerIdentity = null;
+    Identity contractorManIdentity = null;
+    isRecordUpdated = false;
+    try{
+      if(feedMap!=null && !feedMap.isEmpty()){
+        if(feedMap.get(pivotColumn)!=null && feedMap.get(inputManagerSam)!=null){
+
+          String identityName = getIdentityName("avatarId",feedMap.get(pivotColumn));
+
+
+          identity = context.getObjectByName(Identity.class, identityName);
+          if(identity!=null ){  
+            String managerName = getIdentityName("samAccountName",feedMap.get(inputManagerSam));
+       
+
+            managerIdentity = context.getObjectByName(Identity.class, managerName);
+            if(managerIdentity!=null ){
+
+              Identity idCube = ObjectUtil.lockIdentity(context, identity.getName());
+              idCube.setManager(managerIdentity);
+
+              context.saveObject(idCube);
+              ObjectUtil.unlockIdentity(context, idCube);
+              isRecordUpdated = true;
+              identitiesUpdated.add(identity.getName());
+              //comment decache //context.decache(managerIdentity);
+            }else{                  
+              invalidManagerSamAccountName.add(feedMap.get(inputManagerSam));
+            }
+          }
+        }
+        if(!isRecordUpdated){
+          identitiesNotUpdated.add(feedMap.get(pivotColumn));
+        }
+
+      }
+    }catch(Exception e){
+      logger.error("error in update user "+e.getMessage());
+      taskResult.addMessage(new Message(Message.Type.Error, "Exception: "+e.getMessage(), null));
+      if(feedMap!=null){
+        identitiesNotUpdated.add(feedMap.get(pivotColumn));
+      }
+    }
+  }
+
+
+  public List delimToList(String delimiter,String lineString){
+    List result = new ArrayList();
+    if(lineString!=null && !lineString.isEmpty()){
+      if(delimiter!=null && delimiter.equals(",")){
+        List tempList = Util.csvToList(lineString);
+        for(String str : tempList){
+          if(str == null){
+            str = "";
+          }
+          result.add(str.trim());
+        }
+      }else{
+        String []str = lineString.split(delimiter);
+        for(String s : str){
+          if(s == null){
+            s = "";
+          }
+          result.add(s.trim());
+        }
+      }
+    }
+    return result;
+  }
+
+  /* Rule start from below */
+  Log logger = LogFactory.getLog("Ascension-Rule-Migration-Manager-Update");
+  logger.debug("Ascension-Rule-Migration-Manager-Update Start");
+
+
+
+  Set errorListSet = new HashSet();
+ 
+
+  Set identitiesUpdated = new HashSet();
+  Set invalidManagerSamAccountName = new HashSet();
+  Set identitiesNotUpdated = new HashSet();
+
+
+
+
+  boolean isRecordUpdated = false;
+  String inputManagerSam = "mgr_sAMAccountName";
+  String pivotColumn = null;
+  int inputRecordCounter = 0 ;
+
+  String DELIMITER = ",";
+  String inputFileName = "";
+  boolean isHeader = true;
+  String lineString ="";
+  FileInputStream inputFile = null;
+  Scanner scanner = null;
+  List headerList = new ArrayList();
+  List dataList = new ArrayList();
+
+  Map feedMap =null;
+
+  try {
+
+    if(config!=null){
+      inputFileName = config.get("filePath");
+      
+      pivotColumn = config.get("pivotColumn");
+    
+    } 
+
+    inputFile = new FileInputStream(inputFileName);
+
+    scanner = new Scanner(inputFile); 
+
+    while (scanner!=null && scanner.hasNextLine()) {
+      lineString = scanner.nextLine();
+      if(lineString!=null){
+        if(isHeader){
+          isHeader = false;
+          headerList = delimToList(DELIMITER , lineString);
+
+          continue;
+        }
+        inputRecordCounter++;
+        feedMap = null;
+        feedMap = new HashMap();
+        int counter = 0;
+        for( String col : headerList){
+          dataList = delimToList(DELIMITER , lineString);
+          if(dataList!=null && dataList.size() == headerList.size()){
+            feedMap.put(col, dataList.get(counter));
+          }
+          counter++;
+        }
+
+        if(feedMap !=null){
+    
+          updateIdentity(feedMap);
+        }
+      }
+    }
+    context.commitTransaction();
+  }catch (FileNotFoundException e) {
+    logger.error("Exception in update user "+e.getMessage());
+    taskResult.addMessage(new Message(Message.Type.Error, "Exception: "+e.getMessage(), null));
+  }catch (GeneralException e) {
+    logger.error("Exception in update user "+e.getMessage());
+    taskResult.addMessage(new Message(Message.Type.Error, "Exception: "+e.getMessage(), null));
+
+  }finally{
+    if(scanner!=null){
+      scanner.close();
+    }
+    if(inputFile!=null){
+      try {
+        inputFile.close();
+      } catch (IOException e) {
+        logger.error("Exception in "+e.getMessage());
+        taskResult.addMessage(new Message(Message.Type.Error, "Exception: "+e.getMessage(), null));
+      }
+    }
+  }
+
+  int noOfId=identitiesUpdated.size();
+
+
+
+
+  taskResult.setAttribute("noOfId",noOfId);  
+  taskResult.setAttribute("invalidManagerSamAccountName",invalidManagerSamAccountName);
+  taskResult.setAttribute("identitiesNotUpdated",identitiesNotUpdated); 
+  taskResult.setAttribute("totalRecords",inputRecordCounter); 
+
+
+
+  logger.debug("Ascension-Rule-Migration-Manager-Update End");
+  return "";
+
+
+
+  ]]></Source>
+</Rule>

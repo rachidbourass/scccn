@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-InitialName-Sequence-Generator">
+  <Source><![CDATA[
+
+  
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import sailpoint.object.Custom;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.Util;
+  import java.lang.Exception;
+
+  Log logger = LogFactory.getLog("Ascension-Rule-InitialName-Sequence-Generator");
+
+
+  public  String getNextInitialName(String val) 
+  {
+    String alphaVal = "";
+    String alphaMax = "";
+    alphaNumeric = "";
+    int alphaCount = 0;
+    int numMax = 0;
+    int numVal = 0;
+    int numberCount = 0;
+    if (val.equals("@00000000"))
+    {
+      return "A00000000";
+    }
+    for (int i = 0; i < val.length(); i++) 
+    {
+      int alpha = val.charAt(i);
+      if (alpha >= 65 && alpha <= 90)
+      {
+        alphaCount++;
+      }
+    }
+    alphaVal = val.substring(0, alphaCount);
+    alphaMax = populate(alphaCount, "Z");
+    if (alphaCount != 9) 
+    {
+      numVal = Integer.valueOf(val.substring(alphaCount, val.length())).intValue();
+      numMax = Integer.valueOf(populate(9 - alphaCount, "9")).intValue();
+      numberCount = String.valueOf(numVal).length();
+    } 
+    else 
+    {
+      if (alphaVal.equals("ZZZZZZZZZ"))
+      {
+        return alphaNumeric = "000000000";
+      }
+      StringBuffer alphan = new StringBuffer(val);
+      alphan = incAlpha(alphan, alphaCount);
+      alphaNumeric = alphan.toString();
+      return alphaNumeric;
+    }
+
+    if (alphaVal.equals(alphaMax) && (numVal == numMax)) 
+    {
+      StringBuffer alphan = new StringBuffer(alphaVal);
+      alphan = incAlpha(alphan, alphaCount).append('A');
+      String popZero = populate(numberCount - 1, "0");
+      alphaNumeric = alphan.toString() + popZero;
+
+    } 
+    else if ((numVal == numMax)) 
+    {
+      StringBuffer alphan = new StringBuffer(alphaVal);
+      alphan = incAlpha(alphan, alphaCount);
+      String popZero = populate(numberCount, "0");
+      alphaNumeric = alphan.toString() + popZero;
+    } 
+    else 
+    {
+      numVal++;
+      numberCount = String.valueOf(numVal).length();
+      alphaNumeric = String.valueOf(numVal);
+      int len = alphaNumeric.length();
+      if (len < (9 - alphaCount))
+      for (int i = 0; i < (9 - alphaCount - numberCount); i++)
+      alphaNumeric = "0" + alphaNumeric;
+      alphaNumeric = alphaVal + alphaNumeric;
+    }
+    return alphaNumeric;
+
+  }
+
+  public  StringBuffer incAlpha(StringBuffer val, int alphaCount) 
+  {
+    int rec_count = alphaCount - 1;
+    if (rec_count != -1) 
+    {
+      int alpha = val.charAt(rec_count);
+      if (val.charAt(rec_count) == 'Z') 
+      {
+        val.setCharAt(rec_count, 'A');
+        incAlpha(val, rec_count);
+      } 
+      else 
+      {
+        alpha++;
+        char t = (char) alpha;
+        val.setCharAt(rec_count, t);
+      }
+    }
+    return val;
+  }
+
+  public  String populate(int range, String valueToPopulate) 
+  {
+    String temp = "";
+    for (int i = 0; i < (range); i++) 
+    {
+      temp = valueToPopulate + temp;
+    }
+    return temp;
+  }
+  
+  public String generateNextInitialName()
+  {
+    logger.debug("Entering method generateNextInitialName");
+    String initialName = null;
+
+    Custom customObj = null;
+    String customObjName = "Ascension-Custom-InitialName-Generator-Object";
+
+    try 
+    {
+      customObj = ObjectUtil.transactionLock(context, Custom.class, customObjName);
+      if (customObj == null) 
+      {
+        return;
+      }
+      String tempInitialName = customObj.get("lastUsedInitialName");
+      initialName = getNextInitialName(tempInitialName);
+      customObj.put("lastUsedInitialName",initialName);
+    }
+    catch (GeneralException ge) 
+    {
+      logger.error(ge.getMessage());
+    }
+    finally 
+    {
+      if (customObj != null) 
+      {
+        if (customObj.getLock() != null) 
+        {
+          customObj.setLock(null);
+        }
+        context.saveObject(customObj);
+        context.commitTransaction();
+      }
+    }
+    logger.debug("Exiting method generateNextInitialName");
+    return initialName;
+  }
+  
+  ]]></Source>
+</Rule>

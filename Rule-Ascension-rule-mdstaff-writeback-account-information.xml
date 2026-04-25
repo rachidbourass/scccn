@@ -1,0 +1,682 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-MDStaff-Writeback-Account-Information">
+  <Description>MDStaff - Rule - Writeback Account Information</Description>
+  <Source><![CDATA[
+  
+
+	import org.apache.log4j.Logger ;
+
+	import java.text.SimpleDateFormat;
+	import java.util.Date;
+
+	import sailpoint.api.SailPointContext ;
+	import sailpoint.api.SailPointFactory ;
+	import sailpoint.api.IdentityService ;
+	
+	import sailpoint.object.Attributes ;
+	import sailpoint.object.TaskResult ;	
+	import sailpoint.object.TaskResult.CompletionStatus ;
+	import sailpoint.object.Filter ;
+	import sailpoint.object.QueryOptions ;
+	import sailpoint.object.Identity ;	
+	import sailpoint.object.Link ;
+	import sailpoint.object.Custom ;
+	
+	import sailpoint.connector.webservices.WebServicesClient;
+	
+	import sailpoint.tools.Message;
+	import sailpoint.tools.Message.Type;
+
+  	import com.google.gson.Gson;  
+    import com.google.gson.GsonBuilder; 
+    import org.json.JSONArray;
+  	import org.json.JSONException;
+  	import org.json.simple.JSONObject;
+    import sailpoint.object.Application;
+    import sailpoint.object.Identity;
+    import sailpoint.object.Custom;  
+    
+  	import org.json.simple.parser.JSONParser;    
+      
+	Logger log = Logger.getLogger("org.ascension.sailpoint.rules.mdstaff");
+	
+	// These can be alternatively defined in Constants Library	
+	String MINISTRY_NAME_TNNAS="TNNAS - St. Thomas Health" ;
+	String TNNAS_AD_APPLICATION_NAME="AD-DS" ;
+	String TNNAS_AD_DOMAIN_NAME="TNNAS" ;
+	String MDSTAFF_APPLICATION_NAME="MDStaff - Ascension" ;
+	String MDSTAFF_API_INSTANCE_NAME="ascension-uat" ;
+	String MDSTAFF_API_FACILITY_ID="4a8331e6-01fa-4861-9c5c-dee3f78663bb" ; 
+	String MDSTAFF_DEMOGRAPHIC_DATA_ACCOUNT_CREATED="Account Created" ;
+	
+	String AD_ATTR_NAME_PRINCIPALNAME = "msDS-PrincipalName" ;
+	String AD_ATTR_NAME_SAMACCOUNTNAME = "sAMAccountName" ;	
+	String MDSTAFF_ATTR_NAME_PROVIDERID = "ProviderID" ;
+	
+	String CUSTOM_OBJECT_NAME_MDSTAFF = "Ascension-Custom-MDStaff-Ascension" ;
+	String DATE_FORMAT_LAST_TIME_USERS_SCANNED = "yyyy-MM-dd HH:mm:ss" ;
+	
+	// Sample Values - TODO: Fetch it from custom object
+	String LAST_TIME_USERS_SCANNED = "2021-06-09 00:00:00" ;
+	
+	SailPointContext context = null ;
+	
+	String allUsersList = "" ;
+	String allUsersForProcessingList = "" ;	
+	String allSkippedUsersList = "" ;
+	String successList = "" ;
+	String failedList = "" ;
+	String executionLogs = "" ;	
+	String webServiceBaseURL = "";	        
+	String tokenUrl = "" ;
+	String demographicUpdateUrl = "" ;
+	String clientId = "";
+	String clientSecret = "";
+	String inListOfUsersForUpdate = "" ;
+	String newScanTime = "" ;
+	
+	List<Identity> allUserIdentities = null ;
+  
+	
+	void getSailPointContext(){
+		
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - getSailPointContext() - Start...") ;
+		
+		try {
+		
+			context = SailPointFactory.getCurrentContext() ;
+			
+			log.info("Ascension-Rule-MDStaff-Writeback-Account-Information - Got SailPoint Context") ;
+			
+			addToExecutionLogs("Got SailPoint Context") ;
+			
+		} catch (Exception exception){
+			
+			log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - Error getting SailPoint context") ;
+			
+			logger.trace(exception.printStackTrace());
+		}
+		
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - getSailPointContext() - End.") ;
+	}
+	
+	void validateInputs(){
+			
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - validateInputs() - Start...") ;
+		
+		try{
+			
+			inListOfUsersForUpdate = config.get("in_writeback_accountinfo_for") ;
+			
+			log.info("Ascension-Rule-MDStaff-Writeback-Account-Information - inListOfUsersForUpdate - " + inListOfUsersForUpdate) ;
+			
+			if(inListOfUsersForUpdate!=null && !inListOfUsersForUpdate.isEmpty()){
+				
+				allUserIdentities = new ArrayList<Identity>() ; 
+				
+				String[] inListOfUsers = inListOfUsersForUpdate.split(",") ;
+				
+				for(String user: inListOfUsers){
+					
+					Filter filterByUsername = Filter.eq("name",user) ;
+					
+					QueryOptions usersQueryOptions = new QueryOptions();
+					usersQueryOptions.addFilter(filterByUsername) ;
+					
+					List<Identity> userIdentities = context.getObjects(Identity.class,usersQueryOptions) ;
+					
+					if(userIdentities!=null && !userIdentities.isEmpty()){
+						
+						allUserIdentities.addAll(userIdentities) ; 
+					}					
+				}
+			}
+			 
+			
+		} catch (Exception exception){
+			
+			log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - Error getting SailPoint context") ;
+			
+			logger.trace(exception.printStackTrace());
+		}
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - validateInputs() - End.") ;		
+	}
+	
+	void findLatestCreatedUsers(){
+	
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - findLatestCreatedUsers() - Start...") ;
+		
+		try {
+
+			LAST_TIME_USERS_SCANNED = getSetStringValueConfig("GET","LAST_TIME_USERS_SCANNED","") ;
+			
+			log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - findLatestCreatedUsers() - LAST_TIME_USERS_SCANNED - " + LAST_TIME_USERS_SCANNED) ;			
+			
+			if(LAST_TIME_USERS_SCANNED!=null && !LAST_TIME_USERS_SCANNED.isEmpty()){
+				
+				SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_LAST_TIME_USERS_SCANNED) ; 
+				
+				Filter filterByCreatedDate = Filter.ge("created",dateFormat.parse(LAST_TIME_USERS_SCANNED)) ; 
+				
+				Filter filterByMinistry = Filter.eq("ministry",MINISTRY_NAME_TNNAS) ; 
+				
+				Filter combinedFilter = Filter.and(filterByCreatedDate,filterByMinistry) ; 
+				
+				QueryOptions usersQueryOptions = new QueryOptions();
+				usersQueryOptions.addFilter(combinedFilter) ;
+				
+				List<Identity> userIdentities = context.getObjects(Identity.class,usersQueryOptions) ;
+				
+				if(userIdentities!=null){
+				
+					if(allUserIdentities!=null){
+						
+						allUserIdentities.addAll(userIdentities) ;
+						
+					} else {
+						
+						allUserIdentities = new ArrayList<Identity>() ;
+						
+						allUserIdentities.addAll(userIdentities) ; 
+					}				
+				}
+				
+				Date currentDate = new Date() ;
+				
+				LAST_TIME_USERS_SCANNED = getSetStringValueConfig("SET","LAST_TIME_USERS_SCANNED",dateFormat.format(currentDate)) ;
+			} 
+			
+			if(allUserIdentities!=null){
+				
+				log.info("Ascension-Rule-MDStaff-Writeback-Account-Information - findLatestCreatedUsers() - No of users identities found - " + allUserIdentities.size()) ;
+				
+				addToExecutionLogs("Total Number of Identities for update - "+allUserIdentities.size()) ;
+				
+				IdentityService idService = new IdentityService(context) ; 
+				
+				for(Identity userIdentity: allUserIdentities){
+					
+					addToAllUsersList(userIdentity.getName()) ;
+					
+					List applicationLinks = idService.getLinks(userIdentity,0,0) ; 
+					
+					if(applicationLinks!=null && !applicationLinks.isEmpty()){
+						
+						boolean adAccountFound = false ; 
+						
+						String providerID = "" ;
+						String userId = "" ;
+						String msDSPrincipalName = "" ;
+						
+						for(Link applicationLink: applicationLinks){
+							
+							String appName = applicationLink.getApplicationName() ;
+							
+							if(appName!=null && appName.equalsIgnoreCase(TNNAS_AD_APPLICATION_NAME)){
+								
+								msDSPrincipalName = applicationLink.getAttribute(AD_ATTR_NAME_PRINCIPALNAME) ;
+								
+								if(msDSPrincipalName!=null && msDSPrincipalName.contains(TNNAS_AD_DOMAIN_NAME)){
+									
+									userId = applicationLink.getAttribute(AD_ATTR_NAME_SAMACCOUNTNAME) ;
+									
+									adAccountFound = true ; 
+									
+									
+								}
+							}
+							
+							if(appName!=null && appName.equalsIgnoreCase(MDSTAFF_APPLICATION_NAME)){
+								
+								providerID = applicationLink.getAttribute(MDSTAFF_ATTR_NAME_PROVIDERID) ;
+							}
+						}
+						
+						if(!adAccountFound){
+							
+							addToSkippedUsersList(userIdentity.getName()) ;
+							
+						} else {
+							
+							addToUsersForProcessingList(providerID+":"+userId+":"+userIdentity.getName()) ;
+							
+							//addToUsersForProcessingList("d9215856-1415-4223-b715-97ce21fe2edf:userid1:username1") ;
+						}				
+					} else {
+						
+						addToSkippedUsersList(userIdentity.getName()) ;
+					} 
+
+				}
+				
+			} else {
+				
+				log.info("Ascension-Rule-MDStaff-Writeback-Account-Information - findLatestCreatedUsers() - No of users identities found is null") ;
+				
+				addToExecutionLogs("No Identities for update - "+ dateFormat.format(lastRunDate)) ;
+			}
+			
+		} catch (Exception exception){
+			
+			log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - Error finding users for processing.") ;
+			
+			logger.trace(exception.printStackTrace());
+		}
+		
+		//addToUsersForProcessingList("d9215856-1415-4223-b715-97ce21fe2edf:userid1:username1") ;
+		
+		log.info("Ascension-Rule-MDStaff-Writeback-Account-Information - findLatestCreatedUsers() - allUsersList - " + allUsersList) ;
+		
+		log.info("Ascension-Rule-MDStaff-Writeback-Account-Information - findLatestCreatedUsers() - allUsersForProcessingList - " + allUsersForProcessingList) ;
+
+		log.info("Ascension-Rule-MDStaff-Writeback-Account-Information - findLatestCreatedUsers() - allSkippedUsersList - " + allSkippedUsersList) ;
+		
+		log.info("Ascension-Rule-MDStaff-Writeback-Account-Information - findLatestCreatedUsers() - successList - " + successList) ;
+
+		log.info("Ascension-Rule-MDStaff-Writeback-Account-Information - findLatestCreatedUsers() - failedList - " + failedList) ;
+								
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - findLatestCreatedUsers() - End.") ;	
+	}
+	
+	void writeBackToMDStaff() {
+		
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - writeBackToMDStaff() - Start...") ;
+		
+		try{
+			
+			String currentAccessToken = getLatestAccessToken() ;
+			
+			log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - writeBackToMDStaff() - currentAccessToken - " + currentAccessToken) ;
+			
+			addToExecutionLogs("Got Token - "+ currentAccessToken) ;
+			
+			if(currentAccessToken!=null && !currentAccessToken.isEmpty() &&
+				allUsersForProcessingList!=null && !allUsersForProcessingList.isEmpty()
+			){
+				
+				writeAccountInformation(currentAccessToken) ;
+			}
+			
+		} catch (Exception exception){
+			
+			log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - Error getting SailPoint context") ;
+			
+			logger.trace(exception.printStackTrace());
+		}
+		
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - writeBackToMDStaff() - End.") ;
+	}
+	
+	void writeAccountInformation(String accessToken){
+		
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - writeAccountInformation() - Start...") ;
+		
+		try{
+			String[] usersForProcessing = allUsersForProcessingList.split(",") ;
+			
+			for(String user: usersForProcessing){
+				
+				try {
+					if(user!=null && !user.isEmpty()){
+						
+						String[] userInformation = user.split(":") ;
+						
+						String updateDemographicDataURL = demographicUpdateUrl + userInformation[0] ;
+						
+						String body = "{" +
+										"\"Provisioning1ID\":"+"\""+MDSTAFF_DEMOGRAPHIC_DATA_ACCOUNT_CREATED+"\"," +
+										"\"domain1ID\":"+"\""+TNNAS_AD_DOMAIN_NAME+"\"," +
+										"\"userid1\":"+"\""+userInformation[1]+"\"" +
+									 "}";
+						log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - writeAccountInformation() - updateDemographicDataURL - " + updateDemographicDataURL) ;
+						log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - writeAccountInformation() - body - " + body) ;
+						
+						URL updateDemographicDataURLObj = new URL(updateDemographicDataURL);
+						
+						HttpURLConnection tokenConn = (HttpURLConnection) updateDemographicDataURLObj.openConnection();
+						
+						tokenConn.setDoOutput(true);
+						tokenConn.setRequestMethod("PUT");
+						//tokenConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded"); 
+						tokenConn.setRequestProperty("Authorization", "Bearer "+accessToken);  
+						OutputStream os = tokenConn.getOutputStream();
+						
+						os.write(body.getBytes());
+	 	 				os.flush();
+	 	 				
+							log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - writeAccountInformation() - os - " + os) ;
+	 	 				
+						  if(tokenConn.getResponseCode()==200){
+						    BufferedReader br = new BufferedReader(new InputStreamReader(tokenConn.getInputStream()));
+						    String out = "";
+						    String line ="";
+						
+						    while ((line = br.readLine()) != null) {
+						      out=out+line;
+						    }
+							br.close();
+							log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - writeAccountInformation() - Response - " + out) ;
+							
+						    JSONParser parser = new JSONParser();
+						    JSONObject jobj = (JSONObject) parser.parse(out);
+							
+							log.info("Response JSON Object - " + jobj);
+							
+							if(jobj!=null){
+							
+								addToSuccessList(user) ;
+								
+							} else {
+								
+								addToFailedList(user) ;
+							}
+							
+						
+						  } else {
+						
+						    log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - writeAccountInformation() - Error updating account information for user - Failed : HTTP error code : " + tokenConn.getResponseCode());
+						    log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - writeAccountInformation() - Error updating account information for user - Failed : HTTP error message : " + tokenConn.getResponseMessage());
+						    
+						    addToFailedList(user) ;
+						
+						  }	 	 																		
+					}
+
+	
+				} catch (Exception exception){
+					
+					log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - writeAccountInformation() - Error updating account information for user - "+user) ;
+					
+					log.error(exception) ;
+					
+					addToFailedList(user) ;
+				}		
+			}
+			
+			log.info("Ascension-Rule-MDStaff-Writeback-Account-Information - writeAccountInformation() - failedList - " + failedList) ;
+			log.info("Ascension-Rule-MDStaff-Writeback-Account-Information - writeAccountInformation() - successList - " + successList) ;
+			
+			if(failedList!=null && !failedList.isEmpty()){
+				getSetListValueConfig("SET","FAILED_WRITEBACK_USERS_LIST",failedList.split(",")) ;	
+			}
+			
+		} catch (Exception exception){
+			
+			log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - writeAccountInformation() - Error getting SailPoint context") ;
+			
+			logger.trace(exception.printStackTrace());
+		}
+		
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - writeAccountInformation() - End.") ;		
+	}
+	
+	
+	void getApplicationDetails(){
+		
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - getApplicationDetails() - Start...") ;
+		
+		try{
+			
+			Application appObj = context.getObjectByName(Application.class,MDSTAFF_APPLICATION_NAME);
+			
+			if(appObj!=null){
+				webServiceBaseURL = appObj.getAttributeValue("genericWebServiceBaseUrl");	        
+		        tokenUrl = webServiceBaseURL + "/api/tokens" ;
+		        demographicUpdateUrl = webServiceBaseURL + "/api/"+MDSTAFF_API_INSTANCE_NAME+"/demographic/" ;
+		        
+		        clientId = context.decrypt(appObj.getAttributeValue("clientId_CA"));
+		        clientSecret = context.decrypt(appObj.getAttributeValue("clientSecret_CA"));				
+			} 
+	        			
+	
+		} catch (Exception exception){
+			
+			log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - getApplicationDetails() - Error getting SailPoint context") ;
+			
+			logger.trace(exception.printStackTrace());
+		}
+		
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - getApplicationDetails() - End.") ;
+	}
+	
+	public String getLatestAccessToken()
+  	{
+		log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - getLatestAccessToken() - Start...") ;
+		
+		getApplicationDetails() ;
+ 	
+      	try
+      	{
+      		
+      		URL accessTokenURL = new URL(tokenUrl);
+      		
+      		String body = "grant_type=password&username="+clientId+"&password="+clientSecret+"&instance="+MDSTAFF_API_INSTANCE_NAME+"&facilityID="+MDSTAFF_API_FACILITY_ID ;
+      		
+      		log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - getLatestAccessToken() - accessTokenURL - " + accessTokenURL) ;
+      		
+      		//log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - getLatestAccessToken() - body - " + body) ;
+      		
+      		HttpURLConnection tokenConn = (HttpURLConnection) accessTokenURL.openConnection();
+			tokenConn.setDoOutput(true);
+			tokenConn.setRequestMethod("GET");
+			tokenConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");  
+			OutputStream os = tokenConn.getOutputStream();
+			
+			os.write(body.getBytes());
+ 	 		os.flush();
+ 	 		
+			  if(tokenConn.getResponseCode()==200){
+			    BufferedReader br = new BufferedReader(new InputStreamReader(tokenConn.getInputStream()));
+			    String out = "";
+			    String line ="";
+			
+			    while ((line = br.readLine()) != null) {
+			      out=out+line;
+			    }
+				br.close();
+				log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - getLatestAccessToken() - Response - " + out) ;
+				
+			    JSONParser parser = new JSONParser();
+			    JSONObject jobj = (JSONObject) parser.parse(out);
+			
+			    if (jobj != null && jobj.get("access_token") != null) {
+			
+			      currentAccessToken = jobj.get("access_token");
+			
+			    }
+			
+			  } else {
+			
+			    log.error("Failed : HTTP error code : " + tokenConn.getResponseCode());
+			    log.error("Failed : HTTP error message : " + tokenConn.getResponseMessage());
+			
+			  }			    		
+      } 
+      catch(Exception exception) 
+      {
+        currentAccessToken = null;
+        
+        log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - getLatestAccessToken() - Error - " + exception) ;
+      }
+  		log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - getLatestAccessToken() - End.") ;
+  		
+   	  return currentAccessToken;
+  	}
+	
+	void addToExecutionLogs(String executionLogMsg){
+		
+		executionLogs = executionLogs!=null ? executionLogs +"," + executionLogMsg : executionLogMsg ;
+	}
+
+	void addToUsersForProcessingList(String msg){
+		
+		allUsersForProcessingList = allUsersForProcessingList!=null ? allUsersForProcessingList +"," + msg : msg ;
+	}
+	
+	void addToSkippedUsersList(String msg){
+		
+		allSkippedUsersList = allSkippedUsersList!=null ? allSkippedUsersList +"," + msg : msg ;
+	}
+	
+	void addToAllUsersList(String msg){
+		
+		allUsersList = allUsersList!=null ? allUsersList +"," + msg : msg ;
+	}
+		
+	void addToSuccessList(String msg){
+		
+		successList = successList!=null ? successList +"," + msg : msg ;
+	}
+	
+	void addToFailedList(String msg){
+		
+		failedList = (failedList!=null && !failedList.isEmpty()) ? failedList +"," + msg : msg ;
+		
+		log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - addToFailedList() - failedList - " + failedList) ;
+	}	
+	
+	public String getSetStringValueConfig(String operationType, String keyName, String keyValue){
+		
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - getSetStringValueConfig() - Start...") ;
+		
+		String value = null ; 
+		
+		try{
+			
+			log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - getSetStringValueConfig() - valueType = "+valueType+", operationType="+operationType) ;
+			
+			Custom customObject = context.getObjectByName(Custom.class,CUSTOM_OBJECT_NAME_MDSTAFF) ;
+			 
+			if(customObject!=null){
+				
+				if(operationType.equals("GET")){
+				
+					value = customObject.get(keyName) ;
+					
+				} else {
+					
+					customObject.put(keyName,keyValue) ;
+					
+					context.saveObject( customObject );
+
+					context.commitTransaction();
+										
+					value = "SUCCESS" ; 
+				}
+				
+			} else {
+				
+				log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - getSetStringValueConfig() - Custom object not found - "+CUSTOM_OBJECT_NAME_MDSTAFF) ;
+			}
+		} catch (Exception exception){
+			
+			log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - getSetStringValueConfig() - Error getting / Setting value") ;
+			
+			logger.trace(exception.printStackTrace()); 
+		}			
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - getSetStringValueConfig() - End.") ;
+		
+		return value ; 
+	}
+	
+	
+	public List getSetListValueConfig(String operationType, String keyName, String[] keyValues){
+		
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - getSetListValueConfig() - Start...") ;
+		
+		List values = null ; 
+		
+		try{
+			
+			log.debug("Ascension-Rule-MDStaff-Writeback-Account-Information - getSetListValueConfig() - valueType = "+valueType+", operationType="+operationType) ;
+			
+			Custom customObject = context.getObjectByName(Custom.class,CUSTOM_OBJECT_NAME_MDSTAFF) ;
+			 
+			if(customObject!=null){
+				
+				if(operationType.equals("GET")){
+				
+					values = customObject.get(keyName) ;
+					
+				} else {
+					
+					customObject.put(keyName,Arrays.asList(keyValues)) ;
+					
+					context.saveObject( customObject );
+
+					context.commitTransaction();
+					
+					value = "SUCCESS" ; 
+				}
+				
+			} else {
+				
+				log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - getSetListValueConfig() - Custom object not found - "+CUSTOM_OBJECT_NAME_MDSTAFF) ;
+			}
+		} catch (Exception exception){
+			
+			log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - getSetListValueConfig() - Error getting / Setting value") ;
+			
+			logger.trace(exception.printStackTrace());
+		}			
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - getSetListValueConfig() - Start...") ;
+		
+		return values ; 
+	}	
+	
+	void writeToTaskResult() {
+		
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - writeToTaskResult() - Start...") ;
+		
+		try {
+			
+			Attributes returnAttributes = new Attributes() ;
+			returnAttributes.put("outAllUsersList",allUsersList) ;
+			returnAttributes.put("outAllUsersForProcessingList",allUsersForProcessingList) ;			
+			returnAttributes.put("outAllUsersSkippedList",allSkippedUsersList) ;			
+			returnAttributes.put("outSuccessList",successList) ; 
+			returnAttributes.put("outFailedList",failedList) ;
+			returnAttributes.put("executionLogs",executionLogs) ;
+			
+			taskResult.setAttributes(returnAttributes) ;
+			
+			taskResult.addMessage(new Message(Type.Info,"Successfully Completed",null)) ; 
+			
+			//taskResult.setCompletionStatus(CompletionStatus.Sucess) ; 
+			
+			context.saveObject(taskResult) ; 
+			
+			context.commitTransaction();
+			
+		} catch (Exception exception){
+			
+			log.error("Ascension-Rule-MDStaff-Writeback-Account-Information - Error writing to task result") ;
+			
+			logger.trace(exception.printStackTrace());
+		}	
+		
+		log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - writeToTaskResult() - End.") ;	
+	}	
+
+
+	log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - Start...") ;
+	
+	getSailPointContext() ;
+	
+	if(context!=null){
+		
+		validateInputs() ;
+		
+		findLatestCreatedUsers() ;
+		
+		writeBackToMDStaff() ;
+		
+		writeToTaskResult() ;
+	}
+	 
+	log.trace("Ascension-Rule-MDStaff-Writeback-Account-Information - End.") ;
+
+
+  ]]></Source>
+</Rule>

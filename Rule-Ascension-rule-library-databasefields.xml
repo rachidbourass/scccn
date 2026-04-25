@@ -1,0 +1,337 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Library-DatabaseFields">
+  <Source><![CDATA[
+  import java.sql.Connection;
+  import java.sql.Statement;
+  import java.sql.PreparedStatement;
+  import java.sql.DriverManager;
+  import java.sql.ResultSet;
+  import java.sql.SQLException;
+  import sailpoint.tools.Util;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+
+  List getDetailsFromDB(Connection conn, String table) {
+    List detailsAsList = new ArrayList();
+    Statement stmt = null;
+    try {
+      stmt = conn.createStatement();
+      String sql = "SELECT SETID_LOCATION,DESCR FROM " + table;
+      ResultSet rs = stmt.executeQuery(sql);
+
+      while(rs.next()){
+        String location = rs.getString("SETID_LOCATION");
+        String description = rs.getString("DESCR");
+        detailsAsList.add(location + "|" + description);
+      }
+      rs.close();
+      stmt.close();
+    } catch(SQLException se){
+      logger.error("Exception in reading from database: "+se.getMessage());
+    }catch(Exception e){
+      logger.error("Exception in reading from database: "+e.getMessage());
+    }finally{
+      try{
+        if(stmt!=null)
+          stmt.close();
+      }catch(SQLException se2){
+        logger.error("Exception in closing database connection: "+se2.getMessage());
+      }
+    }
+
+    return detailsAsList;
+  }
+
+  List getVendorListFromFile(String filePath) {
+    FileReader fileReader = null;
+    BufferedReader br = null;
+    List fileAsList = new ArrayList();
+    try {
+      fileReader = new FileReader(filePath);    
+      br = new BufferedReader(fileReader);    
+      //skipping header
+      br.readLine();
+
+      line = br.readLine();
+      while(line != null){
+        List eachRow = Util.csvToList(line);
+        if (eachRow != null && eachRow.size() == 2) {
+          String value = eachRow.get(0) + "|" + eachRow.get(1);
+          fileAsList.add(value);
+        }
+        line = br.readLine();
+      }
+      br.close();
+      fileReader.close();
+    }
+    catch (IOException ioe) {
+      logger.error("Exception in reading from file: "+ioe.getMessage());
+    }
+    finally {
+      try {	
+        if (br != null) 
+          br.close();
+        if (fileReader != null)
+          fileReader.close();
+      } catch (IOException ioe2) {
+        logger.error("Exception in closing file connection: "+ioe2.getMessage());
+      }
+    }
+    return fileAsList;
+  }
+
+  Map getDetailsFromDatabase(Connection conn) {
+    Map resultMap = new HashMap();
+    List jobCodeList = new ArrayList();
+    List locationList = new ArrayList();
+    List departmentList = new ArrayList();
+    List vendorList = new ArrayList();
+
+    Statement stmt = null;
+    ResultSet rs = null;
+    try {
+
+      stmt = conn.createStatement();
+      rs = stmt.executeQuery(SQL_QUERY);
+      while(rs.next()){
+        String location = rs.getString("SETID_LOCATION");
+        String description = rs.getString("DESCR");
+        String tableName = rs.getString("TABLE_NAME");
+        if (Util.isNotNullOrEmpty(tableName) && tableName.equalsIgnoreCase(JOB_CODE_TABLE)) {
+          jobCodeList.add(location + "|" + description);
+        } else if (Util.isNotNullOrEmpty(tableName) && tableName.equalsIgnoreCase(DEPT_TABLE)) {
+          departmentList.add(location + "|" + description);
+        } else if (Util.isNotNullOrEmpty(tableName) && tableName.equalsIgnoreCase(LOCATION_TABLE)) {
+          locationList.add(location + "|" + description);
+        } else if (Util.isNotNullOrEmpty(tableName) && tableName.equalsIgnoreCase(VENDOR_TABLE)) {
+          vendorList.add(location + "|" + description);
+        }
+      }
+
+      rs.close();
+      stmt.close();
+
+    } catch (SQLException se) {
+      logger.error("Exception in reading from database: "+se.getMessage());
+    } finally {
+      try  {
+        if (rs != null) {
+          rs.close();
+        }
+        if (stmt != null) {
+          stmt.close();
+        }
+      } catch (SQLException se2) {
+        logger.error("Exception in closing database connection: "+se2.getMessage());
+      }
+    }
+    resultMap.put(JOB_CODE_TABLE, jobCodeList);
+    resultMap.put(DEPT_TABLE, departmentList);
+    resultMap.put(LOCATION_TABLE, locationList);
+    resultMap.put(VENDOR_TABLE, vendorList);
+    return resultMap;
+  }
+
+  void insertIntoDB(Connection conn, List valueList, String tableName) {
+    PreparedStatement insertStatement = null;
+
+    try {
+      insertStatement = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?, ?)"); 
+      for (String newRow : valueList) {
+        String[] values = newRow.split("\\|");
+        if (values != null && values.length == 2)
+        {
+          insertStatement.setString(2, values[1]);
+          insertStatement.setString(1, values[0]);
+
+          insertStatement.executeUpdate();
+        }
+      }
+      insertStatement.close();
+    }catch(SQLException se){
+      logger.error("Exception in writing to database: "+se.getMessage());
+    }catch(Exception e){
+      logger.error("Exception in writing to database: "+e.getMessage());
+    }finally{
+      try{
+        if(insertStatement!=null)
+          insertStatement.close();
+      }catch(SQLException se2){
+        logger.error("Exception in closing database connection: "+se2.getMessage());
+      }
+    }
+  }
+
+
+  String getDBInteraction(String query, String tableCol) {
+    String dbValue = "";
+    Connection conn = context.getJdbcConnection();
+    Statement stmt = null;
+    ResultSet rs = null;
+
+    try {
+      stmt = conn.createStatement();
+      rs = stmt.executeQuery(query);
+      while(rs.next()){
+        dbValue = rs.getString(tableCol);       
+      }
+      stmt.close();
+      rs.close();
+    } catch(SQLException se){
+      logger.error("Exception in reading from database: "+se.getMessage());
+    }catch(Exception e){
+      logger.error("Exception in reading from database: "+e.getMessage());
+    }finally{
+      try {
+        if (stmt != null){	stmt.close();	}
+        if (rs != null){	rs.close();	}
+      } catch (SQLException se) {
+        logger.error("Exception in database Operation : " + se.getMessage());
+      }
+    }
+    return dbValue;
+  }
+
+
+  String getStreetAddress(String colValue){
+
+    String sqlQuery = "SELECT Address_1 FROM LOCATIONS WHERE LOCATION_NAME='"+colValue+"'";
+    String dbValue = getDBInteraction(sqlQuery,"Address_1");
+
+    return dbValue;
+  }
+
+  String getCity(String colValue){
+
+    String sqlQuery = "SELECT city FROM LOCATIONS WHERE LOCATION_NAME='"+colValue+"'";
+    String dbValue = getDBInteraction(sqlQuery,"city");
+
+    return dbValue;
+  }
+
+  String getState(String colValue){
+
+    String sqlQuery = "SELECT state FROM LOCATIONS WHERE LOCATION_NAME='"+colValue+"'";
+    String dbValue = getDBInteraction(sqlQuery,"state");
+
+    return dbValue;
+  }
+
+  String getPostalCode(String colValue){
+
+    String sqlQuery = "SELECT Zip FROM LOCATIONS WHERE LOCATION_NAME='"+colValue+"'";
+    String dbValue = getDBInteraction(sqlQuery,"zip");
+
+    return dbValue;
+  }
+
+
+  String getBusinessCode(String depValue, String locValue){
+
+    String sqlQuery = "SELECT Business_Code FROM BusinessUnitCode WHERE Location_ID='"+locValue+"' and Department_ID='"+depValue+"'";
+    String dbValue = getDBInteraction(sqlQuery,"Business_Code");
+
+    return dbValue;
+  }
+
+  String getBusinessDesc(String colValue){
+
+    String sqlQuery = "SELECT Business_Description FROM BusinessDescription WHERE Business_Code='"+colValue+"'";
+    String dbValue = getDBInteraction(sqlQuery,"Business_Description");
+
+    return dbValue;
+  } 
+
+  String getLocationID(String colValue){
+
+    String sqlQuery = "SELECT Location_ID FROM LOCATIONS WHERE LOCATION_NAME='"+colValue+"'";
+    String dbValue = getDBInteraction(sqlQuery,"Location_ID");
+
+    return dbValue;
+  }
+
+  String getDepartmentID(String colValue){
+
+    String sqlQuery = "SELECT Department_ID FROM BusinessUnitCode WHERE DESCRIPTION='"+colValue+"'";
+    String dbValue = getDBInteraction(sqlQuery,"Department_ID");
+
+    return dbValue;
+  }
+  
+    String getLocationName(String colValue){
+
+    String sqlQuery = "SELECT Location_NAME FROM LOCATIONS WHERE LOCATION_ID='"+colValue+"'";
+    String dbValue = getDBInteraction(sqlQuery,"Location_NAME");
+
+    return dbValue;
+  }
+
+  String getDepartmentName(String colValue){
+
+    String sqlQuery = "SELECT DESCRIPTION FROM BusinessUnitCode WHERE Department_ID='"+colValue+"'";
+    String dbValue = getDBInteraction(sqlQuery,"DESCRIPTION");
+
+    return dbValue;
+  }
+
+
+
+
+  public Map getManagerMapFromDB() {
+    logger.debug("Entering getManagerMapFromDB");
+    Map result = new HashMap();
+    Statement stmt = null;
+    ResultSet rs = null;
+    Connection conn = null;
+    String query = "SELECT Empl_ID,fname_lname FROM ManagerNameToID where fname_lname != '' and Empl_ID != ''";
+    try {
+      conn = context.getJdbcConnection();
+      if(conn!=null){
+        stmt = conn.createStatement();
+        rs = stmt.executeQuery(query);
+        while (rs!=null && rs.next()) {
+          result.put(rs.getString("fname_lname"), rs.getString("Empl_ID"));
+        }
+        stmt.close();
+        rs.close();
+        conn.close();
+      }
+    } catch (SQLException se) {
+      logger.error("Exception in ManagerMapFromDB from database: " + se.getMessage());
+    } catch (Exception e) {
+      logger.error("Exception in ManagerMapFromDB from database: " + e.getMessage());
+    } finally {
+      try {
+        if (stmt != null){	stmt.close();	}
+        if (rs != null){	rs.close();	}
+        if (conn != null){	conn.close();	}
+      } catch (SQLException se) {
+        logger.error("Exception in database Operation : " + se.getMessage());
+      }
+    }
+    logger.debug("Entering getManagerMapFromDB");
+    return result;
+  }
+
+
+  ////////////////////////////////////////////////////////////////////////////
+  //  Global Variables
+  ////////////////////////////////////////////////////////////////////////////
+
+  Log logger = LogFactory.getLog("Ascension.Rule.Library.DatabaseFields");
+
+  logger.debug("Entering Ascension-Rule-Library-DatabaseFields");
+
+
+  String SQL_QUERY = "SELECT SETID_LOCATION,DESCR,'ps_ahhr_sailp_jc_v' AS TABLE_NAME FROM ps_ahhr_sailp_jc_v UNION SELECT SETID_LOCATION,DESCR,'ps_ahhr_sailp_l_vw' AS TABLE_NAME FROM ps_ahhr_sailp_l_vw UNION SELECT SETID_LOCATION,DESCR,'ps_ahhr_sailp_d_vw' AS TABLE_NAME FROM ps_ahhr_sailp_d_vw UNION SELECT 'AMITA' AS SETID_LOCATION,Location_Name,'ps_ahhr_sailp_l_vw' AS TABLE_NAME FROM Locations UNION SELECT 'AMITA' AS SETID_LOCATION,Job_Title_Description,'ps_ahhr_sailp_jc_v' AS TABLE_NAME FROM JobCodes UNION SELECT 'AMITA' AS SETID_LOCATION,DESCR,'ps_ahhr_sailp_jc_v' AS TABLE_NAME FROM ps_ahhr_sailp_jc_v UNION SELECT 'AMITA' AS SETID_LOCATION,Organization,'ps_ahhr_sailp_v_vw' AS TABLE_NAME FROM Vendors UNION SELECT 'AMITA' AS SETID_LOCATION,DESCR,'ps_ahhr_sailp_d_vw' AS TABLE_NAME FROM ps_ahhr_sailp_d_vw WHERE SETID_LOCATION='ILARL'";
+
+  String JOB_CODE_TABLE = "ps_ahhr_sailp_jc_v";
+  String DEPT_TABLE = "ps_ahhr_sailp_d_vw";
+  String LOCATION_TABLE = "ps_ahhr_sailp_l_vw";
+  String VENDOR_TABLE = "ps_ahhr_sailp_v_vw";
+
+
+  ]]></Source>
+</Rule>

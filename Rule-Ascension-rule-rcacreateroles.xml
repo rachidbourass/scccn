@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-RCACreateRoles">
+  <Description>Create roles for each RCA based AD groups. RCA security group names are stored in a Custom object.</Description>
+  <Source><![CDATA[
+
+  import java.util.ArrayList;
+  import java.util.List;
+
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  import connector.common.Util;
+  import sailpoint.api.Describer;
+  import sailpoint.api.SailPointFactory;
+  import sailpoint.object.Bundle;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.ManagedAttribute;
+  import sailpoint.object.Profile;
+  import sailpoint.object.TaskResult;
+  import sailpoint.object.TaskResult.CompletionStatus;
+  import sailpoint.object.Filter.MatchMode;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.Message;
+
+
+  String KEY_ROLE_OWNER_NAME = "IDM Team";
+  String KEY_TASK_NAME = "RCA-CreateRoles";
+  String KEY_ROLENAME_SUFFIX = "-AttestRCA";
+  String KEY_ORGANIZATION_ROLE_NAME = "RCA Attestation Roles";
+  String RCA_GROUP_STORE_CUSTOMOBJ_NAME = "Ascension-Custom-RCAGroups";
+  Log logger = LogFactory.getLog("sailpoint.ascension.rca.task.CreateRCARoles");
+
+  public List findADEntitlement(String secGroupName, TaskResult taskResult)
+  {
+    List mgdAttrList = new ArrayList();
+    try
+    {
+      QueryOptions query = new QueryOptions();
+      query.addFilter(Filter.and(
+        Filter.like("application.name", "AD-DS", MatchMode.START),
+        Filter.like("displayName", "\\"+secGroupName, MatchMode.END)));
+      mgdAttrList = context.getObjects(ManagedAttribute.class, query);
+    }
+    catch (GeneralException e)
+    {
+      taskResult.addMessage(Message.error("RCA || Exception: " + e.getMessage()));
+      // taskResult.addMessage(new Message(Message.Type.Error, "RCA || Exception: " + e.getMessage()));
+      logger.error("RCA || Exception = " + e.getStackTrace());
+      taskResult.setCompletionStatus(CompletionStatus.Error);
+    }
+    return mgdAttrList;
+  }
+
+  public String createRCARoles()
+  {
+    TaskResult taskResult = null;
+    List groupsNotFoundInAD = new ArrayList();
+    List existingRoles = new ArrayList();
+    List maList = null;
+    int objectCount = 0;
+    try
+    {
+      taskResult = context.getObjectByName(TaskResult.class, KEY_TASK_NAME);
+      Bundle rcaOrganizationRole = context.getObjectByName(Bundle.class, KEY_ORGANIZATION_ROLE_NAME);
+      Custom rcaSecGroupStore = context.getObjectByName(Custom.class, RCA_GROUP_STORE_CUSTOMOBJ_NAME);
+      if (rcaSecGroupStore == null)
+        throw new RuntimeException("RCA || Custom object does not exists! Custom obj: " + RCA_GROUP_STORE_CUSTOMOBJ_NAME);
+      String rcaEnvironments = rcaSecGroupStore.get("RCA_ENVs");
+      if (Util.isNullOrEmpty(rcaEnvironments))
+        throw new RuntimeException("RCA || Environment list is missing from the custom object: " + RCA_GROUP_STORE_CUSTOMOBJ_NAME);
+      List rcaEnvList = Util.csvToList(rcaEnvironments);
+      logger.debug("RCA || rcaEnvList = " + rcaEnvList);
+      Identity roleOwner = context.getObjectByName(Identity.class, KEY_ROLE_OWNER_NAME);
+      logger.debug("RCA || roleOwner = " + roleOwner);
+      for (String rcaEnv : rcaEnvList)
+      {
+        List secGroupList = rcaSecGroupStore.getList(rcaEnv);
+        logger.debug("RCA || secGroupList = " + secGroupList);
+        if (null == secGroupList || secGroupList.isEmpty())
+        {
+          logger.warn("RCA || No security groups found for env - " + rcaEnv);
+          continue;
+        }
+        for (String secGroupName : secGroupList)
+        {
+          logger.debug("RCA || secGroupName = " + secGroupName);
+          maList = findADEntitlement(secGroupName, taskResult);
+          logger.debug("RCA || maList = " + maList);
+          if (maList == null || maList.isEmpty())
+          {
+            groupsNotFoundInAD.add(secGroupName);
+            continue;
+          }
+          boolean isUniqueMgdAttr = true;
+          if (maList.size() > 1)
+            isUniqueMgdAttr = false;
+          logger.debug("RCA || isUniqueMgdAttr = " + isUniqueMgdAttr);
+          for (ManagedAttribute ma : maList)
+          {
+            String roleName = secGroupName+KEY_ROLENAME_SUFFIX;
+            if (!isUniqueMgdAttr && Util.isNotNullOrEmpty(ma.getDisplayName()))
+            {
+              String maDisplayName = ma.getDisplayName();
+              logger.debug("RCA || maDisplayName = " + maDisplayName);
+              roleName = ma.getDisplayName().substring(0, maDisplayName.indexOf("\\")) + "-" + secGroupName+KEY_ROLENAME_SUFFIX;
+            }
+            logger.debug("RCA || roleName = " + roleName);
+            Bundle rcaBundle = context.getObjectByName(Bundle.class, roleName);
+            if (rcaBundle != null)
+            {
+              logger.debug("RCA || existing rcaBundle = " + rcaBundle);
+              existingRoles.add(roleName);
+              continue;
+            }
+            rcaBundle = new Bundle();
+            rcaBundle.setName(roleName);
+            rcaBundle.setDisplayName(roleName.substring(0, roleName.indexOf(KEY_ROLENAME_SUFFIX)));
+            rcaBundle.setType("ascit");
+            rcaBundle.setOwner(roleOwner);
+            rcaBundle.setDisabled(false);
+            Profile profile = new Profile();
+            profile.setApplication(ma.getApplication());
+            List valueList = new ArrayList();
+            valueList.add(ma.getValue());
+            profile.addConstraint(Filter.containsAll(ma.getAttribute(), valueList));
+            rcaBundle.add(profile);
+            if (null != rcaOrganizationRole)
+              rcaBundle.addInheritance(rcaOrganizationRole);
+            rcaBundle.setDescriptions(ma.getDescriptions());
+            context.saveObject(rcaBundle);
+            Describer describer = new Describer(rcaBundle);
+            context.commitTransaction();
+            objectCount++;
+          }
+
+        }
+      }
+      //context.commitTransaction();
+      taskResult.addMessage("RCA || Total RCA roles created: " + objectCount);
+      if (!existingRoles.isEmpty())
+      {
+        taskResult.addMessage(Message.warn( "RCA || RCA roles already exists : " + existingRoles));
+        logger.warn("RCA || RCA roles already exists : " + existingRoles);
+      }
+      if (!groupsNotFoundInAD.isEmpty())
+      {
+        taskResult.addMessage(Message.warn( "RCA || RCA security groups not found in AD : " + groupsNotFoundInAD));
+        logger.warn("RCA || RCA security groups not found in AD : " + groupsNotFoundInAD);
+        taskResult.setCompletionStatus(CompletionStatus.Warning);
+      }
+    }
+    catch (GeneralException e)
+    {
+      taskResult.addMessage(Message.error( "Error:" + e.getLocalizedMessage()));
+      logger.error("RCA || Exception = " + e.getStackTrace());
+      taskResult.setCompletionStatus(CompletionStatus.Error);
+    }
+    return "RCA || Total RCA roles created: " + objectCount;
+  }
+
+  createRCARoles();
+
+
+  ]]></Source>
+</Rule>

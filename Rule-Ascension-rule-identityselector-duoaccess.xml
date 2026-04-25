@@ -1,0 +1,321 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-IdentitySelector-DUOAccess" type="IdentitySelector">
+  <Description>This rule is used to select an Identity that is related to the given Identity</Description>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The identity.
+        </Description>
+      </Argument>
+      <Argument name="roleName" type="String">
+        <Description>
+          The name of the sailpoint.object.Bundle (role) that is being selected for the Identity. 
+          If roles are not applicable to this Identity selection, this value will be void.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="success">
+        <Description>
+          True if the selection was successful; false otherwise.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+  import sailpoint.object.Application;
+  import sailpoint.object.Bundle;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.IdentityEntitlement;
+  import sailpoint.object.Link;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.api.IdentityService;
+  import sailpoint.tools.Util;
+  import java.text.SimpleDateFormat;
+  import java.util.Calendar;
+  import java.util.Date;
+
+  private boolean hasRole(Identity identity, String roleName) {
+
+    boolean hasRole = false;
+
+    Filter filter1 = Filter.ignoreCase(Filter.eq("name", "assignedRoles"));
+    Filter filter2 = Filter.ignoreCase(Filter.eq("value", roleName));
+    Filter filter3 = Filter.eq("identity", identity);
+
+    Filter andFilter = Filter.and(filter1, filter2, filter3);
+
+    IdentityEntitlement identityEntitlement = context.getUniqueObject(IdentityEntitlement.class, andFilter);
+
+    if (identityEntitlement != null) {
+
+      hasRole = true;
+
+    }
+
+    return hasRole;
+
+  }
+
+  private boolean hasAccount(Identity identity, String appName) {
+
+    boolean hasAccount = false;
+
+    IdentityService iService = new IdentityService(context);
+
+    Application app = context.getObjectByName(Application.class, appName);
+
+    if (app != null) {
+
+      List appList = new ArrayList();
+      appList.add(app);
+
+      hasAccount = iService.hasAccounts(identity, appList);
+
+    }
+
+    return hasAccount;
+
+  }
+
+  private String getEffectiveStartDate(Identity identity) {
+
+    String effectiveStartDate = "";
+
+    String hcmPrimaryAppName = "DB-Peoplesoft-HCM-Primary";
+    String hcmPrimaryEffDt = "EFFDT";
+
+    if (hasAccount(identity, hcmPrimaryAppName)) {
+
+      Application app = context.getObjectByName(Application.class, hcmPrimaryAppName);
+
+      if (app != null) {
+
+        IdentityService iService = new IdentityService(context);
+
+        List links = iService.getLinks(identity, app);
+
+        if (links != null && !links.isEmpty()) {
+
+          Link link = links.get(0);
+
+          if (link != null && link.getAttribute(hcmPrimaryEffDt) != null) {
+
+            effectiveStartDate = link.getAttribute(hcmPrimaryEffDt);
+
+            Date dateObject = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss a zzz").parse(effectiveStartDate);
+
+            effectiveStartDate = new SimpleDateFormat("yyyy-MM-dd").format(dateObject);
+
+          }
+
+        }
+
+      }
+
+    } else if (identity.getAttribute("hireDate") != null) {
+
+      effectiveStartDate = identity.getAttribute("hireDate");
+
+    }
+
+    return effectiveStartDate; //Expected output: yyyy-MM-dd or empty
+
+  }
+
+  private Date stringToDate(String effectiveStartDate) {
+
+    Date date = new Date();
+
+    if (Util.isNotNullOrEmpty(effectiveStartDate)) { //Expected input: yyyy-MM-dd
+
+      Date dateObject = new SimpleDateFormat("yyyy-MM-dd").parse(effectiveStartDate);
+
+      effectiveStartDate = new SimpleDateFormat("MM/dd/yyyy").format(dateObject);
+
+      date = Util.stringToDate(effectiveStartDate);
+
+    }
+
+    return date;
+
+  }
+
+  private int getDaysUntilEffectiveStartDate(Date effectiveStartDateObj) {
+
+    /*
+        Example: IF today/now is 03/13/2024
+                 AND effectiveStartDate is 03/10/2024
+                 THEN return = -3
+
+                 IF today/now is 03/13/2024
+                 AND effectiveStartDate is 03/16/2024
+                 THEN return = 3
+    */
+
+    Calendar calendar = Calendar.getInstance();
+    Date now = calendar.getTime();
+
+    return Util.getDaysDifference(effectiveStartDateObj, now);
+
+  }
+
+  private String getPrincipalName(Identity identity) {
+
+    IdentityService iService = new IdentityService(context);
+
+    QueryOptions ops = new QueryOptions();
+    ops.addFilter(Filter.eq("type","Active Directory - Direct"));
+
+    List adApps = context.getObjects(Application.class, ops);
+
+    List links = iService.getLinks(identity, adApps, null);
+    String samAccountName = identity.getAttribute("samAccountName");
+    boolean managerStatus = identity.getManagerStatus();
+    Date whenCreated = identity.getCreated();
+    String type = identity.getType();
+
+    Date logicStartsAt = new Date(new Long("1695168000000")); //Only Identities Created After This UNIX Time Should Be Considered.
+
+    //Check 1 - Proceed when samAccountName is populated; managerStatus is true; Identity is not inactive; and whenCreated is after logicStartsAt.
+
+    if (Util.isNotNullOrEmpty(samAccountName) && !identity.isInactive() && Util.isDateAfter(whenCreated, logicStartsAt)) {
+
+      if(links != null){
+
+        //Check 2 - Compare the samAccountName attribute of each AD link to the corresponding Identity Attribute; return msDS-PrincipalName if a match is found.
+
+        for(Link link : links){
+
+          if(link.getApplication().getType().equalsIgnoreCase("Active Directory - Direct")){
+
+            if(link.getAttribute("sAMAccountName").equalsIgnoreCase(samAccountName)){
+
+              String principalName = link.getAttribute("msDS-PrincipalName");
+              String ea6 = link.getAttribute("extensionAttribute6");
+              String ea40 = link.getAttribute("msExchExtensionAttribute40");
+
+
+
+              if (Util.isNotNullOrEmpty(principalName) && Util.isNotNullOrEmpty(ea6) && Util.isNotNullOrEmpty(ea40)  && !Util.nullSafeContains("Gal_Sync,365_Full_Contractor,365_Lite_Contractor",ea6)) {
+
+                return principalName;
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+    return "";
+
+  }
+
+  private void netBiosAdjustment(String netBios) {
+
+    //Adjust Complex Domain NetBIOS to Common Ministry Identifier
+
+    if (Util.nullSafeCaseInsensitiveEq(netBios, "CRITTENTON-NET")) {
+
+      super.netBios = "MIROC";
+
+    }
+
+    if (Util.nullSafeCaseInsensitiveEq(netBios, "MEDXCELFM")) {
+
+      super.netBios = "AHMFM";
+
+    }
+
+    if (Util.nullSafeCaseInsensitiveEq(netBios, "VCHS_NT_DOMAIN")) {
+
+      super.netBios = "KSWIC";
+
+    }
+
+  }
+
+  private boolean shouldReceiveDuoAccess(String principalName) {
+
+    //Get everything before the backslash in the msDS-PrincipalName to determine NetBIOS of Domain.
+
+    netBios = principalName.replaceAll("\\\\.*.","");
+
+    if (Util.isNotNullOrEmpty(netBios)) {
+
+      netBiosAdjustment(netBios);
+
+      if (roleName.contains(netBios)) {
+
+        //roleName of Duo Roles should contain the NetBIOS value of the relevant domain; further conditional checks are not needed here, as they are covered by the getPrincipalName(Identity identity) method.
+
+        return true;
+
+      } 
+
+    }
+
+    return false;
+
+  }
+
+  static String netBios;
+
+  String principalName = getPrincipalName(identity);
+
+  if (Util.isNotNullOrEmpty(principalName)) {
+
+    if (hasRole(identity, roleName)) { //Identity already has role; no need to evaluate effective start date
+
+      return shouldReceiveDuoAccess(principalName);
+
+    } else {
+
+      //Check 3 - Determine if effective start date of Identity is within 3 days of current date
+
+      String effectiveStartDate = getEffectiveStartDate(identity);
+
+      if (Util.isNotNullOrEmpty(effectiveStartDate)) {
+
+        Date effectiveStartDateObj = stringToDate(effectiveStartDate);
+
+        if (effectiveStartDateObj != null) {
+
+          int daysUntilEffectiveStartDate = getDaysUntilEffectiveStartDate(effectiveStartDateObj);
+
+          if (daysUntilEffectiveStartDate <= 3) {
+
+            return shouldReceiveDuoAccess(principalName);
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+  return false;
+  ]]></Source>
+</Rule>
