@@ -1,0 +1,236 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application connector="sailpoint.connector.DelimitedFileConnector" featuresString="DIRECT_PERMISSIONS, NO_RANDOM_ACCESS, DISCOVER_SCHEMA" icon="enterpriseIcon" name="TNNAS - Pyxis ES-St Hickman" type="DelimitedFile">
+  <AccountCorrelationConfig>
+    <Reference class="sailpoint.object.CorrelationConfig" name="Ascension-Pyxis-ES-Correlation"/>
+  </AccountCorrelationConfig>
+  <Attributes>
+    <Map>
+      <entry key="PassphraseForPrivateKey"/>
+      <entry key="PrivateKeyFilePath"/>
+      <entry key="acceleratorPackEnabled"/>
+      <entry key="accountCorrelationAttrExpression"/>
+      <entry key="accountCreateConditionalRule"/>
+      <entry key="accountCreateEntitlements"/>
+      <entry key="accountDisableAttrExpression"/>
+      <entry key="accountLockAttrExpression"/>
+      <entry key="acctAggregationEnd">
+        <value>
+          <Date></Date>
+        </value>
+      </entry>
+      <entry key="acctAggregationStart">
+        <value>
+          <Date></Date>
+        </value>
+      </entry>
+      <entry key="additionalAppBusApprovalRule"/>
+      <entry key="additionalAppBusApprovers"/>
+      <entry key="afterProvisioningRule"/>
+      <entry key="apAdditionalApplicationAfterProvisioningRule"/>
+      <entry key="apAdditionalApplicationCorrelationRule"/>
+      <entry key="apAdditionalApplicationCreationRule"/>
+      <entry key="apAdditionalApplicationCustomizationRule"/>
+      <entry key="apAdditionalApplicationMCustomizationRule"/>
+      <entry key="apAdditionalApplicationMGroupRefreshRule"/>
+      <entry key="apAdditionalApplicationPreIterateRule"/>
+      <entry key="apAfterMoverJoiner">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="apAfterRehireAttrSync">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="apAttributeSyncEligibleRule"/>
+      <entry key="apBeforeMoverAttrSync">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="apPopulationReverseLeaverOptions"/>
+      <entry key="appBusApprovalRule"/>
+      <entry key="appBusApprovers"/>
+      <entry key="ascBusinessApplication" value="TNNAS - Pyxis ES-St.Hickman"/>
+      <entry key="authoritativeEmployee"/>
+      <entry key="authoritativeNonEmployee"/>
+      <entry key="beforeProvisioningRule"/>
+      <entry key="beforemoverPrimaryaccount">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="birthrightEntAttrExpression"/>
+      <entry key="busApp">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="commentsAttr"/>
+      <entry key="commentsValue"/>
+      <entry key="compositeDefinition"/>
+      <entry key="delimiter" value=","/>
+      <entry key="displayFormRule"/>
+      <entry key="evaluateCreateprovpolicy"/>
+      <entry key="file" value="%%ASC_PYXIS_ES_Hickman_FILE_PATH%%"/>
+      <entry key="filetransport" value="local"/>
+      <entry key="filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="ftpsAuthMethod" value="password"/>
+      <entry key="ftpsClientCertificateFilePath"/>
+      <entry key="ftpsClientCertificatePassphrase"/>
+      <entry key="group.filetransport" value="local"/>
+      <entry key="group.filterEmptyRecords">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="group.partitionMode" value="auto"/>
+      <entry key="hardPolicyviolations"/>
+      <entry key="hasHeader">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="isCaseInsensitiveMerge">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="isSortedByIndexColumn">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="joinerEnabled"/>
+      <entry key="joinerPopulationRegex"/>
+      <entry key="joinerRoles"/>
+      <entry key="mergeRows">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="moveAccountContainer"/>
+      <entry key="moverExtendedRule"/>
+      <entry key="moverProcess" value="Do Nothing"/>
+      <entry key="moverRevocation" value="Do Nothing"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="parseType" value="delimited"/>
+      <entry key="partitionMode" value="auto"/>
+      <entry key="port"/>
+      <entry key="primarySyncaccounts">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="primarypasswordSyncaccounts">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="privilegedAccountAttrExpression"/>
+      <entry key="privilegedEntAttrExpression"/>
+      <entry key="rehireExtendedRule"/>
+      <entry key="rehirePrimaryaccount">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="rehireProcess" value="Do Nothing"/>
+      <entry key="removeEntitlementLeaverExceptionExpression"/>
+      <entry key="renameLDAPaccount">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="requestorFormRole"/>
+      <entry key="reverseTerminationExtendedRule"/>
+      <entry key="reverseleaverProcess" value="Do Nothing"/>
+      <entry key="scramblePasswordAttr"/>
+      <entry key="sftpAuthMethod" value="password"/>
+      <entry key="skipSupervisorApproval"/>
+      <entry key="snowAssignmentGroup"/>
+      <entry key="snowAssignmentGroupName" value="TNNAS/APP/Pyxis ES Provisioning/Hickman"/>
+      <entry key="softPolicyviolations"/>
+      <entry key="stopIfLineHasWrongColumnLength">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="DelimitedFile Template"/>
+      <entry key="terminationExtendedRule"/>
+      <entry key="terminationProcess" value="Do Nothing"/>
+      <entry key="xDays"/>
+      <entry key="xDeleteDays"/>
+    </Map>
+  </Attributes>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <ProvisioningForms>
+    <Form name="TNNAS - Pyxis ES-St.Hickman" objectType="account" type="Create">
+      <Attributes>
+        <Map>
+          <entry key="pageTitle" value="TNNAS - Pyxis ES-St.Hickman"/>
+          <entry key="title" value="TNNAS - Pyxis ES-St.Hickman"/>
+        </Map>
+      </Attributes>
+      <Description>TNNAS - Pyxis ES-St.Hickman</Description>
+      <Section name="Section 1">
+        <Field displayName="UserName" name="userName" type="string">
+          <Script>
+            <Source>return identity.getName();</Source>
+          </Script>
+        </Field>
+      </Section>
+    </Form>
+  </ProvisioningForms>
+  <Schemas>
+    <Schema displayAttribute="userName" identityAttribute="userName" nativeObjectType="account" objectType="account" permissionsRemediationModificationType="None">
+      <AttributeDefinition name="userName" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="firstName" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="lastName" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="email" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="phone" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="manager" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition multi="true" name="role" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+      <AttributeDefinition multi="true" name="areas" type="string">
+        <Description></Description>
+      </AttributeDefinition>
+    </Schema>
+  </Schemas>
+  <ApplicationScorecard/>
+</Application>
