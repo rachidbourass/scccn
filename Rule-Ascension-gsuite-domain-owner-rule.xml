@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Gsuite-Domain-Owner-Rule" type="Owner">
+  <Description>Owner Rules are used by provisioning policies to determine the owner of the provisioning policy or its policy fields.</Description>
+  <Signature returnType="Object">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+          The Identity object being provisioned.
+        </Description>
+      </Argument>
+      <Argument name="role">
+        <Description>
+          The Role object involved in the provisioning processed.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The Application object being provisioned.
+        </Description>
+      </Argument>
+      <Argument name="template">
+        <Description>
+          The Template object that defines the provisioning plan.
+        </Description>
+      </Argument>
+      <Argument name="field">
+        <Description>
+          The Field object being processed.
+        </Description>
+      </Argument>
+      <Argument name="requester">
+        <Description>
+          The name of the user requesting the provisioning.
+        </Description>
+      </Argument>
+      <Argument name="identityName">
+        <Description>
+          The name of the Identity object being provisioned.
+        </Description>
+      </Argument>
+      <Argument name="source">
+        <Description>
+          The Application the object was aggregated from.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan object on its way to the Connector
+        </Description>
+      </Argument>
+      <Argument name="accountRequest">
+        <Description>
+          The account request. If an account request is not applicable, the value will be null.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="identity">
+        <Description>
+          Either the Identity of the owner, or the type of template used to
+          define the provisioning policy, from which the owner can be determined.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[import sailpoint.object.Identity;
+import sailpoint.tools.Util;
+
+if (requester != void && Util.isNotNullOrEmpty(requester)) {
+
+   return requester;
+
+} else {
+
+   return application.getOwner().getName();
+
+}]]></Source>
+</Rule>

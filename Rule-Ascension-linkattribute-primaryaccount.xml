@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-LinkAttribute-PrimaryAccount" type="LinkAttribute">
+  <Description>This rule is used when promoting account attributes from Links during aggregation.</Description>
+  <Signature returnType="Object">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="environment">
+        <Description>
+          The optional arguments passed from the task executor, if the rule is running within a task.
+        </Description>
+      </Argument>
+      <Argument name="link">
+        <Description>
+          The Link whose attribute is being promoted.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="value">
+        <Description>
+          An Object to be used as the attribute value.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+  import sailpoint.tools.Util;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+  import java.text.SimpleDateFormat;
+  
+  //Checking for amitaPrimaryAD value
+  if (link.getIdentity() != null) {
+    
+    Identity identity = link.getIdentity();
+    String amitaPrimaryAD = identity.getAttribute("amitaPrimaryAD");
+    String ministry = identity.getAttribute("ministry");
+    
+    if (Util.nullSafeCaseInsensitiveEq(ministry,"AMITA Health")) { //Restrict Nested Logic to AMITA Identities
+      
+      if (Util.isNotNullOrEmpty(amitaPrimaryAD)) {
+        
+        String displayName = link.getDisplayableName();
+        
+        if (Util.nullSafeCaseInsensitiveEq(amitaPrimaryAD, displayName)) {
+          
+          return true;
+
+        }
+        else if (!Util.nullSafeCaseInsensitiveEq(amitaPrimaryAD, displayName)) { //If this resolves to true on all of an individual Identities links, it will have no primary AD account!
+          
+          return false;
+
+        }
+
+      } else if (Util.isNullOrEmpty(amitaPrimaryAD)) 
+	  
+        return false;
+		
+      }
+
+    }
+
+  boolean iiqDisabled = false;
+  if(link.getAttribute("IIQDisabled")!=null){
+    if(link.getAttribute("IIQDisabled") instanceof String)
+      iiqDisabled = Boolean.valueOf(link.getAttribute("IIQDisabled"));
+    else
+      iiqDisabled = link.getAttribute("IIQDisabled");
+  }
+  //if account is disabled not primary account
+  if(iiqDisabled)
+    return false;
+
+  //Checking for mail attribute
+  String email = link.getAttribute("mail");
+  if(Util.isNotNullOrEmpty(email)){
+	return true;
+  }
+  
+  return false;
+]]></Source>
+</Rule>

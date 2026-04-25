@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Rule-Admin-Rehire-TriggerRehireWorkflow">
+  <Description>
+    Rule to Retrigger failed rehire workflow
+  </Description>
+  <Source> <![CDATA[
+  import sailpoint.tools.Util;
+  import sailpoint.object.Identity; 
+  import sailpoint.object.Custom;
+  import sailpoint.object.SailpointContext;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.object.WorkflowLaunch;
+  import sailpoint.api.Workflower;
+  import sailpoint.object.TaskResult;
+  import sailpoint.tools.Message;
+  import java.util.regex.Matcher;
+  import java.util.regex.Pattern;
+  import org.ascn.utils.QueryUtils;
+
+
+  String logName = "Rule-Admin-Rehire-TriggerRehireWorkflow";
+
+  public String launchWorkflowToTriggerRehire(String identityName, Map inputMap){
+    
+    String requestName = "";
+    
+    try
+    {
+      WorkflowLaunch wfl = new WorkflowLaunch();
+      wfl.setWorkflowRef("Ascension-Workflow-Persona-Rehire-Process");
+      wfl.setLauncher(context.getUserName()); 
+
+      requestName = "Ascension-Workflow-Persona-Rehire-Process" + " FOR " + identityName;
+
+      wfl.setCaseName(requestName);
+
+      Map wfArgsMap =  new HashMap();
+      wfArgsMap.put("identityName", identityName);
+      wfArgsMap.put("inputMap", inputMap);
+
+      wfl.setVariables(wfArgsMap);
+      Workflower wf = new Workflower(context);
+      try 
+      {
+        wf.launch(wfl);
+      } 
+      catch (GeneralException ex) 
+      {
+        error(logName, "Exception in launchWorkflowToResendEmailNotification method: " + ex);
+      }
+    }
+    catch(Exception ex)
+    {
+      error(logName, "Exception in launchWorkflowToResendEmailNotification method: " + ex);
+    }
+    
+    return requestName;
+
+  }
+
+  public Map findValuesUsingRegex(String regex, String message){
+    Map outputMap = new HashMap();
+    Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+    Matcher matcher = pattern.matcher(message);
+
+    if(matcher.find()){
+      outputMap.put("oldValue", matcher.group(1));
+      outputMap.put("newValue", matcher.group(2));
+    }
+    return outputMap;
+  }
+
+  public Map getInputFromTaskResult(TaskResult failedTaskResult, Map basicIdentity){
+
+    Map inputMap = new HashMap();
+
+    String old_type = "";
+    String new_type = "";
+    String old_employee_class = "";
+    String new_employee_class = "";
+    String old_gsuite_status = "";
+    String new_gsuite_status = ""; 
+
+    if(failedTaskResult != null){
+
+      List messages = failedTaskResult.getMessages();
+
+      for(Message messageMap : messages){
+
+        String message = messageMap.getKey();
+
+        if(message.contains("Old Type")){
+
+          String regex = "Old Type: (.*?) New Type: (.*?)$";
+          Map outputMap = findValuesUsingRegex(regex, message);
+          old_type = outputMap.get("oldValue");
+          new_type= outputMap.get("newValue");
+
+        } else if(message.contains("Old Employee Class")){
+
+          String regex = "Old Employee Class: (.*?) New Employee Class: (.*?)$";
+          Map outputMap = findValuesUsingRegex(regex, message);
+          old_employee_class = outputMap.get("oldValue");
+          new_employee_class= outputMap.get("newValue");
+
+        } else if(message.contains("Old GSuite Status:")){
+
+          String regex = "Old GSuite Status: (.*?) New GSuite Status: (.*?)$";
+          Map outputMap = findValuesUsingRegex(regex, message);
+          old_gsuite_status = outputMap.get("oldValue");
+          new_gsuite_status= outputMap.get("newValue");
+
+        }
+
+      }
+    }
+
+    if(!Util.isEmpty(old_employee_class) && !Util.isEmpty(new_employee_class)){
+      new_type = basicIdentity.get("type");
+    }
+
+    inputMap.put("new_type", new_type);
+    inputMap.put("old_type", old_type);
+
+    inputMap.put("new_employee_class", new_employee_class);
+    inputMap.put("old_employee_class", old_employee_class);
+
+    inputMap.put("new_gsuite_status", new_gsuite_status);
+    inputMap.put("old_gsuite_status", old_gsuite_status);
+
+    return inputMap;
+  }
+
+  String failedTaskResultName = "";
+  String identityName = "";
+  List errorMessages = new ArrayList();
+  Map basicIdentity = new HashMap();
+  TaskResult failedTaskResult;
+
+  if (null != config && config instanceof Map && !config.isEmpty()) {
+    failedTaskResultName = config.get("taskResultName");
+    identityName = config.get("identityName");
+  }
+
+  if(Util.isNotNullOrEmpty(identityName)){
+    
+    taskResult.setAttribute("rehiredIdentityName", identityName);
+
+    basicIdentity = QueryUtils.getBasicIdentity(identityName);
+
+    if(Util.isEmpty(basicIdentity)){
+      
+      errorMessages.add("Identity object not found: " + identityName);
+      
+    }
+
+  } else{
+
+    errorMessages.add("Please input a valid Identity Name");
+  }
+
+  if(Util.isNotNullOrEmpty(failedTaskResultName)){
+    
+    taskResult.setAttribute("failedTaskResultName", failedTaskResultName);
+
+    failedTaskResult = context.getObjectByName(TaskResult.class, failedTaskResultName);
+
+    if(failedTaskResult == null){
+
+      errorMessages.add("Task Result object not found: " + failedTaskResultName);
+
+    } else if(!failedTaskResultName.contains("Rehire") && !failedTaskResultName.contains("Reenable")){
+      
+      errorMessages.add("Check the Task Result Name: " + failedTaskResultName);
+      
+    } else if(!failedTaskResult.getCompletionStatus().isEqual("Error")){
+
+      errorMessages.add("The given Task Result was not a failure");
+
+    }
+
+  } else{
+
+    errorMessages.add("Please input a valid Task Result Name");
+
+  }
+
+  if(Util.isEmpty(errorMessages)){
+
+    Map inputMap = getInputFromTaskResult(failedTaskResult, basicIdentity);
+
+    String requestName = launchWorkflowToTriggerRehire(identityName, inputMap); //launches the rehire workflow and returns the request name
+    
+    requestName = "Launched workflow " + requestName;
+    
+    taskResult.setAttribute("message", requestName);
+
+  } else {
+
+    taskResult.setAttribute("errorMessages", errorMessages);
+
+  }
+
+  ]]></Source>
+</Rule>

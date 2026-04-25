@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Invision-AfterProvisioning-Rule" type="AfterProvisioning">
+  <Description>An IdentityIQ server-side rule that is executed after the connector's provisioning method is called. This gives the customer the ability to customize or react to anything in the ProvisioningPlan AFTER it has been sent out to the specific applications. 
+
+This rule will be called for any application found in a plan that also has a configured 'afterProvisioningRule' configured.</Description>
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan object on its way to the Connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application object that references this before/after script.
+        </Description>
+      </Argument>
+      <Argument name="result">
+        <Description>
+          The ProvisioningResult object returned by the connectors provision method. This can be null and in many cases the connector will  not return a result and instead will annotate the plan's ProvisioningResult either at the plan or account level.        
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[ 
+import sailpoint.api.Workflower;
+import sailpoint.object.Attributes;
+import sailpoint.object.Application;
+import sailpoint.object.Identity;
+import sailpoint.object.Link;
+import sailpoint.object.ProvisioningPlan;
+import sailpoint.object.ProvisioningPlan.AbstractRequest;
+import sailpoint.object.ProvisioningPlan.AccountRequest;
+import sailpoint.object.ProvisioningPlan.AccountRequest.Operation;
+import sailpoint.object.ProvisioningPlan.AttributeRequest;
+import sailpoint.object.ProvisioningResult;
+import sailpoint.object.QueryOptions;
+import sailpoint.object.Workflow;
+import sailpoint.tools.Util;
+import org.apache.log4j.Logger;
+import sailpoint.object.IdentityEntitlement;
+import sailpoint.object.IdentityRequestItem;
+import sailpoint.object.Filter;
+import sailpoint.object.QueryOptions;
+import sailpoint.object.IdentityEntitlement.AggregationState;
+
+Logger refLogger = Logger.getLogger("sailpoint.ascension.rules.afterProvisioning.Invision");
+
+refLogger.debug("Entering AfterProvisioning For Invision");
+
+if(plan != null) {
+
+    refLogger.trace("plan is NOT NULL - Proceeding...");
+	refLogger.debug("Printing Plan in AfterProvisioning rule: "+ plan.toXml());
+	
+    Identity refIdentity = plan.getIdentity();
+    String identityName = refIdentity.getName();
+	
+	refLogger.debug("AfterProvisioning rule IdentityName: "+ identityName);
+
+    String samAccountName = refIdentity.getAttribute("samAccountName");
+
+    String appName = application.getName(); 
+
+    //get identity entitlement 
+	
+	QueryOptions ops = new QueryOptions();
+	ops.addFilter(Filter.eq("application.name", "Invision"));
+	ops.addFilter(Filter.eq("identity.name", identityName));
+	ops.addFilter(Filter.eq("aggregationState", "Disconnected"));
+	
+	List identityEntitlements = context.getObjects(IdentityEntitlement.class, ops);
+	
+	if (identityEntitlements !=null && identityEntitlements.size() > 0 ) {
+		//check if identityEntitlement is correlated
+		refLogger.debug("Disconnected Entitlements: "+ identityEntitlements.size());
+		
+		for (IdentityEntitlement idEntitlement : identityEntitlements) {
+			idEntitlement.setAggregationState(IdentityEntitlement.AggregationState.Connected);
+			idEntitlement.setAssigned(true);
+			context.saveObject(idEntitlement);
+			refLogger.debug("After setting idEntitlement aggregation state: "+ idEntitlement.getAggregationState().toString());
+			refLogger.debug("Assigned: "+ idEntitlement.isAssigned());
+		}	
+	}
+	
+	context.commitTransaction();
+	
+	
+	
+} else {
+
+    refLogger.trace("plan is NULL - END");
+
+}
+
+refLogger.trace("Exiting AfterProvisioning For Invision");
+  ]]></Source>
+</Rule>

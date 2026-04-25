@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-ADMIN-DeleteWorkItems">
+  <Source><![CDATA[
+
+	import sailpoint.object.Filter;
+	import sailpoint.object.Link;
+	import sailpoint.object.QueryOptions;
+	import sailpoint.tools.GeneralException;
+	import sailpoint.api.SailPointContext;
+	import sailpoint.api.Terminator;
+  import sailpoint.object.WorkItem;
+  import sailpoint.object.WorkflowCase;
+	import java.util.ArrayList;
+	
+  import sailpoint.api.ObjectUtil;
+  import java.text.DateFormat;
+  import java.text.SimpleDateFormat;
+  import java.util.Calendar;
+
+ 
+	QueryOptions qo = new QueryOptions();
+  List workitemIds=new ArrayList();
+  List workflowCaseIds=new ArrayList();
+
+  qo.addFilter(Filter.like("description","Complete provisioning form for"));
+  for(WorkItem wi: context.getObjects(WorkItem.class, qo)){
+   
+    if(wi.getOwner()!=null && wi.getOwner().getName().equalsIgnoreCase("IDM Team")){ 
+      
+      workflowCaseIds.add(wi.getWorkflowCase().getId());
+      
+    }
+  }
+ 
+  boolean simulation = false;
+
+ // String workflowCaseName = "QuickLink Launch for identity spadmin";
+
+  // Set this Ineteger to the days how long workflowCases should be kept. ex.: 1 = delete all WFCases older than 1 day !
+
+  int daysGapToDelete = 0;
+
+  int countDeletedWorkflows = 0;
+
+  Map keepCaseMap = new HashMap();
+
+  Terminator term = new Terminator(context);
+
+  // Now minus gap days
+
+  Calendar cal = new GregorianCalendar();
+
+  cal.add(Calendar.DATE, -daysGapToDelete);
+
+  Date cutOffDate = cal.getTime();
+
+  for(String id:workflowCaseIds){
+
+    WorkflowCase wfCase = context.getObject(WorkflowCase.class, id);
+    
+    if(wfCase != null){      
+
+      // Delete everything
+
+      if(!keepCaseMap.containsValue(wfCase.getId()) && !simulation){
+
+        term.deleteObject(wfCase);
+
+        countDeletedWorkflows++;
+
+      }
+
+    }else{
+
+     // workflowcase is null
+
+    }
+
+    if(!simulation){
+
+      // if (countDeletedWorkflows % 30 == 0) {    // optimize performance
+
+      context.commitTransaction();
+
+      //}
+
+    }else{
+
+      //Simulation is true --> no commits
+
+    }
+   
+    if((countDeletedWorkflows % 20) == 0) {
+      context.decache();
+    }
+    
+  }
+
+  if(!simulation){
+
+    context.commitTransaction();
+
+  }else{
+
+    //Simulation is true --> no commits
+
+  }
+
+  return "done --> deleted --> " + countDeletedWorkflows;
+	return "Success";
+  
+]]></Source>
+</Rule>

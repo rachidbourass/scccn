@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-AMITA-InternalID-correction-Task-Rule">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Persona-Management-RuleLibrary"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+  import sailpoint.tools.Util;
+
+  import sailpoint.object.Identity;
+
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.commons.logging.Log;
+
+
+  public String regenerateInternalID( String identityName ){
+
+    logger.info( "Enter regenerateInternalID() method for: " +identityName );
+
+    String internalID;
+    String identityPersona;
+    String oldInternalID;
+
+    List childPersonaList = new ArrayList();
+
+    Identity identity;
+
+    if( identityName != null && !identityName.isEmpty() ){
+
+      identity = context.getObjectByName( Identity.class, identityName );
+
+      if( identity != null ){
+
+        //Check if identity is parent or child persona
+        identityPersona = identity.getAttribute( "personaType" );
+
+        if( "Primary".equalsIgnoreCase( identityPersona ) ){
+
+          oldInternalID = identity.getAttribute( "internalId" );
+
+          //Generate a new unique internal ID and set on parent identity
+          internalID = generateNextSailpointInternalIdentifier();
+          internalID = checkDuplicateGenerateNewInternalID( internalID );
+
+          identity.setAttribute( "internalId", internalID );
+          context.saveObject( identity );
+          context.commitTransaction();
+
+          //update the child personas with the correct ID
+          childPersonaList = identity.getAttribute( "childPersonas" );
+          if( !Util.isEmpty( childPersonaList ) ){
+
+            try{
+
+              updateParentPersonaAttributesInSecondaryIdentities( childPersonaList, identityName );
+
+            } catch(Exception e){
+
+              logger.error( "Exception occured while updating child identities with parent SID" );
+              //Roll back to old ID
+              internalID = oldInternalID;
+
+              identity.setAttribute( "internalId", oldInternalID );
+              context.saveObject( identity );
+              context.commitTransaction();
+            }
+          } else {
+
+            logger.error( "child persona list is empty for: " +identityName );
+          }
+
+        } else if( "Child".equalsIgnoreCase( identityPersona ) ){
+
+          oldInternalID = identity.getAttribute( "internalId" );
+
+          //Generate a new unique internal ID and set on parent identity
+          internalID = generateNextSailpointInternalIdentifier();
+          internalID = checkDuplicateGenerateNewInternalID( internalID );
+
+          identity.setAttribute( "internalId", internalID );
+          context.saveObject( identity );
+          context.commitTransaction();
+
+          //Update the identity's internalID on the parent persona
+          String parentIdentityName = identity.getAttribute( "parentPersonaName" );
+          Identity parentIdentity = context.getObjectByName( Identity.class, parentIdentityName );
+
+          if( parentIdentity != null ){
+            childPersonaList = parentIdentity.getAttribute( "childPersonas" );
+
+            if( !Util.isEmpty( childPersonaList ) ){
+              try{
+                childPersonaList.remove( oldInternalID );
+                childPersonaList.add( internalID );
+
+                parentIdentity.setAttribute( "childPersonas", childPersonaList );
+                context.saveObject( parentIdentity );
+                context.commitTransaction();
+
+              } catch( Exception e ){
+
+                logger.error( "Exception occured while updating new child internalID in the parent persona." );
+                //Roll back to Old ID
+                internalID = oldInternalID;
+
+                identity.setAttribute( "internalId", oldInternalID );
+                context.saveObject( identity );
+                context.commitTransaction();
+              }
+
+            } else {
+
+              logger.error( "child persona list is empty for: " +parentIdentityName+ ". Adding child to the list." );
+
+              childPersonaList.add( internalID );
+              parentIdentity.setAttribute( "childPersonas", childPersonaList );
+              context.saveObject( parentIdentity );
+              context.commitTransaction();	
+            }
+          }
+        }
+      }
+    }
+
+    logger.info( "Exit regenerateInternalID() method" );
+
+    return internalID;
+  }
+
+  Log logger = LogFactory.getLog("Ascension-Rule-AMITA-InternalID-correction-Task-Rule");
+  logger.info( "Enter Ascension-Rule-AMITA-InternalID-correction-Task-Rule" );
+
+  List identityNameList = new ArrayList(Arrays.asList( "SUTCI401" ));
+  List resultList = new ArrayList();
+  String newInternalID;
+
+  for( String identityName : identityNameList ){
+
+    newInternalID = null;
+    logger.debug( "Processing identity: " +identityName );
+
+    try{
+
+      newInternalID = regenerateInternalID( identityName );
+      resultList.add( "Successfully updated: " +identityName+ " with InternalID: " +newInternalID );
+      logger.debug( "New Internal ID generated for: " +identityName+ "as: " +newInternalID );
+
+    }catch( Exception e ){
+
+      resultList.add( "Failed to update: " +identityName );
+      logger.error( "Exception occured for" +identityName );
+    }
+  }
+
+  logger.info( "Exit Ascension-Rule-AMITA-InternalID-correction-Task-Rule" );
+  return resultList;
+
+  ]]></Source>
+</Rule>

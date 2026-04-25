@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-ADMIN-Replay-AccessRequest">
+  <Source><![CDATA[
+	import sailpoint.object.*;
+    import sailpoint.api.*;
+    import sailpoint.tools.*;
+  	import sailpoint.server.*;
+    import sailpoint.workflow.*;
+	
+	
+	public void scheduleWorkflow(String workflowName, String caseName, long startTime, Attributes wfArgs, String requesterId){    
+      
+		if (null == caseName || "".equals(caseName.trim())){
+			caseName     = "Run " + workflowName;       
+		}
+
+		Workflow eventWorkflow = context.getObject(Workflow.class, workflowName);
+		if (null == eventWorkflow) {
+		 System.out.println("Could not find a workflow named: " + workflowName);
+		 throw new GeneralException("Invalid worklfow: " + workflowName);
+		}
+
+		// Simulate the request being submitted by a user. Default: spadmin.
+		Identity id = context.getObjectByName(Identity.class, requesterId);
+		if (null == id) {
+		 System.out.println("Could not find a requester Identity: " + requesterId);
+		 throw new GeneralException("Invalid identity: " + requesterId);
+		}
+
+
+
+		// Build out a map of arguments to pass to the Request Scheduler.
+		Attributes reqArgs = new Attributes();
+		reqArgs.put(StandardWorkflowHandler.ARG_REQUEST_DEFINITION,sailpoint.request.WorkflowRequestExecutor.DEFINITION_NAME);
+		reqArgs.put(sailpoint.workflow.StandardWorkflowHandler.ARG_WORKFLOW,workflowName);
+		reqArgs.put(sailpoint.workflow.StandardWorkflowHandler.ARG_REQUEST_NAME,caseName);
+    reqArgs.put( "requestName", caseName );            
+
+		wfArgs.put("workflow", eventWorkflow.getName());
+
+		reqArgs.putAll(wfArgs);
+
+		// Use the Request Launcher to schedule the workflow reqeust.  This requires
+		// a Request object to store the properties of the request item.
+		Request req = new Request();
+		RequestDefinition reqdef = context.getObject(RequestDefinition.class, "Workflow Request");
+    reqdef.setDescription("Replayed Previous AccessRequest ID: "+requesterId);
+    //reqdef.setExtended1("Replayed Previous AccessRequest ID: "+requesterId);
+		req.setDefinition(reqdef);
+		req.setEventDate( new Date(startTime));
+		req.setOwner(id);
+		req.setName(caseName);
+		req.setAttributes( reqdef, reqArgs );
+   // req.setString1("Replayed Previous AccessRequest ID: "+requesterId);
+
+		// Schedule the work flow via the request manager.
+		RequestManager.addRequest(context, req);    
+    }
+	
+	String workflowName="LCM Provisioning";
+	List idenReqs=new ArrayList();
+  idenReqs.add("0001312170");
+  //idenReqs.add("0001264442");
+  //idenReqs.add("0001274499");
+  //idenReqs.add("0001086482");
+  //idenReqs.add("0001086493");
+  //idenReqs.add("0001086492");
+  //idenReqs.add("0001086497");
+  //idenReqs.add("0001089975");  
+  //idenReqs.add("0000414042");  
+  
+  
+	IdentityRequest idenReq=null;
+	Identity identity=null;
+	ProvisioningPlan plan=null;
+	Attributes newWFArgs=null;
+	Date today=new Date();
+	for(String identReqNumber:idenReqs){
+		idenReq=context.getObjectByName(IdentityRequest.class,identReqNumber);
+		if(idenReq!=null){
+      
+      List plans= idenReq.getProvisionedProject().getPlans();
+      ProvisioningPlan plan=new ProvisioningPlan();
+      for(ProvisioningPlan dummyPlan:plans){
+        plan.add(dummyPlan.getAccountRequests().get(0));
+      }
+			//plan= idenReq.getProvisionedProject().getMasterPlan();	
+			identity=context.getObjectById(Identity.class,idenReq.getTargetId());
+			plan.setIdentity(identity);
+     // return plan;
+			newWFArgs = new Attributes();
+			newWFArgs.put("identityName",identity.getName());
+			newWFArgs.put("plan",plan);
+			newWFArgs.put("approvalScheme","none");
+			newWFArgs.put("notificationScheme","none");
+			newWFArgs.put("policyScheme","none");
+      newWFArgs.put("flow","Replayed Request ("+identReqNumber+")");
+			scheduleWorkflow(workflowName, null, today.getTime(), newWFArgs, "spadmin");    
+		}
+	}
+	
+	
+	
+	
+  ]]></Source>
+</Rule>

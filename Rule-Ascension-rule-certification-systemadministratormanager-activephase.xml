@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Certification-SystemAdministratorManager-ActivePhase" type="CertificationPhaseChange">
+  <Description>This rule is run when the certification either enters or leaves a phase.</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+  </ReferencedRules>
+  <Signature returnType="void">
+    <Inputs>
+      <Argument name="log" type="org.apache.commons.logging.Log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="certification">
+        <Description>
+          The sailpoint.object.Certification being certified.
+        </Description>
+      </Argument>
+      <Argument name="certificationItem">
+        <Description>
+          The sailpoint.object.CertificationItem that is being certified.
+        </Description>
+      </Argument>
+      <Argument name="previousPhase">
+        <Description>
+          Certification.Phase (may be null) that is the previous phase.
+        </Description>
+      </Argument>
+      <Argument name="nextPhase">
+        <Description>
+          Certification.Phase (may be null) that is the next phase.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+        
+        import java.util.List;
+        import sailpoint.object.Certification;
+        import sailpoint.object.CertificationEntity;
+        import sailpoint.object.CertificationItem;
+        import sailpoint.object.EntitlementSnapshot;
+        import sailpoint.object.Identity;
+
+        String logName = "Ascension.Rule.Ascension-Rule-Certification-SystemAdministratorManager-ActivePhase";
+        debug(logName,"Enter rule Ascension-Rule-Certification-SystemAdministratorManager-ActivePhase");
+        if (certification != null) {
+            try {
+                List entities = certification.getEntities();
+                for (CertificationEntity entity : entities) {
+                    String idStr = entity.getIdentity();
+                    Identity iden = context.getObjectByName(Identity.class, idStr);
+                    String managerName = "Undefined";
+                    if(iden != null && iden.getManager() != null){
+                        managerName = iden.getManager().getDisplayName();
+                    }
+                    List certItems = entity.getItems();
+                    for (CertificationItem item : certItems) {
+                        EntitlementSnapshot entitlementSnapshot = item.getExceptionEntitlements();                                                                      
+                        if (entitlementSnapshot != null ) {
+                            entitlementSnapshot.setDisplayName("Manager: "+managerName) ;
+                            //Update the value the UI uses for the Account Name column of line items within an Access Review
+                        }
+                    }
+                }
+            }catch(Exception e) {
+                error(logName,"Error while executing the rule Ascension-Rule-Certification-SystemAdministratorManager-ActivePhase",e);
+            }
+        }
+        debug(logName,"Exit rule Ascension-Rule-Certification-SystemAdministratorManager-ActivePhase");
+        
+    ]]></Source>
+</Rule>

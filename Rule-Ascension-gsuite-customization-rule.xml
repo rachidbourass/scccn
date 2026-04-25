@@ -1,0 +1,191 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-GSuite-Customization-Rule" type="ResourceObjectCustomization">
+  <Description>This rule is configured on the application and is called after the connector has build a ResourceObject from the native application data. Initially designed for non-rule based connectors to add SPPrivileged flag to an object, but could be used to do any transformations.</Description>
+  <Signature returnType="ResourceObject">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="object">
+        <Description>
+          The ResourceObject built by the connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          Application that references the connector.
+        </Description>
+      </Argument>
+      <Argument name="connector">
+        <Description>
+          The connector object.
+        </Description>
+      </Argument>
+      <Argument name="state">
+        <Description>
+          A Map containing state information.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="resourceObject">
+        <Description>
+          The updated resource object.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[import sailpoint.object.QueryOptions;
+  	import sailpoint.object.Filter;
+  	import sailpoint.object.Identity;
+    import sailpoint.object.ResourceObject;
+    import sailpoint.api.SailPointContext;
+    import org.apache.log4j.Logger;
+    import java.util.Map;
+    import java.lang.reflect.Type;
+    import com.google.gson.Gson;
+    import com.google.gson.reflect.TypeToken;
+    import org.json.simple.JSONObject;
+    import org.json.simple.JSONArray;
+    import org.json.simple.parser.JSONParser;
+	import org.json.simple.parser.ParseException;
+
+    Logger logger = Logger.getLogger("sailpoint.ascension.rules.gsuite.gal.converter");
+
+    JSONObject convertMapToJSON(Map jsonFormatMap){
+        JSONObject jsonObject = new JSONObject();
+        for(String key : jsonFormatMap.keySet()){
+            if(jsonFormatMap.get(key) != null){
+                jsonObject.put(key,jsonFormatMap.get(key)); 
+            } else{
+                jsonObject.put(key,""); 
+            }
+        }
+        return jsonObject;
+    }
+
+  JSONArray convertListToJSONArray(List jsonFormatList) {
+    
+    //Provided by SailPoint ES to resolve backwards compatibility issue - 10/17/24
+
+    JSONArray jsonArray = new JSONArray();
+
+    if (jsonFormatList != null && jsonFormatList.size() > 0) {
+
+        for (String json: jsonFormatList) {
+
+            HashMap map = new HashMap();
+            org.json.JSONObject jObject = new org.json.JSONObject(json);
+            Iterator keys = jObject.keys();
+
+            while (keys.hasNext()) {
+
+                String key = (String) keys.next();
+                String value = jObject.getString(key);
+                map.put(key, value);
+
+            }
+
+            JSONObject eachObject = convertMapToJSON(map);
+            jsonArray.add(eachObject);
+
+            return jsonArray;
+
+        }
+
+    }
+
+    return null;
+
+  }
+
+    Object locationsObject = object.getAttribute("locations");
+    if(locationsObject != null){
+        if(locationsObject instanceof List){
+            JSONArray jsonArray = convertListToJSONArray(locationsObject);
+            String jsonString = jsonArray.toString();
+            object.setAttribute("locations",jsonString);
+        }
+        else if (locationsObject instanceof Map){
+            JSONObject jsonObject = convertMapToJSON(locationsObject);
+            if(jsonObject != null){
+                String jsonString = jsonObject.toString();
+                object.setAttribute("locations",jsonString);
+            }
+        }
+    }
+    
+    Object phonesObject = object.getAttribute("phones");
+	if (phonesObject != null) {
+    try{ //Added By RS to troubleshoot - START
+		if((phonesObject instanceof List) && (!phonesObject.isEmpty())) {
+			
+			phonesObjectString = phonesObject.toString();
+			if (phonesObjectString.contains("Google Voice")) { 
+				for (int i = 0; i < phonesObject.size(); i++) {
+					if (phonesObject.get(i).contains("Google Voice")) {
+						logger.debug("phoneNumber contains googleVoice: "+ phonesObject.get(i).toString());
+						JSONParser parser = new JSONParser();
+						Object jsonObj = parser.parse(phonesObject.get(i));
+            
+						JSONObject jsonObject = (JSONObject) jsonObj;
+						String googleVoiceNumber = jsonObject.get("value");
+						
+						String primaryEmail = object.getAttribute("primaryEmail");
+						QueryOptions qo = new QueryOptions();
+						qo.addFilter(Filter.ignoreCase(Filter.eq("email",primaryEmail)));
+						List matchingIdentity = context.getObjects(Identity.class, qo);
+						
+						//There should be only one Matching Identity
+						for (Identity identity : matchingIdentity){
+							if (identity != null) {
+								String identityName = identity.getName();
+								logger.debug("Setting Google Voice Number for identity: " +identityName);
+								identity.setAttribute("googleVoiceNumber", googleVoiceNumber);
+								context.saveObject(identity);
+								logger.debug("After Setting Google Voice Number for identity: " +identityName);
+								context.commitTransaction();
+							}
+						}
+					}
+				} 
+			}
+		}
+    }catch(Exception e){
+     // log.error("ASECNSION GSUITE CUSTOM RULE ERROR: ",e);
+      throw e;
+    }
+	}
+
+    Object gsuiteObjx = object.getAttribute("includeInGlobalAddressList");
+    if(void !=gsuiteObjx && null !=gsuiteObjx){
+        String acctGal = String.valueOf(gsuiteObjx.toString().toLowerCase());
+        object.setAttribute("includeInGlobalAddressList",acctGal);
+    }
+
+ Object gsuiteObjMgrLevel = object.getAttribute("customSchemas.User_Info.Manager_Level");
+  if(void !=gsuiteObjMgrLevel && null !=gsuiteObjMgrLevel){
+    String acctMgrLevel = String.valueOf(gsuiteObjMgrLevel.toString());
+    object.setAttribute("customSchemas.User_Info.Manager_Level",acctMgrLevel);
+  }
+  Object gsuiteObjDeptID = object.getAttribute("customSchemas.User_Info.Department_ID");
+  if(void !=gsuiteObjDeptID && null !=gsuiteObjDeptID){
+    String acctDeptID = String.valueOf(gsuiteObjDeptID.toString());
+    object.setAttribute("customSchemas.User_Info.Department_ID",acctDeptID);
+  }
+  Object gsuiteObjBuisnessUnit = object.getAttribute("customSchemas.User_Info.Business_Unit");
+  if(void !=gsuiteObjBuisnessUnit && null !=gsuiteObjBuisnessUnit){
+    String acctBuisnessUnit = String.valueOf(gsuiteObjBuisnessUnit.toString());
+    object.setAttribute("customSchemas.User_Info.Business_Unit",acctBuisnessUnit);
+  }
+
+    return object;]]></Source>
+</Rule>

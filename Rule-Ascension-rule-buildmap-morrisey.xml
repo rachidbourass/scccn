@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-BuildMap-Morrisey" type="BuildMap">
+  <Description>This rule is used by the delimited file connector to build a map representation of the delimited data.</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Library-DatabaseFields"/>
+  </ReferencedRules>
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application whose data file is being processed.
+        </Description>
+      </Argument>
+      <Argument name="schema">
+        <Description>
+          The Schema currently in use.
+        </Description>
+      </Argument>
+      <Argument name="state">
+        <Description>
+          A Map containing state information.
+        </Description>
+      </Argument>
+      <Argument name="record">
+        <Description>
+          A List of data tokens parsed from the current line of the data file.
+        </Description>
+      </Argument>
+      <Argument name="cols">
+        <Description>
+          A List of the columns to use.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="map">
+        <Description>
+          A Map of the resource object assembled from the data.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import sailpoint.connector.DelimitedFileConnector;
+  import sailpoint.tools.Util;
+
+  Log logger = LogFactory.getLog("Ascension-Rule-BuildMap-Morrisey");
+
+  logger.debug("Entering Ascension-Rule-BuildMap-Morrisey"); 
+
+  Map map = DelimitedFileConnector.defaultBuildMap(cols,record);
+
+  String status = (String) map.get("Status");
+
+  if(Util.nullSafeCaseInsensitiveEq("Active",status) || Util.nullSafeCaseInsensitiveEq("Applicant",status)){
+    map.put("IIQDisabled","false");
+  } else{
+    map.put("IIQDisabled","true");
+  }
+
+  String facContact = (String) map.get("FacContact");
+
+  if(Util.isNotNullOrEmpty(facContact)){
+    Map managerMorriseyMap = state.get("managerMorriseyMap");
+    if(managerMorriseyMap == null){
+      logger.debug("managerMorriseyMap is null, hence populate it from DB");
+      managerMorriseyMap = getManagerMapFromDB();
+      state.put("managerMorriseyMap",managerMorriseyMap);
+      managerMorriseyMap = state.get("managerMorriseyMap");
+      logger.debug("managerMorriseyMap fetched :: ");
+    }
+
+
+    if(managerMorriseyMap!=null && managerMorriseyMap.get(facContact)!=null ){
+      map.put("ManagerID",managerMorriseyMap.get(facContact));
+    }else{
+      map = new HashMap();
+    }
+  }else{
+  	map =  new HashMap();
+  }
+
+
+  return map;]]></Source>
+</Rule>

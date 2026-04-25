@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="ascension-admin-update_history_items">
+  <Source><![CDATA[
+  import java.io.IOException;
+  import java.nio.file.Files;
+  import java.nio.file.Path;
+  import java.nio.file.Paths;
+  import java.util.ArrayList;
+  import java.util.Iterator;
+  import java.util.List;
+
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.CertificationAction;
+  import sailpoint.object.Filter;
+  import sailpoint.object.IdentityHistoryItem;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.WorkItem.State;
+  import sailpoint.tools.GeneralException;
+
+  Log logger = LogFactory.getLog("org.ascension.sailpoint.attestation.psattestation");
+  
+  List<IdentityHistoryItem> iiList = new ArrayList();
+  public void createFile(IdentityHistoryItem object) throws GeneralException, IOException
+  {
+    String fileSeparator = System.getProperty("file.separator");
+    String dirPath = "D:/temp/IdentityHistoriesBackup";
+    Path dirPathObj = Paths.get(dirPath);
+    boolean dirExists = Files.exists(dirPathObj);
+
+    if (dirExists)
+    {
+      System.out.println("! Directory Already Exists !    " + dirPathObj);
+    }
+    else
+    {
+      try
+      {
+        // Creating The New Directory Structure
+        Files.createDirectories(dirPathObj);
+        System.out.println("! New Directory Successfully Created !   " + dirPathObj);
+      }
+      catch (IOException ioExceptionObj)
+      {
+        System.out
+          .println("Problem Occured While Creating The Directory Structure= " + ioExceptionObj.getMessage());
+      }
+    }
+
+    String fileData = object.toXml();
+    Files.write(Paths.get(dirPathObj + fileSeparator + object.getAccount() + ".xml"), fileData.getBytes());
+  }
+
+
+  public String updateIdentityHistory() throws GeneralException, IOException
+  //public  List<IdentityHistoryItem> updateIdentityHistory() throws GeneralException, IOException
+  {
+    List historyIDList = new ArrayList();
+    historyIDList.add("0af01f3e805213ba81808f8f1ea115b8");
+    historyIDList.add("0af01f3e805213ba81808f8eb50e1438");
+    historyIDList.add("0af01f3e805213ba81808f8ea1471409");
+    historyIDList.add("0af01f3e805213ba81808f8e3f7c12c0");
+
+
+    QueryOptions query = new QueryOptions();
+    //query.add(Filter.in("id", historyIDList));
+    //query.addFilter(Filter.eq("id", "0af01f3e805213ba81808f8eb50e1438"));
+    query.addFilter(Filter.and(Filter.eq("status", "Remediated"),Filter.eq("application", "PeopleSoft Attestation")));
+    Iterator itr = context.search(IdentityHistoryItem.class, query);
+    while(itr.hasNext())
+    {
+      IdentityHistoryItem item = itr.next();
+      createFile(item);
+      CertificationAction action = item.getAction();
+      action.setRemediationCompleted(true);
+      action.setCompletionState(State.Finished);
+      iiList.add(item);
+      context.saveObject(item);
+     /* if(count >= 100)
+      {
+        context.commitTransaction();
+        count = 0;
+      }
+      count++; */
+    }
+
+    context.commitTransaction();
+    return "Successful";
+   // return iiList;
+  }
+   /*int count = 0;
+  List<IdentityHistoryItem> inList = updateIdentityHistory();
+  
+  for(IdentityHistoryItem ii : inList){
+   
+    int inSize = inList.size();
+    count++;
+    
+    if(count == 200){
+      context.saveObject(ii);
+      context.commitTransaction();
+      
+    }
+    context.saveObject(ii);
+    context.commitTransaction();
+  }
+  return "Executed Successfully";*/
+  return updateIdentityHistory();
+  ]]></Source>
+</Rule>

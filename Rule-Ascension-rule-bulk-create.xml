@@ -1,0 +1,311 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Bulk-Create">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-ValidationLibrary"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+  import sailpoint.tools.Util;
+  import java.io.File;
+  import java.io.FileNotFoundException;
+  import java.util.Scanner;
+  import sailpoint.object.Custom;
+
+  import sailpoint.object.Workflow;
+  import sailpoint.object.WorkflowLaunch;
+  import sailpoint.api.Workflower;
+  import java.text.SimpleDateFormat; 
+  import sailpoint.tools.Message;
+  import sailpoint.object.TaskResult;
+  import sailpoint.tools.GeneralException;
+
+
+  import org.apache.commons.logging.LogFactory;
+  import org.apache.commons.logging.Log;
+
+  Log logger = LogFactory.getLog("Ascension-Rule-Bulk-Create");
+
+
+  /**
+	 * @param filePath
+	 * @return
+	 */
+  public static List readInputFile(String filePath) {
+    logger.debug("Entering method readInputFile ");
+
+    String headerString = null;
+    int headerLength = 0;
+    List allUsersList = new ArrayList();
+    String[] headerSplit = null;
+    Map identityMap = null;
+    Scanner sc = null;
+    try {
+      if (Util.isNotNullOrEmpty(filePath)) {
+        File file = new File(filePath);
+        if ((!file.exists()) || (file.isDirectory())) {
+          logger.error("File doesnt exist");
+          taskResult.addMessage(new Message(Message.Type.Warn, "Input file does not exist : "+filePath, null));
+
+        } else {
+          try {
+            sc = new Scanner(file);
+          } catch (FileNotFoundException fnex) {
+            logger.error("FileNotFoundException : "+fnex.getMessage());
+            taskResult.addMessage(new Message(Message.Type.Error, "File not found "+fnex.getMessage(), null));
+          }
+          while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+            if (lineCount == 0) {
+              headerString = line;
+              lineCount++;
+              if (Util.isNotNullOrEmpty(headerString) && headerString.contains("|")) {
+                headerSplit = headerString.split("\\|");
+                if (headerSplit != null) {
+                  headerLength = headerSplit.length;
+                }
+              }
+              continue;
+
+            }
+            if (Util.isNotNullOrEmpty(line) && line.contains("|")) {
+              identityMap = new HashMap();
+              String[] eachLineSplit = line.split("\\|");
+              logger.debug("eachLineSplit length : "+ eachLineSplit.length + "  Header Length : "+headerLength);
+              if (eachLineSplit != null && eachLineSplit.length == headerLength) {
+                for(int headerStart = 0; headerStart < headerLength; headerStart++){
+                  identityMap.put(headerSplit[headerStart], eachLineSplit[headerStart]);
+                }
+              }else{
+                taskResult.addMessage(new Message(Message.Type.Warn, "Invalid Record Columns length : "+line, null));
+              }
+            }
+            if(!Util.isEmpty(identityMap)){
+              allUsersList.add(identityMap);
+            }
+
+            lineCount++;
+          }
+        }
+      }
+    }catch(Exception ex){
+      logger.error("Exception readInputFile :: "+ex.getMessage());
+      taskResult.addMessage(new Message(Message.Type.Error, "Exception : "+ex.getMessage(), null));
+    } finally {
+      if(sc != null)
+        sc.close();
+    }
+    logger.debug("Exiting method readInputFile ");
+    return allUsersList;
+  }
+
+  /**
+	 * @param outputMap
+	 * @return
+	 */
+  public Map processIdentities(Map outputMap){
+    logger.debug("Entering method processIdentities");
+    Map identityModel = new HashMap();
+    String dobFormat = null;
+    boolean validationFailed = false;
+    List validationErrors = new ArrayList();
+    if(outputMap != null && !outputMap.isEmpty()){
+
+      identityModel.put("lastname",Util.isNotNullOrEmpty(outputMap.get("Last Name (Legal)")) ? outputMap.get("Last Name (Legal)")  : "");
+      identityModel.put("firstname",Util.isNotNullOrEmpty(outputMap.get("First Name (Legal)")) ? outputMap.get("First Name (Legal)")  : "");
+      identityModel.put("middleName",Util.isNotNullOrEmpty(outputMap.get("Middle (Legal)")) ? outputMap.get("Middle (Legal)")  : "");
+      identityModel.put("ssn",Util.isNotNullOrEmpty(outputMap.get("Last 4 of SSN")) ? outputMap.get("Last 4 of SSN")  : "");
+      identityModel.put("manager",Util.isNotNullOrEmpty(outputMap.get("Sponsoring Manager SuccessFactors ID")) ? outputMap.get("Sponsoring Manager SuccessFactors ID")  : "");
+      identityModel.put("buildingId",Util.isNotNullOrEmpty(outputMap.get("Work Location Code of CWR/Student")) ? outputMap.get("Work Location Code of CWR/Student")  : "");
+      identityModel.put("departmentNumber",Util.isNotNullOrEmpty(outputMap.get("Department Code of CWR/Student")) ? outputMap.get("Department Code of CWR/Student")  : "");
+      identityModel.put("hireDate",Util.isNotNullOrEmpty(outputMap.get("Start Date")) ? outputMap.get("Start Date")  : "");
+      identityModel.put("ctrexpDt",Util.isNotNullOrEmpty(outputMap.get("End Date")) ? outputMap.get("End Date")  : "");
+      identityModel.put("jobcode",Util.isNotNullOrEmpty(outputMap.get("Job Code")) ? outputMap.get("Job Code")  : "");
+      identityModel.put("title",Util.isNotNullOrEmpty(outputMap.get("Job Title")) ? outputMap.get("Job Title")  : "");
+      identityModel.put("notes",Util.isNotNullOrEmpty(outputMap.get("Notes")) ? outputMap.get("Notes")  : "");
+      identityModel.put("identityType","NonHRContractorPersona");
+      identityModel.put("ministry",Util.isNotNullOrEmpty(outputMap.get("Ministry")) ? outputMap.get("Ministry")  : "");
+      identityModel.put("type","non-hr contractor");  
+
+      if(Util.isNotNullOrEmpty(outputMap.get("Ministry"))){
+        String ministry = outputMap.get("Ministry");
+        if(Util.isNullOrEmpty(outputMap.get("Domain"))){
+          Custom custom = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration");
+          if(custom != null && custom.get("DefaultDomain") != null){
+            Map customValMap = custom.get("DefaultDomain");
+            identityModel.put("domain",Util.isNotNullOrEmpty(customValMap.get(ministry)) ? customValMap.get(ministry)  : "");
+          }
+        }
+        else{
+          identityModel.put("domain",Util.isNotNullOrEmpty(outputMap.get("Domain")) ? outputMap.get("Domain")  : "");
+        }       
+      }
+      Custom customObj = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration");
+      if(customObj != null && customObj.get("BulkAmitaUserDetails") != null){
+        Map bulkAmitaUserDetailsCustomValMap = customObj.get("BulkAmitaUserDetails");
+
+        if(bulkAmitaUserDetailsCustomValMap != null && !bulkAmitaUserDetailsCustomValMap.isEmpty()){
+          dobFormat = Util.isNotNullOrEmpty(bulkAmitaUserDetailsCustomValMap.get("dobFormat")) ? bulkAmitaUserDetailsCustomValMap.get("dobFormat")  : "";
+        }
+      }      
+      if(Util.isNotNullOrEmpty(outputMap.get("Date of Birth"))){
+        String dateString = outputMap.get("Date of Birth");
+        if(Util.isNotNullOrEmpty(dateString) && Util.isNotNullOrEmpty(dobFormat)){
+
+          SimpleDateFormat formatter=new SimpleDateFormat(dobFormat); 
+          Date dobFormatted=formatter.parse(dateString); 
+          String outputDateString = formatter.format(dobFormatted);
+          logger.debug("outputDateString : "+outputDateString);
+          identityModel.put("dob",outputDateString);
+        }
+      }
+    }
+    if(Util.isNotNullOrEmpty(outputMap.get("Vendor Name").trim())){
+      ArrayList messages=validateVendorName(outputMap.get("Vendor Name").trim());
+      if(messages != null && messages.size()>0){
+        validationFailed = true;
+        String message = "Invalid Vendor Name, " + messages;
+        validationErrors.add(message);
+      }
+      else { identityModel.put("vendorName",outputMap.get("Vendor Name").trim());}
+    }
+    else{ identityModel.put("vendorName","");}
+
+    if(Util.isNotNullOrEmpty(outputMap.get("Contractor Email").trim())){
+      ArrayList messages=validateEmail(outputMap.get("Contractor Email").trim());
+      if(messages != null && messages.size()>0){
+        validationFailed = true;
+        String message = "Invalid Contractor Email, " + messages;
+        validationErrors.add(message);
+
+      }
+      else { identityModel.put("email",outputMap.get("Contractor Email").trim());}
+    }
+    else{ identityModel.put("email","");}
+
+    if(Util.isNotNullOrEmpty(outputMap.get("Mobile Number").trim())){
+      ArrayList messages=validatePhoneNumber(outputMap.get("Mobile Number").trim());
+      if(messages != null && messages.size()>0){
+        validationFailed = true;
+        String message = "Invalid Mobile Number, " + messages;
+        validationErrors.add(message);
+      }
+      else { identityModel.put("mobile",outputMap.get("Mobile Number").trim());}
+    }
+    else{ identityModel.put("mobile","");}
+    logger.debug("Exiting method processIdentities");
+    if(validationFailed){
+      failedCount++;
+      String message = "Record Number - " + recordNumber + ", First Name - " + identityModel.get("firstname") + ", Last Name - " + identityModel.get("lastname") + ", Validation Error - " + validationErrors;
+      failedUserNames.add(message);
+      return null;
+    }
+    return identityModel;
+  }
+
+  /**
+	 * @param identityModel
+	 * @return
+	 */
+  public void launchCreateWorkflow(Map identityModel){
+    logger.debug("Entering method launchCreateWorkflow");
+    Map args = new HashMap();
+    WorkflowLaunch wflaunch = new WorkflowLaunch();
+    Workflow wfInstance = context.getObjectByName(Workflow.class,"Ascension-Workflow-Bulk-CreateContractor");
+    if (wfInstance!=null){
+      wflaunch.setWorkflowName(wfInstance.getName());
+      wflaunch.setWorkflowRef(wfInstance.getName());
+      wflaunch.setCaseName("Ascension or Amita Bulk Contractor Onboarding proccess");
+    }
+    args.put("userInformationMap",identityModel);
+    log.error("UserInformation is     -----"+args);
+    wflaunch.setVariables(args);
+
+    Workflower workflower = new Workflower(context);
+    WorkflowLaunch launch = workflower.launch(wflaunch);
+    if(launch != null && launch.isFailed()){
+      List messages = launch.getMessages();
+      List errors = new ArrayList();
+      if(messages != null && !messages.isEmpty()){
+        for(Message msg : messages){
+          if(message.getType.equals(Message.Type.Error)){
+            errors.add(msg.getMessage());
+          }
+        }
+      }
+      failedCount++;
+      String message = "Record Number - " + recordNumber + ", First Name - " + identityModel.get("firstname") + ", Last Name - " + identityModel.get("lastname") + ", Workflow Error - " + errors;
+      failedUserNames.add(message);
+    }
+    else{
+      successCount++;
+      successUserNames.add(identityModel.get("firstname") + " " + identityModel.get("lastname"));
+    }
+
+
+    logger.debug("Exiting method launchCreateWorkflow");
+
+  }
+
+  /**
+ * Rule logic starts
+ * 
+ */
+  List<Map> allUsersList = new ArrayList();
+  String fileLocation ="";
+  String notes = "";
+  int lineCount = 0;
+  int recordNumber = 0;
+
+  int successCount = 0;
+  int failedCount = 0;
+  List successUserNames = new ArrayList();
+  List failedUserNames = new ArrayList();
+  if(taskResult == void || taskResult == null){
+    taskResult = new TaskResult();
+  }
+  if((void != config) && (null != config) && (config instanceof Map)){
+
+    Map notesMap = new HashMap();
+    fileLocation = config.get("filePath");
+    if(Util.isNotNullOrEmpty(fileLocation)){
+      taskResult.setAttribute("fileLocation",fileLocation); 
+      allUsersList = readInputFile(fileLocation);
+      logger.debug("===allUsersList : "+allUsersList);
+      if(allUsersList != null && !allUsersList.isEmpty()){
+        taskResult.addMessage(new Message(Message.Type.Info, "allUsersList : "+allUsersList, null));
+        for(Map outputMap : allUsersList){
+          recordNumber++;
+          notesMap = outputMap;
+          Map identityModel = processIdentities(outputMap);
+          if(identityModel != null && !identityModel.isEmpty()){
+            launchCreateWorkflow(identityModel);
+          }
+        }
+      }
+      if(notesMap != null && !notesMap.isEmpty()){
+        notes = Util.isNotNullOrEmpty(notesMap.get("Notes")) ? notesMap.get("Notes")  : "";
+        Custom custom = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration");
+        if(custom != null && custom.get("BulkAmitaUserDetails") != null){
+          Map customValMap = custom.get("BulkAmitaUserDetails");
+          if(customValMap != null && !customValMap.isEmpty()){
+            customValMap.put("Notes", notes);
+            custom.put("BulkAmitaUserDetails", customValMap);
+            context.saveObject(custom);
+            context.commitTransaction();
+          }
+          //comment decache //context.decache(custom);
+        }
+      }
+    }
+  }
+
+
+  taskResult.setAttribute("notes",notes);
+  taskResult.setAttribute("recordCount",lineCount-1);
+  taskResult.setAttribute("successCount",successCount);  
+  taskResult.setAttribute("failedCount",failedCount);
+  taskResult.setAttribute("successUserNames",successUserNames);
+  taskResult.setAttribute("failedUserNames",failedUserNames);
+  return ""+allUsersList;
+  ]]></Source>
+</Rule>

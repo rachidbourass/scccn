@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-ADMIN-Replay-ForceCompleteWorkItem">
+  <Source><![CDATA[
+	import sailpoint.object.*;
+    import sailpoint.api.*;
+    import sailpoint.tools.*;
+  	import sailpoint.server.*;
+    import sailpoint.workflow.*;
+	
+	String workItemNum = "0af01f3d938f160d81938f9a9e1a226f";
+	WorkItem wi = context.getObjectById(WorkItem.class, workItemNum);
+	wi.setCompleter("spadmin");
+	wi.setState(WorkItem.State.Finished);
+	Workflower workflower = new Workflower(context);
+	workflower.process(wi, false);
+]]></Source>
+</Rule>

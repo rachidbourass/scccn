@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-AdminRule-FetchADAccountExpires">
+  <Source><![CDATA[
+
+import sailpoint.object.EmailFileAttachment;
+import sailpoint.object.EmailOptions;
+import sailpoint.object.EmailTemplate;
+import sailpoint.object.Filter;
+import sailpoint.object.Link;
+import sailpoint.object.QueryOptions;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+	String accountExpire = "accountExpires"; //link extended attribute
+		QueryOptions qo = new QueryOptions();
+		Filter filter = Filter.ignoreCase(Filter.and(Filter.eq("application.type", "Active Directory - Direct"), Filter.eq("identity.type", "Employee"), Filter.eq("identity.inactive", false)));
+		//Filter filter=Filter.ignoreCase(Filter.and(Filter.eq("application.name", "AD-DS"),Filter.notnull(accountExpire),Filter.eq("identity.type", "Employee"),Filter.eq("identity.inactive", false)));
+		qo.addFilter(filter);
+		qo.setResultLimit(3000);
+
+		List links = context.getObjects(Link.class, qo);
+
+
+		//return links;
+		Map finalData = new HashMap();
+
+		List successDetails = null;
+		String dummyData = null;
+		log.error("Links****" + links.size());
+		Date today = new Date();
+		StringBuilder dataBuilder = new StringBuilder();
+		dataBuilder.append("Identity" + "," + "Account Name" + "," + "Application Name" + "," + "Account Expire");
+		dataBuilder.append("\n");
+		if (links.size() > 0) {
+			String dataReq = null;
+			for (Link link: links) {
+				if (link.getAttribute(accountExpire) != null @and!"never".equalsIgnoreCase(link.getAttribute(accountExpire))) {
+					log.error("link data*****" + link.getNativeIdentity());
+				   
+					dataBuilder.append(link.getIdentity().getName() + "," + link.getDisplayName() + "," + link.getApplicationName() + "," + link.getAttribute(accountExpire));
+					dataBuilder.append("\n");
+				   
+				}
+			}
+		}
+		String finalRecords=dataBuilder.toString().replaceAll("null","");	;
+		log.error("Sending email to the manager for account expiration");
+		Map mailargs = new HashMap();
+		String strTemplate="Ascension-EmailTemplate-EmployeeAccountExpireDates";
+		String fileName="Account_expiration_data.csv";
+		EmailTemplate template = context.getObjectByName(EmailTemplate.class, strTemplate);
+		EmailOptions mailopts = null;
+		EmailFileAttachment attachment = null;
+		log.error("finalRecords****"+finalRecords);
+		mailopts = new EmailOptions();
+		List toAddresses = new ArrayList();
+		toAddresses.add("rajesh.saka@ascension-external.org");
+		toAddresses.add("cam.weyhrich@ascension.org");
+		mailopts.setTo(toAddresses);
+		attachment = new EmailFileAttachment(fileName, EmailFileAttachment.MimeType.MIME_CSV,finalRecords.getBytes("UTF-8"));
+		mailopts.addAttachment(attachment);
+		context.sendEmailNotification(template, mailopts);
+		
+ ]]></Source>
+</Rule>

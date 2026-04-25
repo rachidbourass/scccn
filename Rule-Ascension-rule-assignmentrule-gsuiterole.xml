@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-AssignmentRule-GSuiteRole" type="IdentitySelector">
+  <Description>This rule is used to select an Identity that is related to the given Identity</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Rule-Ascension-EmailAddress-RuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-GSuite"/>
+  </ReferencedRules>
+  <Signature returnType="boolean">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity" type="Identity">
+        <Description>
+          The identity.
+        </Description>
+      </Argument>
+      <Argument name="roleName" type="String">
+        <Description>
+          The name of the sailpoint.object.Bundle (role) that is being selected for the Identity. 
+          If roles are not applicable to this Identity selection, this value will be void.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="success">
+        <Description>
+          True if the selection was successful; false otherwise.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[import java.util.Map;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Attributes;
+  import org.apache.log4j.Logger;
+  import sailpoint.api.IdentityService; 
+  import sailpoint.object.Application;
+  import java.util.List;
+  import sailpoint.tools.Util;
+
+  Logger logger = Logger.getLogger("ascension.rules.custom.gsuite");
+
+  String customObjectName = "Ascension-Custom-Gsuite";
+  String EA40 = "gsuiteStatus";
+  String EA20 = "gsuiteMdm";
+  String emplType = "employeeType";
+
+  String EA40Value = "";
+  String EA20Value = "";
+  String emplTypeValue = "";
+  String gsuiteAttributeValue = "";
+
+  IdentityService is = new IdentityService(context);
+
+  List appList = new ArrayList();
+  appList.add(context.getObjectByName(Application.class, ("GSuite")));
+  boolean hasAccount = is.hasAccounts(identity,appList);
+
+  String company = identity.getAttribute("company");
+
+  if(!hasAccount){
+    //Check For - Contractor Birthright (Ref: Rule-Ascension-EmailAddress-RuleLibrary)
+    boolean isContractorBirthright = meetsContractorBirthrightGSuite(identity);
+    if (isContractorBirthright) {
+      return true;
+    }
+    if (!Util.nullSafeCaseInsensitiveEq(company, "AMITA")) {
+      //Check For - Permitted Via Identity Attributes
+      Custom customObject = context.getObject(Custom.class, customObjectName);
+      if(void != customObject && null != customObject){
+        Attributes attrs = customObject.getAttributes();
+        if(attrs != null){
+          Map gsuite_status_mapping = attrs.get("gsuite_status_mapping");
+          if(gsuite_status_mapping != null ){
+            if(!identity.isInactive() && identity.getAttribute(EA40) != null && !identity.getAttribute(EA40).isEmpty()){                      
+              if(identity.getAttribute(EA20) != null){
+                EA20Value = identity.getAttribute(EA20);
+              }
+              if(identity.getAttribute(emplType) != null){
+                emplTypeValue = identity.getAttribute(emplType);
+              }
+              gsuiteAttributeValue = identity.getAttribute(EA40).toString()+"#"+EA20Value+"#"+emplTypeValue;
+              if(gsuite_status_mapping.keySet().contains(gsuiteAttributeValue)){
+                return true;
+              }
+            }         
+          }
+        }
+      }
+    }
+  }
+  return false;]]></Source>
+</Rule>

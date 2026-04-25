@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Application-Decommission-Rule">
+  <Description>Decommssion application from iiq </Description>
+  <Source><![CDATA[
+
+  import sailpoint.object.Application;
+  import sailpoint.api.Terminator;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  String className = "rule.Application_Decommission_Rule";
+  Log logger = LogFactory.getLog(className);
+
+  String appNames = (String)config.get("appName");
+
+  logger.debug("Applications selected "+appNames);
+
+  try{
+    if(appNames!=null) { 
+      String [] apps_Array = appNames.split(",");
+      Arrays.asList(apps_Array);
+
+      if(null!=apps_Array){
+        for(String appName: apps_Array){
+
+          Application appObject = context.getObjectByName(Application.class,appName);
+          if(null!=appObject){
+            Terminator terminator = new Terminator(context);
+            terminator.deleteObject(appObject);         
+          }
+        }
+      }
+    }
+  }catch (GeneralException exception){
+    throw new GeneralException("Application_Decommission_Rule || GeneralException "+exception.getMessage());
+  }
+  
+  taskResult.setAttribute("app",appNames);
+
+  ]]></Source>
+</Rule>

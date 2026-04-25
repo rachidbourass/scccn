@@ -1,0 +1,219 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-AfterProvisioning-TeamTSI" type="AfterProvisioning">
+  <Description>An IdentityIQ server-side rule that is executed after the connector's provisioning method is called. This gives the customer the ability to customize or react to anything in the ProvisioningPlan AFTER it has been sent out to the specific applications. 
+
+This rule will be called for any application found in a plan that also has a configured 'afterProvisioningRule' configured.</Description>
+  <Signature>
+    <Inputs>
+      <Argument name="log" type="org.apache.commons.logging.Log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan object on its way to the Connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application object that references this before/after script.
+        </Description>
+      </Argument>
+      <Argument name="result">
+        <Description>
+          The ProvisioningResult object returned by the connectors provision method. This can be null and in many cases the connector will  not return a result and instead will annotate the plan's ProvisioningResult either at the plan or account level.        
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+import sailpoint.object.ProvisioningResult;
+import java.util.List;
+import sailpoint.object.ProvisioningPlan;
+import sailpoint.object.ProvisioningPlan.AccountRequest;
+import sailpoint.object.ProvisioningPlan.AttributeRequest;
+import sailpoint.object.Identity;
+import java.sql.PreparedStatement;
+import sailpoint.object.Application;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import sailpoint.object.Filter;
+import sailpoint.object.ManagedAttribute;
+import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
+import sailpoint.object.EmailTemplate;	
+import sailpoint.object.EmailOptions;
+import sailpoint.server.Auditor;
+import sailpoint.object.AuditEvent;
+  
+//import sailpoint.connector.ConnectorClassLoader;
+
+//ClassLoader currentCl = Thread.currentThread().getContextClassLoader();
+//ClassLoader bakcedUpCl = null;
+//if(currentCl instanceof ConnectorClassLoader){
+   //bakcedUpCl = currentCl;
+   //Thread.currentThread().setContextClassLoader(currentCl.getParent());
+//}
+
+String ruleName = "Ascension - Rule- After - provisioning - TeamTSI";
+Logger logger = Logger.getLogger("TeamTSI : " + ruleName);
+logger.debug("Start : After Provisioning Rule of  TeamTSI Application");
+
+String reciverEmailID="support@teamTSI.com";
+String EmailTemplateName = "Ascension-EmailTemplate-TeamTSI";
+
+String userName=null,firstName=null,lastName=null,phoneNumber=null,emailAddress=null,managerEmail=null,managerName=null,communityID=null,community=null, opertaion=null;
+String targetApplication =null, AccountNativeID=null,dissplayName=null;
+
+//Update Audit for email trigger
+public void updateAudit(String str4)
+{
+	logger.debug("Audit started");
+	AuditEvent event = new AuditEvent();
+	event.setTarget(userName);
+	event.setAction(opertaion);
+	event.setApplication(targetApplication);
+	event.setAccountName(AccountNativeID);
+	event.setAttributeName("Operation Task Description : " + opertaion);
+	event.setAttribute("Source", opertaion);
+	event.setString1("User Name : "+userName);
+	event.setString2("Full Name : "+dissplayName);
+	event.setString3("Community : "+ community);
+	event.setString4(str4);
+	Auditor.log(event);
+	context.commitTransaction();
+	logger.debug("Audit succesfully");	
+}
+
+public void sendEmail(){
+	updateAudit( "Status : Preparing Email to Send");
+    ArrayList emailReceipent = new ArrayList();
+
+	emailReceipent.add(reciverEmailID);
+    try {
+      EmailTemplate emailTemplate = context.getObjectByName(EmailTemplate.class, EmailTemplateName);
+      if (emailTemplate != null) {
+        Map myargs = new HashMap();
+		myargs.put("opertaion", opertaion);
+        myargs.put("userName", userName);
+        myargs.put("firstName",firstName);      
+        myargs.put("lastName", lastName);
+		myargs.put("emailAddress", emailAddress);
+		myargs.put("phoneNumber", phoneNumber);
+		myargs.put("managerName", managerName);
+		myargs.put("managerEmail", managerEmail);
+		myargs.put("Community", community);
+		myargs.put("dissplayName", dissplayName);
+        EmailOptions ops = new EmailOptions(emailReceipent, myargs);
+		ops.setCc(managerEmail);
+		ops.setCc(emailAddress);
+		logger.debug("Sending Email Notification");
+        context.sendEmailNotification(emailTemplate, ops);
+		updateAudit("Status : Email Send Succesfully");
+		logger.debug("Email Send & Audit Succesfully");
+      }
+	  else{
+		updateAudit("Status : Email Failed , Email template Not Avilable");
+		logger.debug("emailTemplate is Not avilable, email opertion failed");
+	  }
+    }
+    catch (Exception ex) {
+	updateAudit("Status : Exception in Email send operation method sendEmail :"+ex);
+      logger.debug("Exception in method sendEmail : " + ex);
+    }
+}
+
+public String communityName(String cID)
+{
+	logger.debug("extracting community name from ID:"+cID);
+	Filter f1 = Filter.and(Filter.eq("value", cID), Filter.eq("application.name", targetApplication));
+	ManagedAttribute entitlement_ID = context.getUniqueObject(ManagedAttribute.class,f1);
+	if(entitlement_ID!=null) {
+		return entitlement_ID.getAttribute("Communityname");
+	}
+	return null;
+}
+
+if(plan!=null&& plan.getAccountRequests(application.getName())!=null )
+{
+	if(plan.getAccountRequests(application.getName()).get(0).getResult().getStatus().equals(ProvisioningResult.STATUS_COMMITTED)){
+		Identity identity = (Identity)plan.getIdentity();
+		List accountRequests = plan.getAccountRequests(); 
+		userName=identity.getAttribute("samAccountName");
+		firstName =identity.getFirstname();
+		lastName=identity.getLastname();
+		emailAddress=identity.getAttribute("email");
+		managerName=identity.getManager().getAttribute("firstname")+" "+identity.getManager().getAttribute("lastname");
+		managerEmail=identity.getManager().getAttribute("email");
+		dissplayName=identity.getDisplayableName();
+		
+		if (accountRequests != null) {
+			for (ProvisioningPlan.AccountRequest accReq: accountRequests) {		
+				targetApplication = accReq.getApplication();
+				AccountNativeID = accReq.getNativeIdentity();
+				//Create  ACCOUNT
+				if (accReq.getOperation().equals(ProvisioningPlan.AccountRequest.Operation.Create)){
+				opertaion="Create Account";
+				phoneNumber=(String)accReq.getAttributeRequest("phonenumber").getValue();
+				List attributeRequests = accReq.getAttributeRequests("Community");
+					if (attributeRequests != null) {
+						for (ProvisioningPlan.AttributeRequest attrReq: attributeRequests) {
+						//filtering community 
+							if (attrReq.getValue() instanceof String) 
+							{
+								communityID=attrReq.getValue() ;
+							}
+						}
+						community=communityName(communityID);
+						logger.debug("Application Name:"+targetApplication+" , UserName:"+userName+" , Firstname:"+firstName+" , Lastname:"+lastName+" , Email:"+emailAddress+" , Manager Name:"+managerName+" , Manager Email:"+managerEmail+" , Phone Number:"+phoneNumber+" , Opertaion:"+opertaion+" , Community ID:"+communityID+" , Community  Name:"+community);
+						sendEmail();
+					}
+				}
+				// Delete or DIsable
+				if ((accReq.getOperation().equals(ProvisioningPlan.AccountRequest.Operation.Disable))||(accReq.getOperation().equals(ProvisioningPlan.AccountRequest.Operation.Delete))){
+					opertaion="Delete Account";
+					phoneNumber=(String)accReq.getAttributeRequest("extphoneNumber").getValue();
+					//Logic to extract community				
+					community="";
+					String[] coID=accReq.getAttributeRequest("extCommunityID").getValue().split(",");
+					for(String cID: coID){
+						community=community+","+communityName(cID);
+					}
+					community=community.substring(1);
+					logger.debug("Application Name:"+targetApplication+" , UserName:"+userName+" , Firstname:"+firstName+" , Lastname:"+lastName+" , Email:"+emailAddress+" , Manager Name:"+managerName+" , Manager Email:"+managerEmail+" , Phone Number:"+phoneNumber+" , Opertaion:"+opertaion+" , Community Name:"+community);
+					sendEmail();
+				}
+				//Modify Operations
+				if (accReq.getOperation().equals(ProvisioningPlan.AccountRequest.Operation.Modify)) {
+					if (attributeRequests != null) {
+						phoneNumber=(String)accReq.getAttributeRequest("extphoneNumber").getValue();
+						for (ProvisioningPlan.AttributeRequest attrReq: attributeRequests) {
+							//REMOVE ENTITLEMENTS
+							if (attrReq.getOperation().equals(ProvisioningPlan.Operation.Remove)) {
+								opertaion="Remove Account";
+								if (attrReq.getValue() instanceof String) {
+									communityID=attrReq.getValue();
+									sendEmail();
+								}
+								else if (attrReq.getValue() instanceof List) {
+									logger.debug ("Multiple community selection is not supported");
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}	
+}
+logger.debug("END : After Provisioning Rule of TeamTSI Application");
+]]></Source>
+</Rule>

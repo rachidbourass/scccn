@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-AfterProvisioning-AggregateAccount" type="AfterProvisioning">
+  <Description>An IdentityIQ server-side rule that is executed after the connector's provisioning method is called. This gives the customer the ability to customize or react to anything in the ProvisioningPlan AFTER it has been sent out to the specific applications. 
+
+    This rule will be called for any application found in a plan that also has a configured 'afterProvisioningRule' configured.</Description>
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan object on its way to the Connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application object that references this before/after script.
+        </Description>
+      </Argument>
+      <Argument name="result">
+        <Description>
+          The ProvisioningResult object returned by the connectors provision method. This can be null and in many cases the connector will  not return a result and instead will annotate the plan's ProvisioningResult either at the plan or account level.        
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+  import sailpoint.object.SailpointContext;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.Operation;  
+  import sailpoint.object.ProvisioningPlan.AccountRequest; 
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.ProvisioningPlan.AccountRequest.Operation;
+  import sailpoint.object.ProvisioningResult;
+  import sailpoint.object.Application;
+  import sailpoint.object.ResourceObject;
+  import sailpoint.connector.Connector;
+  import sailpoint.connector.ADLDAPConnector;
+  import sailpoint.tools.Util;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;	
+
+  Log logger = LogFactory.getLog("rule.afterProvisioning.AD");
+
+  logger.debug("Entering AD-PresenceHealth After Provisioning Rule");
+  if (plan != null && application != null) { 
+
+    List accountRequests = plan.getAccountRequests(application.getName());
+
+    if(null != accountRequests &&  !accountRequests.isEmpty()){
+      for(AccountRequest accountRequest : accountRequests){
+        if(accountRequest != null &&  accountRequest.getResult() != null){ 
+
+          AttributeRequest ar = accountRequest.getAttributeRequest("AC_NewParent");
+          if (null == ar) {
+            ar = accountRequest.getAttributeRequest("AC_NewName");
+          }
+
+          if (null == ar) {
+            logger.debug("Not a rename or move. There might be a connector error in account request . Bypassing AfterProvisioning logic.");  
+            break; 
+          }
+
+          // If there was failure in connector, bypass everything.
+          ProvisioningResult result = accountRequest.getResult();
+          if (result!=null && result.getStatus() != null && !result.getStatus().equals(ProvisioningResult.STATUS_FAILED)) {
+
+            if (ar.getName().equals("AC_NewParent")) {
+              logger.debug("AC_NewParent AttributeRequest");
+              String oldDN = accountRequest.getNativeIdentity();
+
+
+              // Pull the new OU from the AttributeRequest and build a new DN
+              String newOU = (String) ar.getValue();
+
+              int indexOfDomain = 0;
+              String cn = "";
+              if(oldDN.contains("\\")){
+                indexOfDomain = oldDN.toLowerCase().indexOf(",", oldDN.indexOf(",") + 1);
+              }else{
+                indexOfDomain = oldDN.toLowerCase().indexOf(",", oldDN.indexOf(","));
+              }
+
+              //this index should be the start of the parent
+              if(indexOfDomain > 0){
+                cn = oldDN.substring(0,indexOfDomain);
+              }
+
+              String newDN = cn + "," + newOU;
+
+
+              // Let's call the connector to get the newly moved object
+              Application app = context.getObjectByName(Application.class,application.getName());
+              sailpoint.connector.Connector conn = sailpoint.connector.ConnectorFactory.getConnector(app, null); 
+              Map map = new HashMap();
+              int c=0;
+              ResourceObject ro=null;
+
+              while(c<100){ 
+                try {
+                  ro = conn.getObject("account",newDN,map);
+                }catch (sailpoint.connector.ObjectNotFoundException onfe) {  
+                  logger.debug("Object not found Attempt #"+c);
+                } 
+                if(ro!=null)
+                  break;
+                Thread.sleep(100); 
+                c=c+1;
+              }
+
+              if(ro!=null){
+
+
+                // Stuff the resource object in the place where the Provisioner will find it
+                ProvisioningResult result = accountRequest.getResult();
+                result.setObject(ro);
+                accountRequest.setResult(result);
+
+                // Scramble the native identity to force a link creation
+                accountRequest.setNativeIdentity("#DOES_NOT_EXIST#");
+
+                // Need to clean out the old link...
+                AccountRequest delete = new AccountRequest();
+                delete.setApplication(application.getName());
+                delete.setNativeIdentity(oldDN);
+                delete.setOperation(Operation.Delete);
+
+                ProvisioningResult pr = new ProvisioningResult();
+                pr.setStatus(ProvisioningResult.STATUS_COMMITTED);
+                delete.setResult(pr);
+                plan.add(delete);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  logger.debug("Exiting AD_PresenceHealth Provisioning Rule");
+  ]]></Source>
+</Rule>

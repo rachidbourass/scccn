@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-BeforeProvisioning-AD" type="BeforeProvisioning">
+  <Description>An IdentityIQ server-side rule that is executed before the connector's provisioning method is called. This gives the customer the ability to customize or react to anything in the ProvisioningPlan BEFORE it is sent to the underlying connectors used in provisioning. 
+
+    This rule will be called for any application found in a plan that also has a configured 'beforeProvisioningRule' configured.  
+
+    The plan can be updated directly in the rule by reference and does not need to return the plan.</Description>
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-GSuite"/>
+  </ReferencedRules>
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan object on its way to the Connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application object that references this before/after script.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Application;
+  import sailpoint.object.Identity;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.Attributes;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.tools.Util;
+  import java.util.Date;
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  Log logger = LogFactory.getLog("Ascension-Rule-BeforeProvisioning-AD");
+
+  logger.debug("Enter Ascension-Rule-BeforeProvisioning-AD");
+  String thisAppName = application.getName();
+  String identityName = null;
+  Identity identity = null;
+  boolean isInactive = false;
+  String identityType= null;
+  Date creationDate = null;
+  if (plan != null) {
+    if (plan.getIdentity() != null ) {
+      identity = plan.getIdentity();
+	  identityName = identity.getName();
+	  isInactive = identity.isInactive();	  
+	  identityType = identity.getType() ;
+	  creationDate = identity.getCreated();
+    }
+	List appLink = getIdentityAppLinks(identity, thisAppName);
+    String logPrefix = thisAppName +" : "+identityName;
+    //Commenting below if to negate premature emptying of plan
+	if(!appLink.isEmpty() || appLink.size() > 0){
+    logger.debug(logPrefix+" Multiple SAME Account Exists For User :"+identityName);
+	plan = getEmptyPlan(plan);    
+	}
+    if(identity !=null && null != plan){
+      if (plan.getAccountRequests() != null && plan.getAccountRequests(application.getName()) != null	&& !plan.getAccountRequests(application.getName()).isEmpty()) {
+        for (AccountRequest accReq : plan.getAccountRequests(application.getName())) {
+          if (accReq != null	&& accReq.getAttributeRequests() != null && !accReq.getAttributeRequests().isEmpty() ) {
+             if(null != accReq.getOperation() && (AccountRequest.Operation.Create.equals(accReq.getOperation())) && isInactive) {
+			   List emptyAR = new ArrayList();
+               if(Util.nullSafeCaseInsensitiveEq(identityType,"non-hr contractor") && getDaysBetween(creationDate) >=7) {                 
+                plan.setAccountRequests(emptyAR);
+			   }
+			   else if(!Util.nullSafeCaseInsensitiveEq(identityType,"non-hr contractor")) {
+			    plan.setAccountRequests(emptyAR);
+			   }
+              }
+			else {
+            AttributeRequest additionalAttReq = accReq.getAttributeRequest("additionalDomain");
+            if(additionalAttReq!=null &&  additionalAttReq.getValue()!=null && Util.isNotNullOrEmpty(additionalAttReq.getValue().toString())){
+              String inputDomain = additionalAttReq.getValue().toString();
+
+              logger.debug("Additional Network Access Role Requested additionalDomain");
+
+              accReq.remove(additionalAttReq);
+              Attributes atts  = new Attributes();
+              if(accReq.getArguments()!=null){
+                atts = accReq.getArguments();
+              }
+              atts.put("additionalDomain", inputDomain);
+              accReq.setArguments(atts);
+             }
+			            
+            //code to remove fodLocation attribute 9/7/2021
+            AttributeRequest fodAttReq = accReq.getAttributeRequest("fodLocation");
+            if(fodAttReq!=null &&  fodAttReq.getValue()!=null && Util.isNotNullOrEmpty(fodAttReq.getValue().toString())){
+              accReq.remove(fodAttReq);
+            }//end of code added 9/7/2021
+           } 
+          }
+        }
+      }
+      
+    }
+  }
+
+  logger.debug("Exit Ascension-Rule-BeforeProvisioning-AD");
+
+  ]]></Source>
+</Rule>

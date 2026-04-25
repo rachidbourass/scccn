@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Cleanup-HFMAuditEvents">
+  <Source><![CDATA[ 
+
+
+  import java.util.ArrayList;
+  import java.util.Iterator;
+  import java.util.List;
+
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.AuditEvent;
+  import sailpoint.object.Filter;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.Util;
+
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  Log logger = LogFactory.getLog("org.ascension.sailpoint.rules.remediationAudit");
+
+  String KEY_OPEN_ACTION = "HFMCertificationCreation";
+  String KEY_END_ACTION = "HFMCertificationEnding";
+
+  public String deleteOldHFMAuditEvents() throws GeneralException, IllegalArgumentException
+  {
+    List deletedSources = new ArrayList();
+    List auditAttributes = new ArrayList();
+    String source = null;
+    auditAttributes.add("source");
+    QueryOptions endAudtquery = new QueryOptions();
+
+    Iterator itrResult = context.search(AuditEvent.class, endAudtquery.addFilter(Filter.eq("action", KEY_END_ACTION)), auditAttributes);
+    while (itrResult.hasNext())
+    {
+      source =  ((Object[]) itrResult.next())[0];
+      if(Util.isNullOrEmpty(source))
+        continue;
+      deletedSources.add(source);
+    }
+    
+    QueryOptions openAudtquery = new QueryOptions();
+    context.removeObjects(AuditEvent.class, openAudtquery.addFilter(Filter.and(Filter.eq("action", KEY_OPEN_ACTION), Filter.in("source", deletedSources))));
+    context.commitTransaction();
+    return deletedSources.toString();
+  }
+  
+   public String deleteSpecificHFMAuditEvent() throws GeneralException, IllegalArgumentException
+   {
+      String source = "Reassignment from 'HFM Access Reviews for Ascension-HFMAttestationReviewer created on11/17/22 12:07:44 PM CST' to Jill Curtis";
+      String KEY_END_ACTION = "HFMCertificationEnding";
+     	String KEY_OPEN_ACTION = "HFMCertificationCreation";
+      
+      QueryOptions query = new QueryOptions();
+      context.removeObjects(AuditEvent.class, query.addFilter(Filter.and( Filter.eq("source", source),Filter.eq("action", KEY_OPEN_ACTION))));
+      context.commitTransaction();
+      
+      return "Success";
+   }
+
+  //deleteOldHFMAuditEvents();
+  deleteSpecificHFMAuditEvent()
+
+
+  ]]></Source>
+</Rule>

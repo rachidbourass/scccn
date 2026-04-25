@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Apptio-AdvancedPolicyViolation" type="Policy">
+  <Description>This rule is used to determine if a Policy has been violated.</Description>
+  <Signature returnType="PolicyViolation">
+    <Inputs>
+      <Argument name="log" type="org.apache.commons.logging.Log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context" type="sailpoint.api.SailPointContext">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+          The Identity being inspected.
+        </Description>
+      </Argument>
+      <Argument name="policy">
+        <Description>
+          The Policy being evaluated.
+        </Description>
+      </Argument>
+      <Argument name="constraint">
+        <Description>
+          The Constraint being evaluated.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="violation">
+        <Description>
+          The PolicyViolation object.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[import sailpoint.object.PolicyViolation;
+   import sailpoint.object.*;
+import sailpoint.api.IdentityService;
+	public PolicyViolation checkApptioViolation(Identity identity){
+
+    boolean isViolation = false; 
+    boolean hasRole = false;
+	
+    String empType = identity.getAttribute("type");
+    List assignedRoles = identity.getAssignedRoles();
+    if(assignedRoles != null && !assignedRoles.isEmpty()){
+     for(Bundle assignedRole : assignedRoles){
+				if("ApptioApplicationAccess".equalsIgnoreCase(assignedRole.getName()))
+				     {
+					 hasRole=true;
+					 break;
+					 }
+    }
+    }   
+     if((null!=empType)&&(!("employee".equalsIgnoreCase(empType)))&& hasRole)
+			isViolation=true;
+			            
+              
+    if(isViolation){
+             PolicyViolation v = null;
+		SODConstraint constraint = new SODConstraint();
+		   v = new PolicyViolation();
+		   v.setActive(true);
+		   v.setIdentity(identity);
+		   v.setPolicy(policy);
+		  v.setConstraint(constraint);
+		   v.setDescription("Only Employee type of users can submt request for this application");
+		   v.setStatus(sailpoint.object.PolicyViolation.Status.Open);
+		return v;
+	}
+    return null;
+  }
+	
+	PolicyViolation v = null;
+	v = checkApptioViolation(identity);
+    return v;]]></Source>
+</Rule>

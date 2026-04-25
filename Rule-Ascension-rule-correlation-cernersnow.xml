@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-Correlation-CernerSnow" type="Correlation">
+  <Description>Identity Correlation Rules are used to find identities to which new accounts can be attached.
+A correlation rule must return a Map with one of the specified Return arguments.</Description>
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="environment" type="Map">
+        <Description>
+          Arguments passed to the aggregation task.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          Application being aggregated.
+        </Description>
+      </Argument>
+      <Argument name="account">
+        <Description>
+          A sailpoint.object.ResourceObject returned from the
+          collector.
+        </Description>
+      </Argument>
+      <Argument name="link">
+        <Description>
+          Existing link to this account.
+        </Description>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="identityName">
+        <Description>
+          The name of an Identity object.
+        </Description>
+      </Argument>
+      <Argument name="identity">
+        <Description>
+          A fully resolved Identity object if the rule wants
+          to do its own queries to locate the identity.
+        </Description>
+      </Argument>
+      <Argument name="identityAttributeName">
+        <Description>
+          The name of the extended attribute that can be used
+          to locate an existing identity.
+        </Description>
+      </Argument>
+      <Argument name="identityAttributeValue">
+        <Description>
+          The value of the named extended attribute that can be used
+          to locate an existing identity. This attribute is used
+          together with the identityAttributeName argument.
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[import sailpoint.tools.Util;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Link;
+
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  Log logger = LogFactory.getLog("Ascension.Rule.Correlation.CernerSnow");
+  try{
+  logger.debug("Ascension.Rule.Correlation.CernerSnow Starting");
+  Map result = new HashMap();
+  Identity tempIdentity = null;
+
+  String userId = account.getStringAttribute("User ID");
+
+
+  if(Util.isNotNullOrEmpty(userId)){ 
+    QueryOptions op = new QueryOptions();
+    op.add(Filter.ignoreCase(Filter.eq("samAccountName", userId)));
+    Iterator itr = context.search(Identity.class, op);
+    if (!Util.isEmpty(itr)) {
+      while (itr.hasNext()) {
+        tempIdentity = (Identity) itr.next();
+        result.put("identityName", tempIdentity.getName());
+//        context.decache(tempIdentity);
+        return result;
+      }
+      Util.flushIterator(itr);
+    }
+
+    logger.debug("SamAccountName Check Done");
+    //employee ID
+    String empId = account.getStringAttribute("employee ID");
+    if( Util.isNotNullOrEmpty(empId) && Util.isNullOrEmpty(result.get("identityName")) ){
+      QueryOptions opEmpID = new QueryOptions();
+      opEmpID.add(Filter.ignoreCase(Filter.eq("employeeId", empId)));
+      Iterator itrEmpID = context.search(Identity.class, opEmpID);
+      if (!Util.isEmpty(itrEmpID)) {
+        while (itrEmpID.hasNext()) {
+          tempIdentity = (Identity) itrEmpID.next();
+          result.put("identityName", tempIdentity.getName());
+//          context.decache(tempIdentity);
+          return result;
+        }
+        Util.flushIterator(itrEmpID);
+      }
+
+    }
+    logger.debug("EmpId Check Done");
+
+    //all ad link
+    if( Util.isNullOrEmpty(result.get("identityName")) ){
+      QueryOptions ops = new QueryOptions();
+      ops.addFilter(Filter.like("links.displayName", userId, Filter.MatchMode.END));
+      Iterator itrID = context.search(Identity.class,ops,"name");
+      if (!Util.isEmpty(itrID)) {
+        while (Util.isNullOrEmpty(result.get("identityName")) && itrID.hasNext()) {
+          Object[] currentUser = (Object[]) itrID.next();       	
+          if(currentUser != null && currentUser[0] != null) {
+            tempIdentity = context.getObjectByName(Identity.class, currentUser[0].toString());
+            if(tempIdentity!=null){
+              List<Link> linkList = tempIdentity.getLinks();
+              if(!Util.isEmpty(linkList)){
+                for(Link tempLink : linkList){
+                  if(Util.nullSafeCaseInsensitiveEq(tempLink.getApplication().getType(), "Active Directory - Direct")){
+                    if(tempLink.getAttribute("sAMAccountName") !=null && Util.nullSafeCaseInsensitiveEq( tempLink.getAttribute("sAMAccountName").toString(), userId)){
+                      result.put("identityName", tempIdentity.getName());
+                      return result;
+                    }
+                  }
+                }
+              }
+//              context.decache(tempIdentity);
+            }
+          }
+        }
+        Util.flushIterator(itrID);
+      }
+    }
+  }
+
+  logger.debug("Ascension.Rule.Correlation.CernerSnow Exiting");
+  }catch(Exception e){
+     logger.error("Exception in Ascension-Rule-Correlation-CernerSnow: ",e);
+  }
+  return result;]]></Source>
+</Rule>

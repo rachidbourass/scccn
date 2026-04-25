@@ -1,0 +1,245 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-BeforeProvisioning-Cerner" type="BeforeProvisioning">
+  <Description>An IdentityIQ server-side rule that is executed before the connector's provisioning method is called. This gives the customer the ability to customize or react to anything in the ProvisioningPlan BEFORE it is sent to the underlying connectors used in provisioning. 
+
+    This rule will be called for any application found in a plan that also has a configured 'beforeProvisioningRule' configured.  
+
+    The plan can be updated directly in the rule by reference and does not need to return the plan.</Description>
+  <Signature>
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="plan">
+        <Description>
+          The ProvisioningPlan object on its way to the Connector.
+        </Description>
+      </Argument>
+      <Argument name="application">
+        <Description>
+          The application object that references this before/after script.
+        </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[ 
+
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+  import sailpoint.object.Application;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Identity;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.ProvisioningPlan.Operation;
+  import sailpoint.object.WorkflowLaunch;
+  import sailpoint.tools.Util;
+  import sailpoint.tools.GeneralException;
+
+	import sailpoint.api.Workflower;
+  import java.util.Date;
+
+
+
+  public ProvisioningPlan createDrMasterPlan(){
+	  logger.debug("createDrMasterPlan starting");
+    ProvisioningPlan tempPlan = null;
+    try{
+      if(plan != null){
+
+        if(identity!=null){
+
+          if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+            tempPlan = new ProvisioningPlan();
+            ProvisioningPlan.AccountRequest drAcctReq = new ProvisioningPlan.AccountRequest();
+            List<AttributeRequest> attributeRequestList = new ArrayList();
+
+            attributeRequestList.add(new AttributeRequest("DocD48",Operation.Add,Util.isNotNullOrEmpty(identity.getStringAttribute("midasDekalbOrgID"))?identity.getStringAttribute("midasDekalbOrgID"):""));
+            attributeRequestList.add(new AttributeRequest("DocH48",Operation.Add,Util.isNotNullOrEmpty(identity.getStringAttribute("midasHighlandsOrgID"))?identity.getStringAttribute("midasHighlandsOrgID"):""));
+            attributeRequestList.add(new AttributeRequest("DocP48",Operation.Add,Util.isNotNullOrEmpty(identity.getStringAttribute("midasRiverParkOrgID"))?identity.getStringAttribute("midasRiverParkOrgID"):""));;
+            attributeRequestList.add(new AttributeRequest("DocS48",Operation.Add,Util.isNotNullOrEmpty(identity.getStringAttribute("midasStonesRiverOrgID"))?identity.getStringAttribute("midasStonesRiverOrgID"):""));
+            attributeRequestList.add(new AttributeRequest("DocT40",Operation.Add,Util.isNotNullOrEmpty(identity.getStringAttribute("midasWestOrgID"))?identity.getStringAttribute("midasWestOrgID"):""));;
+            attributeRequestList.add(new AttributeRequest("DocM45",Operation.Add,Util.isNotNullOrEmpty(identity.getStringAttribute("midasRutherfordOrgID"))?identity.getStringAttribute("midasRutherfordOrgID"):""));
+            attributeRequestList.add(new AttributeRequest("docName",Operation.Add,Util.isNotNullOrEmpty(identity.getDisplayName())?identity.getDisplayName():""));
+            attributeRequestList.add(new AttributeRequest("npi",Operation.Add,Util.isNotNullOrEmpty(identity.getStringAttribute("npiNumber"))?identity.getStringAttribute("npiNumber"):""));
+            attributeRequestList.add(new AttributeRequest("docType",Operation.Add,dataMap.get("docType")!=null?dataMap.get("docType").toString().trim():""));
+            attributeRequestList.add(new AttributeRequest("TypeD48",Operation.Add,dataMap.get("TypeD48")!=null?dataMap.get("TypeD48").toString().trim():""));
+            attributeRequestList.add(new AttributeRequest("TypeH48",Operation.Add,dataMap.get("TypeH48")!=null?dataMap.get("TypeH48").toString().trim():""));
+            attributeRequestList.add(new AttributeRequest("TypeP48",Operation.Add,dataMap.get("TypeP48")!=null?dataMap.get("TypeP48").toString().trim():""));
+            attributeRequestList.add(new AttributeRequest("TypeS48",Operation.Add,dataMap.get("TypeS48")!=null?dataMap.get("TypeS48").toString().trim():""));
+            attributeRequestList.add(new AttributeRequest("TypeT40",Operation.Add,dataMap.get("TypeT40")!=null?dataMap.get("TypeT40").toString().trim():""));
+            attributeRequestList.add(new AttributeRequest("TypeM45",Operation.Add,dataMap.get("TypeM45")!=null?dataMap.get("TypeM45").toString().trim():""));
+            attributeRequestList.add(new AttributeRequest("ReqType",Operation.Add,dataMap.get("ReqType")!=null?dataMap.get("ReqType").toString().trim():""));
+            attributeRequestList.add(new AttributeRequest("RecID",Operation.Add,identityRequestId));
+            attributeRequestList.add(new AttributeRequest("submitEmail",Operation.Add,Util.isNotNullOrEmpty(identity.getEmail())?identity.getEmail():""));
+            drAcctReq.setAttributeRequests(attributeRequestList);
+            tempPlan.setIdentity(identity);
+            drAcctReq.setOperation(ProvisioningPlan.AccountRequest.Operation.Create);
+            drAcctReq.setApplication("Doctor Master");						
+            tempPlan.add(drAcctReq);
+          }
+          context.decache(identity);
+        }
+      }
+    }catch(Exception e){
+      logger.error("Exception in Cerner-Service Now Before Provisioining : "+e.getMessage());
+    }
+	logger.debug("createDrMasterPlan exiting");
+    return tempPlan;
+  }
+
+  public String getValue(String value){
+    String ref = "Ref";
+    String adm = "Adm";
+    String con = "Con";
+    String ord = "Ord";
+
+    if(Util.isNotNullOrEmpty(value)){
+      if(value.toUpperCase().startsWith(adm.toUpperCase())){
+        value = adm;
+      }else if(value.toUpperCase().startsWith(con.toUpperCase())){
+        value = con;
+      }else if(value.toUpperCase().startsWith(ord.toUpperCase())){
+        value = ord;
+      }else{
+        value = ref;
+      }
+    }else{
+      value = "";
+    }
+    return value;
+  }
+  
+  // Logic starts from here
+  static Log logger = LogFactory.getLog("rule.Ascension-Rule-BeforeProvisioning-Cerner");
+  logger.debug("Entering Ascension-Rule-BeforeProvisioning-Cerner");
+
+
+
+  String requested_for = "";
+  String requester = "spadmin";
+  String identityRequestId = "";
+  Map arguments = new HashMap();
+  Identity identity = null;
+  String userType = "";
+  ProvisioningPlan drPlan = null;
+  Map dataMap = null;
+  boolean remvoeRequest = false;
+
+  if(plan != null){
+    if(Util.isNotNullOrEmpty(plan.getString("identityRequestId"))){
+      identityRequestId = plan.getString("identityRequestId");
+    }
+    if (plan.getArguments() != null) {
+      arguments = (Map)plan.getArguments();
+    }
+    if(plan.get("requested_for")!=null && Util.isNotNullOrEmpty(plan.get("requested_for").toString()) ){
+      requested_for = plan.get("requested_for").toString();
+      identity = context.getObjectByName(Identity.class, requested_for);
+    }
+    if(identity!=null){
+      userType = identity.getStringAttribute("type");
+    }
+    if(Util.nullSafeCaseInsensitiveEq("physician",userType)){
+
+      ///
+
+      if(plan.getAccountRequests()!=null && plan.getAccountRequests(application.getName())!=null && !plan.getAccountRequests(application.getName()).isEmpty() ){
+        for(AccountRequest accReq : plan.getAccountRequests(application.getName())){
+          remvoeRequest = false;
+          if(accReq != null && accReq.getAttributeRequests()!=null && !accReq.getAttributeRequests().isEmpty() 
+             && accReq.getOperation() != null && (AccountRequest.Operation.Create.equals(accReq.getOperation()) || AccountRequest.Operation.Modify.equals(accReq.getOperation())) ){
+            dataMap = new HashMap();
+            for(AttributeRequest attReq : accReq.getAttributeRequests()){
+              if(attReq.getOperation()!=null &&  (Operation.Add.equals(attReq.getOperation()) || Operation.Set.equals(attReq.getOperation())) ){
+                if("ST. DeKalb Location Type".equalsIgnoreCase(attReq.getName())){
+                  if(attReq.getValue()!=null){
+                    dataMap.put("TypeD48",getValue(attReq.getValue().toString()));
+                  }
+                }else if("ST. Highlands Location Type".equalsIgnoreCase(attReq.getName())){
+                  if(attReq.getValue()!=null){
+                    dataMap.put("TypeH48",getValue(attReq.getValue().toString()));
+                  }
+                }else if("ST. Riverpark Location Type".equalsIgnoreCase(attReq.getName())){
+                  if(attReq.getValue()!=null){
+                    dataMap.put("TypeP48",getValue(attReq.getValue().toString()));
+                  }
+                }else if("ST. Stones Location Type".equalsIgnoreCase(attReq.getName())){
+                  if(attReq.getValue()!=null){
+                    dataMap.put("TypeS48",getValue(attReq.getValue().toString()));
+                  }
+                }else if("ST. West Location Type".equalsIgnoreCase(attReq.getName())){
+                  if(attReq.getValue()!=null){
+                    dataMap.put("TypeT40",getValue(attReq.getValue().toString()));
+                  }
+                }else if("ST. Rutherford Location Type".equalsIgnoreCase(attReq.getName())){
+                  if(attReq.getValue()!=null){
+                    dataMap.put("TypeM45",getValue(attReq.getValue().toString()));
+                  }
+                }else if("Provider Credentials".equalsIgnoreCase(attReq.getName())){
+                  if(attReq.getValue()!=null){
+                    dataMap.put("docType",attReq.getValue().toString());
+                  }
+                }
+                else{
+                  dataMap.put(attReq.getName(),attReq.getValue());
+                }
+              }else if(Operation.Remove.equals(attReq.getOperation()) || Operation.Revoke.equals(attReq.getOperation())){
+                //remove request
+                remvoeRequest = true;
+                dataMap.clear();
+                break;
+              }
+            }
+        
+            if(!remvoeRequest ){
+              // call workflow
+              ////
+              dataMap.put("ReqType",(AccountRequest.Operation.Create.equals(accReq.getOperation()))?"Add":accReq.getOperation() );
+              drPlan = createDrMasterPlan();
+
+             
+              if(drPlan !=null){
+                
+                logger.debug("Dr Master launch Workflow Starting");
+
+                WorkflowLaunch wfl = new WorkflowLaunch();
+                wfl.setWorkflowRef("Ascension-Workflow-DoctorMaster");
+                wfl.setLauncher(context.getUserName());
+                wfl.setCaseName("Dr Master Provision " + new Date());
+
+                Map wfArgsMap =  new HashMap();
+                wfArgsMap.put("plan", drPlan);
+                wfArgsMap.put("launcher", context.getUserName());
+                wfArgsMap.put("identityName", requested_for);
+
+                wfl.setVariables(wfArgsMap);
+                Workflower wf = new Workflower(context);
+                try {
+                  wf.launch(wfl);
+                  logger.debug("Dr Master workflow launched successfully");
+                } catch (GeneralException e) {
+                  logger.error("Exception in launching workflow  " + e.getMessage());
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  logger.debug("Exiting Ascension-Rule-BeforeProvisioning-Cerner");
+
+
+  ]]></Source>
+</Rule>

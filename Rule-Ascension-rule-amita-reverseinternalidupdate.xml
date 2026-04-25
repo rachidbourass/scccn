@@ -1,0 +1,235 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-AMITA-ReverseInternalIDUpdate">
+  <Signature returnType="Map">
+    <Inputs>
+      <Argument name="log">
+        <Description>
+          The log object associated with the SailPointContext.
+        </Description>
+      </Argument>
+      <Argument name="context">
+        <Description>
+          A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+        </Description>
+      </Argument>
+      <Argument name="filePath" type="String"/>
+    </Inputs>
+    <Returns>
+      <Argument name="successUserNames">
+        <Description>
+          Success User Names
+        </Description>
+      </Argument>
+      <Argument name="failedUserNames">
+        <Description>
+          Failed User Names
+        </Description>
+      </Argument>
+    </Returns>
+  </Signature>
+  <Source><![CDATA[
+  import java.io.File;
+  import java.io.FileNotFoundException;
+  import java.util.ArrayList;
+  import java.util.HashMap;
+  import java.util.List;
+  import java.util.Map;
+  import java.util.Scanner;
+  import java.io.BufferedWriter;
+  import sailpoint.object.Custom;
+
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  import sailpoint.api.SailPointContext;
+  import sailpoint.api.SailPointFactory;
+  import sailpoint.object.Attributes;
+  import sailpoint.object.Identity;
+  import sailpoint.object.TaskResult;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.Message;
+  import sailpoint.tools.Util;
+
+  Log logger = LogFactory.getLog("sailpoint.ascension.task.InternalIdLog.AscensionRuleAMITAReverseInternalIDUpdate");
+  List modifiedSIDsList = new ArrayList();
+  int idNameIndex = 0;
+  int internalIdIndex = 0;
+  String identityName = null;
+  String oldInternalId = null;
+  List successUserNames = new ArrayList();
+  List failedUserNames = new ArrayList();
+
+  public void updateOldInternalId(String identityName, String internalId) {
+    Identity identity = context.getObjectByName(Identity.class, identityName);
+    if(null != identity) {
+      String newInternalId = identity.getStringAttribute("internalId");
+      identity.setAttribute("internalId", internalId);
+      context.saveObject(identity);
+      context.commitTransaction();
+      logger.debug("Old internal ID is successfully updated for the identity: " + identityName);
+      modifiedSIDsList.add("idName: " + identityName + " || updatedOldChildInternalId: " + internalId); 
+      successUserNames.add(identityName);
+      String personaType = identity.getStringAttribute("personaType");
+	  
+	  //Check if primary and update the parent SID in the child identities
+	  
+      if(Util.nullSafeCaseInsensitiveEq("Primary", personaType)) {
+        List childPersonaNames = identity.getAttribute("childPersonaNames");
+        if(childPersonaNames != null && !childPersonaNames.isEmpty()) {
+          for (String childPersonaName : childPersonaNames) {
+            try {
+              Identity childIdentity = context.getObjectByName(Identity.class, childPersonaName);
+              if(childIdentity != null) {
+                childIdentity.setAttribute("parentPersonaSID", internalId);
+                context.saveObject(childIdentity);
+                context.commitTransaction();
+              } else {
+                stringBufferObj.append("UserName: " + identityName + " || failed to set Parent SID for the child identity: " + childPersonaName);
+                stringBufferObj.append("\n");
+              }
+            }
+            catch(Exception ex) {
+              stringBufferObj.append("UserName: " + identityName + " || failed to set Parent SID for the child identity: " + childPersonaName);
+              stringBufferObj.append("\n");
+              logger.error(ex.getMessage());
+            }
+          }
+        }
+      } 
+	  
+	  //check if child and update the child SID in the parent identities
+	  
+	  else if(Util.nullSafeCaseInsensitiveEq("Child", personaType)){
+        String parentPersonaName = identity.getStringAttribute("parentPersonaName");
+        Identity parentIdentity = context.getObjectByName(Identity.class, parentPersonaName);
+        if (parentIdentity == null) 
+        {
+          logger.error("parentIdentity not found: " + parentPersonaName);
+        }
+        else 
+        {
+          List childPersonas = parentIdentity.getAttribute("childPersonas");
+          logger.debug("childPersonas: " + childPersonas);
+          if (childPersonas != null && !childPersonas.isEmpty() && childPersonas.contains(newInternalId)) 
+          {
+            childPersonas.remove(newInternalId);
+            childPersonas.add(internalId);
+            parentIdentity.setAttribute("childPersonas", childPersonas);
+            context.saveObject(parentIdentity);
+            context.commitTransaction();
+          }
+        }
+      }
+    } 
+	else {
+      stringBufferObj.append("UserName: " + identityName + " || Identity not found");
+      stringBufferObj.append("\n");
+      failedUserNames.add(identityName);
+    }
+  }
+  public void readInputFile(String filePath) throws GeneralException {
+    logger.debug("Entering method readInputFile ");
+
+    int lineCount = 0;
+    String headerString = null;
+    int headerLength = 0;
+    List allUsersList = new ArrayList();
+    String[] headerSplit = null;
+    Scanner sc = null;
+    try {
+      if (Util.isNotNullOrEmpty(filePath)) {
+        File file = new File(filePath);
+        if (!file.exists() || file.isDirectory()) {
+          logger.error("File doesnt exist");
+          taskResult.addMessage(new Message(Message.Type.Warn, "Input file does not exist : " + filePath, null));
+          return null;
+        }
+        try {
+          sc = new Scanner(file);
+        }
+        catch (FileNotFoundException fnex) {
+          logger.error("FileNotFoundException : " + fnex.getMessage());
+          taskResult.addMessage(new Message(Message.Type.Error, "File not found " + fnex.getMessage(), null));
+        }
+        Identity identity = null;
+        List userNameList = new ArrayList();
+        while (sc.hasNextLine()) {
+          String line = sc.nextLine();
+          //For the first line in excel file, get the index of Identity Name and Internal ID
+          if (lineCount == 0) {
+            headerString = line;
+            lineCount++;
+            logger.debug("headerString : " + headerString);
+            if (Util.isNotNullOrEmpty(headerString) && headerString.contains("|")) {
+              String[] headerSplit = headerString.split("\\|");
+              if (headerSplit != null) {
+                headerLength = headerSplit.length;
+                for (int i = 0; i < headerLength; i++) {
+                  String headerValue = headerSplit[i];
+                  if (Util.isNotNullOrEmpty(headerValue)) {
+                    if (Util.nullSafeCaseInsensitiveEq(headerValue,"identityCubeName")) {
+                      idNameIndex = i;
+                    } else if (Util.nullSafeCaseInsensitiveEq(headerValue,"internalId")) {
+                      internalIdIndex = i;
+                    } 
+                  }
+                }
+              }
+            }
+            continue;
+          }
+          //This logic is executed for all other lines in the excel file other than the first line
+          if (Util.isNotNullOrEmpty(line) && line.contains("|")) {
+            String[] eachLineSplit = line.split("\\|");
+            if (eachLineSplit != null && eachLineSplit.length == headerLength) {
+              identityName = eachLineSplit[idNameIndex];
+              oldInternalId = eachLineSplit[internalIdIndex];
+              if(Util.isNotNullOrEmpty(identityName) && Util.isNotNullOrEmpty(oldInternalId)) {
+                updateOldInternalId(identityName, oldInternalId);
+              }
+            }
+          }
+          lineCount++;
+        }
+      }
+    }
+    catch (Exception ex) {
+      logger.error("Exception readInputFile :: " + ex.getMessage());
+      taskResult.addMessage(new Message(Message.Type.Error, "Exception : " + ex.getMessage(), null));
+    }
+    finally {
+      if (sc != null){
+        sc.close();
+	  }
+    }
+    logger.debug("Exiting method readInputFile");
+  }
+  /**** Main method ****/
+  logger.debug("Starting main method || rule:  Ascension-Rule-AMITA-ReverseInternalIDUpdate");
+  //fileLocation and pathOut values can be changed as required
+  String fileLocation = "\\\\ANDC1WAPP0143.ds.sjhs.com\\AppAggregation\\";
+  String pathOut = "\\\\ANDC1WAPP0143.ds.sjhs.com\\AppAggregation\\t";
+  StringBuffer stringBufferObj = new StringBuffer();
+  readInputFile(fileLocation);
+
+  int lineCount = 0;
+  BufferedWriter outputFile = null;
+  try {
+    outputFile = new BufferedWriter(new FileWriter(pathOut));
+    outputFile.append(stringBufferObj.toString());
+  } catch (IOException e) {
+    logger.error("IOException : "+e.getMessage());
+  } finally {
+    try {
+      outputFile.flush();  
+      outputFile.close();
+    } catch (IOException e) {
+      logger.error("IOException : "+e.getMessage());
+    }
+  }
+  logger.debug("Sucessful Users: " + successUserNames);
+  logger.debug("Failed Users: " + failedUserNames);
+  return "Identities Updated: " + modifiedSIDsList;
+  ]]></Source>
+</Rule>

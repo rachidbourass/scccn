@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-Rule-CleanUp-IdentityName">
+  <Description>
+      This rule is intended to clean up identityName values that don't match the PeopleSoft employeeNumber
+   </Description>
+  <Signature returnType="String">
+    <Inputs>
+      <Argument name="context">
+        <Description>
+               A sailpoint.api.SailPointContext object that can be used to query the database if necessary.
+            </Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+        import org.apache.commons.logging.Log;
+        import org.apache.commons.logging.LogFactory;
+        import sailpoint.api.SailPointContext;
+        import sailpoint.object.AuditEvent;
+        import sailpoint.object.Attributes;
+        import sailpoint.object.Identity;
+        import sailpoint.object.Filter;
+        import sailpoint.object.QueryOptions;
+        import sailpoint.tools.Util;
+        import sailpoint.api.Terminator;
+        import sailpoint.object.TaskResult;
+        import sailpoint.object.WorkItem;
+        import sailpoint.object.WorkItem.State;
+        import sailpoint.object.IdentityRequest;
+        import sailpoint.object.WorkflowCase;
+
+        import java.io.BufferedReader;
+        import java.io.BufferedWriter;
+        import java.io.File;
+        import java.io.FileNotFoundException;
+        import java.io.FileOutputStream;
+        import java.io.FileReader;
+        import java.io.FileWriter;
+        import java.io.IOException;
+        import java.io.PrintWriter;
+        import java.io.UnsupportedEncodingException;
+  
+        public void reassociateAuditEvents(String identityName, String employeeNumber) {
+          qo = new QueryOptions();
+          qo.addFilter(Filter.eq("target","Identity:" + identityName));
+          List auditEventList = context.getObjects(AuditEvent.class, ops);
+
+          for (AuditEvent auditEvent : auditEventList) {
+              auditEvent.setTarget("Identity:" + employeeNumber);
+              context.saveObject(auditEvent);
+              context.commitTransaction();
+//              context.decache(auditEvent);
+          }
+        }
+        
+        private static Log logger = LogFactory.getLog("rule.ascension.cleanup.identityname");
+        public static int count = 0;
+        boolean reportOnly = true;
+        taskResult.setCompletionStatus(TaskResult.CompletionStatus.Success);
+
+        String fileName = "D:/Files/identitiesToUpdate.csv";
+        BufferedWriter outFile = new BufferedWriter(new FileWriter(fileName));
+
+        QueryOptions qo = new QueryOptions();
+        qo.addFilter(Filter.eq("links.application.name","DB-Peoplesoft-HCM-Primary"));
+        qo.setCloneResults(true);
+        Iterator it = context.search(Identity.class, qo, "name");
+
+        while(it.hasNext()){
+            String identityName = it.next()[0];
+
+            try{
+                ++count;
+
+                Identity identity = context.getObjectByName(Identity.class, identityName);
+
+                if(identity == null)
+                    continue;
+
+                String employeeNumber = identity.getStringAttribute("employeeId");
+              
+                boolean hasPendingRequests = false;
+                QueryOptions qo2 = new QueryOptions();
+                qo2.addFilter(Filter.eq("targetId", identity.getId()));
+                List<IdentityRequest> identityRequestList = context.getObjects(IdentityRequest.class, qo2);
+                for(IdentityRequest identityRequest : identityRequestList){
+                  if(State.Finished != identityRequest.getState()){
+                    hasPendingRequests = true;
+                  }
+                }
+
+                if(Util.isNotNullOrEmpty(employeeNumber) && !identityName.equalsIgnoreCase(employeeNumber)){
+
+                    if(reportOnly || hasPendingRequests){
+                        outFile.write(identityName + ":" + employeeNumber + " - Pending Requests: " + hasPendingRequests);
+                        outFile.newLine();
+                    } else {
+                        identity.setName(employeeNumber);
+                        context.saveObject(identity);
+                        context.commitTransaction();
+                        reassociateAuditEvents(identityName, employeeNumber);
+                    }
+                }
+
+                identity = null;
+                if ((count % 20) == 0) {
+//                    context.decache();
+                    System.out.println("Count: " + count); 
+                }
+            } catch(Exception e){
+                taskResult.setCompletionStatus(TaskResult.CompletionStatus.Error);
+            }
+        }
+
+        outFile.close();
+
+        return ("Finished Processing " + count);
+      ]]></Source>
+</Rule>
