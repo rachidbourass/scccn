@@ -1,0 +1,396 @@
+Date: Sun, 26 Apr 2026 00:12:27 +0000 (UTC)
+Message-ID: <1815763445.499.1777162347748@49db1799607e>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_498_2020715287.1777162347747"
+
+------=_Part_498_2020715287.1777162347747
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html xmlns:o=3D'urn:schemas-microsoft-com:office:office'
+      xmlns:w=3D'urn:schemas-microsoft-com:office:word'
+      xmlns:v=3D'urn:schemas-microsoft-com:vml'
+      xmlns=3D'urn:w3-org-ns:HTML'>
+<head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8=
+">
+    <title>Assignment Based Deprovisioning (Associate) (Use Case =E2=80=93 =
+UC19)</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:TargetScreenSize>1024x640</o:TargetScreenSize>
+            <o:PixelsPerInch>72</o:PixelsPerInch>
+            <o:AllowPNG/>
+        </o:OfficeDocumentSettings>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+                <!--
+        @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-paper-source: 0;
+        }
+
+        table {
+            border: solid 1px;
+            border-collapse: collapse;
+        }
+
+        table td, table th {
+            border: solid 1px;
+            padding: 5px;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        tr {
+            page-break-after: avoid;
+        }
+
+        div.Section1 {
+            page: Section1;
+        }
+
+        /* Confluence print stylesheet. Common to all themes for print medi=
+a */
+/* Full of !important until we improve batching for print CSS */
+
+@media print {
+    #main {
+        padding-bottom: 1em !important; /* The default padding of 6em is to=
+o much for printouts */
+    }
+
+    body {
+        font: var(--ds-font-body-small, Arial, Helvetica, FreeSans, sans-se=
+rif);
+    }
+
+    body, #full-height-container, #main, #page, #content, .has-personal-sid=
+ebar #content {
+        background: var(--ds-surface, #fff) !important;
+        color: var(--ds-text, #000) !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    a, a:link, a:visited, a:focus, a:hover, a:active {
+        color: var(--ds-text, #000);
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content h5,
+    #content h6 {
+        page-break-after: avoid;
+    }
+
+    pre {
+        font: var(--ds-font-code, Monaco, "Courier New", monospace);
+    }
+
+    #header,
+    .aui-header-inner,
+    #navigation,
+    #sidebar,
+    .sidebar,
+    #personal-info-sidebar,
+    .ia-fixed-sidebar,
+    .page-actions,
+    .navmenu,
+    .ajs-menu-bar,
+    .noprint,
+    .inline-control-link,
+    .inline-control-link a,
+    a.show-labels-editor,
+    .global-comment-actions,
+    .comment-actions,
+    .quick-comment-container,
+    #addcomment {
+        display: none !important;
+    }
+
+    /* CONF-28544 cannot print multiple pages in IE */
+    #splitter-content {
+        position: relative !important;
+    }
+
+    .comment .date::before {
+        content: none !important; /* remove middot for print view */
+    }
+
+    h1.pagetitle img {
+        height: auto;
+        width: auto;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    #footer {
+        position: relative !important; /* CONF-17506 Place the footer at en=
+d of the content */
+        margin: 0;
+        padding: 0;
+        background: none;
+        clear: both;
+    }
+
+    #poweredby {
+        border-top: none;
+        background: none;
+    }
+
+    #poweredby li.print-only {
+        display: list-item;
+        font-style: italic;
+    }
+
+    #poweredby li.noprint {
+        display: none;
+    }
+
+    /* no width controls in print */
+    .wiki-content .table-wrap,
+    .wiki-content p,
+    .panel .codeContent,
+    .panel .codeContent pre,
+    .image-wrap {
+        overflow: visible !important;
+    }
+
+    /* TODO - should this work? */
+    #children-section,
+    #comments-section .comment,
+    #comments-section .comment .comment-body,
+    #comments-section .comment .comment-content,
+    #comments-section .comment p {
+        page-break-inside: avoid;
+    }
+
+    #page-children a {
+        text-decoration: none;
+    }
+
+    /**
+     hide twixies
+
+     the specificity here is a hack because print styles
+     are getting loaded before the base styles. */
+    #comments-section.pageSection .section-header,
+    #comments-section.pageSection .section-title,
+    #children-section.pageSection .section-header,
+    #children-section.pageSection .section-title,
+    .children-show-hide {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .children-show-hide.icon {
+        display: none;
+    }
+
+    /* personal sidebar */
+    .has-personal-sidebar #content {
+        margin-right: 0px;
+    }
+
+    .has-personal-sidebar #content .pageSection {
+        margin-right: 0px;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+-->
+    </style>
+</head>
+<body>
+    <h1>Assignment Based Deprovisioning (Associate) (Use Case =E2=80=93 UC1=
+9)</h1>
+    <div class=3D"Section1">
+        <h3 id=3D"AssignmentBasedDeprovisioning(Associate)(UseCase=E2=80=93=
+UC19)-AssignmentBasedDeprovisioningworkflow">Assignment Based Deprovisionin=
+g workflow</h3>
+<p>Table-34</p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"1800" data-layout=3D"default" data-local-id=3D"4=
+dab3a17-40c5-49dd-b90f-c44b5cec5584" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 330.0px;">
+<col style=3D"width: 1469.0px;">
+</colgroup>
+<tbody>
+<tr>
+<td data-highlight-colour=3D"#d9e2f3" class=3D"confluenceTd">
+<p>Type</p></td>
+<td class=3D"confluenceTd">
+<p>Assignment Based Deprovisioning</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#d9e2f3" class=3D"confluenceTd">
+<p>Description</p></td>
+<td class=3D"confluenceTd">
+<p>This Assignment Based Deprovisioning workflow covers removal in user wor=
+k assignment</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#d9e2f3" class=3D"confluenceTd">
+<p>List of Attributes&nbsp;</p></td>
+<td class=3D"confluenceTd">
+<p>The following set of attributes represent the tentative set of users=E2=
+=80=99 attributes which will be used in the process flow. The final set of =
+source and target attributes will be finalized in the solution design docum=
+ent.</p>
+<ol start=3D"1">
+<li>
+<p>Person Number&nbsp;</p></li>
+<li>
+<p>Assignment Status&nbsp;</p></li>
+<li>
+<p>System Worker Type&nbsp;</p></li>
+<li>
+<p>Action Name&nbsp;</p></li>
+<li>
+<p>Department&nbsp;</p></li>
+<li>
+<p>Position&nbsp;</p></li>
+<li>
+<p>Location&nbsp;</p></li>
+<li>
+<p>Ministry&nbsp;</p></li>
+<li>
+<p>WORKRELATIONSHIP_PRIMARY_FLAG will be No</p></li>
+<li>
+<p>ASSIGNMENT_EFFECTIVE_START_DATE</p></li>
+<li>
+<p>ASSIGNMENT_EFFECTIVE_END_DATE</p></li>
+<li>
+<p>ASSIGNMENT_PRIMARY_FLAG</p></li>
+<li>
+<p>ASSIGNMENT_STATUS</p></li>
+<li>
+<p>TERMINATION_DATE</p></li>
+<li>
+<p>JOBCODE</p></li>
+<li>
+<p>ASSIGNMENT_ID=E2=80=8B</p></li>
+</ol>
+<p></p>
+<p>Refer Appendix =E2=80=9C<a class=3D"external-link" href=3D"https://drive=
+.google.com/drive/folders/17u4oN4VdyLijziIcn8PMSlUxT5HS_LW0" rel=3D"nofollo=
+w"><u>Source and Target Attribute Mapping</u></a>=E2=80=9D for complete lis=
+t of attribute mapping.</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#d9e2f3" class=3D"confluenceTd">
+<p>Pre-Conditions</p></td>
+<td class=3D"confluenceTd">
+<p>User should have a primary work relationship and ASSIGNMENT_PRIMARY_FLAG=
+ is set to =E2=80=98No=E2=80=99.</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#d9e2f3" class=3D"confluenceTd">
+<p>Trigger</p></td>
+<td class=3D"confluenceTd">
+<p>When following conditions are true:</p>
+<ol start=3D"1">
+<li>
+<p>=E2=80=98<strong>System Worker Type</strong>=E2=80=99 attribute should b=
+e equal to =E2=80=98<strong>Employee</strong>=E2=80=99.</p></li>
+<li>
+<p>=E2=80=98<strong>Action Name</strong>=E2=80=99 should be equal to =E2=80=
+=98<strong>End Assignment</strong>=E2=80=99.</p></li>
+<li>
+<p>=E2=80=98<strong>Assignment Status</strong>=E2=80=99 status is =E2=80=98=
+<strong>Inactive-Payroll Eligible</strong>=E2=80=99</p></li>
+</ol></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#d9e2f3" class=3D"confluenceTd">
+<p>Basic Flow</p></td>
+<td class=3D"confluenceTd">
+<ol start=3D"1">
+<li>
+<p>Users should have primary/secondary work Assignment assigned in SailPoin=
+t IdentityIQ.</p></li>
+<li>
+<p>Secondary/Primary work assignment deprovisioning initiation for primary =
+record in Oracle HCM Cloud.</p></li>
+<li>
+<p>SailPoint IdentityIQ removes secondary work Assignment based on ASSIGNME=
+NT_PRIMARY_FLAG .</p></li>
+</ol></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#d9e2f3" class=3D"confluenceTd">
+<p>List of downstream applications</p></td>
+<td class=3D"confluenceTd">
+<p>Active Directory, Azure, GSuite, ServiceNow, Oracle ERP Cloud, Oracle EP=
+M Cloud, OCI.</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#d9e2f3" class=3D"confluenceTd">
+<p>Acceptance criteria</p></td>
+<td class=3D"confluenceTd">
+<p>Secondary work Assignment deprovisioning process is triggered on removal=
+ of secondary assignment in Oracle HCM Cloud feed</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#d9e2f3" class=3D"confluenceTd">
+<p>Error handling</p></td>
+<td class=3D"confluenceTd">
+<p>A ServiceNow ticket will be created and assigned to the Ascension Health=
+ Alliance SailPoint IIQ support team.</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#d9e2f3" class=3D"confluenceTd">
+<p>Persona / Actors</p></td>
+<td class=3D"confluenceTd">
+<p>Automated Process</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p></p>
+<h3 id=3D"AssignmentBasedDeprovisioning(Associate)(UseCase=E2=80=93UC19)-As=
+signmentBasedDeprovisioningflowdiagram">Assignment Based Deprovisioning flo=
+w diagram</h3>
+<p>Diagram-18</p><span class=3D"confluence-embedded-file-wrapper image-cent=
+er-wrapper confluence-embedded-manual-size"><img class=3D"confluence-embedd=
+ed-image confluence-external-resource image-center" width=3D"1800" src=3D"h=
+ttps://lh7-rt.googleusercontent.com/docsz/AD_4nXd9eMdoCJ3wnTCnmRFiJI_FsSTOE=
+9NofTkDKZtXouj2OpGgLZcXRjo5R_0P14lgbHnKUsZALYsXLkjK9Iz4Q1LewRylEGqx1r-1805V=
+Cz7ZHZuFfcFwq7nhFFmMb3oQ9fRs4g3PioTPNzFtA6xewZo?key=3DTLN5qYAofk7cZFkEjvGAU=
+Wbk" data-image-src=3D"https://lh7-rt.googleusercontent.com/docsz/AD_4nXd9e=
+MdoCJ3wnTCnmRFiJI_FsSTOE9NofTkDKZtXouj2OpGgLZcXRjo5R_0P14lgbHnKUsZALYsXLkjK=
+9Iz4Q1LewRylEGqx1r-1805VCz7ZHZuFfcFwq7nhFFmMb3oQ9fRs4g3PioTPNzFtA6xewZo?key=
+=3DTLN5qYAofk7cZFkEjvGAUWbk" loading=3D"lazy"></span>
+<p></p>
+    </div>
+</body>
+</html>
+------=_Part_498_2020715287.1777162347747--

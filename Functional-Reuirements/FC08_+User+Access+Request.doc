@@ -1,0 +1,401 @@
+Date: Sun, 26 Apr 2026 00:01:19 +0000 (UTC)
+Message-ID: <278462735.423.1777161679373@0b243c39726a>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_422_1191045144.1777161679373"
+
+------=_Part_422_1191045144.1777161679373
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html xmlns:o=3D'urn:schemas-microsoft-com:office:office'
+      xmlns:w=3D'urn:schemas-microsoft-com:office:word'
+      xmlns:v=3D'urn:schemas-microsoft-com:vml'
+      xmlns=3D'urn:w3-org-ns:HTML'>
+<head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8=
+">
+    <title>FC08: User Access Request</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:TargetScreenSize>1024x640</o:TargetScreenSize>
+            <o:PixelsPerInch>72</o:PixelsPerInch>
+            <o:AllowPNG/>
+        </o:OfficeDocumentSettings>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+                <!--
+        @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-paper-source: 0;
+        }
+
+        table {
+            border: solid 1px;
+            border-collapse: collapse;
+        }
+
+        table td, table th {
+            border: solid 1px;
+            padding: 5px;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        tr {
+            page-break-after: avoid;
+        }
+
+        div.Section1 {
+            page: Section1;
+        }
+
+        /* Confluence print stylesheet. Common to all themes for print medi=
+a */
+/* Full of !important until we improve batching for print CSS */
+
+@media print {
+    #main {
+        padding-bottom: 1em !important; /* The default padding of 6em is to=
+o much for printouts */
+    }
+
+    body {
+        font: var(--ds-font-body-small, Arial, Helvetica, FreeSans, sans-se=
+rif);
+    }
+
+    body, #full-height-container, #main, #page, #content, .has-personal-sid=
+ebar #content {
+        background: var(--ds-surface, #fff) !important;
+        color: var(--ds-text, #000) !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    a, a:link, a:visited, a:focus, a:hover, a:active {
+        color: var(--ds-text, #000);
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content h5,
+    #content h6 {
+        page-break-after: avoid;
+    }
+
+    pre {
+        font: var(--ds-font-code, Monaco, "Courier New", monospace);
+    }
+
+    #header,
+    .aui-header-inner,
+    #navigation,
+    #sidebar,
+    .sidebar,
+    #personal-info-sidebar,
+    .ia-fixed-sidebar,
+    .page-actions,
+    .navmenu,
+    .ajs-menu-bar,
+    .noprint,
+    .inline-control-link,
+    .inline-control-link a,
+    a.show-labels-editor,
+    .global-comment-actions,
+    .comment-actions,
+    .quick-comment-container,
+    #addcomment {
+        display: none !important;
+    }
+
+    /* CONF-28544 cannot print multiple pages in IE */
+    #splitter-content {
+        position: relative !important;
+    }
+
+    .comment .date::before {
+        content: none !important; /* remove middot for print view */
+    }
+
+    h1.pagetitle img {
+        height: auto;
+        width: auto;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    #footer {
+        position: relative !important; /* CONF-17506 Place the footer at en=
+d of the content */
+        margin: 0;
+        padding: 0;
+        background: none;
+        clear: both;
+    }
+
+    #poweredby {
+        border-top: none;
+        background: none;
+    }
+
+    #poweredby li.print-only {
+        display: list-item;
+        font-style: italic;
+    }
+
+    #poweredby li.noprint {
+        display: none;
+    }
+
+    /* no width controls in print */
+    .wiki-content .table-wrap,
+    .wiki-content p,
+    .panel .codeContent,
+    .panel .codeContent pre,
+    .image-wrap {
+        overflow: visible !important;
+    }
+
+    /* TODO - should this work? */
+    #children-section,
+    #comments-section .comment,
+    #comments-section .comment .comment-body,
+    #comments-section .comment .comment-content,
+    #comments-section .comment p {
+        page-break-inside: avoid;
+    }
+
+    #page-children a {
+        text-decoration: none;
+    }
+
+    /**
+     hide twixies
+
+     the specificity here is a hack because print styles
+     are getting loaded before the base styles. */
+    #comments-section.pageSection .section-header,
+    #comments-section.pageSection .section-title,
+    #children-section.pageSection .section-header,
+    #children-section.pageSection .section-title,
+    .children-show-hide {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .children-show-hide.icon {
+        display: none;
+    }
+
+    /* personal sidebar */
+    .has-personal-sidebar #content {
+        margin-right: 0px;
+    }
+
+    .has-personal-sidebar #content .pageSection {
+        margin-right: 0px;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+-->
+    </style>
+</head>
+<body>
+    <h1>FC08: User Access Request</h1>
+    <div class=3D"Section1">
+        <h3 id=3D"FC08:UserAccessRequest-1.AccessRequestfornewApplicationAc=
+count">1. Access Request for new Application Account</h3>
+<ul>
+<li>
+<p>Assumption for this process is that users do not have an account in the =
+application for which access is being requested.</p></li>
+<li>
+<p>Request for access is raised by the requester either on behalf of anothe=
+r user or for self by providing the required information in the User access=
+ request form.</p></li>
+<li>
+<p>SailPoint IdentityIQ check for SOD violation, if an SOD violation exists=
+ then the request will not be submitted. If no violation occurs the request=
+ gets submitted.</p></li>
+<li>
+<p>The request is sent to the requestee=E2=80=99s line manager for approval=
+. If the request is rejected by the line manager, the requester is notified=
+ by email and the request is automatically closed.&nbsp;</p></li>
+<li>
+<p>If the request is approved by the line manager, the request is sent to t=
+he access owner for the next level of approval. If the request is rejected =
+by the access owner, the requester is notified, and the request is automati=
+cally closed.&nbsp;</p></li>
+<li>
+<p>Once approved by the access owner, the request will be sent for provisio=
+ning.</p></li>
+<li>
+<p>After receiving the required approvals, access is provisioned as defined=
+ by the application and the requester is notified.&nbsp;</p></li>
+<li>
+<p>The security team will be notified by a ServiceNow ticket if there is a =
+problem encountered during the request provisioning. The security team will=
+ analyze the request status and take appropriate action to resolve issues e=
+ither by provisioning the access manually or by creating a new request in S=
+ailPoint IIQ to retry the access provisioning.&nbsp;</p></li>
+<li>
+<p>New access requests created by the security team for provisioning retry =
+will follow the same path as a new access request.</p></li>
+</ul>
+<p><strong>Dependency:</strong></p>
+<p>Table-14</p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"959" data-layout=3D"default" data-local-id=3D"f5=
+615d90-8dc1-43da-abcc-975113cbdff2" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 70.0px;">
+<col style=3D"width: 446.0px;">
+<col style=3D"width: 443.0px;">
+</colgroup>
+<tbody>
+<tr>
+<td data-highlight-colour=3D"#d4deec" class=3D"confluenceTd">
+<p>S. no</p></td>
+<td data-highlight-colour=3D"#d4deec" class=3D"confluenceTd">
+<p>Dependency</p></td>
+<td data-highlight-colour=3D"#d4deec" class=3D"confluenceTd">
+<p>Point of contact for answers</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>1</p></td>
+<td class=3D"confluenceTd">
+<p>Set up SOD mitigations for roles/ entitlements in SailPoint IdentityIQ</=
+p></td>
+<td class=3D"confluenceTd">
+<p>Ascension Health Alliance team to provide mitigated roles/entitlements l=
+ist</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>2</p></td>
+<td class=3D"confluenceTd">
+<p>After request is approved requester gets notified</p></td>
+<td class=3D"confluenceTd">
+<p>Ascension Health Alliance team to confirm notification templates</p></td=
+>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id=3D"FC08:UserAccessRequest-2.RequestforAccessProvisioning/De-Provisio=
+ningforanExistingApplicationAccount">2. Request for Access Provisioning/De-=
+Provisioning for an Existing Application Account</h3>
+<ul>
+<li>
+<p>Assumption for this process is that users already have an account in the=
+ application for which additional access is being requested or existing acc=
+ess is being removed.</p></li>
+<li>
+<p>Request for additional access or removal for existing access is raised b=
+y the requester either on behalf of another user or for self by providing r=
+equired information in user access request form.&nbsp;</p></li>
+<li>
+<p>SailPoint IIQ check for SOD violation, if an SOD violation exists then t=
+he request will not be submitted. If no violation occurs the request gets s=
+ubmitted.</p></li>
+<li>
+<p>The request is sent to the requestee=E2=80=99s line manager for approval=
+. If the request is rejected by the line manager, the requester is notified=
+ by email and the requests are automatically closed.&nbsp;</p></li>
+<li>
+<p>If the request is approved by the line manager, the request is sent to t=
+he access owner for the next level of approval. If the request is rejected =
+by the access owner, the requester is notified, and the request is automati=
+cally closed.&nbsp;</p></li>
+<li>
+<p>Once approved by the access owner, the request will be sent for provisio=
+ning/de-provisioning.</p></li>
+<li>
+<p>After receiving the required approvals, access is provisioned/de-provisi=
+oned as defined by the application and the requester is notified.&nbsp;</p>=
+</li>
+<li>
+<p>The security team will be notified by a ServiceNow ticket if there is a =
+problem encountered during the request provisioning. The security team will=
+ analyze the request status and take appropriate action to resolve the issu=
+e either by provisioning/de-provisioning the access manually or by creating=
+ a new request in SailPoint IIQ to re-try the access provisioning/de-provis=
+ioning.&nbsp;</p></li>
+<li>
+<p>New access requests created by the security team for provisioning/de-pro=
+visioning retry will follow the same path as a new access request.</p></li>
+</ul>
+<p><strong>Dependency:</strong></p>
+<p>Table-15</p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"1005" data-layout=3D"default" data-local-id=3D"e=
+064845d-9276-4d11-bf7f-f5c9c6642b03" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 74.0px;">
+<col style=3D"width: 434.0px;">
+<col style=3D"width: 494.0px;">
+</colgroup>
+<tbody>
+<tr>
+<td data-highlight-colour=3D"#d4deec" class=3D"confluenceTd">
+<p>S. no</p></td>
+<td data-highlight-colour=3D"#d4deec" class=3D"confluenceTd">
+<p>Dependency</p></td>
+<td data-highlight-colour=3D"#d4deec" class=3D"confluenceTd">
+<p>Point of contact for answers</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>1</p></td>
+<td class=3D"confluenceTd">
+<p>Set up SOD mitigations for roles/ entitlements in SailPoint IdentityIQ</=
+p></td>
+<td class=3D"confluenceTd">
+<p>Ascension Health Alliance team to provide mitigated roles/entitlements l=
+ist</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>2</p></td>
+<td class=3D"confluenceTd">
+<p>After request is approved requester gets notified</p></td>
+<td class=3D"confluenceTd">
+<p>Ascension Health Alliance team to confirm on notification templates</p><=
+/td>
+</tr>
+</tbody>
+</table>
+</div>
+<p></p>
+    </div>
+</body>
+</html>
+------=_Part_422_1191045144.1777161679373--

@@ -1,0 +1,2455 @@
+Date: Sun, 26 Apr 2026 14:35:04 +0000 (UTC)
+Message-ID: <1265505358.807.1777214104606@49db1799607e>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_806_1561379168.1777214104606"
+
+------=_Part_806_1561379168.1777214104606
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html xmlns:o=3D'urn:schemas-microsoft-com:office:office'
+      xmlns:w=3D'urn:schemas-microsoft-com:office:word'
+      xmlns:v=3D'urn:schemas-microsoft-com:vml'
+      xmlns=3D'urn:w3-org-ns:HTML'>
+<head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8=
+">
+    <title>AD-PRESENCEHEALTH Application</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:TargetScreenSize>1024x640</o:TargetScreenSize>
+            <o:PixelsPerInch>72</o:PixelsPerInch>
+            <o:AllowPNG/>
+        </o:OfficeDocumentSettings>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+                <!--
+        @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-paper-source: 0;
+        }
+
+        table {
+            border: solid 1px;
+            border-collapse: collapse;
+        }
+
+        table td, table th {
+            border: solid 1px;
+            padding: 5px;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        tr {
+            page-break-after: avoid;
+        }
+
+        div.Section1 {
+            page: Section1;
+        }
+
+        /* Confluence print stylesheet. Common to all themes for print medi=
+a */
+/* Full of !important until we improve batching for print CSS */
+
+@media print {
+    #main {
+        padding-bottom: 1em !important; /* The default padding of 6em is to=
+o much for printouts */
+    }
+
+    body {
+        font: var(--ds-font-body-small, Arial, Helvetica, FreeSans, sans-se=
+rif);
+    }
+
+    body, #full-height-container, #main, #page, #content, .has-personal-sid=
+ebar #content {
+        background: var(--ds-surface, #fff) !important;
+        color: var(--ds-text, #000) !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    a, a:link, a:visited, a:focus, a:hover, a:active {
+        color: var(--ds-text, #000);
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content h5,
+    #content h6 {
+        page-break-after: avoid;
+    }
+
+    pre {
+        font: var(--ds-font-code, Monaco, "Courier New", monospace);
+    }
+
+    #header,
+    .aui-header-inner,
+    #navigation,
+    #sidebar,
+    .sidebar,
+    #personal-info-sidebar,
+    .ia-fixed-sidebar,
+    .page-actions,
+    .navmenu,
+    .ajs-menu-bar,
+    .noprint,
+    .inline-control-link,
+    .inline-control-link a,
+    a.show-labels-editor,
+    .global-comment-actions,
+    .comment-actions,
+    .quick-comment-container,
+    #addcomment {
+        display: none !important;
+    }
+
+    /* CONF-28544 cannot print multiple pages in IE */
+    #splitter-content {
+        position: relative !important;
+    }
+
+    .comment .date::before {
+        content: none !important; /* remove middot for print view */
+    }
+
+    h1.pagetitle img {
+        height: auto;
+        width: auto;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    #footer {
+        position: relative !important; /* CONF-17506 Place the footer at en=
+d of the content */
+        margin: 0;
+        padding: 0;
+        background: none;
+        clear: both;
+    }
+
+    #poweredby {
+        border-top: none;
+        background: none;
+    }
+
+    #poweredby li.print-only {
+        display: list-item;
+        font-style: italic;
+    }
+
+    #poweredby li.noprint {
+        display: none;
+    }
+
+    /* no width controls in print */
+    .wiki-content .table-wrap,
+    .wiki-content p,
+    .panel .codeContent,
+    .panel .codeContent pre,
+    .image-wrap {
+        overflow: visible !important;
+    }
+
+    /* TODO - should this work? */
+    #children-section,
+    #comments-section .comment,
+    #comments-section .comment .comment-body,
+    #comments-section .comment .comment-content,
+    #comments-section .comment p {
+        page-break-inside: avoid;
+    }
+
+    #page-children a {
+        text-decoration: none;
+    }
+
+    /**
+     hide twixies
+
+     the specificity here is a hack because print styles
+     are getting loaded before the base styles. */
+    #comments-section.pageSection .section-header,
+    #comments-section.pageSection .section-title,
+    #children-section.pageSection .section-header,
+    #children-section.pageSection .section-title,
+    .children-show-hide {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .children-show-hide.icon {
+        display: none;
+    }
+
+    /* personal sidebar */
+    .has-personal-sidebar #content {
+        margin-right: 0px;
+    }
+
+    .has-personal-sidebar #content .pageSection {
+        margin-right: 0px;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+-->
+    </style>
+</head>
+<body>
+    <h1>AD-PRESENCEHEALTH Application</h1>
+    <div class=3D"Section1">
+        <p>
+<style>[data-colorid=3Dj6d95a67ve]{color:#ff5630} html[data-color-mode=3Dda=
+rk] [data-colorid=3Dj6d95a67ve]{color:#cf2600}[data-colorid=3Dg7oxzgralo]{c=
+olor:#ff5630} html[data-color-mode=3Ddark] [data-colorid=3Dg7oxzgralo]{colo=
+r:#cf2600}</style><strong>Overview</strong></p>
+<p>Authoritative application , providing birthright access for Employees, C=
+ontractors &amp; Physicians.</p>
+<p></p>
+<p><strong>Connector Information</strong></p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"856" data-layout=3D"align-start" data-local-id=
+=3D"e28b39f0-4187-4422-8ed3-8f055b396aa5" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 378.0px;">
+<col style=3D"width: 477.0px;">
+</colgroup>
+<tbody>
+<tr>
+<td class=3D"confluenceTd">
+<p>Connector Name</p></td>
+<td class=3D"confluenceTd">
+<p>AD-PRESENCEHEALTH</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Connector Type</p></td>
+<td class=3D"confluenceTd">
+<p>Active Directory - Direct</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Connector Version</p></td>
+<td class=3D"confluenceTd">
+<p>8.4p1</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Vendor Documentation</p></td>
+<td class=3D"confluenceTd">
+<p><a class=3D"external-link" href=3D"https://documentation.sailpoint.com/c=
+onnectors/identityiq/active_directory/help/integrating_active_directory/int=
+ro.html" rel=3D"nofollow">Integrating SailPoint with Active Directory</a></=
+p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Connector Details</strong></p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"864" data-layout=3D"align-start" data-local-id=
+=3D"ed6ef1bc-c85c-43df-bc5b-9335085d74fe" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 378.0px;">
+<col style=3D"width: 485.0px;">
+</colgroup>
+<tbody>
+<tr>
+<td class=3D"confluenceTd">
+<p>=E2=81=A0Environment Name</p></td>
+<td class=3D"confluenceTd">
+<p>Production</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Owner</p></td>
+<td class=3D"confluenceTd">
+<p>IDM Team</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Connector Type</p></td>
+<td class=3D"confluenceTd">
+<p>Active Directory - Direct</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Authoritative Application</p></td>
+<td class=3D"confluenceTd">
+<p>False</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Revoker</p></td>
+<td class=3D"confluenceTd">
+<p>None</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Connector Configuration</strong></p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"864" data-layout=3D"align-start" data-local-id=
+=3D"6f8626cb-7b10-4ccb-b965-6a0433e68e25" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 378.0px;">
+<col style=3D"width: 485.0px;">
+</colgroup>
+<tbody>
+<tr>
+<td data-highlight-colour=3D"#f4f5f7" colspan=3D"2" class=3D"confluenceTd">
+<p><strong>IQService Configuration</strong></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>IQ Service Host / IP Address</p></td>
+<td class=3D"confluenceTd">
+<p><a class=3D"external-link" href=3D"http://ANDC2WAPP0431.ds.sjhs.com" rel=
+=3D"nofollow">ANDC2WAPP0431.ds.sjhs.com</a></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Port Number</p></td>
+<td class=3D"confluenceTd">
+<p>5050</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>IQ Service user</p></td>
+<td class=3D"confluenceTd">
+<p>ds\sailpointtomcat-ds</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>IQ Service Password</p></td>
+<td class=3D"confluenceTd">
+<p>***</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Use TLS</p></td>
+<td class=3D"confluenceTd">
+<p>True</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#f4f5f7" colspan=3D"2" class=3D"confluenceTd">
+<p><strong>Forest Configuration</strong></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Forest Name</p></td>
+<td class=3D"confluenceTd">
+<p>presencehealth.net</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Global Catalog Server</p></td>
+<td class=3D"confluenceTd">
+<p>10.120.56.140:3268</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>User</p></td>
+<td class=3D"confluenceTd">
+<p>presencehealth\S_sailpointprd-PRESE</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Password</p></td>
+<td class=3D"confluenceTd">
+<p>***</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Authentication and Security</p></td>
+<td class=3D"confluenceTd">
+<p>Simple</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Use TLS</p></td>
+<td class=3D"confluenceTd">
+<p>False</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#f4f5f7" colspan=3D"2" class=3D"confluenceTd">
+<p><strong>Domain Configuration</strong></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Forest Name</p></td>
+<td class=3D"confluenceTd">
+<p>presencehealth.net</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Domain Name</p></td>
+<td class=3D"confluenceTd">
+<p>DC=3Dpresencehealth,DC=3Dnet</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>NetBIOS Name</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>User</p></td>
+<td class=3D"confluenceTd">
+<p>presencehealth\S_sailpointprd-PRESE</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Password</p></td>
+<td class=3D"confluenceTd">
+<p>***</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Servers</p></td>
+<td class=3D"confluenceTd">
+<p>10.120.207.140</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Authentication and Security</p></td>
+<td class=3D"confluenceTd">
+<p>Simple</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Use TLS</p></td>
+<td class=3D"confluenceTd">
+<p>True</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#f4f5f7" colspan=3D"2" class=3D"confluenceTd">
+<p><strong>Account</strong></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Allow Auto Partitioning</p></td>
+<td class=3D"confluenceTd">
+<p>True</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Number of Partitions</p></td>
+<td class=3D"confluenceTd">
+<p>256</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p><strong>User Search Scope</strong></p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Search DN</p></td>
+<td class=3D"confluenceTd">
+<p>DC=3Dpresencehealth,DC=3Dnet</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Iterate Search Filter</p></td>
+<td class=3D"confluenceTd">
+<p>(&amp;(objectClass=3Duser)(objectCategory=3Dperson))</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Group Membership Search DN</p></td>
+<td class=3D"confluenceTd">
+<p>DC=3Dpresencehealth,DC=3Dnet</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Group Member Filter String</p></td>
+<td class=3D"confluenceTd">
+<p>(objectClass=3Dgroup)</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#f4f5f7" colspan=3D"2" class=3D"confluenceTd">
+<p><strong>Group</strong></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p><strong>Group Search Scope</strong></p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Search DN</p></td>
+<td class=3D"confluenceTd">
+<p>DC=3Dpresencehealth,DC=3Dnet</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Iterate Search Filter</p></td>
+<td class=3D"confluenceTd">
+<p>(objectClass=3Dgroup)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Schema</strong></p>
+<p>Account</p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"757" data-layout=3D"align-start" data-local-id=
+=3D"db18bfde-de22-43f3-bbcd-70fd441d7cfc" class=3D"confluenceTable">
+<tbody>
+<tr>
+<th data-highlight-colour=3D"var(--ds-background-accent-gray-subtlest, var(=
+--ds-background-accent-gray-subtlest, #F1F2F4))" class=3D"confluenceTh">
+<p><strong>Details</strong></p></th>
+<th data-highlight-colour=3D"var(--ds-background-accent-gray-subtlest, var(=
+--ds-background-accent-gray-subtlest, #F1F2F4))" class=3D"confluenceTh">
+<p>&nbsp;</p></th>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Native Object Type</p></td>
+<td class=3D"confluenceTd">
+<p>User</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Identity Attribute</p></td>
+<td class=3D"confluenceTd">
+<p>distinguishedName</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Display Attribute</p></td>
+<td class=3D"confluenceTd">
+<p>msDS-PrincipalName</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Instance Attribute</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Remediation Modifiable</p></td>
+<td class=3D"confluenceTd">
+<p>Readonly</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class=3D"table-wrap">
+<table data-table-width=3D"1009" data-layout=3D"align-start" data-local-id=
+=3D"40768794-6136-4b54-973d-23677b106fe6" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 270.0px;">
+<col style=3D"width: 358.0px;">
+<col style=3D"width: 128.0px;">
+<col style=3D"width: 252.0px;">
+</colgroup>
+<tbody>
+<tr>
+<th data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTh">
+<p><strong>Attribute</strong></p></th>
+<th data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTh">
+<p><strong>Description</strong></p></th>
+<th data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTh">
+<p><strong>Type</strong></p></th>
+<th data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTh">
+<p><strong>Managed / Multi</strong></p></th>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>businessCategory</p></td>
+<td class=3D"confluenceTd">
+<p>business category</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>carLicense</p></td>
+<td class=3D"confluenceTd">
+<p>vehicle license or registration plate</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p>Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>cn</p></td>
+<td class=3D"confluenceTd">
+<p>common name(s) for which the entity is known by</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>departmentNumber</p></td>
+<td class=3D"confluenceTd">
+<p>identifies a department within an organization</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>description</p></td>
+<td class=3D"confluenceTd">
+<p>descriptive information</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>destinationIndicator</p></td>
+<td class=3D"confluenceTd">
+<p>destination indicator</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>displayName</p></td>
+<td class=3D"confluenceTd">
+<p>preferred name to be used when displaying entries</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>distinguishedName</p></td>
+<td class=3D"confluenceTd">
+<p>distinguished name for which the entity is known by</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>employeeNumber</p></td>
+<td class=3D"confluenceTd">
+<p>numerically identifies an employee within an organization</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>employeeType</p></td>
+<td class=3D"confluenceTd">
+<p>type of employment for a person</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>facsimileTelephoneNumber</p></td>
+<td class=3D"confluenceTd">
+<p>Facsimile (Fax) Telephone Number</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p>Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>givenName</p></td>
+<td class=3D"confluenceTd">
+<p>first name(s) for which the entity is known by</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>homePhone</p></td>
+<td class=3D"confluenceTd">
+<p>home telephone number</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>homePostalAddress</p></td>
+<td class=3D"confluenceTd">
+<p>home postal address</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>initials</p></td>
+<td class=3D"confluenceTd">
+<p>initials of some or all of names, but not the surname(s).</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>internationalISDNNumber</p></td>
+<td class=3D"confluenceTd">
+<p>international ISDN number</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>l</p></td>
+<td class=3D"confluenceTd">
+<p>city</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>mail</p></td>
+<td class=3D"confluenceTd">
+<p>RFC822 Mailbox</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>manager</p></td>
+<td class=3D"confluenceTd">
+<p>DN of manager</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>mobile</p></td>
+<td class=3D"confluenceTd">
+<p>mobile telephone number</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>o</p></td>
+<td class=3D"confluenceTd">
+<p>organization this object belongs to</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>ou</p></td>
+<td class=3D"confluenceTd">
+<p>organizational unit this object belongs to</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p>Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>pager</p></td>
+<td class=3D"confluenceTd">
+<p>pager telephone number</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>physicalDeliveryOfficeName</p></td>
+<td class=3D"confluenceTd">
+<p>Physical Delivery Office Name</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>postOfficeBox</p></td>
+<td class=3D"confluenceTd">
+<p>Post Office Box</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>postalAddress</p></td>
+<td class=3D"confluenceTd">
+<p>postal address</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>postalCode</p></td>
+<td class=3D"confluenceTd">
+<p>postal code</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>preferredDeliveryMethod</p></td>
+<td class=3D"confluenceTd">
+<p>preferred delivery method</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>preferredLanguage</p></td>
+<td class=3D"confluenceTd">
+<p>preferred written or spoken language for a person</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>registeredAddress</p></td>
+<td class=3D"confluenceTd">
+<p>registered postal address</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>roomNumber</p></td>
+<td class=3D"confluenceTd">
+<p>room number</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>secretary</p></td>
+<td class=3D"confluenceTd">
+<p>DN of secretary</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>seeAlso</p></td>
+<td class=3D"confluenceTd">
+<p>DN of related object</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>sn</p></td>
+<td class=3D"confluenceTd">
+<p>last (family) name(s) for which the entity is known by</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>st</p></td>
+<td class=3D"confluenceTd">
+<p>state or province which this object resides in</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>street</p></td>
+<td class=3D"confluenceTd">
+<p>street of this object</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>streetAddress</p></td>
+<td class=3D"confluenceTd">
+<p>street address of this object</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>telephoneNumber</p></td>
+<td class=3D"confluenceTd">
+<p>Telephone Number</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>teletexTerminalIdentifier</p></td>
+<td class=3D"confluenceTd">
+<p>Teletex Terminal Identifier</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>telexNumber</p></td>
+<td class=3D"confluenceTd">
+<p>Telex Number</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>title</p></td>
+<td class=3D"confluenceTd">
+<p>title associated with the entity</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>uid</p></td>
+<td class=3D"confluenceTd">
+<p>user identifier</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>userPrincipalName</p></td>
+<td class=3D"confluenceTd">
+<p>user principal name</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>objectClass</p></td>
+<td class=3D"confluenceTd">
+<p>object classes of the entity</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p>Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>memberOf</p></td>
+<td class=3D"confluenceTd">
+<p>Group Membership</p></td>
+<td class=3D"confluenceTd">
+<p>group</p></td>
+<td class=3D"confluenceTd">
+<p>Managed, Entitlement, Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>objectSid</p></td>
+<td class=3D"confluenceTd">
+<p>Windows Security Identifier</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>objectguid</p></td>
+<td class=3D"confluenceTd">
+<p>Object globally unique identifier</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>objectType</p></td>
+<td class=3D"confluenceTd">
+<p>Type of Active Directory object</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>sAMAccountName</p></td>
+<td class=3D"confluenceTd">
+<p>sAMAccountName</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>accountFlags</p></td>
+<td class=3D"confluenceTd">
+<p>List of the flags enabled on an account</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p>Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>department</p></td>
+<td class=3D"confluenceTd">
+<p>User's department</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msNPCallingStationID</p></td>
+<td class=3D"confluenceTd">
+<p>CallingStationID</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p>Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msRADIUSFramedRoute</p></td>
+<td class=3D"confluenceTd">
+<p>Static Routes for Dial-In connection</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p>Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msNPAllowDialin</p></td>
+<td class=3D"confluenceTd">
+<p>Is dial-in allowed</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msRADIUSCallbackNumber</p></td>
+<td class=3D"confluenceTd">
+<p>Callback Number</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msRADIUSFramedIPAddress</p></td>
+<td class=3D"confluenceTd">
+<p>Define Static IP Address</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>externalEmailAddress</p></td>
+<td class=3D"confluenceTd">
+<p>External email address of Mail User</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>mailNickname</p></td>
+<td class=3D"confluenceTd">
+<p>Exchange Alias</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>homeMDB</p></td>
+<td class=3D"confluenceTd">
+<p>Exchange Database</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msExchHideFromAddressLists</p></td>
+<td class=3D"confluenceTd">
+<p>Hide from Exchange address lists</p></td>
+<td class=3D"confluenceTd">
+<p>boolean</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msRTCSIP-UserEnabled</p></td>
+<td class=3D"confluenceTd">
+<p>User enabled for Skype for Business Server</p></td>
+<td class=3D"confluenceTd">
+<p>boolean</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>SipAddress</p></td>
+<td class=3D"confluenceTd">
+<p>Skype for Business sipAddress</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>RegistrarPool</p></td>
+<td class=3D"confluenceTd">
+<p>Skype for Business Registrar pool</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>LyncPinSet</p></td>
+<td class=3D"confluenceTd">
+<p>Skype for Business user pin set status</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>LyncPinLockedOut</p></td>
+<td class=3D"confluenceTd">
+<p>Skype for Business user pin lock status</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>DialPlan</p></td>
+<td class=3D"confluenceTd">
+<p>Skype for Business user dial plan name</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>dNSHostName</p></td>
+<td class=3D"confluenceTd">
+<p>Fully Qualified Domain Name for the Service Account</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msDS-ManagedPasswordInterval</p></td>
+<td class=3D"confluenceTd">
+<p>Password change interval in days for the Managed Service Account</p></td=
+>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msDS-SupportedEncryptionTypes</p></td>
+<td class=3D"confluenceTd">
+<p>Supported Encryption Types for the Managed Service Account</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p>Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msDS-GroupMSAMembership</p></td>
+<td class=3D"confluenceTd">
+<p>Principals allowed to use Group Managed Service Account</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p>Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msDS-AllowedToActOnBehalfOfOtherIdentity</p></td>
+<td class=3D"confluenceTd">
+<p>Principals that can act on the behalf of Group Managed Service Account</=
+p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p>Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>servicePrincipalName</p></td>
+<td class=3D"confluenceTd">
+<p>Service principal names for the Service Account</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p>Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>shadowAccountDN</p></td>
+<td class=3D"confluenceTd">
+<p>DistinguishedName of the Linked Mailbox shadow account</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>shadowAccountGuid</p></td>
+<td class=3D"confluenceTd">
+<p>ObjectGuid of the Linked Mailbox shadow account</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msExchRecipientTypeDetails</p></td>
+<td class=3D"confluenceTd">
+<p>Type of the Microsoft Exchange recipient object</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msDS-PrincipalName</p></td>
+<td class=3D"confluenceTd">
+<p>Name of the entity in the format "NetBIOS domain name\sAMAccountName"</p=
+></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>pwdLastSet</p></td>
+<td class=3D"confluenceTd">
+<p>pwdLastSet</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>accountExpires</p></td>
+<td class=3D"confluenceTd">
+<p>accountExpires</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msExchExtensionCustomAttribute5</p></td>
+<td class=3D"confluenceTd">
+<p>msExchExtensionCustomAttribute5</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msExchExtensionAttribute35</p></td>
+<td class=3D"confluenceTd">
+<p>msExchExtensionAttribute35</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msExchExtensionAttribute34</p></td>
+<td class=3D"confluenceTd">
+<p>msExchExtensionAttribute34</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>company</p></td>
+<td class=3D"confluenceTd">
+<p>company</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msExchExtensionAttribute33</p></td>
+<td class=3D"confluenceTd">
+<p>Badge Number Value</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Group</p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"757" data-layout=3D"align-start" data-local-id=
+=3D"8c444d10-cbbf-49a0-98e7-fbfad8ca445d" class=3D"confluenceTable">
+<tbody>
+<tr>
+<th data-highlight-colour=3D"var(--ds-background-accent-gray-subtlest, var(=
+--ds-background-accent-gray-subtlest, #F1F2F4))" class=3D"confluenceTh">
+<p><strong>Details</strong></p></th>
+<th data-highlight-colour=3D"var(--ds-background-accent-gray-subtlest, var(=
+--ds-background-accent-gray-subtlest, #F1F2F4))" class=3D"confluenceTh">
+<p>&nbsp;</p></th>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Native Object Type</p></td>
+<td class=3D"confluenceTd">
+<p>Group</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Identity Attribute</p></td>
+<td class=3D"confluenceTd">
+<p>distinguishedName</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Display Attribute</p></td>
+<td class=3D"confluenceTd">
+<p>msDS-PrincipalName</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Group Membership Attribute</p></td>
+<td class=3D"confluenceTd">
+<p>member</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Group Hierarchy Attribute</p></td>
+<td class=3D"confluenceTd">
+<p>memberOf</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Remediation Modifiable</p></td>
+<td class=3D"confluenceTd">
+<p>Readonly</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class=3D"table-wrap">
+<table data-table-width=3D"1009" data-layout=3D"align-start" data-local-id=
+=3D"b356bb9c-1e92-4941-9f1a-44c87e4ac354" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 200.0px;">
+<col style=3D"width: 428.0px;">
+<col style=3D"width: 128.0px;">
+<col style=3D"width: 252.0px;">
+</colgroup>
+<tbody>
+<tr>
+<th class=3D"confluenceTh">
+<p><strong>Attribute</strong></p></th>
+<th class=3D"confluenceTh">
+<p><strong>Description</strong></p></th>
+<th class=3D"confluenceTh">
+<p><strong>Type</strong></p></th>
+<th class=3D"confluenceTh">
+<p><strong>Managed / Multi</strong></p></th>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>cn</p></td>
+<td class=3D"confluenceTd">
+<p>common name(s) for which the entity is known by</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>distinguishedName</p></td>
+<td class=3D"confluenceTd">
+<p>distinguished name for which the entity is known by</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>owner</p></td>
+<td class=3D"confluenceTd">
+<p>owner (of the object)</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>description</p></td>
+<td class=3D"confluenceTd">
+<p>descriptive information</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>memberOf</p></td>
+<td class=3D"confluenceTd">
+<p>Group Membership</p></td>
+<td class=3D"confluenceTd">
+<p>group</p></td>
+<td class=3D"confluenceTd">
+<p>Entitlement, Multi-Valued</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>objectSid</p></td>
+<td class=3D"confluenceTd">
+<p>Windows Security Identifier</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>objectguid</p></td>
+<td class=3D"confluenceTd">
+<p>Object globally unique identifier</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>mailNickname</p></td>
+<td class=3D"confluenceTd">
+<p>Exchange Distribution Group Name</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>GroupType</p></td>
+<td class=3D"confluenceTd">
+<p>Group Type</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>GroupScope</p></td>
+<td class=3D"confluenceTd">
+<p>Group Scope</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>sAMAccountName</p></td>
+<td class=3D"confluenceTd">
+<p>sAMAccountName</p></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>msDS-PrincipalName</p></td>
+<td class=3D"confluenceTd">
+<p>Name of the entity in the format "NetBIOS domain name\sAMAccountName"</p=
+></td>
+<td class=3D"confluenceTd">
+<p>string</p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Provisioning Policies</strong></p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"687" data-layout=3D"align-start" data-local-id=
+=3D"378ae356-52bc-4aef-9436-f36ec13f4bbd" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 216.0px;">
+<col style=3D"width: 471.0px;">
+</colgroup>
+<tbody>
+<tr>
+<th colspan=3D"2" class=3D"confluenceTh">
+<p><strong>Account</strong></p></th>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTd">
+<p>Type</p></td>
+<td data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTd">
+<p>Custom Policy Name</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Create</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Form-PresenceHealth-ActiveDirectory-CreatePolicy</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Update</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Form-AD-PRESENCEHEALTH-UpdatePolicy</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Enable</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Form-ActiveDirectory-EnablePolicy-AMITA</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Disable</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Form-ActiveDirectory-DisablePolicy-AMITA</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTd">
+<p>Group</p></td>
+<td data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Create</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Create Group</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Update</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Update Group</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&nbsp;<strong>Correlation</strong></p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"629" data-layout=3D"align-start" data-local-id=
+=3D"be46bfdc-a3ba-4299-a265-216feb3f7de7" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 197.0px;">
+<col style=3D"width: 431.0px;">
+</colgroup>
+<tbody>
+<tr>
+<th colspan=3D"2" class=3D"confluenceTh">
+<p><strong>Account</strong></p></th>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTd">
+<p>Application Attribute</p></td>
+<td data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTd">
+<p>Identity Attribute</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" colspan=3D"2" class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p></p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p></p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&nbsp;</p>
+<p><strong>Rules:</strong></p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"760" data-layout=3D"align-start" data-local-id=
+=3D"5a7d5d55-a86e-4bc2-9b97-ceaa4ef152bd" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 310.0px;">
+<col style=3D"width: 447.0px;">
+</colgroup>
+<tbody>
+<tr>
+<td data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTd">
+<p>Rule Type</p></td>
+<td data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTd">
+<p>Rule Name</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Correlation Rule</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-Correlation-AD-Amita</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Creation Rule</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-AD-IdentityCreation-Rule</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Manager Correlation rule</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Managed Entitlement Customization Rule</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-ManagedAttribute-Requestable-Flag</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Before Provisioning Rule</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-BeforeProvisioning-AD</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>After Provisioning Rule</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-AfterProvisioning-AggregateAccount</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><span data-colorid=3D"g7oxzgralo">Note: </span></p>
+<p><strong>Identity Mapping Attributes &amp; Rules</strong></p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"1092" data-layout=3D"align-start" data-local-id=
+=3D"f4013072-2961-44e0-ac61-4a31ae6dddd4" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 241.0px;">
+<col style=3D"width: 394.0px;">
+<col style=3D"width: 456.0px;">
+</colgroup>
+<tbody>
+<tr>
+<th data-highlight-colour=3D"var(--ds-background-accent-gray-subtlest, var(=
+--ds-background-accent-gray-subtlest, #F1F2F4))" class=3D"confluenceTh">
+<p><strong>Identity Attribute</strong></p></th>
+<th data-highlight-colour=3D"var(--ds-background-accent-gray-subtlest, var(=
+--ds-background-accent-gray-subtlest, #F1F2F4))" class=3D"confluenceTh">
+<p><strong>Source Attributes</strong></p></th>
+<th data-highlight-colour=3D"var(--ds-background-accent-gray-subtlest, var(=
+--ds-background-accent-gray-subtlest, #F1F2F4))" class=3D"confluenceTh">
+<p><strong>Rule Name</strong></p></th>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>st</p></td>
+<td class=3D"confluenceTd">
+<p>st</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>streetAddress</p></td>
+<td class=3D"confluenceTd">
+<p>streetAddress</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>orgUnitPath</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+<td class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttribute-OrgUnitPath AD-DS</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>info</p></td>
+<td class=3D"confluenceTd">
+<p>info</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>mobile</p></td>
+<td class=3D"confluenceTd">
+<p>mobile</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>facsimileTelephoneNumber</p></td>
+<td class=3D"confluenceTd">
+<p>facsimileTelephoneNumber</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>pager</p></td>
+<td class=3D"confluenceTd">
+<p>pager</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>homePhone</p></td>
+<td class=3D"confluenceTd">
+<p>homePhone</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>postOfficeBox</p></td>
+<td class=3D"confluenceTd">
+<p>postOfficeBox</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>gsuiteMdm</p></td>
+<td class=3D"confluenceTd">
+<p>msExchExtensionAttribute20</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>legalHold</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+<td class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttribute-LegalHold AD-DS</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>gsuiteLastName</p></td>
+<td class=3D"confluenceTd">
+<p>ASC_GSuite_LastName</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>otherTelephone</p></td>
+<td class=3D"confluenceTd">
+<p>ASC_GSuite_LastName</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>albirMiscellaneous</p></td>
+<td class=3D"confluenceTd">
+<p>extensionAttribute7</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>archiving</p></td>
+<td class=3D"confluenceTd">
+<p>extensionAttribute5</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>mailDomain</p></td>
+<td class=3D"confluenceTd">
+<p>extensionAttribute9</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>middleName</p></td>
+<td class=3D"confluenceTd">
+<p>initials</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>dob</p></td>
+<td class=3D"confluenceTd">
+<p>employeeType</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>taniumData</p></td>
+<td class=3D"confluenceTd">
+<p>msExchExtensionAttribute39</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>displayName</p></td>
+<td class=3D"confluenceTd">
+<p>displayName</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>gsuiteGal</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+<td class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttribute-GAL AD-DS</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>gsuiteStatus</p></td>
+<td class=3D"confluenceTd">
+<p>msExchExtensionAttribute40</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>city</p></td>
+<td class=3D"confluenceTd">
+<p>l</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>workLocationCode</p></td>
+<td class=3D"confluenceTd">
+<p>extensionAttribute13</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>employeeId</p></td>
+<td class=3D"confluenceTd">
+<p>employeeNumber</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>employeeType</p></td>
+<td class=3D"confluenceTd">
+<p>extensionAttribute12</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>ssn</p></td>
+<td class=3D"confluenceTd">
+<p>departmentNumber</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>managerLevel</p></td>
+<td class=3D"confluenceTd">
+<p>extensionAttribute15</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>mailAlias</p></td>
+<td class=3D"confluenceTd">
+<p>proxyAddresses</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>samAccountName</p></td>
+<td class=3D"confluenceTd">
+<p>sAMAccountName</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>buildingId</p></td>
+<td class=3D"confluenceTd">
+<p>msExchExtensionAttribute25</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>telephoneNumber</p></td>
+<td class=3D"confluenceTd">
+<p>telephoneNumber</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>postalCode</p></td>
+<td class=3D"confluenceTd">
+<p>postalCode</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>businessUnit</p></td>
+<td class=3D"confluenceTd">
+<p>extensionAttribute11</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>company</p></td>
+<td class=3D"confluenceTd">
+<p>company</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>title</p></td>
+<td class=3D"confluenceTd">
+<p>title</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>departmentNumber</p></td>
+<td class=3D"confluenceTd">
+<p>extensionAttribute10</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>locationDescription</p></td>
+<td class=3D"confluenceTd">
+<p>physicalDeliveryOfficeName</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>att_first_name</p></td>
+<td class=3D"confluenceTd">
+<p>givenName</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>lastname</p></td>
+<td class=3D"confluenceTd">
+<p>sn</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>department</p></td>
+<td class=3D"confluenceTd">
+<p>department</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>att_email</p></td>
+<td class=3D"confluenceTd">
+<p>mail</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><span data-colorid=3D"j6d95a67ve">Note :</span></p>
+<p><strong>Target Mapping</strong></p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"1133" data-layout=3D"align-start" data-local-id=
+=3D"e062e467-2b0f-4b6f-aefb-3c06eb59a972" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 264.0px;">
+<col style=3D"width: 257.0px;">
+<col style=3D"width: 134.0px;">
+<col style=3D"width: 474.0px;">
+</colgroup>
+<tbody>
+<tr>
+<td data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTd">
+<p><strong>Name</strong></p></td>
+<td data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTd">
+<p><strong>Attribute Name</strong></p></td>
+<td data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTd">
+<p><strong>All Accounts</strong></p></td>
+<td data-highlight-colour=3D"#f4f5f7" class=3D"confluenceTd">
+<p><strong>Formatting Rule</strong></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>st</p></td>
+<td class=3D"confluenceTd">
+<p>st</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>streetAddress</p></td>
+<td class=3D"confluenceTd">
+<p>st</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>middleName</p></td>
+<td class=3D"confluenceTd">
+<p>initials</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-Amita-MiddleName</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>displayName</p></td>
+<td class=3D"confluenceTd">
+<p>displayName</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>city</p></td>
+<td class=3D"confluenceTd">
+<p>l</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>vendorName</p></td>
+<td class=3D"confluenceTd">
+<p>company</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>jobcode</p></td>
+<td class=3D"confluenceTd">
+<p>extensionAttribute5</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>businessUnitDescription</p></td>
+<td class=3D"confluenceTd">
+<p>roomNumber</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>internalId</p></td>
+<td class=3D"confluenceTd">
+<p>businessCategory</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>postalCode</p></td>
+<td class=3D"confluenceTd">
+<p>postalCode</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>location</p></td>
+<td class=3D"confluenceTd">
+<p>physicalDeliveryOfficeName</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>title</p></td>
+<td class=3D"confluenceTd">
+<p>title</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>manager</p></td>
+<td class=3D"confluenceTd">
+<p>manager</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-Amita-Manager</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>locationDescription</p></td>
+<td class=3D"confluenceTd">
+<p>physicalDeliveryOfficeName</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>att_first_name</p></td>
+<td class=3D"confluenceTd">
+<p>givenName</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>lastname</p></td>
+<td class=3D"confluenceTd">
+<p>sn</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>department</p></td>
+<td class=3D"confluenceTd">
+<p>department</p></td>
+<td class=3D"confluenceTd">
+<p>TRUE</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>SailPoint Aggregation Configuration</strong></p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"760" data-layout=3D"align-start" data-local-id=
+=3D"5df17b47-8eb2-4c66-a756-0d49aac3f453" class=3D"confluenceTable">
+<tbody>
+<tr>
+<td class=3D"confluenceTd">
+<p>Account Aggregation</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Task Schedule</p></td>
+<td data-highlight-colour=3D"#eae6ff" class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&nbsp;</p>
+<p><strong>Testing and Validation</strong></p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"760" data-layout=3D"align-start" data-local-id=
+=3D"45c27f68-6651-4037-962e-8a8be120e886" class=3D"confluenceTable">
+<tbody>
+<tr>
+<td class=3D"confluenceTd">
+<p>Test Case</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Test Data</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Validation Steps</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p></p>
+<p><strong>Document Review and Signoff</strong></p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"826" data-layout=3D"align-start" data-local-id=
+=3D"89acd1dc-a55d-4a09-8df3-140558219d7a" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 294.0px;">
+<col style=3D"width: 292.0px;">
+<col style=3D"width: 120.0px;">
+<col style=3D"width: 120.0px;">
+</colgroup>
+<tbody>
+<tr>
+<td class=3D"confluenceTd">
+<p>Resource</p></td>
+<td colspan=3D"2" class=3D"confluenceTd">
+<p>Role</p></td>
+<td class=3D"confluenceTd">
+<p>Date</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+<td colspan=3D"2" class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+<td colspan=3D"2" class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+<td colspan=3D"2" class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>Signed-Off by</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+<td class=3D"confluenceTd">
+<p>Signed Date:</p></td>
+<td class=3D"confluenceTd">
+<p>&nbsp;</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>&nbsp;</p>
+    </div>
+</body>
+</html>
+------=_Part_806_1561379168.1777214104606--

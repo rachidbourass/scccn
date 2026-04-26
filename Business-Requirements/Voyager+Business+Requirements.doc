@@ -1,0 +1,362 @@
+Date: Sat, 25 Apr 2026 23:35:31 +0000 (UTC)
+Message-ID: <1132017264.123.1777160131953@4e6e29256dc9>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_122_317832515.1777160131953"
+
+------=_Part_122_317832515.1777160131953
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html xmlns:o=3D'urn:schemas-microsoft-com:office:office'
+      xmlns:w=3D'urn:schemas-microsoft-com:office:word'
+      xmlns:v=3D'urn:schemas-microsoft-com:vml'
+      xmlns=3D'urn:w3-org-ns:HTML'>
+<head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8=
+">
+    <title>Voyager Business Requirements</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:TargetScreenSize>1024x640</o:TargetScreenSize>
+            <o:PixelsPerInch>72</o:PixelsPerInch>
+            <o:AllowPNG/>
+        </o:OfficeDocumentSettings>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+                <!--
+        @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-paper-source: 0;
+        }
+
+        table {
+            border: solid 1px;
+            border-collapse: collapse;
+        }
+
+        table td, table th {
+            border: solid 1px;
+            padding: 5px;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        tr {
+            page-break-after: avoid;
+        }
+
+        div.Section1 {
+            page: Section1;
+        }
+
+        /* Confluence print stylesheet. Common to all themes for print medi=
+a */
+/* Full of !important until we improve batching for print CSS */
+
+@media print {
+    #main {
+        padding-bottom: 1em !important; /* The default padding of 6em is to=
+o much for printouts */
+    }
+
+    body {
+        font: var(--ds-font-body-small, Arial, Helvetica, FreeSans, sans-se=
+rif);
+    }
+
+    body, #full-height-container, #main, #page, #content, .has-personal-sid=
+ebar #content {
+        background: var(--ds-surface, #fff) !important;
+        color: var(--ds-text, #000) !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    a, a:link, a:visited, a:focus, a:hover, a:active {
+        color: var(--ds-text, #000);
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content h5,
+    #content h6 {
+        page-break-after: avoid;
+    }
+
+    pre {
+        font: var(--ds-font-code, Monaco, "Courier New", monospace);
+    }
+
+    #header,
+    .aui-header-inner,
+    #navigation,
+    #sidebar,
+    .sidebar,
+    #personal-info-sidebar,
+    .ia-fixed-sidebar,
+    .page-actions,
+    .navmenu,
+    .ajs-menu-bar,
+    .noprint,
+    .inline-control-link,
+    .inline-control-link a,
+    a.show-labels-editor,
+    .global-comment-actions,
+    .comment-actions,
+    .quick-comment-container,
+    #addcomment {
+        display: none !important;
+    }
+
+    /* CONF-28544 cannot print multiple pages in IE */
+    #splitter-content {
+        position: relative !important;
+    }
+
+    .comment .date::before {
+        content: none !important; /* remove middot for print view */
+    }
+
+    h1.pagetitle img {
+        height: auto;
+        width: auto;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    #footer {
+        position: relative !important; /* CONF-17506 Place the footer at en=
+d of the content */
+        margin: 0;
+        padding: 0;
+        background: none;
+        clear: both;
+    }
+
+    #poweredby {
+        border-top: none;
+        background: none;
+    }
+
+    #poweredby li.print-only {
+        display: list-item;
+        font-style: italic;
+    }
+
+    #poweredby li.noprint {
+        display: none;
+    }
+
+    /* no width controls in print */
+    .wiki-content .table-wrap,
+    .wiki-content p,
+    .panel .codeContent,
+    .panel .codeContent pre,
+    .image-wrap {
+        overflow: visible !important;
+    }
+
+    /* TODO - should this work? */
+    #children-section,
+    #comments-section .comment,
+    #comments-section .comment .comment-body,
+    #comments-section .comment .comment-content,
+    #comments-section .comment p {
+        page-break-inside: avoid;
+    }
+
+    #page-children a {
+        text-decoration: none;
+    }
+
+    /**
+     hide twixies
+
+     the specificity here is a hack because print styles
+     are getting loaded before the base styles. */
+    #comments-section.pageSection .section-header,
+    #comments-section.pageSection .section-title,
+    #children-section.pageSection .section-header,
+    #children-section.pageSection .section-title,
+    .children-show-hide {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .children-show-hide.icon {
+        display: none;
+    }
+
+    /* personal sidebar */
+    .has-personal-sidebar #content {
+        margin-right: 0px;
+    }
+
+    .has-personal-sidebar #content .pageSection {
+        margin-right: 0px;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+-->
+    </style>
+</head>
+<body>
+    <h1>Voyager Business Requirements</h1>
+    <div class=3D"Section1">
+        <h3 id=3D"VoyagerBusinessRequirements-ProprietaryandConfidentialInf=
+ormation.Unauthorizedcopy,reproduction,anddistributionisstrictlyprohibitedw=
+ithoutthepriorwrittenconsentofAscensionHealthAlliance">
+<style>[data-colorid=3Ded41m6gl5c]{color:#ff5630} html[data-color-mode=3Dda=
+rk] [data-colorid=3Ded41m6gl5c]{color:#cf2600}</style><span data-colorid=3D=
+"ed41m6gl5c">Proprietary and Confidential Information. Unauthorized copy, r=
+eproduction, and distribution is strictly prohibited without the prior writ=
+ten consent of Ascension Health Alliance</span></h3>
+<h2 id=3D"VoyagerBusinessRequirements-ClickhereforLatestRequirementsDocumen=
+t">Click here for <a class=3D"external-link" href=3D"https://docs.google.co=
+m/document/d/1yA3xK_k8R91T74YljT-qRXfuRA60rvsr/edit" rel=3D"nofollow">Lates=
+t Requirements Document</a></h2>
+<p></p>
+<div class=3D"table-wrap">
+<table data-table-width=3D"594" data-layout=3D"align-start" data-local-id=
+=3D"4b7a1e64-8b8f-4a97-8cf9-7769f06e5edf" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 80.0px;">
+<col style=3D"width: 513.0px;">
+</colgroup>
+<tbody>
+<tr>
+<th colspan=3D"2" class=3D"confluenceTh">
+<p><strong>Table of Contents</strong></p></th>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>1</p></td>
+<td class=3D"confluenceTd">
+<p><a href=3D"https://ascensionjira.atlassian.net/wiki/spaces/IGA/pages/117=
+0079770/Introduction" data-linked-resource-id=3D"1170079770" data-linked-re=
+source-version=3D"3" data-linked-resource-type=3D"page">Introduction</a></p=
+></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>2</p></td>
+<td class=3D"confluenceTd">
+<p><a href=3D"https://ascensionjira.atlassian.net/wiki/spaces/IGA/pages/117=
+0112567/Executive+Summary" data-linked-resource-id=3D"1170112567" data-link=
+ed-resource-version=3D"3" data-linked-resource-type=3D"page">Executive Summ=
+ary</a></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>3</p></td>
+<td class=3D"confluenceTd">
+<p><a href=3D"https://ascensionjira.atlassian.net/wiki/spaces/IGA/pages/117=
+0079820/Overview" data-linked-resource-id=3D"1170079820" data-linked-resour=
+ce-version=3D"2" data-linked-resource-type=3D"page">Overview</a></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>4</p></td>
+<td class=3D"confluenceTd">
+<p><a href=3D"https://ascensionjira.atlassian.net/wiki/spaces/IGA/pages/117=
+0014265/Preconditions" data-linked-resource-id=3D"1170014265" data-linked-r=
+esource-version=3D"2" data-linked-resource-type=3D"page">Preconditions</a><=
+/p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>5</p></td>
+<td class=3D"confluenceTd">
+<p><a href=3D"https://ascensionjira.atlassian.net/wiki/spaces/IGA/pages/116=
+9883192/Assumptions" data-linked-resource-id=3D"1169883192" data-linked-res=
+ource-version=3D"2" data-linked-resource-type=3D"page">Assumptions</a></p><=
+/td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>6</p></td>
+<td class=3D"confluenceTd">
+<p><a href=3D"https://ascensionjira.atlassian.net/wiki/spaces/IGA/pages/116=
+9883202/Post+Conditions" data-linked-resource-id=3D"1169883202" data-linked=
+-resource-version=3D"2" data-linked-resource-type=3D"page">Post Conditions<=
+/a></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>7</p></td>
+<td class=3D"confluenceTd">
+<p><a href=3D"https://ascensionjira.atlassian.net/wiki/spaces/IGA/pages/117=
+0014280/Functional+Requirements" data-linked-resource-id=3D"1170014280" dat=
+a-linked-resource-version=3D"1" data-linked-resource-type=3D"page">Function=
+al Requirements</a></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>8</p></td>
+<td class=3D"confluenceTd">
+<p><a href=3D"https://ascensionjira.atlassian.net/wiki/spaces/IGA/pages/116=
+9850443/Non+Functional+Requirements" data-linked-resource-id=3D"1169850443"=
+ data-linked-resource-version=3D"1" data-linked-resource-type=3D"page">Non =
+=E2=80=93 Functional Requirements</a></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>9</p></td>
+<td class=3D"confluenceTd">
+<p><a href=3D"https://ascensionjira.atlassian.net/wiki/spaces/IGA/pages/117=
+0014342/Technical+Architecture" data-linked-resource-id=3D"1170014342" data=
+-linked-resource-version=3D"2" data-linked-resource-type=3D"page">Technical=
+ Architecture</a></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>10</p></td>
+<td class=3D"confluenceTd">
+<p><a href=3D"https://ascensionjira.atlassian.net/wiki/spaces/IGA/pages/117=
+0014352/Identity+and+Access+Management+Use-Cases" data-linked-resource-id=
+=3D"1170014352" data-linked-resource-version=3D"15" data-linked-resource-ty=
+pe=3D"page">Identity and Access Management Use-Cases</a></p></td>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p>11</p></td>
+<td class=3D"confluenceTd">
+<p><a href=3D"https://ascensionjira.atlassian.net/wiki/pages/resumedraft.ac=
+tion?draftId=3D1177419777&amp;draftShareId=3Dea7f7520-ca73-4138-862b-38f6df=
+207d00" rel=3D"nofollow">Document Control Information</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p></p>
+    </div>
+</body>
+</html>
+------=_Part_122_317832515.1777160131953--

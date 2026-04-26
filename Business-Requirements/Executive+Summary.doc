@@ -1,0 +1,306 @@
+Date: Sat, 25 Apr 2026 23:40:27 +0000 (UTC)
+Message-ID: <156410252.537.1777160427319@79b8a9279287>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_536_168455827.1777160427319"
+
+------=_Part_536_168455827.1777160427319
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html xmlns:o=3D'urn:schemas-microsoft-com:office:office'
+      xmlns:w=3D'urn:schemas-microsoft-com:office:word'
+      xmlns:v=3D'urn:schemas-microsoft-com:vml'
+      xmlns=3D'urn:w3-org-ns:HTML'>
+<head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8=
+">
+    <title>Executive Summary</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:TargetScreenSize>1024x640</o:TargetScreenSize>
+            <o:PixelsPerInch>72</o:PixelsPerInch>
+            <o:AllowPNG/>
+        </o:OfficeDocumentSettings>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+                <!--
+        @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-paper-source: 0;
+        }
+
+        table {
+            border: solid 1px;
+            border-collapse: collapse;
+        }
+
+        table td, table th {
+            border: solid 1px;
+            padding: 5px;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        tr {
+            page-break-after: avoid;
+        }
+
+        div.Section1 {
+            page: Section1;
+        }
+
+        /* Confluence print stylesheet. Common to all themes for print medi=
+a */
+/* Full of !important until we improve batching for print CSS */
+
+@media print {
+    #main {
+        padding-bottom: 1em !important; /* The default padding of 6em is to=
+o much for printouts */
+    }
+
+    body {
+        font: var(--ds-font-body-small, Arial, Helvetica, FreeSans, sans-se=
+rif);
+    }
+
+    body, #full-height-container, #main, #page, #content, .has-personal-sid=
+ebar #content {
+        background: var(--ds-surface, #fff) !important;
+        color: var(--ds-text, #000) !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    a, a:link, a:visited, a:focus, a:hover, a:active {
+        color: var(--ds-text, #000);
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content h5,
+    #content h6 {
+        page-break-after: avoid;
+    }
+
+    pre {
+        font: var(--ds-font-code, Monaco, "Courier New", monospace);
+    }
+
+    #header,
+    .aui-header-inner,
+    #navigation,
+    #sidebar,
+    .sidebar,
+    #personal-info-sidebar,
+    .ia-fixed-sidebar,
+    .page-actions,
+    .navmenu,
+    .ajs-menu-bar,
+    .noprint,
+    .inline-control-link,
+    .inline-control-link a,
+    a.show-labels-editor,
+    .global-comment-actions,
+    .comment-actions,
+    .quick-comment-container,
+    #addcomment {
+        display: none !important;
+    }
+
+    /* CONF-28544 cannot print multiple pages in IE */
+    #splitter-content {
+        position: relative !important;
+    }
+
+    .comment .date::before {
+        content: none !important; /* remove middot for print view */
+    }
+
+    h1.pagetitle img {
+        height: auto;
+        width: auto;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    #footer {
+        position: relative !important; /* CONF-17506 Place the footer at en=
+d of the content */
+        margin: 0;
+        padding: 0;
+        background: none;
+        clear: both;
+    }
+
+    #poweredby {
+        border-top: none;
+        background: none;
+    }
+
+    #poweredby li.print-only {
+        display: list-item;
+        font-style: italic;
+    }
+
+    #poweredby li.noprint {
+        display: none;
+    }
+
+    /* no width controls in print */
+    .wiki-content .table-wrap,
+    .wiki-content p,
+    .panel .codeContent,
+    .panel .codeContent pre,
+    .image-wrap {
+        overflow: visible !important;
+    }
+
+    /* TODO - should this work? */
+    #children-section,
+    #comments-section .comment,
+    #comments-section .comment .comment-body,
+    #comments-section .comment .comment-content,
+    #comments-section .comment p {
+        page-break-inside: avoid;
+    }
+
+    #page-children a {
+        text-decoration: none;
+    }
+
+    /**
+     hide twixies
+
+     the specificity here is a hack because print styles
+     are getting loaded before the base styles. */
+    #comments-section.pageSection .section-header,
+    #comments-section.pageSection .section-title,
+    #children-section.pageSection .section-header,
+    #children-section.pageSection .section-title,
+    .children-show-hide {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .children-show-hide.icon {
+        display: none;
+    }
+
+    /* personal sidebar */
+    .has-personal-sidebar #content {
+        margin-right: 0px;
+    }
+
+    .has-personal-sidebar #content .pageSection {
+        margin-right: 0px;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+-->
+    </style>
+</head>
+<body>
+    <h1>Executive Summary</h1>
+    <div class=3D"Section1">
+        <p>This section describes a summary of the changes that were made t=
+o the previous version of the requirement document. The previous version of=
+ this requirement document is =E2=80=98Ascension-IAM Requirements Document_=
+Draft_v0.4.</p>
+<p><strong>Summary of changes:</strong></p>
+<ul>
+<li>
+<p><u>"Scope"</u> section was updated with in-scope JML event list, number =
+of AD domains, OIM as downstream application and OIM feed file generation f=
+rom SailPoint.</p></li>
+<li>
+<p>=E2=80=9C<u>Out of Scope</u>=E2=80=9D section was updated with new items=
+ 1) UKG account management, 2) OIM integrated target application management=
+ and 3) fix gaps in existing SailPoint Platform.</p></li>
+<li>
+<p>=E2=80=9C<u>Assumptions</u>=E2=80=9D section was updated with the follow=
+ing additional assumptions: 1) existing list of integrated applications/int=
+egrated systems are working as expected and 2) existing SailPoint platform =
+is functioning as expected.</p></li>
+<li>
+<p>=E2=80=9C<u>Workforce Management UKG</u>=E2=80=9D section was updated wi=
+th the following&nbsp; additional points: 1) SailPoint to support manual re=
+quest provisioning/de-provisioning and 2) SOD validation will be supported =
+by SailPoint.</p></li>
+<li>
+<p>=E2=80=9C<u>ServiceNow</u>=E2=80=9D section was updated with the followi=
+ng&nbsp; additional items 1) SailPoint IIQ shall be&nbsp; source of truth f=
+or account and access operations performed in ServiceNow, 2) SailPoint to s=
+upport manual request provisioning/de-provisioning and 3) SOD validation wi=
+ll be supported by SailPoint.</p></li>
+<li>
+<p>=E2=80=9C<u>Oracle EPM Cloud</u>=E2=80=9D section was updated with the f=
+ollowing additional items: 1) EPM module connector details and 2) SOD valid=
+ation will be supported by SailPoint.</p></li>
+<li>
+<p>=E2=80=9C<u>OCI</u>=E2=80=9D section was updated with the following addi=
+tional items 1) SOD validation will be supported by SailPoint.</p></li>
+<li>
+<p>=E2=80=9C<u>OIM</u>=E2=80=9D section was newly added with details about =
+OIM feed generation.</p></li>
+<li>
+<p>=E2=80=9C<u>Identity and Access Management Use-Cases</u>=E2=80=9D sectio=
+n and subsections were updated for error handling, trigger condition, accep=
+tance criteria, pre-conditions, and basic flow.</p></li>
+<li>
+<p>Additional Use-cases were added to cover =E2=80=9C<u>Secondary Work Rela=
+tionship Provisioning (Associate)</u>=E2=80=9D, =E2=80=9C<u>Secondary Work =
+Relationship - Suspension (Associate)=E2=80=9D,</u> =E2=80=9C<u>Secondary W=
+ork Relationship -Termination (Associate)</u>=E2=80=9D, =E2=80=9C<u>Seconda=
+ry Work Relationship Provisioning (NEP)=E2=80=9D,</u> =E2=80=9C<u>Secondary=
+ Work Relationship -Suspension (NEP)</u>=E2=80=9D and =E2=80=9C<u>Secondary=
+ Work Relationship -Termination (NEP)</u> =E2=80=9C use cases.</p></li>
+<li>
+<p>=E2=80=9C<u>Termination (Associates)</u>, <u>Suspension (Associates)</u>=
+=E2=80=9D, =E2=80=9C<u>Termination (NEP)</u>=E2=80=9D and =E2=80=9C<u>Suspe=
+nsion (NEP)</u>=E2=80=9D sections were updated with disconnected applicatio=
+ns account handling as follows: A ServiceNow ticket will be created for eac=
+h disconnected application team where the user account will be disabled. Ex=
+isting SailPoint configuration will be used to create the ServiceNow ticket=
+s.</p></li>
+<li>
+<p>Scenarios for non-worker user type have been added<u>(</u>=E2=80=9C<u>No=
+n-Worker User Onboarding</u>=E2=80=9C<u>,</u>=E2=80=9C<u>Non-Worker User Of=
+fboarding</u>=E2=80=9C<u>)</u>.</p></li>
+<li>
+<p>=E2=80=9C<u>Suspension (Associates)</u>=E2=80=9C<u>,</u>=E2=80=9C<u>Leav=
+e Of Absence (LOA)(Associates)</u>=E2=80=9C<u>,</u>=E2=80=9C<u>Leave Of Abs=
+ence (LOA) (NEP)</u>=E2=80=9D and =E2=80=9C<u>Suspension (NEP)</u>=E2=80=9D=
+ sections were updated to cover the recall functionality.</p></li>
+</ul>
+    </div>
+</body>
+</html>
+------=_Part_536_168455827.1777160427319--

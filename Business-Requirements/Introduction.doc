@@ -1,0 +1,385 @@
+Date: Sat, 25 Apr 2026 23:40:10 +0000 (UTC)
+Message-ID: <906202559.383.1777160410950@5bb99cdafc20>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_382_945669419.1777160410950"
+
+------=_Part_382_945669419.1777160410950
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html xmlns:o=3D'urn:schemas-microsoft-com:office:office'
+      xmlns:w=3D'urn:schemas-microsoft-com:office:word'
+      xmlns:v=3D'urn:schemas-microsoft-com:vml'
+      xmlns=3D'urn:w3-org-ns:HTML'>
+<head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8=
+">
+    <title>Introduction</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:TargetScreenSize>1024x640</o:TargetScreenSize>
+            <o:PixelsPerInch>72</o:PixelsPerInch>
+            <o:AllowPNG/>
+        </o:OfficeDocumentSettings>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+                <!--
+        @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-paper-source: 0;
+        }
+
+        table {
+            border: solid 1px;
+            border-collapse: collapse;
+        }
+
+        table td, table th {
+            border: solid 1px;
+            padding: 5px;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        tr {
+            page-break-after: avoid;
+        }
+
+        div.Section1 {
+            page: Section1;
+        }
+
+        /* Confluence print stylesheet. Common to all themes for print medi=
+a */
+/* Full of !important until we improve batching for print CSS */
+
+@media print {
+    #main {
+        padding-bottom: 1em !important; /* The default padding of 6em is to=
+o much for printouts */
+    }
+
+    body {
+        font: var(--ds-font-body-small, Arial, Helvetica, FreeSans, sans-se=
+rif);
+    }
+
+    body, #full-height-container, #main, #page, #content, .has-personal-sid=
+ebar #content {
+        background: var(--ds-surface, #fff) !important;
+        color: var(--ds-text, #000) !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    a, a:link, a:visited, a:focus, a:hover, a:active {
+        color: var(--ds-text, #000);
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content h5,
+    #content h6 {
+        page-break-after: avoid;
+    }
+
+    pre {
+        font: var(--ds-font-code, Monaco, "Courier New", monospace);
+    }
+
+    #header,
+    .aui-header-inner,
+    #navigation,
+    #sidebar,
+    .sidebar,
+    #personal-info-sidebar,
+    .ia-fixed-sidebar,
+    .page-actions,
+    .navmenu,
+    .ajs-menu-bar,
+    .noprint,
+    .inline-control-link,
+    .inline-control-link a,
+    a.show-labels-editor,
+    .global-comment-actions,
+    .comment-actions,
+    .quick-comment-container,
+    #addcomment {
+        display: none !important;
+    }
+
+    /* CONF-28544 cannot print multiple pages in IE */
+    #splitter-content {
+        position: relative !important;
+    }
+
+    .comment .date::before {
+        content: none !important; /* remove middot for print view */
+    }
+
+    h1.pagetitle img {
+        height: auto;
+        width: auto;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    #footer {
+        position: relative !important; /* CONF-17506 Place the footer at en=
+d of the content */
+        margin: 0;
+        padding: 0;
+        background: none;
+        clear: both;
+    }
+
+    #poweredby {
+        border-top: none;
+        background: none;
+    }
+
+    #poweredby li.print-only {
+        display: list-item;
+        font-style: italic;
+    }
+
+    #poweredby li.noprint {
+        display: none;
+    }
+
+    /* no width controls in print */
+    .wiki-content .table-wrap,
+    .wiki-content p,
+    .panel .codeContent,
+    .panel .codeContent pre,
+    .image-wrap {
+        overflow: visible !important;
+    }
+
+    /* TODO - should this work? */
+    #children-section,
+    #comments-section .comment,
+    #comments-section .comment .comment-body,
+    #comments-section .comment .comment-content,
+    #comments-section .comment p {
+        page-break-inside: avoid;
+    }
+
+    #page-children a {
+        text-decoration: none;
+    }
+
+    /**
+     hide twixies
+
+     the specificity here is a hack because print styles
+     are getting loaded before the base styles. */
+    #comments-section.pageSection .section-header,
+    #comments-section.pageSection .section-title,
+    #children-section.pageSection .section-header,
+    #children-section.pageSection .section-title,
+    .children-show-hide {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .children-show-hide.icon {
+        display: none;
+    }
+
+    /* personal sidebar */
+    .has-personal-sidebar #content {
+        margin-right: 0px;
+    }
+
+    .has-personal-sidebar #content .pageSection {
+        margin-right: 0px;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+-->
+    </style>
+</head>
+<body>
+    <h1>Introduction</h1>
+    <div class=3D"Section1">
+        <p>This document describes the use cases for the IAM platform. The =
+IAM platform will handle Associate and Non-Employee Party (NEP) lifecycle m=
+anagement (LCM) as well as the overall governance process as described in t=
+his requirement document.</p>
+<p>This document focuses on:</p>
+<ul>
+<li>
+<p>Definition and validation of scope for the Voyager program.</p></li>
+<li>
+<p>Alignment of stakeholders=E2=80=99 expectations to secure their involvem=
+ent in the delivery of the Voyager program.</p></li>
+<li>
+<p>Establishing logistics needed for the delivery of the Voyager program =
+=E2=80=93 people and processes.</p></li>
+</ul>
+<h3 id=3D"Introduction-1.1TargetAudience"><strong>1.1 Target Audience</stro=
+ng></h3>
+<p style=3D"margin-left: 30.0px;">The following lists the intended audience=
+ for this document:</p>
+<ul>
+<li>
+<p>Security Team</p></li>
+<li>
+<p>Application Owners</p></li>
+<li>
+<p>QA (Quality Assurance) Team</p></li>
+<li>
+<p>Voyager Project Team</p></li>
+<li>
+<p>Project Stakeholders</p></li>
+<li>
+<p>Core HR Team</p></li>
+</ul>
+<h3 id=3D"Introduction-1.2Scope"><strong>1.2 Scope</strong></h3>
+<p>The following lists the items to be implemented as part of Ascension Hea=
+lth Alliance Voyager program:</p>
+<ul>
+<li>
+<p>Integrate SailPoint IdentityIQ (IIQ) with Oracle Human Capital Managemen=
+t Cloud (Oracle HCM Cloud as the authoritative source.</p></li>
+<li>
+<p>Integrate IIQ with Active Directory (42 domains), ServiceNow, UKG/Kronos=
+, Oracle Enterprise Resource Planning Cloud (Oracle ERP Cloud), Oracle EPM =
+Cloud, OCI, and OIM for user account and access management.</p></li>
+<li>
+<p>Establish rules to define the mappings of identity attributes between th=
+e target and source systems.&nbsp;</p></li>
+<li>
+<p>Configure the following LCM processes for Associates and NEP users.</p><=
+/li>
+</ul>
+<ol start=3D"1">
+<li>
+<p>Pre-Hire</p></li>
+<li>
+<p>New-Hire</p></li>
+<li>
+<p>Mover</p></li>
+<li>
+<p>Termination</p>
+<ol start=3D"1">
+<li>
+<p>Severance</p></li>
+<li>
+<p>Divesture</p></li>
+<li>
+<p>Layoff</p></li>
+<li>
+<p>Resignation</p></li>
+<li>
+<p>Voluntary termination</p></li>
+<li>
+<p>Involuntary termination</p></li>
+</ol></li>
+<li>
+<p>Suspension</p></li>
+<li>
+<p>Leave Of Absence (LOA)&nbsp;</p></li>
+<li>
+<p>Manual access provisioning/de-provisioning</p></li>
+<li>
+<p>Re-hire</p></li>
+<li>
+<p>Conversion</p></li>
+<li>
+<p>Profile update&nbsp;</p></li>
+<li>
+<p>Provisioning secondary work relationships</p></li>
+<li>
+<p>
+<del>Secondary work relation suspension</del></p></li>
+<li>
+<p>
+<del>Secondary work relation termination&nbsp;</del></p></li>
+</ol>
+<ul>
+<li>
+<p>Configure the following LCM process for Non-Worker users:</p>
+<ul>
+<li>
+<p>Non-Worker user onboarding</p></li>
+<li>
+<p>Non-Worker user offboarding (termination)</p></li>
+</ul></li>
+<li>
+<p>Configure request-based access provisioning process with required forms =
+and workflows to manage ad-hoc user access requests for in-scope applicatio=
+ns.&nbsp;</p></li>
+<li>
+<p>Develop scripts for unit testing, System Integration Testing (SIT) and U=
+ser Acceptance Testing (UAT).</p></li>
+<li>
+<p>Perform execution for Unit Testing, SIT and Provide guidance for UAT exe=
+cution.</p></li>
+<li>
+<p>Configure access certification for required roles and permissions for Ac=
+tive Directory (42 domains), ServiceNow, UKG, Oracle ERP Cloud, Oracle EPM =
+Cloud, OCI.</p></li>
+<li>
+<p>IIQ will generate a feed file in the format which will be agreed upon wi=
+th the IAM and OIM team. The feed will be generated on a predefined frequen=
+cy and transferred to the OIM system via a defined file transfer mechanism.=
+ Feed generation frequency and file transfer mechanism will need to be deci=
+ded.</p></li>
+</ul>
+<h3 id=3D"Introduction-1.3Outofscope"><strong>1.3 Out of scope</strong></h3=
+>
+<ul>
+<li>
+<p>As part of the Ascension Health Alliance Voyager program, ServiceNow tic=
+ket creation is not included.</p></li>
+<li>
+<p>Disconnected applications provisioning/deprovisioning from SailPoint is =
+out of scope.</p></li>
+<li>
+<p>Execution of UAT scripts is out of scope.</p></li>
+<li>
+<p>Regression testing for existing functionalities will be performed by Asc=
+ension Health Alliance.</p></li>
+<li>
+<p>UKG account management (i.e., create, enable, disable, delete) is out of=
+ scope.</p></li>
+<li>
+<p>Target applications integrated in OIM will not be managed by SailPoint.<=
+/p></li>
+<li>
+<p>Fixing gaps in the existing SailPoint IIQ platform is out of scope.</p><=
+/li>
+</ul>
+    </div>
+</body>
+</html>
+------=_Part_382_945669419.1777160410950--

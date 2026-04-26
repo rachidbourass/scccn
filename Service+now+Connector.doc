@@ -1,0 +1,546 @@
+Date: Sun, 26 Apr 2026 15:36:14 +0000 (UTC)
+Message-ID: <1371639360.145.1777217774056@5b929e433cc7>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_144_1058037284.1777217774056"
+
+------=_Part_144_1058037284.1777217774056
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html xmlns:o=3D'urn:schemas-microsoft-com:office:office'
+      xmlns:w=3D'urn:schemas-microsoft-com:office:word'
+      xmlns:v=3D'urn:schemas-microsoft-com:vml'
+      xmlns=3D'urn:w3-org-ns:HTML'>
+<head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8=
+">
+    <title>Service now Connector</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:TargetScreenSize>1024x640</o:TargetScreenSize>
+            <o:PixelsPerInch>72</o:PixelsPerInch>
+            <o:AllowPNG/>
+        </o:OfficeDocumentSettings>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+                <!--
+        @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-paper-source: 0;
+        }
+
+        table {
+            border: solid 1px;
+            border-collapse: collapse;
+        }
+
+        table td, table th {
+            border: solid 1px;
+            padding: 5px;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        tr {
+            page-break-after: avoid;
+        }
+
+        div.Section1 {
+            page: Section1;
+        }
+
+        /* Confluence print stylesheet. Common to all themes for print medi=
+a */
+/* Full of !important until we improve batching for print CSS */
+
+@media print {
+    #main {
+        padding-bottom: 1em !important; /* The default padding of 6em is to=
+o much for printouts */
+    }
+
+    body {
+        font: var(--ds-font-body-small, Arial, Helvetica, FreeSans, sans-se=
+rif);
+    }
+
+    body, #full-height-container, #main, #page, #content, .has-personal-sid=
+ebar #content {
+        background: var(--ds-surface, #fff) !important;
+        color: var(--ds-text, #000) !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    a, a:link, a:visited, a:focus, a:hover, a:active {
+        color: var(--ds-text, #000);
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content h5,
+    #content h6 {
+        page-break-after: avoid;
+    }
+
+    pre {
+        font: var(--ds-font-code, Monaco, "Courier New", monospace);
+    }
+
+    #header,
+    .aui-header-inner,
+    #navigation,
+    #sidebar,
+    .sidebar,
+    #personal-info-sidebar,
+    .ia-fixed-sidebar,
+    .page-actions,
+    .navmenu,
+    .ajs-menu-bar,
+    .noprint,
+    .inline-control-link,
+    .inline-control-link a,
+    a.show-labels-editor,
+    .global-comment-actions,
+    .comment-actions,
+    .quick-comment-container,
+    #addcomment {
+        display: none !important;
+    }
+
+    /* CONF-28544 cannot print multiple pages in IE */
+    #splitter-content {
+        position: relative !important;
+    }
+
+    .comment .date::before {
+        content: none !important; /* remove middot for print view */
+    }
+
+    h1.pagetitle img {
+        height: auto;
+        width: auto;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    #footer {
+        position: relative !important; /* CONF-17506 Place the footer at en=
+d of the content */
+        margin: 0;
+        padding: 0;
+        background: none;
+        clear: both;
+    }
+
+    #poweredby {
+        border-top: none;
+        background: none;
+    }
+
+    #poweredby li.print-only {
+        display: list-item;
+        font-style: italic;
+    }
+
+    #poweredby li.noprint {
+        display: none;
+    }
+
+    /* no width controls in print */
+    .wiki-content .table-wrap,
+    .wiki-content p,
+    .panel .codeContent,
+    .panel .codeContent pre,
+    .image-wrap {
+        overflow: visible !important;
+    }
+
+    /* TODO - should this work? */
+    #children-section,
+    #comments-section .comment,
+    #comments-section .comment .comment-body,
+    #comments-section .comment .comment-content,
+    #comments-section .comment p {
+        page-break-inside: avoid;
+    }
+
+    #page-children a {
+        text-decoration: none;
+    }
+
+    /**
+     hide twixies
+
+     the specificity here is a hack because print styles
+     are getting loaded before the base styles. */
+    #comments-section.pageSection .section-header,
+    #comments-section.pageSection .section-title,
+    #children-section.pageSection .section-header,
+    #children-section.pageSection .section-title,
+    .children-show-hide {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .children-show-hide.icon {
+        display: none;
+    }
+
+    /* personal sidebar */
+    .has-personal-sidebar #content {
+        margin-right: 0px;
+    }
+
+    .has-personal-sidebar #content .pageSection {
+        margin-right: 0px;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+-->
+    </style>
+</head>
+<body>
+    <h1>Service now Connector</h1>
+    <div class=3D"Section1">
+        <p>Currently there are 200+ delimiter applications are on boarded i=
+n production. Maintaining these files are challenging. after analyzing the =
+issue team is decided to create tables and load the data to those tables an=
+d replace Delimiter connectors to JDBC.</p>
+<p></p>
+<p>The service now ticketing process is not changed. When ever provisioning=
+ request is created for add remove disable, enable, lock or unlock scenario=
+ the service now ticket will be created. once the ticket is closed from ser=
+vice now then link is created in sailpoint.</p>
+<p></p>
+<p>The following applications are converted from Delimiter to JDBC:</p>
+<p>AccessBadge-PhotoIdRequest-Ineva-MedicalGroup<br>
+AccessBadge-PhotoIdRequest-Ineva-Ortho<br>
+AccessBadge-PhotoIdRequest-Ineva-Warrick<br>
+AccessBadge-PhotoIdRequest-Inind-Amg<br>
+AccessBadge-PhotoIdRequest-Inind-Anderson<br>
+AccessBadge-PhotoIdRequest-Inind-CancerCenter<br>
+AccessBadge-PhotoIdRequest-Inind-Carmel<br>
+AccessBadge-PhotoIdRequest-Inind-Clay<br>
+AccessBadge-PhotoIdRequest-Inind-Dunn<br>
+AccessBadge-PhotoIdRequest-Inind-Fishers<br>
+AccessBadge-PhotoIdRequest-Inind-HeartCenter<br>
+AccessBadge-PhotoIdRequest-Inind-IndyCampus<br>
+AccessBadge-PhotoIdRequest-Inind-Jennings<br>
+AccessBadge-PhotoIdRequest-Inind-Kokomo<br>
+AccessBadge-PhotoIdRequest-Inind-Mercy<br>
+AccessBadge-PhotoIdRequest-Inind-NeighborhoodHospitals<br>
+AccessBadge-PhotoIdRequest-Inind-Parkwood<br>
+AccessBadge-PhotoIdRequest-Inind-Pcc<br>
+AccessBadge-PhotoIdRequest-Inind-Randolph<br>
+AccessBadge-PhotoIdRequest-Inind-Salem<br>
+AccessBadge-PhotoIdRequest-Inind-Seton<br>
+AccessBadge-PhotoIdRequest-Inind-StressCenter<br>
+AccessBadge-PhotoIdRequest-Inind-Williamsport<br>
+AccessBadge-PhotoIdRequest-Inind-Women<br>
+Accucareaccumed<br>
+Apptio<br>
+AthenaHealth<br>
+BadgeaccessModifyRequest-AllSaintThomas<br>
+CareManagement<br>
+Cashpro<br>
+CdmWeb<br>
+CentricityLegacyRecord<br>
+CernerDependent<br>
+CernerLabcorp<br>
+Cerner-mikal-attestation<br>
+Cerner-serviceNow<br>
+CongaContractsfkaNovatus<br>
+DoctorMaster<br>
+DragonDictation<br>
+DragonMedicalOne<br>
+EgniteCardiocare<br>
+EmsHospitalHub<br>
+Epic-Wiapp<br>
+Epic-Wigle<br>
+Epic-Wimil<br>
+Epiphany<br>
+EpLabDatabase<br>
+EsoHde<br>
+ExtendedForm<br>
+Facets-UserAccess<br>
+Fairwarning<br>
+Fljac-CernerMillennium<br>
+Flpen-OneChart-NonProvider<br>
+Gcp-roles<br>
+Hbi<br>
+HealthchartPatientPortal<br>
+Healthconnect<br>
+Heartflow<br>
+Hfm<br>
+HfmAttestation<br>
+Icertis-ContractManagement-ManagedCare<br>
+ImsReadytracker<br>
+Ineva-Advantx-Surgicare<br>
+Ineva-ApRobot-ConnectRx<br>
+Ineva-Aria<br>
+Ineva-AttendanceCalendar<br>
+Ineva-BaxaIvCompounder<br>
+Ineva-C-iiSafe-PharmacyMisc.<br>
+Ineva-ClinicalPerformanceManagement<br>
+Ineva-Copath<br>
+Ineva-Cpsi<br>
+Ineva-EondirectLung<br>
+Ineva-GreatPlains-Surgicare<br>
+Ineva-HospiraMednet<br>
+Ineva-Hugs<br>
+Inevainind-CentricityPerinatalcpn<br>
+Ineva-Inind-Dash<br>
+Inevainind-EpiphanyCardioServer<br>
+Inevainind-Iprocedure<br>
+Inevainind-LightningBoltScheduling<br>
+Inevainind-Mdstaff<br>
+Inevainind-MergeHemocardiologyHemodynamic<br>
+Inevainind-NetHealthTherapy<br>
+Inevainind-PassportIntellisource<br>
+Inevainind-Penvasc<br>
+Inevainind-Phreesia<br>
+Inevainind-PyxisEs<br>
+Inevainind-RadiologyPacs<br>
+Inevainind-Sci<br>
+Inevainind-SunriseClinicalManagerfkaQuest<br>
+Inevainind-SunriseClinicalManager-Reports<br>
+Inevainind-SynapseIqReporting<br>
+Inevainind-TableauDashboard<br>
+Inevainind-Teletracking<br>
+Inevainind-Xcelera<br>
+Ineva-MckessonConnectSmoconnectRx<br>
+Ineva-MergeCardio<br>
+Ineva-OmniCare<br>
+Ineva-PathwaysHealthcareScheduling-PatientSchedulingphs<br>
+Ineva-PharmacyOrders<br>
+Ineva-Policystat-Evansville<br>
+Ineva-Policystat-Warrick<br>
+Ineva-Powerscribe<br>
+Ineva-PyxisConnect<br>
+Ineva-PyxisEs-Evansville<br>
+Ineva-PyxisEs-EvansvilleOrtho<br>
+Ineva-PyxisEs-Warrick<br>
+Ineva-Pyxis-ProfessionalBoulevard<br>
+Ineva-Pyxis-St.VincentWarrick<br>
+Ineva-RalsBedsideGlucose<br>
+Ineva-SciEntriBookscheduleMaximizer<br>
+Ineva-SciEntriOrderingproviderNetworkManagerorderFacilitator<br>
+Ineva-Simplify<br>
+Ineva-SleepwareG3sleepLabs<br>
+Ineva-SyngoRadiology<br>
+Ineva-Systoc<br>
+Ineva-Teamdme<br>
+Ineva-Traumabase-TraumaDatabase<br>
+Ineva-ViewpointUltrasound<br>
+Ineva-Xcelera<br>
+Inind-3mHdm-360<br>
+Inind-Aria<br>
+Inind-Censitrac<br>
+Inind-CiiSafe<br>
+Inind-ClinicalPerformanceManagement<br>
+Inind-Eregxpress<br>
+Inind-Ers<br>
+Inind-GeViewpointCpdx<br>
+Inind-GeViewpointMfm<br>
+Inind-Heartflow<br>
+Inind-HospiraMednet<br>
+Inind-ImsReadytracker<br>
+Inind-Magview<br>
+Inind-MergeCardio<br>
+Inind-NextgateEmpi<br>
+Inind-NuancePowershareallLocations<br>
+Inind-NursingStudentApplication<br>
+Inind-PaceartOptima<br>
+Inind-PharmacyOrders<br>
+Inind-Policystat-Anderson<br>
+Inind-Policystat-Carmel<br>
+Inind-Policystat-Clay<br>
+Inind-Policystat-Dunn<br>
+Inind-Policystat-Fishers<br>
+Inind-Policystat-HeartCenter<br>
+Inind-Policystat-Indy<br>
+Inind-Policystat-Jennings<br>
+Inind-Policystat-Kokomo<br>
+Inind-Policystat-Mercy<br>
+Inind-Policystat-Randolph<br>
+Inind-Policystat-Salem<br>
+Inind-Policystat-Seton<br>
+Inind-Policystat-StVincentHealth<br>
+Inind-Policystat-StVincentMedicalGroup<br>
+Inind-PowerscribeForRadiology<br>
+Inind-Precession<br>
+Inind-ProsolvFujifilmSynapse<br>
+Inind-Provation<br>
+Inind-PyxisEs-Anderson<br>
+Inind-PyxisEs-Carmel<br>
+Inind-PyxisEs-Clay<br>
+Inind-PyxisEs-Dunn<br>
+Inind-PyxisEs-Fishers<br>
+Inind-PyxisEs-Jennings<br>
+Inind-PyxisEs-Kokomo<br>
+Inind-PyxisEs-Randolph<br>
+Inind-PyxisEs-Salem<br>
+Inind-PyxisEs-SetonLongTerm<br>
+Inind-PyxisEs-St.VincentsNeighborhoodHospital<br>
+Inind-PyxisEs-Stress<br>
+Inind-PyxisEs-StV86thIndianapolis<br>
+Inind-PyxisEs-StVHeartCenter<br>
+Inind-PyxisEs-Williamsport<br>
+Inind-PyxisEs-Womens<br>
+Inind-PyxisLogistics<br>
+Inind-PyxisMedstation4000legacySystem<br>
+Inind-RightFax<br>
+Inind-SciEntriBookscheduleMaximizer<br>
+Inind-SciEntriOrderingproviderNetworkManagerorderFacilitator<br>
+Inind-Sentri7<br>
+Inind-SiemensSyngoRis<br>
+Inind-SleepwareG3<br>
+Inind-SoarianHimforHeartCenter<br>
+Inind-SoveraForHim<br>
+Inind-SoveraForPfs<br>
+Inind-Sshnotebook<br>
+Inind-SunriseClinicalManager-Reports<br>
+Inind-Timelessmed<br>
+Inind-Traumabase<br>
+Inind-Vocera<br>
+Inind-XimSystem<br>
+Invision-midet-attestation<br>
+Invision-tnnas-attestation<br>
+Invision-txaus-attestation<br>
+In-Voalte<br>
+IschemaviewRapidStrokeImaging<br>
+Kofax<br>
+MacroHelixLlc340bArchitect<br>
+Magview<br>
+Matrixcare-ahs-attestation<br>
+Mdstaff-Amita<br>
+MeditechLegacyArchiveViewer<br>
+MergeHemodynamics<br>
+Midas<br>
+Morrisey<br>
+NavihealthEdischarge<br>
+Neodata<br>
+Netdocuments<br>
+Non-productionCerner-serviceNow<br>
+NursenavOncology<br>
+Onecontent<br>
+Opa<br>
+Optimum-patcom<br>
+OptumCareCoordinationPlatform<br>
+OptumPerformanceAnalyticsopa<br>
+OrderFacilitator<br>
+PaceartOptima<br>
+Passport<br>
+PassportOnesource<br>
+PayerWebsites-AscensionAssociates<br>
+PeoplesoftAttestation<br>
+Pharmacykeeper<br>
+PharmacyOrderImagingQueue<br>
+Pharmaserv<br>
+Phreesia<br>
+Phs<br>
+Policystattnnas<br>
+PremierQualityAdvisor<br>
+ProvationMd<br>
+PwcSmart<br>
+Pyxis<br>
+QuestFacilityBoard<br>
+RaisersEdge<br>
+RaulandResponder<br>
+Readyset<br>
+Redoc<br>
+Report2web<br>
+RightFax<br>
+Sci<br>
+Sentri7<br>
+SharepointOnlineGuestAccessnotForCommunitiesSharepoint<br>
+SifDataAccess<br>
+Sitecore<br>
+StandingStone<br>
+Star<br>
+Star-albir<br>
+SthPacs<br>
+StorzStreamConnect<br>
+Tableau-ascensionnational<br>
+Talyst<br>
+Tecsys<br>
+Teletracking<br>
+Tnnas-Censitrac<br>
+Tnnas-Dash<br>
+Tnnas-GeCcw<br>
+Tnnas-P2Sentinal<br>
+Tnnas-Pharmacykeeper-SaintThomasDekalbHospital<br>
+Tnnas-Pharmacykeeper-SaintThomasHickman<br>
+Tnnas-Pharmacykeeper-SaintThomasHighlandsHospital<br>
+Tnnas-Pharmacykeeper-SaintThomasMidtownHospital<br>
+Tnnas-Pharmacykeeper-SaintThomasRiverParkHospital<br>
+Tnnas-Pharmacykeeper-SaintThomasRutherfordHospital<br>
+Tnnas-Pharmacykeeper-SaintThomasStonesRiverHospital<br>
+Tnnas-Pharmacykeeper-SaintThomasWestHospital<br>
+Tnnas-Powerinsight<br>
+Tnnas-pyxises-highlands<br>
+Tnnas-PyxisEs-riverpark<br>
+Tnnas-pyxis-es-riverpark<br>
+Tnnas-PyxisEs-st.thomasRutherford<br>
+Tnnas-PyxisMedstation-Highlands<br>
+Tnnas-PyxisMedstation-RiverPark<br>
+Tnnas-SciEntriBookscheduleMaximizer<br>
+Tnnas-SciEntriOrderingorderFacilitator<br>
+Tnnas-Voalte<br>
+VarianAria<br>
+Vdi<br>
+VisualClubmate<br>
+Wimil-Ocie<br>
+Winebc<br>
+Xltek<br>
+3m360<br>
+3mHdm360Emd<br>
+AccessBadge-PhotoIdRequest-Ineva-Evansville</p>
+<p></p>
+<p>Service now Configuration Details:</p>
+<p>username: sailpoint_subprod_svc<br>
+password: sail_IGC<br>
+Client ID: 7b79bac0600b16108eca78648cb090e6<br>
+Client Secret: &nbsp; ;ceT2n&amp;lt;)l`<br>
+Refresh Token: wPOyhrIaj0OxKQ-8EcVtGEj4-SBiRCxzgzosXODyjPSZOrksF1BBhaGCxmxh=
+uis7eshciGWZ99xR5ML972a7Lw</p>
+<p>Identityiq for Service now Configuration Details:</p>
+<p>client ID: b258d0a871a544718aa0ba1a48b31207</p>
+<p>url: <a class=3D"external-link" href=3D"https://ascensionesmuat.service-=
+now.com/" rel=3D"nofollow">https://ascensionesmuat.service-now.com</a></p>
+<p>Client Secret: CYm!4O@kO)c</p>
+<p>Password: E#3u&gt;Kgm1}k[S3uX.wAN+RJ</p>
+<p>Refresh Token: IR0MjP7EzV6exGhgwZHfNWgEMOgQZlB4ai6vFkroEcpLnZRbaVOAOyPKP=
+jd9AwgHRwglTo2J8t-GcgFuq5wrxw</p>
+    </div>
+</body>
+</html>
+------=_Part_144_1058037284.1777217774056--
