@@ -1,0 +1,3118 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Application PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Application connector="sailpoint.connector.OpenConnectorAdapter" featuresString="NO_AGGREGATION, PROVISIONING, UNLOCK, ENABLE, PASSWORD" name="IdentityIQ for ServiceNow Service Desk" type="ServiceNow Service Desk">
+  <Attributes>
+    <Map>
+      <entry key="authenticationType" value="Basic"/>
+      <entry key="changeRequest">
+        <value>
+          <Map>
+            <entry key="checkStatus">
+              <value>
+                <Map>
+                  <entry key="checkStatusQueryParam">
+                    <value>
+                      <Map>
+                        <entry key="sysparm_fields" value="state,close_code"/>
+                        <entry key="sysparm_query" value="number=$ticketId"/>
+                      </Map>
+                    </value>
+                  </entry>
+                  <entry key="closureCodeResponseElement" value="$.result[0].close_code"/>
+                  <entry key="resource" value="/api/now/table/change_request"/>
+                  <entry key="responseElement" value="$.result[0].state"/>
+                  <entry key="statusMap">
+                    <value>
+                      <Map>
+                        <entry key="-1" value="Queued"/>
+                        <entry key="-2" value="Queued"/>
+                        <entry key="-3" value="Queued"/>
+                        <entry key="-4" value="Queued"/>
+                        <entry key="-5" value="Queued"/>
+                        <entry key="0" value="Queued"/>
+                        <entry key="3" value="Committed"/>
+                        <entry key="4" value="Failed"/>
+                      </Map>
+                    </value>
+                  </entry>
+                  <entry key="statusMapClosureCode">
+                    <value>
+                      <Map>
+                        <entry key="successful" value="Committed"/>
+                        <entry key="successful_issues" value="Committed"/>
+                        <entry key="unsuccessful" value="Failed"/>
+                      </Map>
+                    </value>
+                  </entry>
+                </Map>
+              </value>
+            </entry>
+            <entry key="provision">
+              <value>
+                <Map>
+                  <entry key="request">
+                    <value>
+                      <Map>
+                        <entry key="u_assignment_group" value="Service Desk"/>
+                        <entry key="u_category" value="Other"/>
+                        <entry key="u_description" value="#foreach($req in $plan.requests) #if($req.operation == &apos;Create&apos;) $newline Create Account on application $req.resource#else $newline For $req.id in application $req.resource #end #if($req.items) $newline #foreach($item in $req.items) $!item.Operation $item.name:$item.value $newline #end #else $!req.Operation Account #end #end"/>
+                        <entry key="u_impact" value="3"/>
+                        <entry key="u_priority" value="4"/>
+                        <entry key="u_requested_by" value="$!plan.arguments.opened_by"/>
+                        <entry key="u_risk" value="4"/>
+                        <entry key="u_short_description" value="IdentityIQ Access Request $!plan.arguments.identityRequestId"/>
+                      </Map>
+                    </value>
+                  </entry>
+                  <entry key="resource" value="/api/now/import/x_sap_sdim_change_request"/>
+                  <entry key="responseElement" value="$.result[0].display_value"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="client_id"/>
+      <entry key="client_secret"/>
+      <entry key="connectorAppForServiceNow"/>
+      <entry key="connectorClass" value="openconnector.connector.servicedesk.ServiceDeskConnector"/>
+      <entry key="encrypted" value="client_secret,refresh_token,oauth_token_info"/>
+      <entry key="grant_type"/>
+      <entry key="incident">
+        <value>
+          <Map>
+            <entry key="checkStatus">
+              <value>
+                <Map>
+                  <entry key="checkStatusQueryParam">
+                    <value>
+                      <Map>
+                        <entry key="sysparm_fields" value="incident_state,close_code"/>
+                        <entry key="sysparm_query" value="number=$ticketId"/>
+                      </Map>
+                    </value>
+                  </entry>
+                  <entry key="closureCodeResponseElement" value="$.result[0].close_code"/>
+                  <entry key="resource" value="/api/now/table/incident"/>
+                  <entry key="responseElement" value="$.result[0].incident_state"/>
+                  <entry key="statusMap">
+                    <value>
+                      <Map>
+                        <entry key="1" value="Queued"/>
+                        <entry key="2" value="Queued"/>
+                        <entry key="3" value="Queued"/>
+                        <entry key="6" value="Committed"/>
+                        <entry key="7" value="Committed"/>
+                        <entry key="8" value="Failed"/>
+                      </Map>
+                    </value>
+                  </entry>
+                  <entry key="statusMapClosureCode">
+                    <value>
+                      <Map>
+                        <entry key="Closed/Resolved by Caller" value="Committed"/>
+                        <entry key="Not Solved (Not Reproducible)" value="Failed"/>
+                        <entry key="Not Solved (Too Costly)" value="Failed"/>
+                        <entry key="Solved (Permanently)" value="Committed"/>
+                        <entry key="Solved (Work Around)" value="Committed"/>
+                        <entry key="Solved Remotely (Permanently)" value="Committed"/>
+                        <entry key="Solved Remotely (Work Around)" value="Committed"/>
+                      </Map>
+                    </value>
+                  </entry>
+                </Map>
+              </value>
+            </entry>
+            <entry key="provision">
+              <value>
+                <Map>
+                  <entry key="request">
+                    <value>
+                      <Map>
+                        <entry key="u_assignment_group" value="Service Desk"/>
+                        <entry key="u_caller_id" value="$!plan.arguments.requested_for"/>
+                        <entry key="u_contact_type" value="email"/>
+                        <entry key="u_description" value="#foreach($req in $plan.requests) #if($req.operation == &apos;Create&apos;) $newline Create Account on application $req.resource#else $newline For $req.id in application $req.resource #end #if($req.items) $newline #foreach($item in $req.items) $!item.Operation $item.name:$item.value $newline #end #else $!req.Operation Account #end #end"/>
+                        <entry key="u_impact" value="3"/>
+                        <entry key="u_opened_by" value="$!plan.arguments.opened_by"/>
+                        <entry key="u_short_description" value="IdentityIQ Access Request $!plan.arguments.identityRequestId"/>
+                        <entry key="u_urgency" value="3"/>
+                      </Map>
+                    </value>
+                  </entry>
+                  <entry key="resource" value="/api/now/import/x_sap_sdim_incident"/>
+                  <entry key="responseElement" value="result[0].display_value"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="noPermissions" value="true"/>
+      <entry key="operations" value="Create, Modify, Delete, Enable, Disable, Unlock, SetPassword"/>
+      <entry key="password" value="%%ASC_SERVICENOW_PW%%"/>
+      <entry key="refresh_token"/>
+      <entry key="serviceRequest">
+        <value>
+          <Map>
+            <entry key="checkStatus">
+              <value>
+                <Map>
+                  <entry key="checkStatusQueryParam">
+                    <value>
+                      <Map>
+                        <entry key="sysparm_fields" value="request_state"/>
+                        <entry key="sysparm_query" value="number=$ticketId"/>
+                      </Map>
+                    </value>
+                  </entry>
+                  <entry key="resource" value="/api/now/table/sc_request"/>
+                  <entry key="responseElement" value="$.result[0].request_state"/>
+                  <entry key="statusMap">
+                    <value>
+                      <Map>
+                        <entry key="Active" value="Queued"/>
+                        <entry key="Fulfilled" value="Committed"/>
+                        <entry key="New" value="Queued"/>
+                        <entry key="Pending" value="Queued"/>
+                        <entry key="Re-assigned" value="Queued"/>
+                        <entry key="closed_cancelled" value="Failed"/>
+                        <entry key="closed_complete" value="Committed"/>
+                        <entry key="closed_rejected" value="Failed"/>
+                        <entry key="in_process" value="Queued"/>
+                        <entry key="pre_approval_evaluation" value="Queued"/>
+                        <entry key="procurement" value="Queued"/>
+                        <entry key="requested" value="Queued"/>
+                        <entry key="waiting" value="Queued"/>
+                      </Map>
+                    </value>
+                  </entry>
+                </Map>
+              </value>
+            </entry>
+            <entry key="provision">
+              <value>
+                <Map>
+                  <entry key="catalogItem">
+                    <value>
+                      <Map>
+                        <entry key="3M 360" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="3M HDM 360 eMD" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - INEVA - Evansville" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - INEVA - Medical Group" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - INEVA - Ortho" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - INEVA - Warrick" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - AMG" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Anderson" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Cancer Center" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Carmel" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Clay" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Dunn" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Fishers" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Heart Center" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Indy Campus" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Jennings" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Kokomo" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Mercy" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Neighborhood Hospitals" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - PCC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Parkwood" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Randolph" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Salem" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Seton" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Stress Center" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Williamsport" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Access Badge - Photo ID Request - ININD - Women" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="AccuCare/AccuMed" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Ascension Provider Master Data Manager" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Athena Health" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="BUNDL (Except Texas)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Badge (Access) Modify Request - All Saint Thomas" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="CDM Web" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Care Management" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="CashPro" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Centricity Legacy Record" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Cerner Dependent" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Cerner LabCorp" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Cerner-Service Now" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Conga Contracts (fka Novatus)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Dragon Dictation" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Dragon Medical One" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="EMS Hospital Hub" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="EP Lab Database" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ESO HDE" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Epiphany" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Ethics Tracker" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="FairWarning" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Frontier - Access Control System" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="HBI" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="HFM" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="HealthChart Patient Portal" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="HealthConnect" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Hyperion Financial Management (HFM)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="IMS ReadyTracker" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - AP Robot - Connect RX" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - AdvantX - Surgicare" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Aria" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Attendance Calendar" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Baxa IV Compounder" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - C-II Safe - Pharmacy Misc." value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - CPSI" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Centricity Perinatal (CPN)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Clinical Performance Management" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - CoPath" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Connect - Pharmacy Misc." value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Cyrus Implant Tracking" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - EonDirect Lung" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Great Plains - Surgicare" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - HUGS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Hospira MedNet" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - IMBills (Phy Chg Capture)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - ININD - DASH" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - McKesson Connect SMO /Connect RX" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Medical Registry Services - Tumor Registry" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Merge Cardio" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - NTracts (ALL locations)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Omni Care" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - PYXIS - Professional Boulevard" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - PYXIS - St. Vincent Warrick" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Pathways Healthcare Scheduling - Patient Scheduling (PHS)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Pharmacy Orders" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - PolicyStat - Evansville" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - PolicyStat - Warrick" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - PowerScribe" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Pyxis Connect" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Pyxis ES - Evansville" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Pyxis ES - Evansville Ortho" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Pyxis ES - Warrick" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - SCI Entri Ordering" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - SCI Entri Schedule Maximizer" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Simplify" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Sleepware G3 (sleep labs)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Syngo Radiology" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Systoc" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - TeamDME" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - TraumaBase - Trauma Database" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Viewpoint Ultrasound" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Vocera" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - Xcelera" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - eMon (eScription Admin)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA - eScription.com" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA-nSpire Spirometry AD group membership" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Access Badge - Photo ID Request" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Centricity Perinatal (CPN)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Epiphany Cardio Server" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Lightning Bolt Scheduling" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - MDStaff" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Merge Hemo (Cardiology Hemodynamic)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Net Health Therapy" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Passport IntelliSource" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - PenVasc" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Phreesia" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Pyxis ES" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Radiology Pacs" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - SCI" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - SharePoint Online Guest Access (not for Communities SharePoint)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Sunrise Clinical Manager (fka QUEST)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Sunrise Clinical Manager - Reports" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Synapse IQ Reporting" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - Tableau Dashboard" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - TeleTracking" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD - iProcedure" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="INEVA/ININD-Phreesia" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - 3M HDM-360" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Aria" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - AvaSys" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - CII Safe" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Censitrac" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Clinical Performance Management" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Connect RX" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - ERS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Exacqvision" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - GE ViewPoint CPDX" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - GE ViewPoint MFM" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - GEMMS/ECIS EHR" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Heartflow" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Hospira MedNet" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - I-Stat" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - IMS ReadyTracker" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - MagView" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Medic" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Merge Cardio" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - NextGate EMPI" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Nuance Powershare (ALL locations)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Nursing Student application" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Paceart Optima" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pharmacy Orders" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Anderson" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Carmel" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Clay" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Dunn" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Fishers" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Heart Center" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Indy" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Jennings" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Kokomo" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Mercy" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Randolph" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Salem" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - Seton" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - St Vincent Health" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PolicyStat - St Vincent Medical Group" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - PowerScribe for Radiology" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Precession" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - ProSolv Fujifilm Synapse" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Provation" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Anderson" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Carmel" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Clay" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Dunn" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Fishers" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Jennings" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Kokomo" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Mercy" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Randolph" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Salem" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Seton Long Term" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - St V 86th Indianapolis" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - St V Heart Center" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Stress" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Williamsport" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis ES - Womens" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis Logistics" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Pyxis MedStation 4000 (Legacy System)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Right Fax" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - SCI Entri Ordering" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - SCI Entri Schedule Maximizer" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - SENTRI7" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - SSHNotebook" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Siemens Syngo Ris" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Sleepware G3" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Soarian HIM (for Heart Center)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Sovera for HIM" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Sovera for PFS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - TimelessMed" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Traumabase" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - Vocera" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - XIM System" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="ININD - eRegXpress" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MI - EnterpriseRx" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MI - Good Day Ascension Intranet Access (CWR Only)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MI - Heartflow" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MI - MD Staff" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - 3M APRDR / CGS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Alere EPOC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Apptio" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Argus - QCIM" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Business Objects" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - CPN - Centricity Perinatal" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Centricity Cardio Workflow (CCW)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Cerner BH or LTAC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Cerner Hub" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Cerner MyUserExperience" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Cerner Non Prod" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Cerner Vitalslink" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Cerner ePrescribe" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Clintegrity / CDE Triage" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Daily QA3" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Dentrix Enterprise" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Dragon Access" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Dragon Medical One (DMO)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Eclipse Patient Treatment Planning System" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Emergin" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - GE AW VM Server - East Region" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - GE ViewPoint" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Hugs" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Image Now (Perceptive Content)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Imprivata User Policy" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Intellispace OBTV (Macomb)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Internet" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Invivo DynaCAD" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - MagView" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Meditech" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Merge Cardio" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Merge Hemo" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Metriq Cancer Registry Application" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Midas + Care Management" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Misys EMR" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Misys Optimum" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Mosaiq Radiation Oncology Information System" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Muse" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Net Health Therapy" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - PACS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - PaceArt Optima" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - PathNet / Cerner RHO Millenium" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Patient Refund Request" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Pharmacy Orders" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Phreesia" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Power Insight (PI)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - PowerScribe" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - ProVationMD" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Pyxis and Pyxis ES - Ascension Macomb Oakland Hospital Madison Heights Campus" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Pyxis and Pyxis ES - Ascension Macomb Oakland Hospital Warren Campus" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Pyxis and Pyxis ES - Ascension Providence Hospital Novi Campus" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Pyxis and Pyxis ES - Ascension Providence Hospital Southfield Campus" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Pyxis and Pyxis ES - Ascension River District Hospital" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Pyxis and Pyxis ES - Ascension St John Hospital" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Pyxis and Pyxis ES - Macomb Township Medical Center" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - QuadraMed / AcuityPlus / WinPFS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - R4 Perinatal" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - REDOC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - RadCalc" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Right Fax" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - SNC Patient" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - SYSTOC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Sentri7" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Sitecore Content Editor" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - TeleTracking" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Teleview / TSO" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - TeraRecon" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIDET - Vocera" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - AS 400" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Allscripts Touchworks" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Apptio" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Assessment Data Manager (ADM)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Bed Ready" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - CAPS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - CERMe (InterQual)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - CPN" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Cadstream" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Clintegrity / CDE Triage" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - DATQuant" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Dragon" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - EndoCapsule" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - GE CCW" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - GE Maclab / Cardiolab" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - GE ViewPoint" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Glucometer" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - HDM" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Home Drive Access" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - IECG" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Lab (Cerner Millennium)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - LifePoint" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Metriq Tumor Registry" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Midas + Care Management" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - My Virtual Desktop (MVD) Policy" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - NThrive" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - PACECare" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Phreesia" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Point Click Care" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - PolicyStat (Request only if user edits policies)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - PowerScribe" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Pyxis Connect" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Pyxis ES" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Pyxis Meds" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Reports 2 Web" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Rev Cycle" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Right Fax" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - SYSTOC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Sentri7" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Sitecore Content Editor" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Sunrise Clinical Manager - Clinical Performance Management (CPM)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Sunrise Clinical Manager - Non Provider" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Sunrise Clinical Manager - Provider" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Sunrise Radiology (RIS)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Synapse / Prosolv" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - VIPR" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Vital Center (Allscript Touchworks Downtime)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIGRA - Vocera" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - 3M Coder" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - 3M HDM" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Apollo" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Apptio" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Ascent Capture (KOFAX)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - CareFusion/VMAX" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Cerner MyUserExperience" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Cerner Non Prod" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Cerner Patient Portal" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Cerner Scheduling Resource" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Cerner Vitalslink" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Clintegrity / CDE Triage" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - CoPath" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Continuum" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Crowe RCA" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - DA2" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - DMS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Dragon" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - ERS / PRS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Fetalink" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - GE Viewpoint" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - HBI" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - HIE Results" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Harmony" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Holter" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Hospira Smart Pumps" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Hugs" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Local Admin Rights" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - MPAC Healthquest" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - MUSE" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - MatrixCare - AOD (Answers on Demand)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Merge Cardio" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Merge Hemo" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Merge Unity PACS (DR Systems)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Michigan Care Improvement Registry (MCIR)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Microsystems" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Midas + Care Management" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Natus Neuroworks" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Net - It Central" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Nicvue EMG" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - PACECare" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Paceart" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Phreesia" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Power Insight (PI)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Pyxis" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Pyxis Logistics" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - RaisersEdge" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Right Fax" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - SARView" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - SYSTOC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Sentri7" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Sitecore Content Editor" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Sleep Lab (Compumedics)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Solcom" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - TempTrak" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - TraumaBase" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - Wellcentive" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIKAL - eScription" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - AP iDoc" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - AllScripts Care Management" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - CPN" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Cerner Hub" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Cerner MyUserExperience" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Cerner Non Prod" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Cerner PACS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Cerner ePrescribe" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Clintegrity / CDE Triage" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - DA2" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Dragon" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Epiphany Cardio Server" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Kronos" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Lawson Applications" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Lawson ESS required for Crittenton Employee" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Lawson Employee Self Service (ESS)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Lawson Mobile Supply Chain / Sims" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Lawson Reports (LBI)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - MVD - Access from Ascension Crittenton Locations and Equipment" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - MVD - External, Non-Mobile Access Only (no on site access)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - MagView" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - McKesson HBI" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - McKesson HPM" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - McKesson Performance Visibility (MPV)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - McKesson STAR" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Merge Cardio (Cardiology Clinical Imaging)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Merge Hemo" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Midas + Care Management" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Natus Neuroworks" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Phreesia" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Power Insight (PI)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Powerscribe 360" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Pyxis" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Pyxis ES" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Right Fax" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - SPM" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - SYSTOC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Sitecore Content Editor" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - SureScripts" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - Syngo Suite" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MIROC - iDoc" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - 3M ESA" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - 3M HIS (Softmed)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - AS 400" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Allscripts Touchworks" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Apptio" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Budget Advisor" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Cadstream" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Cadwell Cascade 3.1" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Cadwell Easy III" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Clintegrity / CDE Triage" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Dragon" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Eclipse (Security Request)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Epiphany Cardio" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - GE CARDIOLAB" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - H - SCRIBE" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - HCLL" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Hyperion" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - MRView" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Matrix (SNF EHR)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - MatrixCare SNF" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - McKesson Lab" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - MedSeries 4 (MS4)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Medtronic PaceArt" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Merge CVIS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Merge Cardio (CVIS)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Merge Hemo" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Merge PACS / iConnect" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Meta Powertrack" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Metriq" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Midas + Care Management" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Misys PM (Medic)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Mosaiq" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - My Virtual Desktop (MVD)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - NThrive" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - NUMA" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Net Health Therapy" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Novopath" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Nurse Call Reports" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - OCIE" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - ORSOS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - PenRad" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - PerfectServe" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Phreesia" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - PolicyStat (Request only if user edits policies)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - PowerScribe" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Pyxis Connect" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Pyxis ES" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Quadramed" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - RCA Crowe" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - REDOC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - RadCalc" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Right Fax" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - SYSTOC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Sentri7" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Sitecore Content Editor" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - SmartClient" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Sunrise Clinical Manager - Clinical Performance Management (CPM)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Sunrise Clinical Manager - Non Provider" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Sunrise Clinical Manager - Provider" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Sunrise Mobile MD / Resolution MD" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Sunrise Radiology (RIS)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - TeleTracking" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Tracker 5" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Traumabase" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Velocity" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Vital Center (Allscript Touchworks Downtime)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISAG - Wellcentive" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - 3M ESA" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - 3M HIS (Softmed)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Allscripts Touchworks" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Apptio" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Budget Advisor" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Dragon" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Enterprise Access Directory (EAD)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - MISYS PM" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - MR View" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - MatrixCare SNF" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Merge Cardio (CVIS)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Midas + Care Management" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - NThrive" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Net Health Therapy" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - OCIE" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - ORSOS One - Call" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - PerfectServe" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Phreesia" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - PolicyStat (Request only if user edits policies)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Post Cash Payments" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Pyxis" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Pyxis Connect" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Pyxis ES" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - RCA Crowe" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - REDOC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - SmartClient" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Sunrise Radiology (RIS)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Vital Center (Allscript Touchworks Downtime)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - Wellcentive" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MISTA - eScription" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - 3M Coding and Reimbursement" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - 3M ESA" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - 3M HIS (Softmed)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Allscripts Touchworks" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Apptio" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - CPN" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Cadwell Easy III" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Clintegrity / CDE Triage" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Dragon" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - GE Centricity" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - HCLL" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - MR View" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Matrix (SNF EHR)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - McKesson Lab" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Merge Cardio (CVIS)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Merge PACS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Midas + Care Management" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - NThrive" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Net Health Therapy" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Novopath" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - OCIE" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - ORSOS One - Call" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - PerfectServe" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Phreesia" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - PolicyStat (Request only if user edits policies)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Pyxis Connect" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Pyxis ES" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - REDOC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Sentri7" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Sunrise Radiology (RIS)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Vital Center (Allscript Touchworks Downtime)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MITAW - Wellcentive" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Macro Helix LLC 340B Architect" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="MagView" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Meditech Legacy Archive Viewer" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Merge Hemodynamics" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Midas" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Navihealth edischarge" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="NeoData" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="NetDocuments" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Non-Production Cerner-Service Now" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Nthrive" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="NurseNav Oncology" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="OPA" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="OneContent" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Optimum-Patcom" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Optum Care Coordination Platform" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Optum Performance Analytics (OPA)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Order Facilitator" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="P2 Sentinal" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="PHS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Paceart Optima" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Passport" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Passport OneSource" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Payer Website - Ascension Associates" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Payer Websites - Ascension Associates" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Pharmacy Order Imaging Queue" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="PharmacyKeeper" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Pharmaserv" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Phreesia" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="PolicyStat (TNNAS)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Premier Quality Advisor" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Provation MD" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="PureOHS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="PwC Smart" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Pyxis" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Quest Facility Board" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="RALS Bedside Glucose" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="RISKAPPS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Raisers Edge" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Rauland Responder" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Redoc" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Report2Web" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Reporting Portal" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Right Fax" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="SCI" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="SIF Data Access" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="SISNAI SOA Operations Dashboard" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="STH PACS" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Sentri7" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="SharePoint Online Guest Access (not for Communities SharePoint)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="SiteCore" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Standing Stone" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Storz Stream Connect" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - DASH" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - GE CCW" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - P2 Sentinal" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - PharmacyKeeper - Saint Thomas Dekalb Hospital" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - PharmacyKeeper - Saint Thomas Hickman" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - PharmacyKeeper - Saint Thomas Highlands Hospital" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - PharmacyKeeper - Saint Thomas Midtown Hospital" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - PharmacyKeeper - Saint Thomas River Park Hospital" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - PharmacyKeeper - Saint Thomas Rutherford Hospital" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - PharmacyKeeper - Saint Thomas Stones River Hospital" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - PharmacyKeeper - Saint Thomas West Hospital" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - PowerInsight" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - Pyxis ES-HighLands" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - Pyxis ES-RiverPark" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - Pyxis MedStation - Highlands" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - Pyxis MedStation - River Park" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - SCI Entri Ordering" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - SCI Entri Schedule Maximizer" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TNNAS - Voalte" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Tableau" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Talyst" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Tecsys" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="TeleTracking" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Varian Aria" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Visual ClubMate" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="WinEBC" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="Xltek" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="iSchemaview RAPID Stroke Imaging" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                        <entry key="kofax" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+						<entry key="INEVA - SCI Entri Book (Schedule Maximizer)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+						<entry key="INEVA - SCI Entri Ordering (Provider Network Manager/Order Facilitator)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+						<entry key="ININD - SCI Entri Book (Schedule Maximizer)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+						<entry key="ININD - SCI Entri Ordering (Provider Network Manager/Order Facilitator)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+						<entry key="TNNAS - SCI Entri Book (Schedule Maximizer)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+						<entry key="TNNAS - SCI Entri Ordering (Order Facilitator)" value="%%ASC_SERVICENOW_CATALOG_ID%%"/>
+                      </Map>
+                    </value>
+                  </entry>
+                  <entry key="request">
+                    <value>
+                      <Map>
+                        <entry key="approval" value="approved"/>
+                        <entry key="assignment_group" value="#if($request.items)#foreach($item in $request.items)#if($item.name==&apos;assignment_group&apos;)$item.value#end#end#end"/>
+                        <entry key="category" value="Account Security"/>
+                        <entry key="description" value="Created by IdentityIQ for ServiceNow Service Desk"/>
+                        <entry key="opened_by" value="$!plan.arguments.opened_by"/>
+                        <entry key="req_description" value="$!request.arguments.requestDescription"/>
+                        <entry key="request_state" value="in_process"/>
+                        <entry key="requested_for" value="$!plan.arguments.requested_for"/>
+                        <entry key="short_description" value="$!plan.arguments.shortDesc"/>
+                      </Map>
+                    </value>
+                  </entry>
+                  <entry key="requestObject" value="items"/>
+                  <entry key="resource" value="/api/x_sap_sdim/sailpoint_cart_js_api/create_ticket"/>
+                  <entry key="responseElement" value="$.result.request_number"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="ServiceNow Service Desk"/>
+      <entry key="ticketType" value="serviceRequest"/>
+      <entry key="token_url" value="%%ASC_SERVICENOW_URL%%oauth_token.do"/>
+      <entry key="url" value="%%ASC_SERVICENOW_URL%%"/>
+      <entry key="username" value="%%ASC_SERVICENOW_USERNAME%%"/>
+    </Map>
+  </Attributes>
+  <ProvisioningConfig>
+   <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - SCI Entri Book (Schedule Maximizer)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - SCI Entri Ordering (Provider Network Manager/Order Facilitator)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - SCI Entri Book (Schedule Maximizer)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - SCI Entri Ordering (Provider Network Manager/Order Facilitator)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - SCI Entri Book (Schedule Maximizer)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - SCI Entri Ordering (Order Facilitator)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="OPA"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AccuCare/AccuMed"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Athena Health"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Badge (Access) Modify Request - All Saint Thomas"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="CDM Web"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Care Management"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="CashPro"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Centricity Legacy Record"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Cerner Dependent"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Cerner LabCorp"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Conga Contracts (fka Novatus)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - DASH"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Dragon Dictation"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Dragon Medical One"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="EMS Hospital Hub"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="EP Lab Database"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ESO HDE"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Epiphany"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="FairWarning"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="HBI"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="HFM"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="HealthChart Patient Portal"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="HealthConnect"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="IMS ReadyTracker"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - AP Robot - Connect RX"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - AdvantX - Surgicare"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Aria"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Attendance Calendar"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Baxa IV Compounder"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - C-II Safe - Pharmacy Misc."/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - CPSI"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Clinical Performance Management"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - CoPath"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - EonDirect Lung"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Great Plains - Surgicare"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - HUGS"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Hospira MedNet"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - McKesson Connect SMO /Connect RX"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Merge Cardio"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Omni Care"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - PYXIS - Professional Boulevard"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - PYXIS - St. Vincent Warrick"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Pathways Healthcare Scheduling - Patient Scheduling (PHS)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Pharmacy Orders"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - PolicyStat - Evansville"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - PolicyStat - Warrick"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - PowerScribe"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Pyxis Connect"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Simplify"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Sleepware G3 (sleep labs)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Syngo Radiology"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Systoc"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - TeamDME"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - TraumaBase - Trauma Database"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Viewpoint Ultrasound"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - Centricity Perinatal (CPN)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - Epiphany Cardio Server"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - Lightning Bolt Scheduling"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - MDStaff"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - Merge Hemo (Cardiology Hemodynamic)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - Net Health Therapy"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - Passport IntelliSource"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - PenVasc"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - Phreesia"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - Radiology Pacs"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - SCI"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - Sunrise Clinical Manager (fka QUEST)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - Sunrise Clinical Manager - Reports"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - Synapse IQ Reporting"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - Tableau Dashboard"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - TeleTracking"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Xcelera"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA/ININD - iProcedure"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - 3M HDM-360"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Aria"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - CII Safe"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Censitrac"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Clinical Performance Management"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - ERS"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - GE ViewPoint CPDX"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - GE ViewPoint MFM"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Heartflow"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Hospira MedNet"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - IMS ReadyTracker"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - MagView"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Merge Cardio"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - NextGate EMPI"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Nuance Powershare (ALL locations)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Nursing Student application"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Paceart Optima"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pharmacy Orders"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Anderson"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Carmel"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Clay"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Dunn"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Fishers"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Heart Center"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Indy"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Jennings"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Kokomo"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Mercy"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Randolph"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Salem"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - Seton"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - St Vincent Health"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PolicyStat - St Vincent Medical Group"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - PowerScribe for Radiology"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Precession"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - ProSolv Fujifilm Synapse"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Provation"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="3M 360"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="3M HDM 360 eMD"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - INEVA - Evansville"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - INEVA - Medical Group"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - INEVA - Ortho"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - INEVA - Warrick"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - AMG"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Anderson"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Cancer Center"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Carmel"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Clay"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Dunn"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Fishers"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Heart Center"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Indy Campus"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Jennings"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Kokomo"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Mercy"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Neighborhood Hospitals"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Parkwood"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - PCC"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Randolph"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Salem"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Seton"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Stress Center"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Williamsport"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Access Badge - Photo ID Request - ININD - Women"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Cerner-Service Now"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Pyxis ES - Evansville"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Pyxis ES - Evansville Ortho"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - Pyxis ES - Warrick"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - eRegXpress"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Anderson"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Carmel"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Clay"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Dunn"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Fishers"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Jennings"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Kokomo"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Randolph"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Salem"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Seton Long Term"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - St V 86th Indianapolis"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - St V Heart Center"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Stress"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Williamsport"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - Pyxis ES-HighLands"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - Pyxis ES-RiverPark"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis ES - Womens"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis Logistics"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Pyxis MedStation 4000 (Legacy System)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Right Fax"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - SENTRI7"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Siemens Syngo Ris"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Sleepware G3"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Soarian HIM (for Heart Center)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Sovera for HIM"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Sovera for PFS"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - SSHNotebook"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - TimelessMed"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Traumabase"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - Vocera"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - XIM System"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="iSchemaview RAPID Stroke Imaging"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="kofax"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Macro Helix LLC 340B Architect"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MagView"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Meditech Legacy Archive Viewer"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Merge Hemodynamics"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Midas"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Navihealth edischarge"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="NeoData"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="NetDocuments"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Non-Production Cerner-Service Now"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="NurseNav Oncology"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="OneContent"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Optimum-Patcom"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Optum Care Coordination Platform"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Optum Performance Analytics (OPA)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Order Facilitator"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Paceart Optima"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Passport"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Passport OneSource"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Payer Websites - Ascension Associates"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Pharmacy Order Imaging Queue"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="PharmacyKeeper"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Pharmaserv"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Phreesia"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="PHS"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="PolicyStat (TNNAS)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Premier Quality Advisor"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Provation MD"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="PwC Smart"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Pyxis"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Quest Facility Board"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Raisers Edge"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - RALS Bedside Glucose"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Rauland Responder"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Redoc"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Report2Web"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Right Fax"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="SCI"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Sentri7"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="SharePoint Online Guest Access (not for Communities SharePoint)"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="SIF Data Access"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="SiteCore"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Standing Stone"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="STH PACS"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Storz Stream Connect"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Tableau"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Talyst"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Tecsys"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TeleTracking"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - P2 Sentinal"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - PharmacyKeeper - Saint Thomas Dekalb Hospital"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - PharmacyKeeper - Saint Thomas Hickman"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - PharmacyKeeper - Saint Thomas Highlands Hospital"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - PharmacyKeeper - Saint Thomas Midtown Hospital"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - PharmacyKeeper - Saint Thomas River Park Hospital"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - PharmacyKeeper - Saint Thomas Rutherford Hospital"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - PharmacyKeeper - Saint Thomas Stones River Hospital"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - PharmacyKeeper - Saint Thomas West Hospital"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - PowerInsight"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - Pyxis MedStation - Highlands"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - Pyxis MedStation - River Park"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Varian Aria"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Visual ClubMate"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="WinEBC"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Xltek"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - Voalte"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - SCI Entri Ordering"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="ININD - SCI Entri Schedule Maximizer"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - SCI Entri Ordering"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="TNNAS - SCI Entri Schedule Maximizer"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - SCI Entri Ordering"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - SCI Entri Schedule Maximizer"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <ManagedResource>
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="INEVA - ININD - DASH"/>
+      </ApplicationRef>
+    </ManagedResource>
+    <PlanInitializerScript>
+      <Source>
+
+        import org.apache.commons.logging.Log;
+        import org.apache.commons.logging.LogFactory;
+        import org.apache.commons.lang3.StringUtils;
+
+        import sailpoint.object.Identity;
+        import sailpoint.object.QueryOptions;
+        import sailpoint.object.Filter;
+        import sailpoint.object.ManagedAttribute;
+        import sailpoint.object.ProvisioningPlan;
+        import sailpoint.object.ProvisioningPlan.AccountRequest;
+        import sailpoint.object.ProvisioningPlan.AttributeRequest;
+        import sailpoint.tools.Util;
+        import sailpoint.object.IntegrationConfig;
+        import sailpoint.object.Application;
+        import sailpoint.object.Attributes;
+        import sailpoint.object.Bundle;
+        import sailpoint.object.IdentityRequest;
+        import sailpoint.object.Profile;
+        import sailpoint.object.IdentityRequestItem;
+        import sailpoint.api.SailPointContext;
+        import sailpoint.api.SailPointFactory;
+import sailpoint.api.Provisioner;
+
+        import java.io.IOException;
+        import java.io.RandomAccessFile;
+        import java.nio.channels.FileChannel;
+        import java.nio.channels.FileLock;
+        import java.io.File;
+        import sailpoint.api.Aggregator;
+        import sailpoint.connector.Connector;
+        import sailpoint.connector.ObjectNotFoundException;
+        import sailpoint.object.Attributes;
+        import sailpoint.object.ResourceObject;
+        import sailpoint.object.TaskResult;
+
+        String applicationName = "IIQ";
+        String ministry = "";
+
+        public boolean doTargetedAggregation(SailPointContext context, String nativeId, String appName, Attributes aggArgs) {
+        boolean isAggOK = true;
+
+        try {
+        Application app = context.getObjectByName(Application.class, appName);
+        Connector connector = sailpoint.connector.ConnectorFactory.getConnector(app, null);
+
+        if (aggArgs == null || aggArgs.isEmpty()) {
+        aggArgs = new Attributes();
+        // by default we'll force a full agg and skip deletes
+        aggArgs.put("noOptimizeReaggregation", "true");
+        aggArgs.put("checkDeleted", "false");
+        }
+
+        ResourceObject rObj = connector.getObject("account", nativeId, null);
+        if (null == rObj) {
+        return false;
+        }
+
+        Aggregator agg = new Aggregator(context, aggArgs);
+        TaskResult taskResult = agg.aggregate(app, rObj);
+
+        if (taskResult == null) {
+        isAggOK = false;
+        } else {
+        isAggOK = true;
+        }
+        } catch (Exception e) {
+        isAggOK = false;
+        }
+
+        return isAggOK;
+        }
+
+        public void writeToFile(String appName, HashMap writeParams){
+        if(Util.isNotNullOrEmpty(appName) &amp;&amp; null!=writeParams &amp;&amp; !writeParams.isEmpty()){
+        Application application = context.getObjectByName(Application.class,appName);
+        if(null!=application){
+        String fileName = application.getAttributeValue("file");
+        if(Util.isNotNullOrEmpty(fileName)){
+        // open file in read-write mode
+        RandomAccessFile randomAccessFile = new RandomAccessFile(new File(fileName), "rw");
+        try {
+        // get channel
+        FileChannel channel = randomAccessFile.getChannel();
+
+        // get lock
+        FileLock tryLock = channel.lock();
+
+        String data = "\n";
+        String userName = writeParams.get("Username");
+        String firstName = ((null == writeParams.get("Firstname")) ? "" : writeParams.get("Firstname"));
+        String lastName =((null == writeParams.get("Lastname")) ? "" : writeParams.get("Lastname"));
+        String employeeNumber = ((null == writeParams.get("EmployeeNumber")) ? "" : writeParams.get("EmployeeNumber"));
+        String emailAddress = ((null == writeParams.get("EmailAddress")) ? "" : writeParams.get("EmailAddress"));
+        String department = ((null == writeParams.get("Department")) ? "" : writeParams.get("Department"));
+        String role = ((null == writeParams.get("Role")) ? "" : writeParams.get("Role"));
+
+        String data="\n"+userName+","+firstName+","+lastName+","+employeeNumber+","+emailAddress+","+department+","+role;
+
+        // write to end of file
+        randomAccessFile.seek(randomAccessFile.length());
+        randomAccessFile.write(data.getBytes());
+
+        // release lock
+        tryLock.release();
+
+        // close file
+        randomAccessFile.close();
+        } catch (IOException e) {
+        //TODO
+        }
+        }
+        }
+        }    
+        }
+
+        public String getRequesterCommnets(String identityRequestId, SailPointContext context) {
+        logger.debug("Entering getRequesterCommnets");
+        String comment = "";
+        Map map = new HashMap();
+        try {
+        IdentityRequest identityRequestObj = context.getObjectByName(IdentityRequest.class, identityRequestId);
+        if (identityRequestObj != null) {
+        if (identityRequestObj.getItems() != null &amp;&amp; !identityRequestObj.getItems().isEmpty()) {
+        List &lt;IdentityRequestItem> itemsList = identityRequestObj.getItems();
+        for (IdentityRequestItem item: itemsList) {
+        if (Util.isNotNullOrEmpty(item.getRequesterComments()) &amp;&amp; Util.nullSafeCaseInsensitiveEq("IdentityIQ for ServiceNow Service Desk", item.getProvisioningEngine())) {
+
+        map.put(item.getValue(), item.getRequesterComments());
+        }
+        }
+        }
+        //context.decache(identityRequestObj);
+        }
+        } catch (Exception ex) {
+        logger.error("Exception in getRequesterCommnets " + ex.getMessage());
+        }
+        if (!Util.isEmpty(map)) {
+        Collection values = map.values();
+        if (!Util.isEmpty(values)) {
+        List valueList = (new ArrayList(values));
+        Util.removeDuplicates(valueList);
+        comment = valueList.toString().substring(1, valueList.toString().length() - 1);
+        }
+
+        }
+        logger.debug("Exiting getRequesterCommnets");
+        return comment;
+        }
+
+
+        public String findAssignmentFromBundle(ManagedAttribute eachEntitlement, String identityRequestId, SailPointContext context) {
+        logger.debug("Entering findAssignmentFromBundle");
+        String result = "";
+        String snowAssignmentGroup = "snowAssignmentGroup";
+
+        String roleName = "";
+        List &lt;Application> inputAppList = new ArrayList();
+        List &lt;Profile> profileList = new ArrayList();
+        boolean breakFlag = false;
+        try {
+        if (Util.isNotNullOrEmpty(identityRequestId) &amp;&amp; eachEntitlement != null &amp;&amp; Util.isNotNullOrEmpty(eachEntitlement.getAttribute()) &amp;&amp;
+        Util.isNotNullOrEmpty(eachEntitlement.getValue()) &amp;&amp; eachEntitlement.getApplication() != null) {
+        inputAppList.add(eachEntitlement.getApplication());
+        //get identity requestid obj
+        IdentityRequest identityRequestObj = context.getObjectByName(IdentityRequest.class, identityRequestId);
+        if (identityRequestObj != null) {
+        if (identityRequestObj.getItems() != null &amp;&amp; !identityRequestObj.getItems().isEmpty()) {
+        List &lt;IdentityRequestItem> itemsList = identityRequestObj.getItems();
+        for (IdentityRequestItem item: itemsList) {
+        if (breakFlag) {
+        break;
+        }
+        if ("IIQ".equalsIgnoreCase(item.getApplication())) {
+        roleName = "";
+        if (item.getValue() instanceof String) {
+        roleName = item.getValue().toString();
+        } else if (item.getValue() instanceof List) {
+        if (!((List) item.getValue()).isEmpty()) {
+        roleName = ((List) item.getValue()).get(0).toString();
+        }
+        }
+        // get role obj
+        if (Util.isNotNullOrEmpty(roleName)) {
+        Bundle bundle = context.getObjectByName(Bundle.class, roleName);
+        if (bundle != null &amp;&amp; bundle.getAttribute(snowAssignmentGroup) != null) {
+        profileList = null;
+        profileList = bundle.getProfilesForApplications(inputAppList);
+        if (profileList != null &amp;&amp; !profileList.isEmpty()) {
+        for (Profile profile: profileList) {
+        if (breakFlag) {
+        break;
+        }
+        for (Filter filter: profile.getConstraints()) {
+        if (Util.isNotNullOrEmpty(filter.getExpression())) {
+        if (filter.getExpression().contains(eachEntitlement.getAttribute()) &amp;&amp; filter.getExpression().contains(eachEntitlement.getValue())) {
+        // get the assignment details and break
+        result = (String) bundle.getAttribute(snowAssignmentGroup);
+        breakFlag = true;
+        }
+        }
+        }
+        }
+        }
+        //context.decache(bundle);
+        }
+        }
+        }
+        }
+        }
+        //context.decache(identityRequestObj);
+        }
+        }
+        } catch (Exception ex) {
+        logger.error("Exception in findAssignmentFromBundle " + ex.getMessage());
+        }
+        logger.debug("Exiting findAssignmentFromBundle");
+        return result;
+        }
+
+        public Map addPropertyInPlan(ManagedAttribute managedAttr) {
+        Set setValue = new HashSet();
+        setValue.add("approvalType");
+        setValue.add("ascBusinessApplication");
+        setValue.add("snowAssignmentGroup");
+        setValue.add("snowAssignmentGroupName");
+        setValue.add("sysDescriptions");
+
+        Map attributeMap = new HashMap();
+        if (null != managedAttr &amp;&amp; null != managedAttr.getAttributes() &amp;&amp; null != managedAttr.getAttributes().getMap()) {
+        attributeMap = managedAttr.getAttributes().getMap();
+        if (null != attributeMap &amp;&amp; null != attributeMap.keySet()) {
+        attributeMap.keySet().removeAll(setValue);
+        }
+        }
+        return attributeMap;
+        }
+
+
+
+        void addAssignmentGroupInPlan(ProvisioningPlan plan, SailPointContext context, String reqName) {
+        logger.debug("Starting addAssignmentGroupInPlan");
+        String assignmentGroup = null;
+        String businessApplication = null;
+        boolean isAccReqAdded = false;
+
+        if (plan != void &amp;&amp; plan != null) {
+        List accountRequests = plan.getAccountRequests();
+        List splitAccountRequests = new ArrayList();
+        if (!Util.isEmpty(accountRequests)) {
+        for (AccountRequest request: accountRequests) {
+        applicationName = request.getApplicationName();
+        List attributeRequests = request.getAttributeRequests();
+        isAccReqAdded = false;
+
+        if (!Util.isEmpty(attributeRequests)) {
+        for (AttributeRequest attrRequest: attributeRequests) {
+        assignmentGroup = null;
+        businessApplication = null;
+        Map propertyMap = new HashMap();
+        Map accReqAttrMap = new HashMap();
+        Attributes propertyAttr = new Attributes();
+        String attrName = attrRequest.getName();
+        Object attrValue = attrRequest.getValue();
+        Filter appFilter = Filter.eq("application.name", applicationName);
+        Filter attributeFilter = Filter.eq("attribute", attrName);
+        if (attrValue instanceof String &amp;&amp; Util.isNotNullOrEmpty(attrName) &amp;&amp; Util.isNotNullOrEmpty(attrValue)) {
+
+        Filter valueFilter = Filter.eq("value", attrValue);
+        Filter finalFilter = Filter.and(appFilter, attributeFilter, valueFilter);
+        ManagedAttribute entitlement = context.getUniqueObject(ManagedAttribute.class, finalFilter);
+
+        if (entitlement != null) {
+        bundleSnowAssignmentGroup = findAssignmentFromBundle(entitlement, plan.getString("identityRequestId"), context);
+        if (Util.isNotNullOrEmpty(bundleSnowAssignmentGroup)) {
+        assignmentGroup = bundleSnowAssignmentGroup;
+        } else {
+        assignmentGroup = entitlement.getAttribute("snowAssignmentGroup");
+        }
+		if (Util.isNotNullOrEmpty(assignmentGroup)) {
+		 if(reqName==null){        
+		assignmentGroup="fe159ef11b935094768fea4fad4bcbe5";
+		}
+        businessApplication = entitlement.getAttribute("ascBusinessApplication");
+        propertyMap = addPropertyInPlan(entitlement);
+        AccountRequest eachAccountReq = new AccountRequest(request);
+        if (Util.isNotNullOrEmpty(assignmentGroup)) {
+		 if(reqName==null){        
+		assignmentGroup="fe159ef11b935094768fea4fad4bcbe5";
+		}
+        eachAccountReq.add(new AttributeRequest("assignment_group", ProvisioningPlan.Operation.Set, assignmentGroup));
+        }
+        if (Util.isNotNullOrEmpty(businessApplication)) {
+        eachAccountReq.add(new AttributeRequest("businessApplication", ProvisioningPlan.Operation.Set, businessApplication));
+        }
+        if (propertyMap != null &amp;&amp; !propertyMap.isEmpty()) {
+        propertyAttr = eachAccountReq.getArguments();
+        if (null != propertyAttr &amp;&amp; null != propertyAttr.getMap()) {
+        accReqAttrMap = propertyAttr.getMap();
+        }
+        accReqAttrMap.put("ObjectProperties", propertyMap);
+        if (propertyAttr == null) {
+        propertyAttr = new Attributes();
+        }
+        propertyAttr.setMap(accReqAttrMap);
+        eachAccountReq.setArguments(propertyAttr);
+        }
+        isAccReqAdded = true;
+        splitAccountRequests.add(eachAccountReq);
+        }
+        if (entitlement != null) {
+        //context.decache(entitlement);
+        }
+        } else if (attrValue instanceof List &amp;&amp; Util.isNotNullOrEmpty(attrName) &amp;&amp; null != attrValue) {
+
+        Filter valueFilter = Filter.in("value", attrValue);
+        Filter finalFilter = Filter.and(appFilter, attributeFilter, valueFilter);
+        QueryOptions qo = new QueryOptions();
+        qo.add(finalFilter);
+        List entitlementList = context.getObjects(ManagedAttribute.class, qo);
+        if (entitlementList != null &amp;&amp; !entitlementList.isEmpty()) {
+        for (ManagedAttribute eachEntitlement: entitlementList) {
+        AttributeRequest eachAttributeReq = new AttributeRequest(attrName, attrRequest.getOp(), eachEntitlement.getValue());
+        AccountRequest eachAccountReq = new AccountRequest(request);
+        eachAccountReq.remove(attrRequest);
+
+        eachAccountReq.add(eachAttributeReq);
+        bundleSnowAssignmentGroup = findAssignmentFromBundle(eachEntitlement, plan.getString("identityRequestId"), context);
+        if (Util.isNotNullOrEmpty(bundleSnowAssignmentGroup)) {
+        assignmentGroup = bundleSnowAssignmentGroup;
+        } else {
+        assignmentGroup = eachEntitlement.getAttribute("snowAssignmentGroup");
+        }
+		if (Util.isNotNullOrEmpty(assignmentGroup)) {
+		 if(reqName==null){        
+		assignmentGroup="fe159ef11b935094768fea4fad4bcbe5";
+		}
+        businessApplication = eachEntitlement.getAttribute("ascBusinessApplication");
+        propertyMap = addPropertyInPlan(eachEntitlement);
+        if (Util.isNotNullOrEmpty(assignmentGroup)) {
+		if(reqName==null){        
+		assignmentGroup="fe159ef11b935094768fea4fad4bcbe5";
+		}
+        eachAccountReq.add(new AttributeRequest("assignment_group", ProvisioningPlan.Operation.Set, assignmentGroup));
+        }
+        if (Util.isNotNullOrEmpty(businessApplication)) {
+        eachAccountReq.add(new AttributeRequest("businessApplication", ProvisioningPlan.Operation.Set, businessApplication));
+        }
+        if (propertyMap != null &amp;&amp; !propertyMap.isEmpty()) {
+        propertyAttr = eachAccountReq.getArguments();
+        if (null != propertyAttr &amp;&amp; null != propertyAttr.getMap()) {
+        accReqAttrMap = propertyAttr.getMap();
+        }
+        accReqAttrMap.put("ObjectProperties", propertyMap);
+        if (propertyAttr == null) {
+        propertyAttr = new Attributes();
+        }
+        propertyAttr.setMap(accReqAttrMap);
+        eachAccountReq.setArguments(propertyAttr);
+        }
+        isAccReqAdded = true;
+        splitAccountRequests.add(eachAccountReq);
+        }
+        }
+        }
+        }
+        }
+
+        /*enable or disable case or account req doesnot have attreq or account req doesnot have entitlement */
+        if (Util.isEmpty(attributeRequests) || !isAccReqAdded) {
+
+        AccountRequest eachAcctReq = new AccountRequest(request);
+
+        String appName = request.getApplication();
+        Application appObj = context.getObjectByName(Application.class, appName);
+        if (appObj != null) {
+        assignmentGroup = (String)((appObj.getAttributeValue("snowAssignmentGroup") != null) ? appObj.getAttributeValue("snowAssignmentGroup") : "");
+
+        businessApplication = (String)((appObj.getAttributeValue("ascBusinessApplication") != null) ? appObj.getAttributeValue("ascBusinessApplication") : appName);
+		if (Util.isNotNullOrEmpty(assignmentGroup)) {
+		 if(reqName==null){        
+		assignmentGroup="fe159ef11b935094768fea4fad4bcbe5";
+		}
+        if (Util.isNotNullOrEmpty(assignmentGroup)) {
+		if(reqName==null){        
+		assignmentGroup="fe159ef11b935094768fea4fad4bcbe5";
+		}
+        eachAcctReq.add(new AttributeRequest("assignment_group", ProvisioningPlan.Operation.Set, assignmentGroup));
+        }
+        if (Util.isNotNullOrEmpty(businessApplication)) {
+        eachAcctReq.add(new AttributeRequest("businessApplication", ProvisioningPlan.Operation.Set, businessApplication));
+        }
+        //context.decache(appObj);
+        }
+        isAccReqAdded = true;
+        splitAccountRequests.add(eachAcctReq);
+        }
+
+        }
+        }
+        plan.setAccountRequests(splitAccountRequests);
+        }
+        logger.debug("Exiting addAssignmentGroupInPlan");
+        }
+        }
+        }
+        }
+        /////////////////////////////////////////////////////////////////
+        /// ADDED BY RAJESH
+        /////////////////////////////////////////////////////////////////
+        public String buildFullName(Identity identity) {
+
+        String firstName = identity.getFirstname();
+        String lastName = identity.getLastname();
+        String middleName = identity.getStringAttribute("middleName");
+        String fullName = firstName;
+        if (middleName != null) {
+        fullName = fullName + " " + middleName;
+        }
+        fullName = fullName + " " + lastName;
+
+        return fullName;
+        }
+
+        public String getAttributeRequest(SailPointContext context, AccountRequest accountReq, String attrName) {
+        String result = null;
+
+        AttributeRequest attrReq = accountReq.getAttributeRequest(attrName);
+        if (attrReq != null) {
+        if (attrReq.getValue() instanceof String) {
+        return attrReq.getValue();
+        }
+        }
+        if (result == null) {
+        result = "N/A";
+        }
+        return result;
+        }
+        public List getRoleAttributeRequests(SailPointContext context, AccountRequest accountReq, String attrName) {
+        List results = new ArrayList();
+
+        List attrReqList = accountReq.getAttributeRequests(attrName);
+        if (attrReqList != null &amp;&amp; attrReqList.size()> 0) {
+        for (AttributeRequest attrReq: attrReqList) {
+        results.add(attrReq.getValue());
+        }
+        }
+        if (results.size()> 0) {
+        results.add("N/A");
+        }
+        return results;
+        }
+        public List getAttributeRequestList(SailPointContext context, AccountRequest accountReq, String attrName) {
+        List result = new ArrayList();
+        AttributeRequest attrReq = accountReq.getAttributeRequest(attrName);
+        if (attrReq != null) {
+
+        if (attrReq.getValue() instanceof List) {
+
+        result.addAll((List) attrReq.getValue());
+        } else if (attrReq.getValue() instanceof String) {
+
+        result.add((String) attrReq.getValue());
+        }
+        }
+        return result;
+        }
+
+        public String newUpdateRequirement(SailPointContext context, ProvisioningPlan plan, String comment, Identity identity, Map arguments) {
+        Map map = new HashMap();
+        if (comment != null) {
+        comment += "\n\n";
+        }
+        try {
+        if (plan != null &amp;&amp; identity != null) {
+		String strManager=null;
+        String managerEmail=null;
+        String managerPhoneNumber=null;
+        if(identity.getManager()!=null){
+
+        strManager=identity.getManager().getName()+"-"+identity.getManager().getDisplayableName();
+        managerEmail=(identity.getManager().getEmail()==null) ? "N/A" :identity.getManager().getEmail();     
+        managerPhoneNumber=(identity.getManager().getAttribute("telephoneNumber")==null) ? "N/A":identity.getManager().getAttribute("telephoneNumber");
+        }
+        List accountRequests = plan.getAccountRequests();
+        if (!Util.isEmpty(accountRequests)) {
+        for (AccountRequest account: accountRequests) {
+        applicationName = account.getApplicationName();
+        if ("SCI".equalsIgnoreCase(applicationName)) {
+        if (comment == null) {
+        comment = "Request  Information:\n";
+        }
+        //comment+="\n\nUser Full Name: "+buildFullName(identity)+"\n";
+        comment += "\n\nRequested for: " + identity.getDisplayableName() + "\n";
+        comment += "User facility name: " + identity.getAttribute("buildingId") + "\n";
+        comment += "User department: " + identity.getAttribute("department") + "\n";
+        comment += "User phone number: " + identity.getAttribute("telephoneNumber") + "\n\n\n\n";
+        comment += "User Email: " + identity.getAttribute("email") + "\n";
+		comment += "User Ministry: " + identity.getAttribute("ministry") + "\n";
+        comment += "Manager: " + strManager + "\n";
+        comment += "Manager Email: " + managerEmail + "\n";
+        comment += "Manager Phone Number: " + managerPhoneNumber + "\n";
+        comment += "Application Name: " + applicationName + "\n\n";
+
+        //comment+="\n\nRequested for: "+arguments.get("requestedFor")+"\n";
+        comment += " Requested By First Name:  " + arguments.get("requestedByFirstName") + "\n";
+        comment += "Requested By Last Name: " + arguments.get("requestedByLastName") + "\n";
+        comment += "Network ID: " + arguments.get("networkID") + "\n\n";
+        //comment += "Requested by: " + arguments.get("managerSamAccountName") + "\n\n\n\n";
+		comment += "Requested By: " + arguments.get("opened_by") + "\n\n\n\n";
+
+
+        comment += "Access Needed: " + "\n";
+        comment += "---------------------\n";
+        comment += " Access Type: " + getAttributeRequest(context, account, "accessType") + "\n\n";
+        List faciltyAccList = getAttributeRequestList(context, account, "facilityAccess");
+        comment += "Facility Access: " + "\n";
+        if (faciltyAccList.size()> 0) {
+        for (String fAccVal: faciltyAccList) {
+        comment += fAccVal + "\n\n";
+        }
+        } else {
+        comment += "N/A" + "\n\n";
+        }
+        List roleRequestList = getRoleAttributeRequests(context, account, "Role");
+        comment += "Application Entitlements: " + "\n---------------------\n";
+        if (roleRequestList.size()> 0) {
+        for (String entValue: roleRequestList) {
+        comment += entValue + "\n\n";
+        }
+        } else {
+        comment += "N/A" + "\n\n";
+        }
+        } else if ("Order Facilitator".equalsIgnoreCase(applicationName)) {
+        if (comment == null){
+        comment = "Request Information:\n-----------------------------";
+        }
+        else{
+        comment += "Request Information:\n-----------------------------";
+        }	
+
+        comment += "\n\nRequested for: " + identity.getDisplayableName() + "\n";
+        //comment+="\n\nUser Full Name: "+buildFullName(identity)+"\n";
+        comment += "User facility name: " + identity.getAttribute("buildingId") + "\n";
+        comment += "User department: " + identity.getAttribute("department") + "\n";
+        comment += "User phone number: " + identity.getAttribute("telephoneNumber") + "\n\n\n\n";
+        comment += "User Email: " + identity.getAttribute("email") + "\n";
+		comment += "User Ministry: " + identity.getAttribute("ministry") + "\n";
+        comment += "Manager: " + strManager + "\n";
+        comment += "Manager Email: " + managerEmail + "\n";
+        comment += "Manager Phone Number: " + managerPhoneNumber + "\n";
+        comment += "Application Name: " + applicationName + "\n\n";
+
+        //comment+="\n\nRequested for: "+arguments.get("requestedFor")+"\n";
+        comment += " Requested By First Name:  " + arguments.get("requestedByFirstName") + "\n";
+        comment += "Requested By Last Name: " + arguments.get("requestedByLastName") + "\n";
+        comment += "Network ID: " + arguments.get("networkID") + "\n\n";
+        //comment += "Requested by: " + arguments.get("managerSamAccountName") + "\n\n\n\n";
+		comment += "Requested By: " + arguments.get("opened_by") + "\n\n\n\n";
+
+        comment += "Access Needed: \n";
+        comment += "---------------------\n";
+        comment += " Access Type: " + getAttributeRequest(context, account, "accessType") + "\n\n";
+        List faciltyAccList = getAttributeRequestList(context, account, "facilityAccess");
+        comment += "Facility Access: \n";
+        comment += "---------------------\n";
+        if (faciltyAccList.size()> 0) {
+        for (String fAccVal: faciltyAccList) {
+        comment += fAccVal + "\n\n";
+        }
+        }
+        List roleRequestList = getRoleAttributeRequests(context, account, "Role");
+        comment += "Application Entitlements: \n";
+        comment += "---------------------\n";
+        if (roleRequestList.size()> 0) {
+        for (String entValue: roleRequestList) {
+        comment += entValue + "\n\n";
+        }
+        } else {
+        comment += "N/A" + "\n\n";
+        }
+        } else {
+        // Add User Information for all Non-SCI and OF apps for all operations
+        if (comment == null)
+        comment = "Request Information:\n-----------------------------";
+        else
+        comment += "Request Information:\n-----------------------------";
+
+        comment += "\n\nRequested for: " + identity.getDisplayableName() + "\n";
+        //comment+="\n\nRequested for: "+buildFullName(identity)+"\n";
+        comment += " Requested By First Name:  " + arguments.get("requestedByFirstName") + "\n";
+        comment += "Requested By Last Name: " + arguments.get("requestedByLastName") + "\n";
+        //comment += "Requested By: " + arguments.get("managerSamAccountName") + "\n\n\n\n";      
+		 comment += "Requested By: " + arguments.get("opened_by") + "\n\n\n\n";
+        comment += "Network ID: " + arguments.get("networkID") + "\n\n";
+        comment += "User Ministry: " + identity.getAttribute("ministry") + "\n";
+        comment += "Manager: " + strManager + "\n";
+        comment += "Manager Email: " + managerEmail + "\n";
+        comment += "Manager Phone Number: " + managerPhoneNumber + "\n";
+        comment += "Application details:\n-----------------------------\n";
+        List getAttrRequests = account.getAttributeRequests();
+
+        if (!account.getOperation().equals(AccountRequest.Operation.Create)) {
+        //Application Account Name / Native Identity
+        comment += "Account Username: " + account.getNativeIdentity() + "\n";
+        //User Email Address
+        String userEmail = "";
+        userEmail = identity.getAttribute("email");
+        comment += "User Email: " + userEmail + "\n";
+        }
+        for (AttributeRequest attrRequest: getAttrRequests) {
+        comment += attrRequest.getOperation().toString() + "  " + attrRequest.getName() + " : " + attrRequest.getValue().toString() + "\n";
+        }
+
+        }
+        }
+        }
+        } else {
+
+        }
+        } catch (Exception ex) {
+
+        }
+        return comment;
+        }
+
+        //Rajesh updated on apr22
+        public ProvisioningPlan newUpdateRequirementDesc(SailPointContext context, ProvisioningPlan plan, String comment, Identity identity, Map arguments) {
+        // logs("Starting newUpdateRequirementDesct000001***" + comment, "snowdesk");
+        Map map = new HashMap();
+        if (comment != null) {
+        comment += "\n\n";
+        }
+        try {
+        if (plan != null @and identity != null) {
+		 String strManager=null;
+        String managerEmail=null;
+        String managerPhoneNumber=null;
+        if(identity.getManager()!=null){
+         strManager=identity.getManager().getName()+"-"+identity.getManager().getDisplayableName();
+        managerEmail=(identity.getManager().getEmail()==null) ? "N/A" :identity.getManager().getEmail();     
+        managerPhoneNumber=(identity.getManager().getAttribute("telephoneNumber")==null) ? "N/A":identity.getManager().getAttribute("telephoneNumber");
+        }
+        List accountRequests = plan.getAccountRequests();
+        if (!Util.isEmpty(accountRequests)) {
+        for (AccountRequest account: accountRequests) {
+        comment=null;
+        applicationName = account.getApplicationName();
+        //logs("newUpdateRequirement applicationName string :- " + applicationName, "snowdesk");
+        if ("SCI".equalsIgnoreCase(applicationName)) {
+        if (comment == null)
+        comment = "Request  Information:\n";
+
+        //comment+="\n\nUser Full Name: "+buildFullName(identity)+"\n";
+        comment += "\n\nRequested for: " + identity.getDisplayableName() + "\n";
+        comment += "User facility name: " + identity.getAttribute("buildingId") + "\n";
+        comment += "User department: " + identity.getAttribute("department") + "\n";
+        comment += "User phone number: " + identity.getAttribute("telephoneNumber") + "\n\n\n\n";
+        comment += "User Email: " + identity.getAttribute("email") + "\n";
+		comment += "User Ministry: " + identity.getAttribute("ministry") + "\n";
+        comment += "Manager: " + strManager + "\n";
+        comment += "Manager Email: " + managerEmail + "\n";
+        comment += "Manager Phone Number: " + managerPhoneNumber + "\n";
+        comment += "Application Name: " + applicationName + "\n\n";
+
+        //comment+="\n\nRequested for: "+arguments.get("requestedFor")+"\n";
+        comment += " Requested By First Name:  " + arguments.get("requestedByFirstName") + "\n";
+        comment += "Requested By Last Name: " + arguments.get("requestedByLastName") + "\n";
+        comment += "Network ID: " + arguments.get("networkID") + "\n\n";
+        //comment += "Requested by: " + arguments.get("managerSamAccountName") + "\r\n";
+		comment += "Requested By: " + arguments.get("opened_by") + "\n\n\n\n";
+
+        comment += "\r\n";
+        comment += "Access Needed: " + "\n";
+        comment += "---------------------\n";
+        comment += " Access Type: " + getAttributeRequest(context, account, "accessType") + "\r\n";
+        comment += "\r\n";
+        List faciltyAccList = getAttributeRequestList(context, account, "facilityAccess");
+        comment += "Facility Access: " + "\n";
+        if (faciltyAccList.size() > 0) {
+        for (String fAccVal: faciltyAccList) {
+        comment += fAccVal + "\n\n";
+        }
+        } else {
+        comment += "N/A" + "\n\n";
+        }
+        comment += "\r\n";
+        List roleRequestList = getRoleAttributeRequests(context, account, "Role");
+        comment += "Application Entitlements: " + "\n---------------------\n";
+        if (roleRequestList.size() > 0) {
+        for (String entValue: roleRequestList) {
+        comment += entValue + "\n\n";
+        }
+        } else {
+        comment += "N/A" + "\n\n";
+        }
+        } else if ("Order Facilitator".equalsIgnoreCase(applicationName)) {
+        if (comment == null)
+        comment = "Request Information:\n-----------------------------";
+        else
+        comment += "Request Information:\n-----------------------------";
+
+        comment += "\n\nRequested for: " + identity.getDisplayableName() + "\n";
+        //comment+="\n\nUser Full Name: "+buildFullName(identity)+"\n";
+        comment += "User facility name: " + identity.getAttribute("buildingId") + "\n";
+        comment += "User department: " + identity.getAttribute("department") + "\n";
+        comment += "User phone number: " + identity.getAttribute("telephoneNumber") + "\n\n\n\n";
+        comment += "User Email: " + identity.getAttribute("email") + "\n";		
+        comment += "User Ministry: " + identity.getAttribute("ministry") + "\n";
+        comment += "Manager: " + strManager + "\n";
+        comment += "Manager Email: " + managerEmail + "\n";
+        comment += "Manager Phone Number: " + managerPhoneNumber + "\n";
+        comment += "Application Name: " + applicationName + "\n\n";
+
+        //comment+="\n\nRequested for: "+arguments.get("requestedFor")+"\n";
+        comment += " Requested By First Name:  " + arguments.get("requestedByFirstName") + "\n";
+        comment += "Requested By Last Name: " + arguments.get("requestedByLastName") + "\n";
+        comment += "Network ID: " + arguments.get("networkID") + "\n\n";
+        //comment += "Requested By: " + arguments.get("managerSamAccountName") + "\n\n\n\n";
+        comment += "Requested By: " + arguments.get("opened_by") + "\n\n\n\n";
+        comment += "\r\n";
+        comment += "Access Needed: \n";
+        comment += "---------------------\n";
+        comment += " Access Type: " + getAttributeRequest(context, account, "accessType") + "\r\n";
+        comment += "\r\n";
+        List faciltyAccList = getAttributeRequestList(context, account, "facilityAccess");
+        comment += "Facility Access: \n";
+        comment += "---------------------\n";
+        if (faciltyAccList.size() > 0) {
+        for (String fAccVal: faciltyAccList) {
+        comment += fAccVal + "\r\n";
+        }
+        }
+        comment += "\r\n";
+        List roleRequestList = getRoleAttributeRequests(context, account, "Role");
+        comment += "Application Entitlements: \n";
+        comment += "---------------------\n";
+        if (roleRequestList.size() > 0) {
+        for (String entValue: roleRequestList) {
+        comment += entValue + "\n\n";
+        }
+        } else {
+        comment += "N/A" + "\n\n";
+        }
+        } else {
+        // Add User Information for all Non-SCI and OF apps for all operations
+        if (comment == null){
+        comment = "Request Information:\n-----------------------------";
+        }
+        else{
+        comment += "Request Information:\n-----------------------------";
+        }
+
+        comment += "\n\nRequested for: " + identity.getDisplayableName() + "\n";
+        comment += "Requested By First Name:  " + arguments.get("requestedByFirstName") + "\n";
+        comment += "Requested By Last Name: " + arguments.get("requestedByLastName") + "\n";
+        //comment += "Requested By: " + arguments.get("managerSamAccountName") + "\n\n\n\n";
+        comment += "Requested By: " + arguments.get("opened_by") + "\n\n\n\n";
+        comment += "Network ID: " + arguments.get("networkID") + "\n\n";
+        comment += "User Ministry: " + identity.getAttribute("ministry") + "\n";
+        comment += "Manager: " + strManager + "\n";
+        comment += "Manager Email: " + managerEmail + "\n";
+        comment += "Manager Phone Number: " + managerPhoneNumber + "\n";
+        comment += "Application details:\n-----------------------------\n";
+        List getAttrRequests = account.getAttributeRequests();
+
+        if (!account.getOperation().equals(AccountRequest.Operation.Create)) {
+        comment += "Account Username: " + account.getNativeIdentity() + "\n";
+        String userEmail = "";
+        if (Util.isNotNullOrEmpty(identity.getAttribute("email"))) {
+        userEmail = identity.getAttribute("email");
+        }
+        comment += "User Email: " + userEmail + "\n";
+        }
+        for (AttributeRequest attrRequest: getAttrRequests) {
+        comment += attrRequest.getOperation().toString() + "  " + attrRequest.getName() + " : " + attrRequest.getValue().toString() + "\n";
+        }
+
+        }
+        account.put("requestDescription",comment);
+        }
+        }
+        } else {
+        //logs("Else Case newUpdateRequirementDesc**Either application or Plan is null*", "snowdesk");
+        }
+        } catch (Exception ex) {
+        //logs("Exception newUpdateRequirementDesc***" + ex.getMessage(), "snowdesk");
+        }
+
+        // logs("Existing newUpdateRequirementDesc****plan*****" + plan.toXml(), "snowdesk");
+
+        return plan;
+        }
+        //Rajesh updated on apr22 Ended
+
+        ////////////////////////////////////////////////////////////////
+        // Main
+        ////////////////////////////////////////////////////////////////
+
+        Log logger = LogFactory.getLog("Rule.Application.ServiceNowIntegration");
+        String RULE_NAME = "ServiceNow ServiceDesk Plan Initializer Script";
+        logger.debug("Entering " + RULE_NAME);
+        String bundleSnowAssignmentGroup = "";
+        Map arguments = new HashMap();
+        String requestedFor = "";
+        String networkID = "";
+        String email = "";
+        String requesterComment = "";
+        String managerSamAccountName = "";
+        String requestedForFirstName = "";
+        String requestedForLastName = "";
+        String requestedByFirstName = "";
+        String requestedByLastName = "";
+        String requestDescription = "";
+        String requestAppDesc = "";
+        String requester= "";
+		String strRequesterName="RequesterNotNull";
+
+       /* if ((context == void) || (context == null)) {
+        context = SailPointFactory.getCurrentContext();
+        }
+		*/
+		//Added by Rajesh
+		if (plan != null &amp;&amp; plan.getArguments() != null) {
+        arguments = (Map) plan.getArguments();
+
+        }
+        if (plan != null &amp;&amp; Util.isNotNullOrEmpty(plan.getString("identityRequestId"))) {
+        requesterComment = getRequesterCommnets(plan.getString("identityRequestId"), context);
+        if (Util.isNotNullOrEmpty(requesterComment)) {
+        arguments.put("requesterComment", requesterComment);
+        }
+
+        } else {
+        if(null!=plan &amp;&amp; null!=identity){
+        List accountRequests = plan.getAccountRequests();
+        if (!Util.isEmpty(accountRequests)) {
+        HashMap fileWriteArgs = new HashMap();
+        String appName = "";
+
+        for (AccountRequest account: accountRequests) {
+        if (account.getOperation().equals(AccountRequest.Operation.Create)) {
+        String applicationName = account.getApplicationName();
+        if(Util.isNotNullOrEmpty(applicationName) &amp;&amp; (applicationName.equalsIgnoreCase("INEVA/ININD - Pyxis ES") || applicationName.equalsIgnoreCase("ININD - Pyxis ES - Anderson"))){
+        System.out.println("Application name matched");
+        appName = applicationName;
+        String nativeIdentity = account.getNativeIdentity();
+
+
+        if(Util.isNotNullOrEmpty(nativeIdentity)){
+        fileWriteArgs.put("Username",nativeIdentity);
+
+        List attrRequests = account.getAttributeRequests();
+        if(!Util.isEmpty(attrRequests)){
+        for (AttributeRequest attrReq: attrRequests){
+        String attrName = attrReq.getName();
+        String attrValue = attrReq.getValue();
+        fileWriteArgs.put(attrName,attrValue);
+        }
+        }
+        }
+        }
+        }
+        }
+        if(Util.isNotNullOrEmpty(appName) &amp;&amp; null!=fileWriteArgs &amp;&amp; !fileWriteArgs.isEmpty()){
+        writeToFile(appName,fileWriteArgs);
+        Attributes aggregationArgs = new Attributes();
+        aggregationArgs.put("noOptimizeReaggregation", "true");
+        aggregationArgs.put("correlateEntitlements", "true");
+        aggregationArgs.put("promoteManagedAttributes", "true");
+        aggregationArgs.put("checkDeleted", "false");
+        boolean targetAggResult = doTargetedAggregation(context,fileWriteArgs.get("Username"),appName,aggregationArgs);					
+        }
+        }
+        }
+        }
+        
+        
+        if (identity != null) {
+        requestedFor = identity.getName();
+        networkID = identity.getStringAttribute("samAccountName");
+        email = identity.getEmail();
+        requestedForFirstName = identity.getFirstname();
+        requestedForLastName = identity.getLastname();
+        if (identity.getManager() != null) {
+        managerSamAccountName = identity.getManager().getStringAttribute("samAccountName");
+        }
+        }
+
+        Identity requesterIdentity=null;
+		if (arguments.get("requester") != null) {
+        requester = arguments.get("requester");
+        //added by shilpa
+		if(requester==null){
+		logger.debug("Requester is null");
+		 strRequesterName=null;
+		}
+        if(requester.equalsIgnoreCase("RequestHandler")){
+        requestedByFirstName = "RequestHandler_sailpoint";
+        requestedByLastName = "RequestHandler_sailpoint";
+        }else{
+        requesterIdentity = context.getObjectByName(Identity.class, requester);
+        if (requesterIdentity != null) {
+        requestedByFirstName = requesterIdentity.getFirstname();
+        requestedByLastName = requesterIdentity.getLastname();
+        }
+        }
+		}
+
+        //  if (Util.isNotNullOrEmpty(managerSamAccountName)) {
+        logger.debug("Setting Opened by argument in plan");
+        // arguments.put("opened_by", managerSamAccountName);}
+        //added by shilpa
+        if(requester.equalsIgnoreCase("RequestHandler")){
+        arguments.put("opened_by", "RequestHandler_sailpoint");
+        }
+        if(requesterIdentity!=null){
+        arguments.put("opened_by", requesterIdentity.getName());
+        } //added by shilpa
+        else if(requesterIdentity==null &amp;&amp; requester.equalsIgnoreCase("RequestHandler"))
+        {
+        arguments.put("opened_by", "RequestHandler_sailpoint");
+        }
+        else {
+        logger.debug("Setting Opened by argument is default");
+		 strRequesterName=null;
+        arguments.put("opened_by", "980df3d31b8ce0943f951025bd4bcbd7"); //temp solution - defaults to user sail_point
+        }
+
+        if (Util.isNotNullOrEmpty(requestedFor)) {
+        logger.debug("Setting requested_for argument in plan");
+        arguments.put("requested_for", requestedFor);
+        }
+        if (Util.isNotNullOrEmpty(networkID)) {
+        logger.debug("Setting networkID argument in plan");
+        arguments.put("networkID", networkID);
+        }
+        if (Util.isNotNullOrEmpty(email)) {
+        logger.debug("Setting email argument in plan");
+        arguments.put("email", email);
+        }
+
+        if (Util.isNotNullOrEmpty(requestedForFirstName)) {
+        logger.debug("Setting requestedForFirstName argument in plan");
+        arguments.put("requestedForFirstName", requestedForFirstName);
+        }
+
+        if (Util.isNotNullOrEmpty(requestedForLastName)) {
+        logger.debug("Setting requestedForLastName argument in plan");
+        arguments.put("requestedForLastName", requestedForLastName);
+        }
+
+        if (Util.isNotNullOrEmpty(requestedByFirstName)) {
+        logger.debug("Setting requestedByFirstName argument in plan");
+        arguments.put("requestedByFirstName", requestedByFirstName);
+        }
+
+        if (Util.isNotNullOrEmpty(requestedByLastName)) {
+        logger.debug("Setting requestedByLastName argument in plan");
+        arguments.put("requestedByLastName", requestedByLastName);
+        }
+
+        requestAppDesc=newUpdateRequirement(context,plan,requestAppDesc,identity,arguments);
+        String shortDesc="AAM (SailPoint) Request for "+identity.getLastname()+", "+identity.getFirstname()+" on Application: "+applicationName;
+        if (shortDesc.length()> 256) {
+        shortDesc = StringUtils.abbreviate(shortDesc, 256);
+        }
+        arguments.put("shortDesc", shortDesc);
+
+        //Rajjesh updated on apr22
+        //logs("INITIAL REQUESTED COMMENTS RAJESH plan:- "+plan.toXml(),"snowdesk");
+        plan=newUpdateRequirementDesc(context,plan,requestAppDesc,identity,arguments);
+        //logs("FINAL REQUESTED COMMENTS RAJESH plan:- "+plan.toXml(),"snowdesk");
+        //Rajjesh updated on apr22 Ended
+
+        logger.debug("Updating assignment_group in AccountRequests");
+        addAssignmentGroupInPlan(plan, context, strRequesterName);
+        logger.debug("Exiting " + RULE_NAME);
+      </Source>
+    </PlanInitializerScript>
+  </ProvisioningConfig>
+  <ApplicationScorecard/>
+</Application>
