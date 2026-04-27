@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684155600000" name="Ascension-TaskSchedule-FailedAccessRequests-Email" nextExecution="1684162800000">
+  <Arguments>
+    <Map>
+      <entry key="executor" value="Ascension-TaskDefinition-FailedAccessRequests-Email"/>
+      <entry key="launcher" value="IDM Team"/>
+      <entry key="nextActualFireTime" value="1684162800000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 0 */2 * * ? </String>
+  </CronExpressions>
+  <Description>Executes Ascension-TaskDefinition-FailedAccessRequests-Email</Description>
+</TaskSchedule>

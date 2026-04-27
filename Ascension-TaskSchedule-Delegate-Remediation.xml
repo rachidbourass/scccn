@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule name="Ascension-TaskSchedule-Delegate-Remediation">
+  <Arguments>
+    <Map>
+      <entry key="executor" value="Ascension-TaskDefinition-Delegate-Remediation"/>
+      <entry key="launcher" value="IDM Team"/>
+      
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 30 19 * * ? </String>
+  </CronExpressions>
+  <Description>Scheduled task for Delegate Remidiation</Description>
+</TaskSchedule>

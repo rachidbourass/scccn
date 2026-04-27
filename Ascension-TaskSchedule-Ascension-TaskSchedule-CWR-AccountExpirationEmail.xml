@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684120380000" name="Ascension-TaskSchedule-CWR-AccountExpirationEmail" nextExecution="1684206780000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="Ascension-TaskDefinition-CWR-AccountExpirationEmail"/>
+      <entry key="launcher" value="spadmin"/>
+      <entry key="nextActualFireTime" value="1684206780000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 13 22 * * ? </String>
+  </CronExpressions>
+  <Description/>
+</TaskSchedule>

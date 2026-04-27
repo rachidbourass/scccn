@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule name="e8a31d47d54c4f9aa9bfcb773ca3b1fe">
+  <Arguments>
+    <Map>
+      <entry key="executor" value="Identity Refresh"/>
+      <entry key="filter" value="name==&quot;10686619&quot;"/>
+      <entry key="launcher" value="RequestHandler"/>
+      <entry key="promoteAttributes" value="true"/>
+    </Map>
+  </Arguments>
+  <Description>Immediate task runner</Description>
+</TaskSchedule>

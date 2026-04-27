@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1683975600000" name="ASC-SEQ-Aggregation-Task-FULL" nextExecution="1684580400000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="ASC-SEQ-Tasks-FULL"/>
+      <entry key="launcher" value="sp_eramocki"/>
+      <entry key="nextActualFireTime" value="1684580400000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 0 6 ? * 7 </String>
+  </CronExpressions>
+  <Description>Runs at 5pm CST</Description>
+</TaskSchedule>

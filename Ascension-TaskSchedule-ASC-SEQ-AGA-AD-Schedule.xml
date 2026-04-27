@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1683590400000" name="ASC-SEQ-AGA-AD-Schedule" nextExecution="1684195200000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="ASC-SEQ-AGA-AD-Task"/>
+      <entry key="launcher" value="sp_jpend008-albir"/>
+      <entry key="nextActualFireTime" value="1684195200000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 0 19 ? * 2 </String>
+  </CronExpressions>
+  <Description>Weekly AGA Schedule For AD; 7:00 PM CT Every Monday</Description>
+</TaskSchedule>

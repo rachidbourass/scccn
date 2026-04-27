@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684155600000" name="ASC-SEQ-Aggregation-Task-Schedule" nextExecution="1684159200000">
+  <Arguments>
+    <Map>
+      <entry key="executor" value="ASC-SEQ-Tasks"/>
+      <entry key="launcher" value="sp_eramocki"/>
+      <entry key="nextActualFireTime" value="1684159200000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 0 3-15 ? * 2-6</String>
+  </CronExpressions>
+  <Description>3am CST to 3pm CST</Description>
+</TaskSchedule>
