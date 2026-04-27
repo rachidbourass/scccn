@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Ascension Termination Reminder" resultAction="Rename" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="158"/>
+      <entry key="TaskDefinition.runLengthTotal" value="70981"/>
+      <entry key="TaskDefinition.runs" value="449"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="ruleName" value="Ascension-Rule-Termination-Reminder"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+    </Map>
+  </Attributes>
+  <Description>Does Termination Reminder Operations</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Run Rule"/>
+  </Parent>
+  <Signature>
+    <Returns>
+      <Argument name="result" type="String">
+        <Prompt>Result</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Ascension Report Access Requests With Errors" resultAction="Delete" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="449"/>
+      <entry key="TaskDefinition.runLengthTotal" value="507097"/>
+      <entry key="TaskDefinition.runs" value="1129"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="createdWithInDays" value="30"/>
+      <entry key="ruleName" value="Ascension-Rule-ReportAccessRequestsWithErrors"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+    </Map>
+  </Attributes>
+  <Description>A task that can be used to run an arbitrary rule.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="sp_anaya007"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Run Rule"/>
+  </Parent>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="createdWithInDays" name="createdWithInDays" type="string">
+        <Prompt>IdentityRequests Created within Days</Prompt>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>

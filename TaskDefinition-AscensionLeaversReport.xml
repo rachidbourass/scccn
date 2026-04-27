@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Ascension Leavers Report" progressMode="Percentage" resultAction="Rename" subType="Identity and User Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Ascension Leavers Report">
+            <DataSource defaultSort="name" objectType="Identity" type="Filter">
+              <QueryParameters>
+                <Parameter argument="queryFilter">
+                  <QueryScript>
+                    <Source><![CDATA[
+
+                      import sailpoint.object.Filter;
+
+                      Filter leaverDateFilter=Filter.notnull("leaverDate");                    
+                      queryOptions.addFilter(leaverDateFilter);
+
+                      return queryOptions;
+                    ]]></Source>
+                  </QueryScript>
+                </Parameter>
+              </QueryParameters>
+            </DataSource>
+            <Columns>
+              <ReportColumnConfig field="identity" header="rept_user_details_col_identity" property="name" sortable="true" width="110"/>
+              <ReportColumnConfig field="leaverDate" header="Leaver Date" property="leaverDate" sortable="true" width="110"/>
+              <ReportColumnConfig field="ctrexpDt" header="Expire Date" property="ctrexpDt" sortable="true" width="110"/>
+              <ReportColumnConfig field="assignedRoles" header="AssignedRoles" property="assignedRoleSummary" sortable="true" width="110"/>
+              <ReportColumnConfig field="businessRoles" header="DetectedRoles" property="bundleSummary" sortable="true" width="110"/>
+              <ReportColumnConfig field="attributeAssignments" header="AttributeAssignments" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Identity;
+
+                    Identity identity = context.getObjectById(Identity.class, value);
+
+                    if(null!=identity){
+                    
+                    List entExceptions = identity.getExceptions();
+                    if (entExceptions != null && !entExceptions.isEmpty()) {
+                    return "false";
+                    }else{
+                    return "true";
+                    }
+                    }
+                    }
+
+
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="isInactive" header="isInactive" property="inactive" sortable="true" width="110"/>
+              <ReportColumnConfig field="Days Since leaverDate" header="Days Since leaverDate" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Identity;
+                    import java.text.SimpleDateFormat;
+                    import java.util.Date;
+                    import java.util.HashMap;
+
+                    String strCurrentDate=null;
+                    Date currentDate=null;
+                    Date terminationDate=null;
+                    Date termDate = null;
+                    SimpleDateFormat sdf = null;
+
+                    long dayDifference=0;    
+                    long days=0;
+                    int count=0;
+
+                    Identity identity = context.getObjectById(Identity.class, value);
+
+                    if(null!=identity){
+                    String leaverDt=identity.getAttribute("leaverDate");
+                    sdf = new SimpleDateFormat("yyyyMMdd");
+                    strCurrentDate = sdf.format(new Date());
+                    currentDate = sdf.parse(strCurrentDate);
+                    if(leaverDt != null){
+
+                    termDate = sdf.parse(leaverDt);            
+                    }                    
+                    if(termDate!=null){
+
+                    dayDifference=currentDate.getTime()-termDate.getTime();
+                    days=dayDifference / 1000 / 60 / 60 / 24;
+                    
+                    } 
+
+                    return days;
+                    }
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="employeeId" header="Employee Id" property="employeeId" sortable="true" width="110"/>
+              <ReportColumnConfig field="lastName" header="rept_user_details_col_lastname" property="lastname" sortable="true" width="110"/>
+              <ReportColumnConfig field="firstName" header="rept_user_details_col_firstname" property="firstname" sortable="true" width="110"/>
+              <ReportColumnConfig field="middleName" header="Middle Name" property="middleName" sortable="true" width="110"/>
+              <ReportColumnConfig field="email" header="email" property="email" width="110"/>
+              <ReportColumnConfig field="type" header="Type" property="type" sortable="true" width="110"/>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>A detailed view of users by hire Date.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessUserReport"/>
+  </RequiredRights>
+</TaskDefinition>

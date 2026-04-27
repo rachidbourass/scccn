@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Ascension-AMITA-UpdateInternalID" resultAction="Rename" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="0"/>
+      <entry key="TaskDefinition.runLengthTotal" value="11"/>
+      <entry key="TaskDefinition.runs" value="65"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="ruleName" value="Ascension-Rule-AMITA-UpdateInternalID"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+      <entry key="usernameCSVList" value="10441533"/>
+    </Map>
+  </Attributes>
+  <Description>A task that can be used to run an arbitrary rule.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Run Rule"/>
+  </Parent>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="Give complete file path" name="filePath" type="string">
+        <Prompt>File Path</Prompt>
+      </Argument>
+      <Argument helpKey="List of usernames separated by comma(,); eg. username1,username2,username3" name="usernameCSVList" type="string">
+        <Prompt>List of usernames separated by comma(,)</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="fileLocation" type="string">
+        <Prompt>Input File Path</Prompt>
+      </Argument>
+      <Argument name="userNamesInCSV" type="string">
+        <Prompt>List of usernames separated by comma(,)</Prompt>
+      </Argument>
+      <Argument name="successUserNames" type="string">
+        <Prompt>Successful User Names</Prompt>
+      </Argument>
+      <Argument name="failedUserNames" type="string">
+        <Prompt>Failed User Names</Prompt>
+      </Argument>
+      <Argument name="successChildPersonaNames" type="string">
+        <Prompt>Child Personas Updated Successfully</Prompt>
+      </Argument>
+      <Argument name="failedChildPersonaNames" type="string">
+        <Prompt>Child Personas Update Failed</Prompt>
+      </Argument>
+      <Argument name="modifiedSIDs" type="string">
+        <Prompt>Modified Sailpoint Internal IDs</Prompt>
+      </Argument>
+      <Argument name="errorMessages" type="string">
+        <Prompt>Error Messages</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

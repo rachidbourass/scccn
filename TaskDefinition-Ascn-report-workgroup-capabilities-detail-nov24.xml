@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="ASCN-Report-Workgroup-Capabilities-Detail-Nov24" resultAction="Rename" subType="Identity and User Reports" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="41"/>
+      <entry key="TaskDefinition.runLengthTotal" value="41"/>
+      <entry key="TaskDefinition.runs" value="1"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="disableDetail" value="false"/>
+      <entry key="disableHeader" value="false"/>
+      <entry key="disableSummary" value="false"/>
+      <entry key="dontEmailEmptyReport">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="emailFileFormat">
+        <value>
+          <List>
+            <String>CSV</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="emailIdentities">
+        <value>
+          <List>
+            <String>tpatil</String>
+            <String>10554203</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="enableCsvHeader" value="false"/>
+      <entry key="reportColumnOrder" value="Workgroup, workgroupcapablities, workgroupmembers, workgroupmembername"/>
+    </Map>
+  </Attributes>
+  <Description>A detailed view of Workgroup, members and capabilities report in IdentityIQ.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="sp_rsaka"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="ASCN-Report-Workgroup-Capabilities-Detail"/>
+  </Parent>
+</TaskDefinition>

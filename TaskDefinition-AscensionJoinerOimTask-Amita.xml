@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Ascension Joiner OIM Task - AMITA" resultAction="Rename" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="10"/>
+      <entry key="TaskDefinition.runLengthTotal" value="2580"/>
+      <entry key="TaskDefinition.runs" value="237"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="filePath" value="\\ANDC1WAPP0147.ds.sjhs.com\AMITA\INBOUND\HRI247Feed.csv"/>
+      <entry key="ruleName" value="Ascension-Rule-OIM-Data-Creation-AMITA"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+    </Map>
+  </Attributes>
+  <Description>Task for updating  file for OIM Data for AMITA Users</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Run Rule"/>
+  </Parent>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="Give complete file path" name="filePath" required="true" type="string">
+        <Prompt>File Path</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="deltaRecordsCount" type="int">
+        <Prompt>Total number of records in Delta File</Prompt>
+      </Argument>
+      <Argument name="identitiesFromEventsCount" type="int">
+        <Prompt>Number of identities in User ID and Email Changes List</Prompt>
+      </Argument>
+      <Argument name="processedIdentitiesFromIdentitiesChangedList" type="string">
+        <Prompt>Identities processed from the User ID and Email Changes List</Prompt>
+      </Argument>
+      <Argument name="unprocessedIdentitiesFromIdentitiesChangedList" type="string">
+        <Prompt>Unprocessed Identities from the User ID and Email Changes List</Prompt>
+      </Argument>
+      <Argument name="identitiesPendingDateThreshold" type="string">
+        <Prompt>Identities pending date threshold to provision in the User ID and Email Changes List</Prompt>
+      </Argument>
+      <Argument name="identitiesTobeReviewed" type="string">
+        <Prompt>Identities requiring provisioning review in the User ID and Email Changes List</Prompt>
+      </Argument>
+      <Argument name="identitiesRemovedFromIdentitiesChangedList" type="string">
+        <Prompt>Identities removed from the User ID and Email Changes List</Prompt>
+      </Argument>
+      <Argument name="outputFileRecordsCount" type="string">
+        <Prompt>Number of records sent in the Output File</Prompt>
+      </Argument>
+      <Argument name="errorMessages" type="string">
+        <Prompt>Error Messages</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

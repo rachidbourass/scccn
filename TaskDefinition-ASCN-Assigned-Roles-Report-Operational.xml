@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="ASCN-Assigned-Roles-Report-Operational" resultAction="RenameNew" subType="Application Reports" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="226"/>
+      <entry key="TaskDefinition.runLengthTotal" value="226"/>
+      <entry key="TaskDefinition.runs" value="1"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="daysSinceAssignment" value="7"/>
+      <entry key="disableDetail" value="false"/>
+      <entry key="disableHeader" value="false"/>
+      <entry key="disableSummary" value="false"/>
+      <entry key="dontEmailEmptyReport">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="enableCsvHeader" value="false"/>
+      <entry key="reportColumnOrder" value="samAccountName, lastName, firstName, middleName, jobcode, jobFamily, location, locationDescription, hireDate, domain, company, departmentNumber, businessUnit, ministry, roleName, assignedDate, roleCreated"/>
+    </Map>
+  </Attributes>
+  <Description>This report lists all active identities with assigned RBAC roles created within the specified timeframe. It includes key attribute details for each identity and applies dynamic filters based on the role assignment date, role creation date, and other relevant criteria.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="sp_pkatarapu"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="ASCN-Assigned-Roles-Report"/>
+  </Parent>
+</TaskDefinition>

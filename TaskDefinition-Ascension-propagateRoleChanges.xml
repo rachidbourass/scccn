@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Ascension-Propagate Role Changes" resultAction="Delete" subType="task_item_type_identity" type="Identity">
+  <Attributes>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="checkPolicies" value="false"/>
+      <entry key="duration" value="10"/>
+      <entry key="enablePartitioning" value="true"/>
+      <entry key="keepInactiveViolations" value="false"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+    </Map>
+  </Attributes>
+  <Description>Template for role propagation.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="sp_rsaka"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Propagate Role Changes"/>
+  </Parent>
+</TaskDefinition>

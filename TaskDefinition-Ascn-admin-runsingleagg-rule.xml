@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="ASCN-ADMIN-RunSingleAgg-Rule" resultAction="Rename" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="210"/>
+      <entry key="TaskDefinition.runLengthTotal" value="5461"/>
+      <entry key="TaskDefinition.runs" value="26"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="identitiesToAggregate" value="AD-DS###CN=Stanley-Berry\\, Tonya (tsta0007),OU=Users,OU=Managed,DC=TNNAS,DC=DS,DC=SJHS,DC=com"/>
+      <entry key="ruleName" value="ASCN-ADMIN-RunSingleAgg-Rule"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+    </Map>
+  </Attributes>
+  <Description>Deleteion of rescind user details.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Run Rule"/>
+  </Parent>
+  <Signature>
+    <Inputs>
+      <Argument name="ruleName" type="string">
+        <Prompt>ruleName</Prompt>
+      </Argument>
+      <Argument name="identitiesToAggregate" type="string">
+        <Prompt>List of Records</Prompt>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>

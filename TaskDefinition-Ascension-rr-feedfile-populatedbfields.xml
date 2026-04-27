@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Ascension-RR-FeedFile-PopulateDBFields" resultAction="Delete" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="8"/>
+      <entry key="TaskDefinition.runLengthTotal" value="69"/>
+      <entry key="TaskDefinition.runs" value="8"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="filePath" value="\\ANDC1WAPP0147.ds.sjhs.com\AppAggregation\Amita_data_load\ManagerNameToID_Data_Load\Amita-Location.csv"/>
+      <entry key="ruleName" value="Ascension-Rule-Generic-FileFeed-PopulateDBFields"/>
+      <entry key="tableName" value="1"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+      <entry key="truncate" value="true"/>
+    </Map>
+  </Attributes>
+  <Description>A task that can be used to run an arbitrary rule.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Run Rule"/>
+  </Parent>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="Give complete file path" name="filePath" required="true" type="string">
+        <Prompt>File Path</Prompt>
+      </Argument>
+      <Argument helpKey="Give Table Number(1 = Locations, 2 = Vendors, 3 = JobCodes, 4 = BusinessUnitCode, 5 = BusinessDescription, 6 = ManagerNameToID)" name="tableName" required="true" type="string">
+        <Prompt>Table  Number(1 = Locations, 2 = Vendors, 3 = JobCodes, 4 = BusinessUnitCode, 5 = BusinessDescription, 6 = ManagerNameToID)</Prompt>
+      </Argument>
+      <Argument helpKey="Check to delete exiting data and reload new data" name="truncate" required="true" type="boolean">
+        <Prompt>Truncate</Prompt>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>

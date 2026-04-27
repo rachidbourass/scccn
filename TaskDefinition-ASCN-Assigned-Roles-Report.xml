@@ -1,0 +1,172 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="ASCN-Assigned-Roles-Report" subType="Role Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="ASCN Assigned Roles Report">
+            <DataSource type="Hql">
+              <Query> 
+                FROM IdentityEntitlement ie JOIN ie.identity identity JOIN Bundle bundle ON bundle.name = ie.value WHERE ie.name = 'assignedRoles'</Query>
+              <QueryParameters>
+                <Parameter argument="pastDate"/>
+                <Parameter argument="roleCreatedDate"/>
+                <Parameter argument="roleMinistry"/>
+                <Parameter argument="jobCode"/>
+                <Parameter argument="businessUnit"/>
+              </QueryParameters>
+              <QueryScript>
+                <Source>
+                  import sailpoint.tools.Util;
+                  import java.util.Calendar;
+                  import java.util.Date;
+                  import java.util.List;
+
+
+                  /* ==============================
+                     READ INPUTS
+                     ============================== */
+
+                  String daysSinceAssignment = (String) args.get("daysSinceAssignment");
+                  List roleMinistryList = (List) args.get("roleMinistry");
+                  List roleNameContainsList = (List) args.get("roleNameContains");
+                  List jobCodeList = (List) args.get("jobCode");
+                  List businessUnitList = (List) args.get("businessUnit");
+                  Date roleCreatedDateInput = (Date) args.get("roleCreatedDate");
+                  
+                  
+                  /* ==============================
+                     BASE FILTER
+                     ============================== */
+
+                  query = query + " AND identity.inactive = false";
+
+                  /* ==============================
+                     DAYS SINCE ASSIGNMENT 
+                     ============================== */
+
+                  Calendar calAssign = Calendar.getInstance();
+                  if (Util.isNotNullOrEmpty(daysSinceAssignment)) {
+                  	int days = Integer.parseInt(daysSinceAssignment);
+                    	calAssign.add(Calendar.DAY_OF_YEAR, -days);
+                  		
+                  	Date pastDate = calAssign.getTime();
+                    	args.put("pastDate", pastDate);
+                    	query = query + " AND ie.created >= :pastDate";
+                  	}
+
+                  /* ==============================
+                     ROLE CREATED DATE
+                     ============================== */
+
+                  Calendar calRole = Calendar.getInstance();
+                  if(roleCreatedDateInput != null) {
+                     calRole.setTime(roleCreatedDateInput);
+                     Date roleCreatedDate = calRole.getTime();
+                     args.put("roleCreatedDate", roleCreatedDate);
+                     query = query + " AND bundle.created >= :roleCreatedDate";
+                  	}
+                  /* ==============================
+                     ROLE MINISTRY
+                     ============================== */
+
+                  if (roleMinistryList != null &amp;&amp; !roleMinistryList.isEmpty()) {
+                    query = query + " AND bundle.ministry IN :roleMinistry";
+                    args.put("roleMinistry", roleMinistryList);
+                  }
+                  
+                  /* ==============================
+                     ROLE NAME CONTAINS
+                     ============================== */
+									
+                	if (roleNameContainsList != null &amp;&amp; !roleNameContainsList.isEmpty()) {
+
+                  StringBuilder clause = new StringBuilder(" AND (");
+
+                  for (int i = 0; i &lt; roleNameContainsList.size(); i++) {
+                      if (i > 0) clause.append(" OR ");
+
+                      String val = roleNameContainsList.get(i).replace("'", "''");
+                      clause.append(" ie.value LIKE '%").append(val).append("%'");
+                  	}
+									 	clause.append(")");
+                      query += clause.toString();
+                 	}
+
+                  /* ==============================
+                     JOB CODE 
+                     ============================== */
+
+                  if (jobCodeList != null &amp;&amp; !jobCodeList.isEmpty()) {
+                    query = query + " AND identity.attributes.jobcode IN :jobCode";
+                    args.put("jobCode", jobCodeList);
+                  }
+
+                  /* ==============================
+                     BUSINESS UNIT
+                     ============================== */
+
+                  if (businessUnitList != null &amp;&amp; !businessUnitList.isEmpty()) {
+                    query = query + " AND identity.attributes.businessUnit IN :businessUnit";
+                    args.put("businessUnit", businessUnitList);
+                  }
+ 
+                  return query;
+                </Source>
+              </QueryScript>
+            </DataSource>
+            <ReportForm>
+              <Reference class="sailpoint.object.Form" name="ASCN-Assigned-Roles-Report"/>
+            </ReportForm>
+            <Columns>
+              <ReportColumnConfig field="samAccountName" header="SamAccount Name" property="identity.attributes.samAccountName" sortable="true" width="150"/>
+              <ReportColumnConfig field="lastName" header="Last Name" property="identity.lastname" sortable="true" width="150"/>
+              <ReportColumnConfig field="firstName" header="First Name" property="identity.firstname" sortable="true" width="150"/>
+              <ReportColumnConfig field="middleName" header="Middle Name" property="identity.middleName" sortable="true" width="150"/>
+              <ReportColumnConfig field="jobcode" header="Job Code" property="identity.attributes.jobcode" sortable="true" width="150"/>
+              <ReportColumnConfig field="jobFamily" header="Job Family" property="identity.attributes.jobFamily" sortable="true" width="150"/>
+              <ReportColumnConfig field="location" header="Location ID" property="identity.attributes.location" sortable="true" width="150"/>
+              <ReportColumnConfig field="locationDescription" header="Location Description" property="identity.attributes.locationDescription" sortable="true" width="150"/>
+              <ReportColumnConfig field="hireDate" header="Hire Date" property="identity.attributes.hireDate" sortable="true" width="150"/>
+              <ReportColumnConfig field="domain" header="Domain" property="identity.attributes.domain" sortable="true" width="150"/>
+              <ReportColumnConfig field="company" header="Company" property="identity.attributes.company" sortable="true" width="150"/>
+              <ReportColumnConfig field="departmentNumber" header="Department Code" property="identity.attributes.departmentNumber" sortable="true" width="150"/>
+              <ReportColumnConfig field="businessUnit" header="Business Unit" property="identity.attributes.businessUnit" sortable="true" width="150"/>
+              <ReportColumnConfig field="ministry" header="Ministry Name" property="identity.attributes.ministry" width="150"/>
+              <ReportColumnConfig field="roleName" header="RBAC Role Name" property="ie.value" sortable="true" width="110"/>
+              <ReportColumnConfig field="assignedDate" header="Role Assignment Date" property="ie.created" sortable="true" width="110"/>
+              <ReportColumnConfig field="roleCreated" header="Bundle Created Date" property="bundle.created" sortable="true" width="110"/>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>This report lists all active identities with assigned RBAC roles created within the specified timeframe. It includes key attribute details for each identity and applies dynamic filters based on the role assignment date, role creation date, and other relevant criteria.</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessUserReport"/>
+  </RequiredRights>
+  <Signature>
+    <Inputs>
+      <Argument name="daysSinceAssignment" type="string">
+        <Description>Days Since Assignment</Description>
+      </Argument>
+      <Argument name="roleCreatedDate" type="date">
+        <Description>Role Created Date</Description>
+      </Argument>
+      <Argument name="roleMinistry" type="list">
+        <Description>Bundle Ministry</Description>
+      </Argument>
+      <Argument name="roleNameContains" type="list">
+        <Description>Role Name Contains</Description>
+      </Argument>
+      <Argument name="jobCode" type="list">
+        <Description>Job Code</Description>
+      </Argument>
+      <Argument name="businessUnit" type="list">
+        <Description>Business Unit</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+</TaskDefinition>

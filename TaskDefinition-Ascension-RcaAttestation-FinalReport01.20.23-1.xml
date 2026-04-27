@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition concurrent="true" name="Ascension - RCA Attestation - Final Report 01.20.23 -1" resultAction="Rename" subType="Access Review and Certification Reports" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="71"/>
+      <entry key="TaskDefinition.runLengthTotal" value="1285"/>
+      <entry key="TaskDefinition.runs" value="18"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="certificationGroups">
+        <value>
+          <List>
+            <String>RCA Certification [12/14/22 11:40:44 AM CST]</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="disableDetail" value="false"/>
+      <entry key="disableHeader" value="false"/>
+      <entry key="disableSummary" value="false"/>
+      <entry key="dontEmailEmptyReport">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="emailFileFormat">
+        <value>
+          <List>
+            <String>CSV</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="emailIdentities">
+        <value>
+          <List>
+            <String>10621877</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="enableCsvHeader" value="false"/>
+      <entry key="reportColumnOrder" value="firstName, lastName, manager, managerEmail, certName, displayName, identity, accountName, status, decision, decisionMaker, decisionMakerDisplayName, comments"/>
+      <entry key="reportSortAsc">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="reportSortBy" value="lastName"/>
+    </Map>
+  </Attributes>
+  <Description>Displays information about the Targeted certifications in detailed format.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="sp_ssany005"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Ascension - Targeted Access Review Live Report"/>
+  </Parent>
+</TaskDefinition>

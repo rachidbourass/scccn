@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Ascension-TaskDefinition-GenerateRehireReport" resultAction="Rename" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="2"/>
+      <entry key="TaskDefinition.runLengthTotal" value="794"/>
+      <entry key="TaskDefinition.runs" value="344"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="ruleName" value="Ascension-Rule-Rehire-Report"/>
+      <entry key="taskCompletionEmailNotify" value="Failure"/>
+      <entry key="taskCompletionEmailRecipients" value="10175601, 10341693, 10175359"/>
+      <entry key="taskCompletionEmailTemplate" value="Ascension-EmailTemplate-Failed-Rehire-Report-Notification"/>
+      <entry key="taskName" value="Ascension-TaskDefinition-GenerateRehireReport"/>
+    </Map>
+  </Attributes>
+  <Description>Generates a report of the Rehired Identities</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Run Rule"/>
+  </Parent>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="Please enter the date in the format mm/dd/yyyy" name="startDate" type="date">
+        <Prompt>Start Date</Prompt>
+      </Argument>
+      <Argument helpKey="Please enter the date in the format mm/dd/yyyy" name="endDate" type="date">
+        <Prompt>End Date</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="StartDate" type="string">
+        <Prompt>Start Date</Prompt>
+      </Argument>
+      <Argument name="EndDate" type="string">
+        <Prompt>End Date</Prompt>
+      </Argument>
+      <Argument name="launcher" type="string">
+        <Prompt>Report Sent to</Prompt>
+      </Argument>
+      <Argument name="identitiesRehired" type="string">
+        <Prompt>List of records</Prompt>
+      </Argument>
+      <Argument name="identityCount" type="int">
+        <Prompt>No.of records included in Report</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Ascension - IIQ Capability Report" resultAction="Rename" subType="Administration Reports" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="8"/>
+      <entry key="TaskDefinition.runLengthTotal" value="8"/>
+      <entry key="TaskDefinition.runs" value="1"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="capabilities">
+        <value>
+          <List>
+            <String>SystemAdministrator</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="disableDetail" value="false"/>
+      <entry key="disableHeader" value="false"/>
+      <entry key="disableSummary" value="false"/>
+      <entry key="dontEmailEmptyReport">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="emailFileFormat">
+        <value>
+          <List>
+            <String>PDF</String>
+            <String>CSV</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="emailIdentities">
+        <value>
+          <List>
+            <String>jpend008-albir</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="enableCsvHeader" value="false"/>
+      <entry key="excludeIndirectCapabilities">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="excludeWorkgroups">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="reportColumnOrder" value="name, displayName, identities"/>
+    </Map>
+  </Attributes>
+  <Description>Displays a list of identities that are assigned this capability.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="sp_rsaka"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Capability to Identities Report"/>
+  </Parent>
+</TaskDefinition>

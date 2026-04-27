@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition formPath="/analyze/analyzeTabs.jsf" name="ascension-peoplesoft-attestation-members-report" resultAction="Rename" subType="Search" type="GridReport">
+  <Attributes>
+    <Map>
+      <entry key="IdentitySearchTaskItem">
+        <value>
+          <SearchItem operation="AND" type="Identity">
+            <IdentityFields>
+              <String>company</String>
+              <String>departmentNumber</String>
+              <String>displayName</String>
+              <String>email</String>
+              <String>employeeId</String>
+              <String>firstName</String>
+              <String>identityType</String>
+              <String>jobcode</String>
+              <String>lastName</String>
+              <String>manager</String>
+              <String>ministry</String>
+              <String>parentPersonaName</String>
+              <String>title</String>
+              <String>userName</String>
+              <String>workLocationCode</String>
+            </IdentityFields>
+            <InputDefinitions>
+              <SearchInputDefinition description="srch_input_def_detected_role_include_descr" headerKey="srch_input_def_detected_role_include" inputType="Equal" name="roleHierarchy" nullPropertyName="bundleSummary" nullPropertyType="String" propertyName="roleHierarchy" propertyType="None" searchType="Identity">
+                <Value>
+                  <Boolean/>
+                </Value>
+              </SearchInputDefinition>
+              <SearchInputDefinition description="srch_input_def_assigned_role_include_descr" headerKey="srch_input_def_assigned_role_include" inputType="Equal" name="assignedRoleHierarchy" nullPropertyName="assignedRoleSummary" nullPropertyType="String" propertyName="assignedRoleHierarchy" propertyType="None" searchType="Identity">
+                <Value>
+                  <Boolean/>
+                </Value>
+              </SearchInputDefinition>
+              <SearchInputDefinition description="srch_input_def_application" headerKey="srch_input_def_application" ignoreCase="true" inputType="Equal" name="application" nullPropertyName="links" nullPropertyType="Collection" propertyName="SPT_links.application.id" propertyType="Collection" searchType="Identity">
+                <Value>
+                  <List>
+                    <String>PeopleSoft Attestation</String>
+                  </List>
+                </Value>
+              </SearchInputDefinition>
+            </InputDefinitions>
+            <SearchFilters>
+              <SearchItemFilter booleanOperation="AND" property="srch_input_def_application">
+                <SearchFilter>
+                  <Filter ignoreCase="true" operation="EQ" property="SPT_links.application.id" value="PeopleSoft Attestation"/>
+                </SearchFilter>
+                <Value>
+                  <List>
+                    <String>PeopleSoft Attestation</String>
+                  </List>
+                </Value>
+              </SearchItemFilter>
+            </SearchFilters>
+          </SearchItem>
+        </value>
+      </entry>
+      <entry key="SearchReportFilters">
+        <value>
+          <CompositeFilter operation="AND">
+            <Filter ignoreCase="true" operation="EQ" property="links.application.id" value="PeopleSoft Attestation"/>
+          </CompositeFilter>
+        </value>
+      </entry>
+      <entry key="SearchReportInputDefinitions">
+        <value>
+          <List>
+            <SearchInputDefinition description="Company" extendedAttribute="true" headerKey="Company" inputType="Like" matchMode="START" name="company" propertyName="company" propertyType="String" searchType="ExtendedIdentity"/>
+            <SearchInputDefinition description="departmentNumber" extendedAttribute="true" headerKey="departmentNumber" inputType="Like" matchMode="START" name="departmentNumber" propertyName="departmentNumber" propertyType="String" searchType="ExtendedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_display_name" headerKey="srch_input_def_display_name" ignoreCase="true" inputType="Like" matchMode="START" name="displayName" propertyName="displayName" propertyType="String" searchType="None"/>
+            <SearchInputDefinition description="srch_input_def_email" headerKey="srch_input_def_email" ignoreCase="true" inputType="Like" matchMode="START" name="email" propertyName="email" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="Employee ID" extendedAttribute="true" headerKey="Employee ID" inputType="Like" matchMode="START" name="employeeId" propertyName="employeeId" propertyType="String" searchType="ExtendedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_first_name" headerKey="srch_input_def_first_name" ignoreCase="true" inputType="Like" matchMode="START" name="firstName" propertyName="firstname" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="Identity Type" extendedAttribute="true" headerKey="Identity Type" inputType="Like" matchMode="START" name="identityType" propertyName="identityType" propertyType="String" searchType="ExtendedIdentity"/>
+            <SearchInputDefinition description="Jobcode" extendedAttribute="true" headerKey="Jobcode" inputType="Like" matchMode="START" name="jobcode" propertyName="jobcode" propertyType="String" searchType="ExtendedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_last_name" headerKey="srch_input_def_last_name" ignoreCase="true" inputType="Like" matchMode="START" name="lastName" propertyName="lastname" propertyType="String" searchType="Identity"/>
+            <SearchInputDefinition description="srch_input_def_manager" headerKey="srch_input_def_manager" ignoreCase="true" inputType="Like" matchMode="START" name="manager" nullPropertyName="manager" nullPropertyType="String" propertyName="manager.displayName" propertyType="Identity" searchType="Identity"/>
+            <SearchInputDefinition description="Ministry" extendedAttribute="true" headerKey="Ministry" inputType="Like" matchMode="START" name="ministry" propertyName="ministry" propertyType="String" searchType="ExtendedIdentity"/>
+            <SearchInputDefinition description="Parent Name" extendedAttribute="true" headerKey="Parent Name" inputType="Like" matchMode="START" name="parentPersonaName" propertyName="parentPersonaName" propertyType="String" searchType="ExtendedIdentity"/>
+            <SearchInputDefinition description="Title" extendedAttribute="true" headerKey="Title" inputType="Like" matchMode="START" name="title" propertyName="title" propertyType="String" searchType="ExtendedIdentity"/>
+            <SearchInputDefinition description="srch_input_def_user_name" headerKey="srch_input_def_user_name" ignoreCase="true" inputType="Like" matchMode="START" name="userName" propertyName="name" propertyType="String" searchType="None"/>
+            <SearchInputDefinition description="workLocationCode" extendedAttribute="true" headerKey="workLocationCode" inputType="Like" matchMode="START" name="workLocationCode" propertyName="workLocationCode" propertyType="String" searchType="ExtendedIdentity"/>
+          </List>
+        </value>
+      </entry>
+      <entry key="SearchReportOwner">
+        <value>
+          <Identity lastLogin="1677681822155" lastRefresh="1676763797109" name="sp_ssany005" password="2:ACP:42+H83/q5tRWNr2Y60sS7cgz4yhbYDyu7LZWTTrnwLA=" protected="true">
+            <Attributes>
+              <Map>
+                <entry key="displayName" value="sp_ssany005"/>
+                <entry key="isAMG" value="false"/>
+              </Map>
+            </Attributes>
+            <UIPreferencesRef>
+              <Reference class="sailpoint.object.UIPreferences"/>
+            </UIPreferencesRef>
+            <Capabilities>
+              <Reference class="sailpoint.object.Capability" name="SystemAdministrator"/>
+            </Capabilities>
+            <CertificationLinks>
+              <CertificationLink completed="1676385350155" identitySnapshotId="0af01f3e862e186d81864623dd075d90" type="Group">
+                <Certifiers>
+                  <String>IDM Leads</String>
+                </Certifiers>
+              </CertificationLink>
+            </CertificationLinks>
+          </Identity>
+        </value>
+      </entry>
+      <entry key="SearchReportType" value="Identity"/>
+      <entry key="TaskDefinition.runLengthAverage" value="276"/>
+      <entry key="TaskDefinition.runLengthTotal" value="276"/>
+      <entry key="TaskDefinition.runs" value="1"/>
+    </Map>
+  </Attributes>
+  <Description>ascension-peoplesoft-attestation-members-report</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="sp_ssany005"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Search Report"/>
+  </Parent>
+</TaskDefinition>

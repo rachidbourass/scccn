@@ -1,0 +1,759 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Ascension Dormant Accounts Report" progressMode="Percentage" resultAction="Rename" subType="Identity and User Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="4322"/>
+      <entry key="TaskDefinition.runLengthTotal" value="4322"/>
+      <entry key="TaskDefinition.runs" value="1"/>
+      <entry key="report">
+        <value>
+          <LiveReport title="Dormant Accounts Report">
+            <DataSource objectType="sailpoint.object.Link" type="Filter">
+              <Query>dormantAccount=="true"</Query>
+            </DataSource>
+            <Columns>
+              <ReportColumnConfig field="sAMAccountName" header="sAMAccountName" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    String name = link.getAttribute("sAMAccountName");
+
+                    return name;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="firstName" header="First Name" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    Identity identity = link.getIdentity();
+                    String identityFirstName = identity.getFirstname();
+
+                    return identityFirstName;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="lastName" header="Last Name" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    Identity identity = link.getIdentity();
+                    String identityLastName = identity.getLastname();
+
+                    return identityLastName;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="Description" header="Description" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    String description = link.getAttribute("description");
+
+                    return description;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="Title" header="Title" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    String title = link.getAttribute("title");
+
+                    return title;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="orgRelationship" header="employeeType" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+                    import sailpoint.object.Application;
+                    import sailpoint.api.IdentityService;
+                    import sailpoint.object.Attributes;
+                    import sailpoint.api.SailPointContext;
+
+                    Link link = context.getObjectById(Link.class, value);
+
+                    String psTypeString = "";
+                    if(null!=link){
+                    Identity identity = link.getIdentity();
+                    if(null!=identity){
+
+                    Application peopleSoftApp = context.getObjectByName(Application.class,"DB-Peoplesoft-HCM-Primary");
+                    IdentityService idService = new IdentityService(context);
+                    if(null!=peopleSoftApp && null!=idService){
+                    List<Link> links = idService.getLinks(identity,peopleSoftApp);
+                    if(null!=links){
+                    for(Link link:links){
+                    Object psType =  link.getAttribute("PER_ORG");
+                    if(null!=psType){
+                    psTypeString = psType.toString();
+                    }
+                    }
+                    links = null;
+                    }
+                    }
+
+                    context.decache(identity);
+                    if(null!=peopleSoftApp){
+                    context.decache(peopleSoftApp);
+                    }
+                    }
+                    }
+
+                    return psTypeString;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="employeeType" header="Physician?" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+                    import sailpoint.tools.Util;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    Identity identity = link.getIdentity();
+                    String type = identity.getType();
+
+                    if(Util.isNotNullOrEmpty(type) && type.equalsIgnoreCase("Physician")){
+                    return true;
+                    } else{
+                    return false;
+                    }
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="PSStatus" header="PS Status" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+                    import sailpoint.object.Application;
+                    import sailpoint.api.IdentityService;
+                    import sailpoint.object.Attributes;
+                    import sailpoint.api.SailPointContext;
+                    import sailpoint.tools.Util;
+
+                    Link link = context.getObjectById(Link.class, value);
+
+                    String psStatusString = "";
+                    if(null!=link){
+                    Identity identity = link.getIdentity();
+                    if(null!=identity){
+
+                    Application peopleSoftApp = context.getObjectByName(Application.class,"DB-Peoplesoft-HCM-Primary");
+                    IdentityService idService = new IdentityService(context);
+                    if(null!=peopleSoftApp && null!=idService){
+                    List<Link> links = idService.getLinks(identity,peopleSoftApp);
+                    if(null!=links){
+                    for(Link link:links){
+                    Object psStatus =  link.getAttribute("EMPL_STATUS");
+                    if(null!=psStatus){
+                    psStatusString = psStatus.toString();
+                    }
+                    }
+                    links = null;
+                    }
+                    }
+
+                    context.decache(identity);
+                    if(null!=peopleSoftApp){
+                    context.decache(peopleSoftApp);
+                    }
+                    }
+                    }
+
+                    if(Util.isNotNullOrEmpty(psStatusString)){
+                    if(psStatusString.equalsIgnoreCase("A") || psStatusString.equalsIgnoreCase("L ") || psStatusString.equalsIgnoreCase("P") || psStatusString.equalsIgnoreCase("S")){
+                    psStatusString = "A";
+                    } else{
+                    psStatusString = "I";
+                    }
+                    }
+
+                    return psStatusString;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="accountExpires" header="accountExpires" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.tools.Util;
+                    import java.text.SimpleDateFormat;
+                    import java.lang.Math;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    String accountExpires = link.getAttribute("accountExpires");
+
+                    if(Util.isNotNullOrEmpty(accountExpires)){
+                    if(accountExpires.equalsIgnoreCase("never") || accountExpires.equalsIgnoreCase("0") || accountExpires.equalsIgnoreCase("9223372036854775807")){
+                    return accountExpires;
+                    }
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss a z");
+                    Date cre = null;
+                    try {
+                    cre = sdf.parse(accountExpires);
+                    } catch (ParseException e) {
+                    return accountExpires;
+                    }
+                    sfd = new SimpleDateFormat("M/d/y H:m:s");
+                    return sfd.format(cre);
+                    }
+
+                    return accountExpires;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="iqLastLogon" header="IQ last logon" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.tools.Util;
+                    import java.text.SimpleDateFormat;
+                    import java.lang.Math;
+
+                    import sailpoint.object.Identity;
+                    import sailpoint.object.Application;
+                    import sailpoint.api.IdentityService;
+                    import sailpoint.object.Attributes;
+                    import sailpoint.api.SailPointContext;
+                    import java.text.ParseException;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    String lastLogonTimestamp = link.getAttribute("lastLogonTimestamp");
+                    Date adLastLogonDate = null;
+                    Date gSuiteLastLogonDate = null;
+                    Date duoLastLogonDate = null;
+                    SimpleDateFormat sfd = new SimpleDateFormat("M/d/y H:m:s");
+
+                    if(Util.isNotNullOrEmpty(lastLogonTimestamp) && !lastLogonTimestamp.equals("0")){
+                    long nanoseconds = Long.parseLong(lastLogonTimestamp);
+                    long mills = (nanoseconds/10000000);
+                    long unix = (((1970-1601) * 365) - 3 + Math.round((1970-1601)/4) ) * 86400L;
+                    long timeStamp = mills - unix ;
+
+                    Date date = new Date(timeStamp*1000L); // *1000 is to convert seconds to milliseconds
+                    if(null!=date){
+                    adLastLogonDate = date;
+                    }
+                    }
+
+                    String gSuitelastLoginString = "";
+                    String duoLastLoginString = "";
+                    if(null!=link){
+                    Identity identity = link.getIdentity();
+                    if(null!=identity){
+
+                    Application gsuite = context.getObjectByName(Application.class,"GSuite");
+                    IdentityService idService = new IdentityService(context);
+                    if(null!=gsuite && null!=idService){
+                    List<Link> links = idService.getLinks(identity,gsuite);
+                    if(null!=links){
+                    for(Link link:links){
+                    Object lastLogin =  link.getAttribute("lastLoginTime");
+                    if(null!=lastLogin){
+                    gSuitelastLoginString = lastLogin.toString();
+                    }
+                    }
+                    links = null;
+                    }
+                    }
+
+                    Application duo = context.getObjectByName(Application.class,"Duo");
+                    IdentityService idService = new IdentityService(context);
+                    if(null!=duo && null!=idService){
+                    List<Link> links = idService.getLinks(identity,duo);
+                    if(null!=links){
+                    for(Link link:links){
+                    Object lastLogin =  link.getAttribute("last_login");
+                    if(null!=lastLogin){
+                    duoLastLoginString = lastLogin.toString();
+                    }
+                    }
+                    links = null;
+                    }
+                    }
+
+                    context.decache(identity);
+                    context.decache(gsuite);
+                    context.decache(duo);
+                    }
+                    }
+
+                    if(Util.isNotNullOrEmpty(gSuitelastLoginString)){
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                    Date cre = null;
+                    try {
+                    cre = sdf.parse(gSuitelastLoginString);
+                    } catch (ParseException e) {
+                    //TODO
+                    }
+                    if(null!=cre){
+                    gSuiteLastLogonDate = cre;
+                    }
+                    }
+
+                    if(Util.isNotNullOrEmpty(duoLastLoginString)){
+                    SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+                    Date cre = null;
+                    try {
+                    cre = sdf.parse(duoLastLoginString);
+                    } catch (ParseException e) {
+                    //TODO
+                    }
+                    if(null!=cre){
+                    duoLastLogonDate = cre;
+                    }
+                    }
+
+                    Date latest = null;
+
+                    if(null!=adLastLogonDate && null!=gSuiteLastLogonDate && null!=duoLastLogonDate){
+                    latest = Collections.max(Arrays.asList(adLastLogonDate, gSuiteLastLogonDate, duoLastLogonDate));
+                    } else if(null!=adLastLogonDate && null!=gSuiteLastLogonDate){
+                    latest = Collections.max(Arrays.asList(adLastLogonDate, gSuiteLastLogonDate));
+                    } else if(null!=adLastLogonDate && null!=duoLastLogonDate){
+                    latest = Collections.max(Arrays.asList(adLastLogonDate, duoLastLogonDate));
+                    } else if(null!=gSuiteLastLogonDate && null!=duoLastLogonDate){
+                    latest = Collections.max(Arrays.asList(gSuiteLastLogonDate, duoLastLogonDate));
+                    } else if(null!=adLastLogonDate){
+                    latest = adLastLogonDate;
+                    } else if(null!=gSuiteLastLogonDate){
+                    latest = gSuiteLastLogonDate;
+                    } else if(null!=duoLastLogonDate){
+                    latest = duoLastLogonDate;
+                    }
+
+                    if(null!=latest){
+                    return sfd.format(latest);
+                    }
+                    else{
+                    return "";
+                    }
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="lastLogonTimestamp" header="lastLogonTimestamp" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.tools.Util;
+                    import java.text.SimpleDateFormat;
+                    import java.lang.Math;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    String lastLogonTimestamp = link.getAttribute("lastLogonTimestamp");
+
+                    if(Util.isNotNullOrEmpty(lastLogonTimestamp) && !lastLogonTimestamp.equals("0")){
+                    long nanoseconds = Long.parseLong(lastLogonTimestamp);
+                    long mills = (nanoseconds/10000000);
+                    long unix = (((1970-1601) * 365) - 3 + Math.round((1970-1601)/4) ) * 86400L;
+                    long timeStamp = mills - unix ;
+
+                    Date date = new Date(timeStamp*1000L); // *1000 is to convert seconds to milliseconds
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("M/d/y H:m:s");
+                    lastLogonTimestamp = sdf.format(date);
+                    }
+
+                    return lastLogonTimestamp;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="whenCreated" header="whenCreated" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.tools.Util;
+                    import java.text.SimpleDateFormat;
+                    import java.text.ParseException;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    String whenCreated = link.getAttribute("whenCreated");
+
+                    if(Util.isNotNullOrEmpty(whenCreated)){
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                    Date cre = null;
+                    try {
+                    cre = sdf.parse(whenCreated);
+                    } catch (ParseException e) {
+                    return "";
+                    }
+                    sfd = new SimpleDateFormat("M/d/y H:m:s");
+                    return sfd.format(cre);
+                    }
+
+                    return "";
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="gsuiteLastLogin" header="Gsuite Last Login" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+                    import sailpoint.object.Application;
+                    import sailpoint.api.IdentityService;
+                    import sailpoint.object.Attributes;
+                    import sailpoint.api.SailPointContext;
+                    import sailpoint.tools.Util;
+                    import java.text.SimpleDateFormat;
+                    import java.text.ParseException;
+
+                    Link link = context.getObjectById(Link.class, value);
+
+                    String lastLoginString = "";
+                    if(null!=link){
+                    Identity identity = link.getIdentity();
+                    if(null!=identity){
+
+                    Application gsuite = context.getObjectByName(Application.class,"GSuite");
+                    IdentityService idService = new IdentityService(context);
+                    if(null!=gsuite && null!=idService){
+                    List<Link> links = idService.getLinks(identity,gsuite);
+                    if(null!=links){
+                    for(Link link:links){
+                    Object lastLogin =  link.getAttribute("lastLoginTime");
+                    if(null!=lastLogin){
+                    lastLoginString = lastLogin.toString();
+                    }
+                    }
+                    links = null;
+                    }
+                    }
+
+                    context.decache(identity);
+                    context.decache(gsuite);
+                    }
+                    }
+
+                    if(Util.isNotNullOrEmpty(lastLoginString)){
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                    Date cre = null;
+                    try {
+                    cre = sdf.parse(lastLoginString);
+                    } catch (ParseException e) {
+                    return "";
+                    }
+                    sfd = new SimpleDateFormat("M/d/y H:m:s");
+                    return sfd.format(cre);
+                    }
+
+                    return lastLoginString;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="duoLastLogin" header="Duo Last Login" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+                    import sailpoint.object.Application;
+                    import sailpoint.api.IdentityService;
+                    import sailpoint.object.Attributes;
+                    import sailpoint.api.SailPointContext;
+                    import sailpoint.tools.Util;
+                    import java.text.SimpleDateFormat;
+                    import java.text.ParseException;
+
+                    Link link = context.getObjectById(Link.class, value);
+
+                    String lastLoginString = "";
+                    if(null!=link){
+                    Identity identity = link.getIdentity();
+                    if(null!=identity){
+
+                    Application duo = context.getObjectByName(Application.class,"Duo");
+                    IdentityService idService = new IdentityService(context);
+                    if(null!=duo && null!=idService){
+                    List<Link> links = idService.getLinks(identity,duo);
+                    if(null!=links){
+                    for(Link link:links){
+                    Object lastLogin =  link.getAttribute("last_login");
+                    if(null!=lastLogin){
+                    lastLoginString = lastLogin.toString();
+                    }
+                    }
+                    }
+                    }
+                    }
+                    }
+
+                    if(Util.isNotNullOrEmpty(lastLoginString)){
+                    SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+                    Date cre = null;
+                    try {
+                    cre = sdf.parse(lastLoginString);
+                    } catch (ParseException e) {
+                    return "";
+                    }
+                    sfd = new SimpleDateFormat("M/d/y H:m:s");
+                    return sfd.format(cre);
+                    }
+
+                    return lastLoginString;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="gsuiteUsername" header="Gsuite Username" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+                    import sailpoint.object.Application;
+                    import sailpoint.api.IdentityService;
+                    import sailpoint.object.Attributes;
+                    import sailpoint.api.SailPointContext;
+
+                    Link link = context.getObjectById(Link.class, value);
+
+                    String primaryEmailString = "";
+                    if(null!=link){
+                    Identity identity = link.getIdentity();
+                    if(null!=identity){
+
+                    Application gsuite = context.getObjectByName(Application.class,"GSuite");
+                    IdentityService idService = new IdentityService(context);
+                    if(null!=gsuite && null!=idService){
+                    List<Link> links = idService.getLinks(identity,gsuite);
+                    if(null!=links){
+                    for(Link link:links){
+                    Object primaryEmail =  link.getAttribute("primaryEmail");
+                    if(null!=primaryEmail){
+                    primaryEmailString = primaryEmail.toString();
+                    }
+                    }
+                    links = null;
+                    }
+                    }
+
+                    context.decache(identity);
+                    context.decache(gsuite);
+                    }
+                    }
+
+                    return primaryEmailString;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="duoUsername" header="Duo Username" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+                    import sailpoint.object.Application;
+                    import sailpoint.api.IdentityService;
+                    import sailpoint.object.Attributes;
+                    import sailpoint.api.SailPointContext;
+
+                    Link link = context.getObjectById(Link.class, value);
+
+                    String duoLogin = "";
+                    if(null!=link){
+                    Identity identity = link.getIdentity();
+                    if(null!=identity){
+
+                    Application duo = context.getObjectByName(Application.class,"Duo");
+                    IdentityService idService = new IdentityService(context);
+                    if(null!=duo && null!=idService){
+                    List<Link> links = idService.getLinks(identity,duo);
+                    if(null!=links){
+                    for(Link link:links){
+                    Object userName =  link.getAttribute("username");
+                    if(null!=userName){
+                    duoLogin = userName.toString();
+                    }
+                    }
+                    }
+                    }
+                    }
+                    }
+
+                    return duoLogin;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="sailpointId" header="SailPoint ID" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    Identity identity = link.getIdentity();
+                    String identityName = identity.getName();
+
+                    return identityName;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="email" header="Email" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    Identity identity = link.getIdentity();
+                    String email = identity.getEmail();
+
+                    return email;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="employeeID" header="employeeID" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    String employeeID = link.getAttribute("employeeNumber");
+
+                    return employeeID;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="Ministry" header="Ministry" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    String company = link.getAttribute("company");
+
+                    return company;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="domain" header="Domain" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.tools.Util;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    String principalName = link.getAttribute("msDS-PrincipalName");
+
+                    if(Util.isNotNullOrEmpty(principalName)){
+                    principalName = principalName.replace("\\","\\\\");
+                    String[] splitString = principalName.split("\\\\");
+                    if(null!=splitString && splitString.length > 0){
+                    return splitString[0];
+                    }
+                    }
+
+                    return principalName;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="parentContainer" header="Parent Container" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.tools.Util;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    String dn = link.getNativeIdentity();
+                    if(Util.isNotNullOrEmpty(dn)){
+                    dn = dn.replaceAll("^.+?,(CN|OU.+)","$1");
+                    dn = dn.replaceAll(",OU=","/");
+                    dn = dn.replaceAll("OU=","");
+                    dn = dn.replaceAll("CN=","");
+                    dn = dn.replaceFirst(",DC=","/");
+                    dn = dn.replaceAll(",DC=",".");
+                    }
+                    return dn;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="principalName" header="Principal Name" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    String principalName = link.getAttribute("msDS-PrincipalName");
+
+                    return principalName;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="operid" header="OPERID" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    Identity identity = link.getIdentity();
+                    String operid = identity.getStringAttribute("operId");
+
+                    return operid;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="managerName" header="Manager Name" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    Identity identity = link.getIdentity();
+                    Identity manager = identity.getManager();
+                    String managerName = "";
+
+                    if(manager != null){
+                    managerName = manager.getDisplayName();
+                    }
+                    return managerName;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="managerEmail" header="Manager Email" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Identity;
+
+                    Link link = context.getObjectById(Link.class, value);
+                    Identity identity = link.getIdentity();
+                    Identity manager = identity.getManager();
+                    String managerEmail = "";
+
+                    if(manager != null){
+                    managerEmail = manager.getEmail();
+                    }
+                    return managerEmail;
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>Report identifying all dormant accounts</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessUserReport"/>
+  </RequiredRights>
+</TaskDefinition>

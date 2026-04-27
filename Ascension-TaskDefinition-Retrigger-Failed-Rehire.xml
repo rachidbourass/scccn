@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Ascension-TaskDefinition-Retrigger-Failed-Rehire" resultAction="Rename" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="0"/>
+      <entry key="TaskDefinition.runLengthTotal" value="0"/>
+      <entry key="TaskDefinition.runs" value="0"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="identityName"/>
+      <entry key="ruleName" value="Rule-Admin-Rehire-TriggerRehireWorkflow"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+      <entry key="taskResultName"/>
+    </Map>
+  </Attributes>
+  <Description>A task that can be used to run an arbitrary rule.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Run Rule"/>
+  </Parent>
+  <Signature>
+    <Inputs>
+      <Argument helpKey="Please provide Identity Name for Rehire" name="identityName" required="true" type="string">
+        <Prompt>Identity Name for Rehire</Prompt>
+      </Argument>
+      <Argument helpKey="Please provide Failed Rehire Task Result Name" name="taskResultName" required="true" type="string">
+        <Prompt>Failed Rehire Task Result Name</Prompt>
+      </Argument>
+    </Inputs>
+    <Returns>
+      <Argument name="rehiredIdentityName" type="string">
+        <Prompt>Identity For Rehire</Prompt>
+      </Argument>
+      <Argument name="failedTaskResultName" type="string">
+        <Prompt>Failed Task Result Name</Prompt>
+      </Argument>
+      <Argument name="errorMessages" type="string">
+        <Prompt>Error Messages</Prompt>
+      </Argument>
+      <Argument name="message" type="string">
+        <Prompt>Message</Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>

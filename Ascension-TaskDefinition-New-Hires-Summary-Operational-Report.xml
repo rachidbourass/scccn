@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="New Hires Summary Report - Operational" resultAction="Rename" subType="Identity and User Reports" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="0"/>
+      <entry key="TaskDefinition.runLengthTotal" value="0"/>
+      <entry key="TaskDefinition.runs" value="0"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="disableDetail" value="false"/>
+      <entry key="disableHeader" value="false"/>
+      <entry key="disableSummary" value="false"/>
+      <entry key="dontEmailEmptyReport">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="emailFileFormat">
+        <value>
+          <List>
+            <String>CSV</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="emailIdentities">
+        <value>
+          <List>
+            <String>New-Hires-Summary-Report-DL</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="enableCsvHeader" value="false"/>
+      <entry key="hireDays" value="30"/>
+      <entry key="ministry">
+        <value>
+          <List>
+            <String>AH Ministry Service Center</String>
+            <String>AMITA Health</String>
+            <String>Ascension Alexian Brothers</String>
+            <String>Ascension Community Health Ministries</String>
+            <String>Ascension Senior Living</String>
+            <String>Ascension System Office-MO</String>
+            <String>Ascension Technologies</String>
+            <String>Borgess Health-MI</String>
+            <String>Columbia Health System</String>
+            <String>Columbia St. Mary's-WI</String>
+            <String>Crittenton Hospital Med Ctr</String>
+            <String>Daughters of Charity</String>
+            <String>Genesys Health System-MI</String>
+            <String>Medxcel Facilities Management</String>
+            <String>Ministry Health Care</String>
+            <String>Our Lady of Lourdes Mem Hosp-N</String>
+            <String>Providence Healthcare Netwk-TX</String>
+            <String>Providence Hospital-AL</String>
+            <String>Providence Hospital-DC</String>
+            <String>Sacred Heart Health System-FL</String>
+            <String>Saint Thomas Health Svcs-TN</String>
+            <String>Seton Family of Hospitals-TX</String>
+            <String>St John Health System</String>
+            <String>St. Agnes Healthcare-MD</String>
+            <String>St. John Health-MI</String>
+            <String>St. Joseph Health System-MI</String>
+            <String>St. Mary's Health System-IN</String>
+            <String>St. Mary's Hospital - NY</String>
+            <String>St. Vincent Health-IN</String>
+            <String>St. Vincent's Health System-AL</String>
+            <String>St. Vincent's HealthCare-FL</String>
+            <String>TNNAS - St. Thomas Health</String>
+            <String>Via Christi Health</String>
+            <String>Wheaton Franciscan Healthcare-WI</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="reportColumnOrder" value="Effdt, employeeId, samAccountName, title, department, SETID_LOCATION, manager, managerEmail, domain, firstName, lastName, ssn, dob, OPRID, hireDate, middleName, ministry, email, PSEmail, type"/>
+      <entry key="type">
+        <value>
+          <List>
+            <String>contractor</String>
+            <String>CWR</String>
+            <String>employee</String>
+            <String>non-hr contractor</String>
+            <String>physician</String>
+          </List>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>A detailed view of users by hire Date.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="New Hires Summary Report"/>
+  </Parent>
+</TaskDefinition>

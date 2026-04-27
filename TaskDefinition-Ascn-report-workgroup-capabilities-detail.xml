@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="ASCN-Report-Workgroup-Capabilities-Detail" progressMode="Percentage" resultAction="Rename" subType="Identity and User Reports" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="report">
+        <value>
+          <LiveReport title="Workgroup to Capabilities Detail Report">
+            <DataSource defaultSort="name" objectType="Identity" type="Filter">
+              <QueryParameters>
+                <Parameter argument="queryFilter">
+                  <QueryScript>
+                    <Source><![CDATA[
+                      import sailpoint.object.*;
+                      import java.lang.*;
+
+                      Filter f = Filter.eq("workgroup",true);
+                      queryOptions.addFilter(f);                   
+
+
+                      return queryOptions;
+                    ]]></Source>
+                  </QueryScript>
+                </Parameter>
+              </QueryParameters>
+            </DataSource>
+            <Columns>
+              <ReportColumnConfig field="Workgroup" header="Workgroup" property="name" sortable="true" width="110"/>
+              <ReportColumnConfig field="workgroupcapablities" header="WorkgroupCapabilities" property="name" sortable="true" width="110">
+                <RenderScript>
+                  <Source><![CDATA[
+                    import sailpoint.object.Identity;
+                    import sailpoint.object.Capability;
+                    import java.util.List;
+                    Identity wg = context.getObjectByName(Identity.class, value);
+                    List capab = wg.getCapabilities();
+                    for(Capability cp : capab){
+                    return cp.getDisplayName();
+                    }
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="workgroupmembers" header="WorkgroupMemberID" property="id" width="110">
+                <RenderScript>
+                  <Source><![CDATA[                    
+                    import sailpoint.object.*;
+                    import java.util.*;
+
+
+                    List wgs = new ArrayList();
+
+                    List props = new ArrayList();
+                    props.add("name");
+
+                    QueryOptions qo = new QueryOptions();
+
+                    qo.addFilter(Filter.eq("workgroups.id", value));
+                    Iterator entIter = context.search(Identity.class, qo);
+
+                    while(entIter.hasNext()){							
+                    Identity wg = (Identity)entIter.next();
+                    log.debug(" wg name : "+wg.getName());
+                    wgs.add(wg.getName());
+                    }
+
+                    return wgs;	  
+
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="workgroupmembername" header="WorkgroupMemberName" property="id" width="110">
+                <RenderScript>
+                  <Source><![CDATA[                    
+                    import sailpoint.object.*;
+                    import java.util.*;
+
+
+                    List wgsa = new ArrayList();
+
+                    List propsq = new ArrayList();
+                    propsq.add("name");
+
+                    QueryOptions qi = new QueryOptions();
+
+                    qi.addFilter(Filter.eq("workgroups.id", value));
+                    Iterator iter = context.search(Identity.class, qi);
+
+                    while(iter.hasNext()){							
+                    Identity wg1 = (Identity)iter.next();
+                    log.debug(" wg name : "+wg1.getDisplayName());
+                    wgsa.add(wg1.getDisplayName());
+                    }
+
+                    return wgsa;	  
+
+                  ]]></Source>
+                </RenderScript>
+              </ReportColumnConfig>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+    </Map>
+  </Attributes>
+  <Description>A detailed view of Workgroup, members and capabilities report in IdentityIQ.</Description>
+</TaskDefinition>

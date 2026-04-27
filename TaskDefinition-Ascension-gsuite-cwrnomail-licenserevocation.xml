@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Ascension-GSuite-CWRNoMail-LicenseRevocation" progressInterval="5000" progressMode="String" resultAction="Rename" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="40472"/>
+      <entry key="TaskDefinition.runLengthTotal" value="22785857"/>
+      <entry key="TaskDefinition.runs" value="563"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="ruleName" value="Ascension-Rule-GSuite-CWRNoMail-LicenseRevocation"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+    </Map>
+  </Attributes>
+  <Description>Leverages Google Workspace APIs (Directory API, and Enterprise License Manager API) to obtain Workspace Accounts in the /CWR/NoMail OU; and revokes any Workspace License assigned to them.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="IDM Team"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Run Rule"/>
+  </Parent>
+  <Signature>
+    <Returns>
+      <Argument name="Total Accounts Considered" type="int">
+        <Prompt>Total Accounts Considered: </Prompt>
+      </Argument>
+      <Argument name="Total With License" type="int">
+        <Prompt>Total With License: </Prompt>
+      </Argument>
+      <Argument name="Total Without License" type="int">
+        <Prompt>Total Without License: </Prompt>
+      </Argument>
+      <Argument name="Total Failed Lookups [403 Forbidden]" type="int">
+        <Prompt>Total Failed Lookups [403 Forbidden]: </Prompt>
+      </Argument>
+      <Argument name="Total Refused Revocations [412 Precondition Failed]" type="int">
+        <Prompt>Total Refused Revocations [412 Precondition Failed]: </Prompt>
+      </Argument>
+      <Argument name="Total Successful Revocations" type="int">
+        <Prompt>Total Successful Revocations: </Prompt>
+      </Argument>
+    </Returns>
+  </Signature>
+</TaskDefinition>
