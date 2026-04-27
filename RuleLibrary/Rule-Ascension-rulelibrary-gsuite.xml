@@ -1,0 +1,323 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-RuleLibrary-GSuite">
+  <Source><![CDATA[
+import sailpoint.api.IdentityService;
+import sailpoint.object.Application;
+import sailpoint.object.Link;
+import sailpoint.object.Identity;
+import sailpoint.object.QueryOptions;
+import sailpoint.object.Filter;
+import sailpoint.object.AuditEvent;
+import sailpoint.server.Auditor;
+import java.util.List;
+import sailpoint.object.ProvisioningPlan;
+import sailpoint.object.ProvisioningPlan.AccountRequest;
+import sailpoint.object.ProvisioningPlan.AttributeRequest;
+import sailpoint.tools.Util;
+import java.text.ParseException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Calendar;
+import sailpoint.tools.Util;
+import java.util.StringTokenizer;
+
+public List  getIdADLinks(Identity identity){
+    QueryOptions qo = new QueryOptions();
+    Filter filter = Filter.ignoreCase(Filter.and(Filter.eq("application.type", "Active Directory - Direct"), Filter.eq("identity.name",identity.getName())));
+    qo.addFilter(filter);
+    List links = context.getObjects(Link.class, qo);
+    return links;
+}
+public List  getIdentityAppLinks(Identity identity, String appName){
+    QueryOptions qo = new QueryOptions();
+    Filter filter = Filter.ignoreCase(Filter.and(Filter.eq("application.name", appName), Filter.eq("identity.name",identity.getName())));
+    qo.addFilter(filter);
+    List links = context.getObjects(Link.class, qo);
+    return links;
+	}
+public List<String> getActiveIdentityNames(String matchStr){
+   List<String> idNameList = new ArrayList();
+	 QueryOptions qo = new QueryOptions();
+   Filter filter = null;
+    if(null != matchStr){
+     	filter = Filter.ignoreCase(Filter.and(Filter.like("name", matchStr,Filter.MatchMode.START),Filter.eq("inactive", false)));
+    }else{
+      filter = Filter.ignoreCase(Filter.and(Filter.eq("inactive", false)));
+    }
+	 qo.addFilter(filter);
+	 Iterator it = context.search(Identity.class, qo);
+	 try {
+			while (it.hasNext()) {
+				Identity idn = (Identity) it.next();
+				if (null != idn) {
+					idNameList.add(idn.getName());
+				}
+			}	
+	}catch (Exception ex) {        
+		//log.error("Exception while processing Link matches", ex);        
+	}finally {
+		sailpoint.tools.Util.flushIterator(it);
+	}
+  return idNameList;
+} 
+public List<String> getActiveIdentityNamesByManager(String managerName){
+   List<String> idNameList = new ArrayList();
+	 QueryOptions qo = new QueryOptions();
+   Filter filter = null;
+    if(null != matchStr){
+     	filter = Filter.ignoreCase(Filter.and(Filter.eq("inactive", false),Filter.eq("manager.name",managerName)));
+    }
+	qo.addFilter(filter);
+	 Iterator it = context.search(Identity.class, qo);
+	 try {
+			while (it.hasNext()) {
+				Identity idn = (Identity) it.next();
+				if (null != idn) {
+					idNameList.add(idn.getName());
+				}
+			}	
+	}catch (Exception ex) {        
+		//log.error("Exception while processing Link matches", ex);        
+	}finally {
+		sailpoint.tools.Util.flushIterator(it);
+	}
+  return idNameList;
+} 
+
+  public List<String> getActiveIdentityNamesByIDAttribute(String attribName, String attribVal){
+   List<String> idNameList = new ArrayList();
+	 QueryOptions qo = new QueryOptions();
+   Filter filter = null;
+    if(null != matchStr){
+     	filter = Filter.ignoreCase(Filter.and(Filter.eq("inactive", false),Filter.eq(attribName,attribVal)));
+    }
+	qo.addFilter(filter);
+	 Iterator it = context.search(Identity.class, qo);
+	 try {
+			while (it.hasNext()) {
+				Identity idn = (Identity) it.next();
+				if (null != idn) {
+					idNameList.add(idn.getName());
+				}
+			}	
+	}catch (Exception ex) {        
+		//log.error("Exception while processing Link matches", ex);        
+	}finally {
+		sailpoint.tools.Util.flushIterator(it);
+	}
+  return idNameList;
+} 
+  
+public Map getLinkAttributes(Identity refIdentity, String samAccountName){
+	idnLinks = getIdADLinks(refIdentity);
+	String idnEmail = refIdentity.getEmail();
+	String mailInLink = null;
+	Map outMap = new HashMap();
+  outMap.put("targetConflict",false);
+	if(null != idnLinks @and !idnLinks.isEmpty()){
+		for(Link l:idnLinks){
+			
+			String appName = l.getApplicationName();
+			boolean isAIDApp = Util.nullSafeCaseInsensitiveEq("AD-AID",appName);
+			if(isAIDApp @and Util.nullSafeCaseInsensitiveEq(l.getAttribute("sAMAccountName"),samAccountName)){
+				outMap.put("displayName",l.getDisplayName());
+				outMap.put("applicationName",l.getApplicationName());
+				outMap.put("accountDN",l.getNativeIdentity());
+				mailInLink = l.getAttribute("mail");
+				break;
+			}else if(!isAIDApp @and Util.nullSafeCaseInsensitiveEq(l.getAttribute("sAMAccountName"),samAccountName)){
+				outMap.put("displayName",l.getDisplayName());
+				outMap.put("applicationName",l.getApplicationName());
+				outMap.put("accountDN",l.getNativeIdentity());
+				mailInLink = l.getAttribute("mail");
+			}
+			if(Util.isNotNullOrEmpty(idnEmail) @and Util.isNotNullOrEmpty(mailInLink) @and !Util.nullSafeCaseInsensitiveEq(idnEmail, mailInLink)) {
+				 //Email already set on Identity does not match mail currently set on target AD link
+				 outMap.put("targetConflict",true);
+			}else{
+				outMap.put("targetConflict",false);
+			}
+		}
+	}
+	return outMap;
+  }
+  
+   public boolean hasADLink(Identity refIdentity) {
+    idnLinks = getIdADLinks(refIdentity);
+		boolean hasLink = true;
+    if(idnLinks.isEmpty()){
+      hasLink = false;
+    }
+		return hasLink;
+  }
+
+  public boolean hasAIDLink(Identity refIdentity) {
+    idnLinks = getIdentityAppLinks(refIdentity, "AD-AID");
+   // return hasAppLink(identity, "AD-AID");
+    boolean hasLink = true;
+    if(idnLinks.isEmpty()){
+      hasLink = false;
+    }
+    return hasLink;
+  }
+  public Map getManagedAttributeMap(String appName,String entValue){
+    Map extEntMap;
+    Filter finalFilter=Filter.ignoreCase(Filter.and(Filter.eq("application.name",appName),Filter.eq("value",entValue)));
+    ManagedAttribute mgd=context.getUniqueObject(ManagedAttribute.class,finalFilter);
+    if(null != mgd){
+      extEntMap = new HashMap();
+      extEntMap = mgd.getAttributes();
+    }
+    return extEntMap; 
+}
+
+
+  public String getAttributeValueFromPlan(ProvisioningPlan plan, String appName, String attributeName) {
+		String attributeValue = null;
+		if(null != plan) {
+			
+			List<AccountRequest> ar = plan.getAccountRequests(appName);
+			if(!ar.isEmpty()) {
+				for(AccountRequest a:ar) {
+					AttributeRequest attribReq = a.getAttributeRequest(attributeName);
+					attributeValue = attribReq == null ? null : attribReq.toString();
+					
+				}
+			}
+			
+		}
+		return attributeValue;
+	}
+  
+public long getDaysBetween(String inDate) throws ParseException {
+    Long ldate = Long.parseLong(inDate);
+		LocalDateTime now = LocalDate.now().atStartOfDay();
+		LocalDateTime createdDate =   Instant.ofEpochMilli(ldate).atZone(ZoneId.systemDefault()).toLocalDateTime();
+		Duration duration = Duration.between(now, createdDate);
+	  long diff = Math.abs(duration.toDays());
+		return diff;
+}
+   
+public int getDaysBetween(Date date) {
+  /*
+  Usage:
+  if (getDaysBetween(date) >= 7) {//it has been 7 or more days since [Date]}
+  */
+	Calendar calendar = Calendar.getInstance();
+  Date currentDate = calendar.getTime();
+	calendar.setTime(date);
+	return Util.getDaysDifference(currentDate, date);
+      
+}
+	
+public void logAuditEvent(String objName,String identityName,String appName,acctNativeIdentity, Map inMap){
+	AuditEvent auditEvent = new AuditEvent();
+	auditEvent = new AuditEvent(objName, "Comment", identityName);
+	auditEvent.setApplication(appName);
+	auditEvent.setAccountName(acctNativeIdentity);
+	auditEvent.setString1(inMap.get("string1")+identityName);
+	auditEvent.setString2(inMap.get("string2"));
+	auditEvent.setString3(inMap.get("string3"));
+	auditEvent.setString4(inMap.get("string4"));
+	//auditEvent.setAttributes(attrMap);
+	Auditor.log(auditEvent);
+	context.commitTransaction();
+}
+  
+  public String approvalSchemeVal(Identity identity, Identity launcher) {
+	String approvalSchemeVal = "none";
+	boolean trustedWorkgroupContainsLauncher = false;
+
+	List allWorkgroups = identity.getWorkgroups();
+	List trustedWorkgroups = new ArrayList();
+	for(Identity workgroup : allWorkgroups) {
+		String stringValue = workgroup.getValue().toString();
+		if(stringValue.contains("Trusted")) {
+			trustedWorkgroups.add(workgroup);
+		}
+	}
+
+	List trustedWorkgroupMembers = new ArrayList();
+
+	if(Util.isNotNullOrEmpty(launcher.toString())){ 
+		for(Identity trustedWorkgroup : trustedWorkgroups) {
+			if(trustedWorkgroup!=null){
+				Iterator members = ObjectUtil.getWorkgroupMembers(context, trustedWorkgroup, null);
+				while (members.hasNext()){
+					Object[] object = (Object[]) members.next();
+					Identity firstValue = (Identity) object[0];
+					trustedWorkgroupMembers.add(firstValue.getName());
+				}
+			}
+		}
+
+		if(((Util.isNotNullOrEmpty(launcher.getAttribute("Is Manager"))) && (launcher.getAttribute("Is Manager").equalsIgnoreCase("Y"))) || trustedWorkgroupMembers.contains(launcher)){
+			trustedWorkgroupContainsLauncher = true;
+			approvalSchemeVal = "owner";
+		}
+	}
+	if(!trustedWorkgroupContainsLauncher) {
+		approvalSchemeVal = "manager,owner";
+	}
+	return approvalSchemeVal;
+}
+
+boolean checkMultipleADAccountExists(AccountRequest ar, Identity identityObj) {
+    boolean flag = false;
+    String appName = ar.getApplicationName();	       
+    String domainofAcc ="";
+    String domainofPlan ="";
+    String nativeIdentity = ar.getNativeIdentity();
+    List appLinks = getIdentityAppLinks(identityObj, appName);
+    if(!Util.isEmpty(appLinks)) {
+      for (Link linkObject : appLinks) {		 
+        if(!"true".equals(linkObject.getAttribute("IIQDisabled")) || linkObject.getAttribute("IIQDisabled") != true) {
+          String principalName = linkObject.getAttribute("msDS-PrincipalName");
+          if(Util.isNotNullOrEmpty(principalName) @and  Util.isNotNullOrEmpty(nativeIdentity)){
+            StringTokenizer stringTokenizer = new StringTokenizer(principalName, "\\"); 
+            if(stringTokenizer.hasMoreTokens()) {
+              domainofAcc = stringTokenizer.nextToken(); 
+            }                 				  
+            nativeIdentity = nativeIdentity.toUpperCase();
+            String subDomain = nativeIdentity.substring(nativeIdentity.indexOf("DC=") + 3);
+            domainofPlan = subDomain.substring(subDomain.indexOf(""), subDomain.indexOf(",DC="));            
+            if(Util.nullSafeCaseInsensitiveEq(domainofAcc, domainofPlan)) {              
+              flag = true;
+            }
+          }                
+          break;
+        }
+      }
+    }
+    return flag;
+  }  
+
+
+
+  public ProvisioningPlan getEmptyPlan(ProvisioningPlan plan){
+    List emptyAccounts = new ArrayList();
+    List<AccountRequest> acctReqs = plan.getAccountRequests();
+    Identity identityObj = plan.getIdentity();
+    for(AccountRequest ar : acctReqs){     
+      String appName = ar.getApplicationName();	
+      Application application = context.getObjectByName(Application.class, appName);
+      String appType=application.getType();
+      if("GSuite".equalsIgnoreCase(appName) @and ar.getOperation().toString().equalsIgnoreCase("Create")) {
+        plan.remove(ar);
+      }
+      if(Util.isNotNullOrEmpty(appType) @and Util.nullSafeCaseInsensitiveEq(appType,"Active Directory - Direct") @and Util.nullSafeCaseInsensitiveEq(ar.getOperation().toString(),"Create") @and null != identityObj){
+        if(checkMultipleADAccountExists(ar,identityObj)) {
+          plan.remove(ar);
+          break;
+        }
+      } 
+
+    }
+    return plan;
+  }
+  ]]></Source>
+</Rule>

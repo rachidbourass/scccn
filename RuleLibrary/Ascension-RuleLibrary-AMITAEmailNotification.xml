@@ -1,0 +1,417 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-RuleLibrary-AMITAEmailNotification">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+  import sailpoint.api.IdentityService;
+  import sailpoint.api.ObjectUtil;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Application;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.Util;
+  
+  String logName = "rule.Ascension-RuleLibrary-AMITAEmailNotification";
+
+
+  /***************************************************************************************************
+    * This method is to get the displayName of the identity
+    * Input: identity
+    * Output : identityDisplayName
+    ***************************************************************************************************/
+
+  public String getIdentityDisplayName(Identity identity){
+
+    debug(logName, "Entering method getIdentityDisplayName");
+
+    String identityDisplayName = null;
+
+    if(null != identity){
+
+      identityDisplayName = identity.getDisplayName();
+
+      if(Util.isNullOrEmpty(identityDisplayName) || !identityDisplayName.contains(",")){
+
+        String firstName = identity.getAttribute("firstname");
+        String lastName = identity.getAttribute("lastname");
+
+        if(Util.isNotNullOrEmpty(lastName) && Util.isNotNullOrEmpty(firstName)){
+
+          identityDisplayName = lastName + ", " + firstName;
+
+        }
+
+      }
+
+    }
+
+    debug(logName, "Exiting method getIdentityDisplayName");
+
+    return identityDisplayName;
+  }
+
+
+  /***************************************************************************************************
+    * This method is to get the application account Link from the identity
+    * Input: identity, appName
+    * Output : appLink
+    ***************************************************************************************************/
+
+  public Link getApplicationAccount(Identity identityObj, String appName){
+
+    debug(logName, "Entering method getApplicationAccount");
+
+    Link appLink = null;
+
+    if(null != identityObj){
+
+      IdentityService idService = new IdentityService(context);
+
+      Application applObj = context.getObjectByName(Application.class, appName);
+
+      List appLinks = idService.getLinks(identityObj, applObj);
+
+      if(appLinks != null && !Util.isEmpty(appLinks) && (appLinks.size()==1)){ 
+
+        appLink =  appLinks.get(0);
+
+
+      } else {
+
+        error(logName, methodName + "Error - Account not available or more than 1 account exist.") ;
+
+      }
+    }
+
+    debug(logName, "Exiting method getApplicationAccount");
+
+    return appLink;
+
+  }
+
+
+  /***************************************************************************************************
+    * This method is to decide whether to send consent form
+    * Input: identity
+    * Output : sendConsentForm
+    ***************************************************************************************************/
+
+  public boolean sendConsentForm(Identity identity){
+
+    debug(logName, "Entering method sendConsentForm");
+
+    boolean sendConsentForm = false;
+
+    if(null != identity){
+
+      String type = identity.getAttribute("type");
+
+      if(Util.isNotNullOrEmpty(type) && Util.nullSafeCaseInsensitiveEq(type, "Non-HR Contractor")){
+
+        sendConsentForm = true;
+
+      } else{
+        
+        //If the identity is a PeopleSoft CWR, send consent form
+
+        Link pplsoftLink = getApplicationAccount(identity, "DB-Peoplesoft-HCM-Primary");
+
+        if(pplsoftLink != null){
+
+          String identityType = pplsoftLink.getAttribute("PER_ORG");
+
+          if(Util.isNotNullOrEmpty(identityType) && identityType.equalsIgnoreCase("CWR")){
+
+            sendConsentForm = true;
+
+          }
+          
+        } else {
+          
+          //If the identity is a MDStaff Physician, send consent form
+
+          Link mdStaffAppLink = getApplicationAccount(identity, "MDStaff - AMITA");
+
+          if(mdStaffAppLink != null){
+
+            sendConsentForm = true;
+
+          }
+        }
+      }
+    }
+
+    debug(logName, "Exiting method sendConsentForm");
+
+    return sendConsentForm;
+
+  }
+
+  /***************************************************************************************************
+    * This method sends the Employee Status Change Notification
+    * Input: managerEmail, ctrMgrEmail, domainDL, samAccName, identity
+    * Output : null
+    ***************************************************************************************************/
+
+  public void sendEmployeeStatusChangeNotification(String managerEmail, String ctrMgrEmail, String domainDL, String samAccName, String managerDisplayName, Identity identity){
+
+    debug(logName, "Entering method sendEmployeeStatusChangeNotification");
+
+    String ccEmail = null;
+    Map argValues = new LinkedHashMap();
+    Map emailArgs = new HashMap();
+
+    String identityDisplayName = getIdentityDisplayName(identity);
+
+    emailArgs.put("templateName", "Ascension-EmailTemplate-Amita-RehireManagerNotification");
+
+    argValues.put("Name", identityDisplayName); 
+    argValues.put("Record Source", identity.getAttribute("ministry"));
+    argValues.put("Reporting Manager", managerDisplayName);
+    argValues.put("Department", identity.getAttribute("department"));
+    argValues.put("Job Title", identity.getAttribute("title"));  
+    argValues.put("HR Location Code", identity.getAttribute("buildingId"));
+    argValues.put("Primary Location", identity.getAttribute("locationDescription")); 
+    argValues.put("Symphony ID", identity.getName()); 
+    argValues.put("Courion Profile UID", identity.getAttribute("courionId")); 
+
+    if(Util.isNotNullOrEmpty(samAccName)){ 
+
+      argValues.put("NetworkID", samAccName); 
+
+    }
+    else{
+
+      argValues.put("NetworkID", identity.getAttribute("samAccountName"));
+
+    }
+
+    if(Util.isNotNullOrEmpty(domainDL)){
+      
+      ccEmail = domainDL;
+
+    }
+    
+    if(Util.isNotNullOrEmpty(ctrMgrEmail)){
+      
+      ccEmail = ctrMgrEmail;
+
+    }
+    
+    if(Util.isNotNullOrEmpty(ccEmail)){
+
+      emailArgs.put("ccEmail", ccEmail);
+
+    }
+
+    if(Util.isNotNullOrEmpty(managerEmail)){
+
+      emailArgs.put("toAddress", managerEmail);
+
+    }
+
+    Map args = new HashMap();
+    args.put("Map", argValues);
+    args.put("identityDisplayName", identityDisplayName);
+
+    emailArgs.put("args", args);
+
+    sendEmailNotification(emailArgs);
+
+    debug(logName, "Exiting method sendEmployeeStatusChangeNotification");
+
+  }
+
+  /***************************************************************************************************
+    * This method sends the Initial Login Notification
+    * Input: managerEmail, ctrMgrEmail, passwordAD, identity
+    * Output : null
+    ***************************************************************************************************/
+
+  public void sendInitialLoginNotification(String managerEmail, String ctrMgrEmail, String passwordAD, Identity identity){
+
+    debug(logName, "Entering method sendInitialLoginNotification");
+
+    String ccEmail = null;
+    Map emailArgs = new HashMap();
+    Map argValues = new LinkedHashMap();
+
+    String identityDisplayName = getIdentityDisplayName(identity);
+
+    emailArgs.put("templateName", "Ascension-EmailTemplate-ManagerNotification-NewUserIntialLogin");
+
+    argValues.put("Name", identityDisplayName);
+
+    if (Util.isNotNullOrEmpty(passwordAD)){                                    
+      argValues.put("Password", passwordAD);
+    }
+
+
+    if(Util.isNotNullOrEmpty(managerEmail)){
+      emailArgs.put("toAddress", managerEmail);
+    }               
+    if(Util.isNotNullOrEmpty(ctrMgrEmail)){
+      emailArgs.put("ccEmail", ctrMgrEmail);
+    }
+
+    Map args = new HashMap();
+    args.put("Map", argValues);
+
+    emailArgs.put("args", args);
+
+    sendEmailNotification(emailArgs);
+
+    debug(logName, "Exiting method sendInitialLoginNotification");
+  } 
+
+
+  /***************************************************************************************************
+    * This method sends the notification for the Creation/Rehire of an AD account with Consent Form
+    * Input: managerEmail, ctrMgrEmail, opType, identity
+    * Output : null
+    ***************************************************************************************************/
+
+  public void sendAccountDetails(String managerEmail, String ctrMgrEmail, String opType, String managerDisplayName, Identity identity){
+
+    debug(logName, "Entering method sendAccountDetails");
+
+    String ccEmail = null;
+    Map emailArgs = new HashMap();
+    Map argValues = new LinkedHashMap();
+    List attachments = new ArrayList();
+
+    String identityDisplayName = getIdentityDisplayName(identity);
+
+    emailArgs.put("templateName", "Ascension-EmailTemplate-AMITA-ManagerNotification");
+
+    argValues.put("NetworkID", identity.getAttribute("samAccountName"));
+
+    argValues.put("Name", identityDisplayName);                      
+    argValues.put("Health Ministry", identity.getAttribute("ministry"));
+    argValues.put("Worker Type", identity.getAttribute("type"));
+    argValues.put("Start Date", identity.getAttribute("hireDate"));
+    argValues.put("End Date", identity.getAttribute("ctrexpDt"));
+    argValues.put("Hiring Manager", managerDisplayName);
+    argValues.put("G Suite Account", identity.getAttribute("email"));
+    argValues.put("Domain", identity.getAttribute("domain"));
+    argValues.put("Worker ID", identity.getAttribute("employeeId"));
+    argValues.put("Business Unit", identity.getAttribute("businessUnit"));
+    argValues.put("Corporate Job Code", identity.getAttribute("jobcode"));
+
+    if(Util.isNotNullOrEmpty(managerEmail)){
+      emailArgs.put("toAddress", managerEmail);
+    }
+
+    if(Util.isNotNullOrEmpty(ctrMgrEmail)){
+      emailArgs.put("ccEmail", ctrMgrEmail);
+    }
+
+    Map args = new HashMap();
+    args.put("Map", argValues);
+    args.put("identityDisplayName", identityDisplayName);
+
+    if(Util.isNotNullOrEmpty(opType)){
+      args.put("operation", opType);
+    }
+
+    args.put("internalId", identity.getAttribute("internalId"));
+
+    emailArgs.put("args", args);
+
+    boolean sendConsentForm = sendConsentForm(identity);
+
+    if(sendConsentForm){
+
+      String pdfFilePath = null;
+      String fileName = null;  
+      byte[] fileBytes= null;
+      FileInputStream fis = null;
+      EmailFileAttachment attachment = null;
+
+      Custom custom = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration");
+
+      if(custom !=null && custom.get("consentForm") !=null){
+
+        fileName = custom.get("consentForm").get("fileName").toString();
+        pdfFilePath = custom.get("consentForm").get("pdfFilePath").toString();
+
+      }
+
+      File file = new File(pdfFilePath);
+
+      if(file.exists()){
+
+        fileBytes = new byte[(int) file.length()];
+        fis = new FileInputStream(file);
+        fis.read(fileBytes);   
+        attachment = new EmailFileAttachment(fileName, EmailFileAttachment.MimeType.MIME_PDF, fileBytes);
+        emailArgs.put("attachment", attachment);
+
+      } else{
+
+        error(logName, "File does not exist in the specified location: " + pdfFilePath + " ,Need Consent form file to be present in the location for the email attachment to be sent");
+
+      }
+    }
+
+    sendEmailNotification(emailArgs);
+
+    debug(logName, "Exiting method sendAccountDetails");
+
+  }
+
+
+  /***************************************************************************************************
+    * This method sends the email notification
+    * Input: inputArgs
+    * Output : null
+    ***************************************************************************************************/
+
+  public void sendEmailNotification(Map inputArgs){
+
+    debug(logName, "Entering method sendEmailNotification");
+
+    EmailTemplate template = null;
+
+    if(!Util.isEmpty(inputArgs)){
+
+      String templateName = inputArgs.get("templateName");
+
+      if(Util.isNotNullOrEmpty(templateName)){
+
+        template = context.getObjectByName(EmailTemplate.class, templateName);
+
+      }
+
+      EmailOptions options = new EmailOptions();
+
+      if(Util.isNotNullOrEmpty(inputArgs.get("toAddress"))){
+        options.setTo(inputArgs.get("toAddress"));
+      }
+      if(Util.isNotNullOrEmpty(inputArgs.get("ccEmail"))){
+        options.setCc(inputArgs.get("ccEmail"));
+      }
+      if(inputArgs.containsKey("attachment")){
+        options.addAttachment(inputArgs.get("attachment"));
+      }
+
+      options.setVariables(inputArgs.get("args"));
+
+      if(!Util.isEmpty(inputArgs.get("toAddress")) && template !=null){
+
+        context.sendEmailNotification(template,options);
+      }
+    } else{
+      error(logName, "No input arguments passed to sendEmailNotification method");
+    }
+
+    debug(logName, "Exiting method sendEmailNotification");
+
+  }
+  
+  ]]></Source>
+</Rule>

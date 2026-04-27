@@ -1,0 +1,557 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-RuleLibrary-Duo">
+  <Source><![CDATA[
+
+  static String apiHost;
+  static String apiMethod;
+  static String apiPath;
+  static String apiParams;
+
+  import sailpoint.object.Application;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+  import sailpoint.tools.GeneralException;
+  import sailpoint.tools.Util;
+  import org.json.simple.JSONObject;
+  import org.json.simple.parser.JSONParser;
+
+  //Get Application and Reference Variables
+
+  Application duoApp = context.getObjectByName(Application.class, "Duo");
+
+  Custom duoCustom = context.getObjectByName(Custom.class, "Ascension-Custom-Duo");
+
+  String authHost = duoApp.getAttributeValue("authHost").toString();
+  String intKey = duoApp.getAttributeValue("authIntegrationKey").toString();
+  String duoSecretKey = context.decrypt(duoApp.getAttributeValue("authPassword").toString());
+
+  private List getDuoLinks(String identityName) {
+
+    import sailpoint.api.IdentityService;
+    import sailpoint.object.Identity;
+    import sailpoint.object.Link;
+
+    Identity refIdentity = context.getObjectByName(Identity.class, identityName);
+
+    IdentityService iService = new IdentityService(context);
+
+    List duoLinks = iService.getLinks(refIdentity, super.duoApp);
+
+    return duoLinks;
+
+  }
+
+  private String getCurrentDateStr() {
+
+    import java.text.SimpleDateFormat;
+
+    //Get System DateTime in RFC 2822
+
+    Date currentDate = new Date();
+    String pattern = "EEE, dd MMM yyyy HH:mm:ss Z";
+    SimpleDateFormat format = new SimpleDateFormat(pattern);
+    String currentDateStr = format.format(currentDate);
+
+    return currentDateStr;
+
+  }
+
+  private void encodeForURL(apiPath, apiParams) {
+
+    if (Util.isNotNullOrEmpty(apiPath) || Util.isNotNullOrEmpty(apiParams)) {
+
+      //URL-encoding replacements
+
+      if (Util.isNotNullOrEmpty(apiPath)) {
+
+        super.apiPath = apiPath.replace(" ","%20");
+        super.apiPath = apiPath.replace("@","%40");
+
+      }
+
+      if (Util.isNotNullOrEmpty(apiParams)) {
+
+        super.apiParams = apiParams.replace(" ","%20");
+        super.apiParams = apiParams.replace("@","%40");
+
+      }
+
+    }
+
+  }
+
+  private String buildMessage(String currentDateStr, String apiMethod, String apiHost, String apiPath, String apiParams) {
+
+    import java.lang.StringBuilder;
+
+    StringBuilder messageStr = new StringBuilder();
+    messageStr.append(currentDateStr);
+    messageStr.append("\n");
+    messageStr.append(apiMethod);
+    messageStr.append("\n");
+    messageStr.append(apiHost);
+    messageStr.append("\n");
+    messageStr.append(apiPath);
+    messageStr.append("\n");
+    messageStr.append(apiParams);
+
+    return messageStr.toString();
+
+  }
+
+  private String getAuthHeader(String intKey, String hmacSha1) {
+
+    import org.apache.commons.codec.binary.Base64;
+
+    //Define Authentication Header
+
+    String apiUser = intKey;
+    String apiPassword = hmacSha1;
+
+    String apiAuth = apiUser + ":" + apiPassword;
+    byte[] encodedAuth = Base64.encodeBase64(apiAuth.getBytes());
+
+    String authHeader = "Basic " + new String(encodedAuth);
+
+    return authHeader;
+
+  }
+
+  private HttpURLConnection getAPIConn(String currentDateStr, String apiMethod, String apiHost, String apiPath, String apiParams, String authHeader) {
+
+    import org.apache.http.HttpResponse;
+    import org.apache.http.NameValuePair;
+    import org.apache.http.client.HttpClient;
+    import org.apache.http.client.entity.UrlEncodedFormEntity;
+    import org.apache.http.client.methods.HttpGet;
+    import org.apache.http.client.methods.HttpPost;
+    import org.apache.http.impl.client.DefaultHttpClient;
+    import org.apache.http.message.BasicNameValuePair;
+
+    String apiURLStr = "https://" + apiHost  + apiPath;
+
+    if (Util.isNotNullOrEmpty(apiParams)) {
+
+      //Adjust URL String for Query
+
+      apiURLStr = apiURLStr + "?" + apiParams;
+
+    }
+
+    //Define HTTP Connection
+
+    URL apiURL = new URL(apiURLStr);
+
+    HttpURLConnection apiConn = (HttpURLConnection) apiURL.openConnection();
+
+    apiConn.setDoOutput(true);
+    apiConn.setRequestMethod(apiMethod);
+    apiConn.setRequestProperty("Authorization", authHeader);
+    apiConn.setRequestProperty("Date", currentDateStr);
+    apiConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+    return apiConn;
+
+  }
+
+  private String getOutput(HttpURLConnection apiConn) {
+
+    import java.io.BufferedReader;
+    import java.io.InputStreamReader;
+
+    BufferedReader br = new BufferedReader(new InputStreamReader(apiConn.getInputStream()));
+    String out = "";
+    String line ="";
+
+    while ((line = br.readLine()) != null) {
+      out=out+line;
+    }
+    br.close();
+    return out;
+
+  }
+
+  private List getResponseList(String out) {
+
+    JSONParser parser = new JSONParser();
+    JSONObject jsonOut = (JSONObject) parser.parse(out);
+
+    return jsonOut.get("response");
+
+  }
+
+  private JSONObject getResponseJSON(String out) {
+
+    JSONParser parser = new JSONParser();
+    JSONObject jsonOut = (JSONObject) parser.parse(out);
+
+    return jsonOut.get("response");
+
+  }
+
+  private String getDuoUserId(String duoUsername) {
+
+    //Get System DateTime in RFC 2822
+
+    String currentDateStr = getCurrentDateStr();
+
+    //Define Base Request Variables
+
+    apiHost = super.authHost;
+    apiMethod = "GET";
+    apiPath = "/admin/v1/users";
+    apiParams = "username=" + duoUsername;
+
+    encodeForURL(apiPath, apiParams);
+
+    //Build Message
+
+    String message = buildMessage(currentDateStr, apiMethod, apiHost, apiPath, apiParams);
+
+    //Compute Password (HMAC-SHA1)
+
+    String hmacSha1 = org.apache.commons.codec.digest.HmacUtils.hmacSha1Hex(super.duoSecretKey, message);
+
+    //Get Authentication Header
+
+    String authHeader = getAuthHeader(intKey, hmacSha1);
+
+    //Open API Connection
+
+    HttpURLConnection apiConn = getAPIConn(currentDateStr, apiMethod, apiHost, apiPath, apiParams, authHeader);
+
+    //Get Output
+
+    String out = getOutput(apiConn);
+
+    //Get Response List from Output
+
+    List outList = getResponseList(out);
+
+    //Close API Connection 
+
+    apiConn.disconnect();
+
+    //Return Duo User ID
+
+    return outList.get(0).get("user_id");
+
+  }
+
+
+  private List getDuoUserObject(String duoUsername, String duoObject) {
+
+    if (Util.nullSafeContains("phones,tokens", duoObject)) {
+
+      //Get System DateTime in RFC 2822
+
+      String currentDateStr = getCurrentDateStr();
+
+      //Define Base Request Variables
+
+      String userId = getDuoUserId(duoUsername);
+
+      apiHost = super.authHost;
+      apiMethod = "GET";
+      apiPath = "/admin/v1/users";
+      apiPath = apiPath + "/" + userId + "/" + duoObject;
+      apiParams = "";
+
+      encodeForURL(apiPath, apiParams);
+
+      //Build Message
+
+      String message = buildMessage(currentDateStr, apiMethod, apiHost, apiPath, apiParams);
+
+      //Compute Password (HMAC-SHA1)
+
+      String hmacSha1 = org.apache.commons.codec.digest.HmacUtils.hmacSha1Hex(super.duoSecretKey, message);
+
+      //Get Authentication Header
+
+      String authHeader = getAuthHeader(intKey, hmacSha1);
+
+      //Open API Connection
+
+      HttpURLConnection apiConn = getAPIConn(currentDateStr, apiMethod, apiHost, apiPath, apiParams, authHeader);
+
+      //Get Output
+
+      String out = getOutput(apiConn);
+
+      //Get Response List from Output
+
+      List userObjectList = getResponseList(out);
+
+      //Close API Connection 
+
+      apiConn.disconnect();
+
+      //Return Duo User's Associated Objects
+
+      return userObjectList;
+
+    } else {
+
+      GeneralException e = new GeneralException("Invalid Object Type (duoObject) Supplied. Valid values are 'phones' or 'tokens'");
+      throw e;
+
+    }
+
+  }
+
+  private void deleteDuoObject(List userObjectList, String duoObject) {
+
+    if (Util.nullSafeContains("phone,token", duoObject)) {
+
+      if (userObjectList != null && userObjectList.size() > 0) {
+
+        for (Map objectMap : userObjectList) {
+
+          String targetObjectId = objectMap.get(duoObject + "_id");
+
+          //Get System DateTime in RFC 2822
+
+          String currentDateStr = getCurrentDateStr();
+
+          //Define Base Request Variables
+
+          apiHost = super.authHost;
+          apiMethod = "DELETE";
+          apiPath = "/admin/v1/" + duoObject + "s";
+          apiPath = apiPath + "/" + targetObjectId;
+          apiParams = "";
+
+          //Build Message
+
+          String message = buildMessage(currentDateStr, apiMethod, apiHost, apiPath, apiParams);
+
+          //Compute Password (HMAC-SHA1)
+
+          String hmacSha1 = org.apache.commons.codec.digest.HmacUtils.hmacSha1Hex(super.duoSecretKey, message);
+
+          //Get Authentication Header
+
+          String authHeader = getAuthHeader(intKey, hmacSha1);
+
+          //Open API Connection
+
+          HttpURLConnection apiConn = getAPIConn(currentDateStr, apiMethod, apiHost, apiPath, apiParams, authHeader);
+
+          int apiResponseCode = apiConn.getResponseCode();
+
+          //Close API Connection
+
+          apiConn.disconnect();
+
+        }
+
+      }
+
+    } else {
+
+      GeneralException e = new GeneralException("Invalid Object Type (duoObject) Supplied. Valid values are 'phone' or 'token'");
+      throw e;
+
+    }
+
+  }
+
+  private int syncDuoUserWithAD(String duoUsername, String directoryKey) {
+
+    //Get System DateTime in RFC 2822
+
+    String currentDateStr = getCurrentDateStr();
+
+    //Define Base Request Variables
+
+    apiHost = super.authHost;
+    apiMethod = "POST";
+    apiPath = "/admin/v1/users";
+    apiPath = apiPath + "/directorysync/" + directoryKey + "/syncuser";
+    apiParams = "username=" + duoUsername;
+
+    encodeForURL(apiPath, apiParams);
+
+    //Build Message
+
+    String message = buildMessage(currentDateStr, apiMethod, apiHost, apiPath, apiParams);
+
+    //Compute Password (HMAC-SHA1)
+
+    String hmacSha1 = org.apache.commons.codec.digest.HmacUtils.hmacSha1Hex(super.duoSecretKey, message);
+
+    //Get Authentication Header
+
+    String authHeader = getAuthHeader(intKey, hmacSha1);
+
+    int apiResponseCode = 0;
+
+    try {
+
+      //Open API Connection
+
+      HttpURLConnection apiConn = getAPIConn(currentDateStr, apiMethod, apiHost, apiPath, apiParams, authHeader);
+
+      //Get Output
+
+      String out = getOutput(apiConn);
+
+      //Get API Response Code
+
+      apiResponseCode = apiConn.getResponseCode();
+
+      //Close API Connection 
+
+      apiConn.disconnect();
+
+    } catch (FileNotFoundException e) {
+
+      apiResponseCode = 404;
+
+    } catch (IOException e) {
+
+      String message = e.getMessage();
+
+      if (Util.isNotNullOrEmpty(message)) {
+
+        if (message.matches("429")) {
+
+          apiResponseCode = 429;
+
+        } else {
+
+          throw e;
+
+        }
+
+      }
+    }
+
+    //Return API Response Code
+
+    return apiResponseCode; //200 = Success; 404 = Invalid Reference; 429 = Try Again Later
+
+  }
+
+  private String resolveNTAccountName(String identityName, String duoUsername) {
+
+    import sailpoint.object.Application;
+    import sailpoint.object.Identity;
+    import sailpoint.object.Link;
+
+    String ntAccountName = null;
+
+    Identity refIdentity = context.getObjectByName(Identity.class, identityName);
+
+    if (refIdentity != null) {
+
+      List refLinks = refIdentity.getLinks();
+
+      if(refLinks != null){
+
+        for(Link appLink:refLinks){
+
+          if(appLink.getApplication().getType().equalsIgnoreCase("Active Directory - Direct")){
+
+            if(appLink.getAttribute("sAMAccountName").equalsIgnoreCase(duoUsername)){
+
+              ntAccountName = appLink.getDisplayName();
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+    return ntAccountName;
+
+  }
+
+  private String resolveADApp(String identityName, String duoUsername) {
+
+    import sailpoint.object.Application;
+    import sailpoint.object.Identity;
+    import sailpoint.object.Link;
+
+    String adApp = null;
+
+    Identity refIdentity = context.getObjectByName(Identity.class, identityName);
+
+    if (refIdentity != null) {
+
+      List refLinks = refIdentity.getLinks();
+
+      if(refLinks != null){
+
+        for(Link appLink:refLinks){
+
+          if(appLink.getApplication().getType().equalsIgnoreCase("Active Directory - Direct")){
+
+            if(appLink.getAttribute("sAMAccountName").equalsIgnoreCase(duoUsername)){
+
+              adApp = appLink.getApplication().getName();
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+    return adApp;
+
+  }
+
+
+  private String resolveDirectoryKey(String identityName, String duoUsername) {
+
+    import sailpoint.object.Application;
+    import sailpoint.object.Identity;
+    import sailpoint.object.Link;
+
+    Map directoryKeys = super.duoCustom.get("directoryKeys");
+
+    String adApp = resolveADApp(identityName, duoUsername);
+    String ntAccountName = resolveNTAccountName(identityName, duoUsername);
+    String directoryKey = null;
+
+    if (Util.isNotNullOrEmpty(adApp)) {
+
+      adApp = adApp.toUpperCase();
+
+      if (Util.nullSafeCaseInsensitiveEq(adApp, "AD-WIAPP")) {
+
+        String ntPrefix = ntAccountName.replaceAll("\\.*.","");
+
+        adApp = adApp + "-" + ntPrefix;
+
+      }
+
+      directoryKey = context.decrypt(directoryKeys.get(adApp));
+
+    }
+
+    if (Util.isNotNullOrEmpty(directoryKey)) {
+
+      return directoryKey;
+
+    } else {
+
+      return "noKeyResolved";
+
+    }
+
+  }
+
+  ]]></Source>
+</Rule>

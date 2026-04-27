@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-RuleLibrary-ForOPAPolicies">
+  <Source><![CDATA[
+  
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.QueryOptions; 
+  import sailpoint.tools.Util;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Policy;
+  import sailpoint.object.PolicyViolation;
+  import sailpoint.object.GenericConstraint;
+  import sailpoint.object.Filter;
+	import sailpoint.object.Attributes;
+	import sailpoint.object.IdentityRequest;
+	import sailpoint.object.IdentityRequestItem;
+  
+  import org.apache.commons.loggerging.LogFactory;
+  import org.apache.commons.loggerging.Log;
+  
+  
+	 /**
+   * Method to process the assigned roles on the identity provided in the advanced policy check and return a map of current and future assigned roles
+	 * @param existing Identity
+	 * @param future Identity
+	 * @return Map of existing and future Identities assigned roles list
+	 */
+	public HashMap getUserAssignedDetectedRoles(Identity existingIdentity,Identity futureIdentity){
+		
+		Map assignedDetectedRolesMap = new HashMap();
+		List currentAssignedRoles = new ArrayList();
+		List futureAssignedRoles = new ArrayList();
+		List currentDetectedRoles = new ArrayList();
+		List futureDetectedRoles = new ArrayList();
+		
+		currentAssignedRoles = existingIdentity.getAssignedRoles();
+		futureAssignedRoles = futureIdentity.getAssignedRoles();
+		currentDetectedRoles = existingIdentity.getDetectedRoles();
+		futureDetectedRoles = futureIdentity.getDetectedRoles();
+		
+        if(currentAssignedRoles!=null && !currentAssignedRoles.isEmpty()){
+			assignedDetectedRolesMap.put("currentassigned",currentAssignedRoles);
+		}
+		if(futureAssignedRoles!=null && !futureAssignedRoles.isEmpty()){
+			assignedDetectedRolesMap.put("futureassigned",futureAssignedRoles);
+		}
+		if(currentDetectedRoles!=null && !currentDetectedRoles.isEmpty()){
+			assignedDetectedRolesMap.put("currentdetected",currentDetectedRoles);
+		}
+		if(futureDetectedRoles!=null && !futureDetectedRoles.isEmpty()){
+			assignedDetectedRolesMap.put("futuredetected",futureDetectedRoles);
+		}
+		return assignedDetectedRolesMap;
+	}
+	/**
+   * Method to return the assigned roles list based on the role name starts with and the associated applications assigned
+	 * @param list of roles
+	 * @param role name starts with to match
+	 * @param list of app names whose roles have to be matched
+	 * @return list of OPA app roles found
+	 */
+	public List getOPARoleNamesList(List rolesList,String roleNameStartsWith,List appNamesList){
+		List opaRoleNamesList = new ArrayList();
+		for(Bundle role : rolesList){
+			String roleName = role.getName();
+			Set appObjSet = new HashSet();
+			appObjSet = role.getApplications();
+			if(appObjSet!=null && roleName.startsWith(roleNameStartsWith)){
+				int appsCount = appObjSet.size();
+				int roleAppsCount = 0;
+				if(appsCount>0 && appsCount<3){
+					for (Application appObj : appObjSet){
+						String appName = appObj.getName();
+						if(appNamesList.contains(appName)){
+							roleAppsCount = roleAppsCount+1;
+						}
+					}
+					if(roleAppsCount>0 && roleAppsCount<3){
+						opaRoleNamesList.add(roleName);
+					}
+                }	
+            }
+        }
+		return opaRoleNamesList;
+    }
+	/**
+	 * Checks the count of the required OPA roles
+	 * @param OPA assigned roles list
+	 * @param Required OPA roles list
+	 * @return count of required OPA roles found in the passed roles list
+	 */
+	public int getCountOfOPARequiredRoles(List opaAssignedRoleNamesList,List requiredOPARolesList){
+		int requiredRolesCount=0;
+		if(opaAssignedRoleNamesList!=null && !opaAssignedRoleNamesList.isEmpty()){
+				int opaRolesCount = opaAssignedRoleNamesList.size();
+				for(String opaRoleName : opaAssignedRoleNamesList){
+					if(requiredOPARolesList.contains(opaRoleName)){
+						log.error("OPA Required Role-->"+opaRoleName+"--found in the users roles list");
+						requiredRolesCount = requiredRolesCount+1;
+					}
+				}
+				log.error("Count Of Required OPA Roles--"+requiredRolesCount);
+		}		
+		return requiredRolesCount;
+	}	
+	/**
+	 * Checks the if any the required OPA roles are present in an inflight requests
+	 * @param OPA assigned roles list
+	 * @param Required OPA roles list
+	 * @return count of required OPA roles in the inflight requests
+	 */
+	public int getCountOfInflightOPARequiredRoles(Identity existingIdentity,List requiredOPARolesList){
+  	int inflightRequiredOPARolesCount=0;
+    QueryOptions qo = new QueryOptions();
+  	qo.addFilter(Filter.eq("targetId", existingIdentity.getId()));
+  	qo.addFilter(Filter.isnull("endDate")); 
+  	Iterator idReqItr = context.search(IdentityRequest.class, qo);
+  	while (idReqItr.hasNext()) {
+			IdentityRequest idReqObj = (IdentityRequest) idReqItr.next();
+			if(idReqObj != null ) {
+				QueryOptions qoIRI = new QueryOptions();
+				qoIRI.addFilter(Filter.eq("identityRequest", idReqObj));
+				qoIRI.addFilter(Filter.eq("application", "IIQ"));
+				qoIRI.addFilter(Filter.eq("provisioningState", "pending"));
+				Iterator idReqIItr = context.search(IdentityRequestItem.class, qoIRI);
+				while (idReqIItr.hasNext()) {
+					IdentityRequestItem idReqIObj = (IdentityRequestItem) idReqIItr.next();
+					if(idReqIObj != null){
+						if(requiredOPARolesList.contains(idReqIObj.getValue())){
+							log.error("OPA Required Role-->"+idReqIObj.getValue()+"--found in the users inflight requests");
+							inflightRequiredOPARolesCount++;
+						}	  
+					}
+				}
+			}
+		}
+	return inflightRequiredOPARolesCount;
+}
+  
+  /**
+	 * Trigger the Policy Violation
+	 * @param Identity,Policy,Constraint,ViolationDesc
+	 * @return policy violation object
+	 */
+  public PolicyViolation triggerPolicyViolation(Identity identity,Policy policy,GenericConstraint constraint,String violationDesc){
+		PolicyViolation violation = new PolicyViolation();
+		violation.setActive(true);
+		violation.setIdentity(identity);
+		violation.setPolicy(policy);
+		violation.setConstraint(constraint);
+		violation.setDescription(violationDesc);
+		violation.setStatus(sailpoint.object.PolicyViolation.Status.Open);
+		return violation;
+	}	
+  ]]></Source>
+</Rule>

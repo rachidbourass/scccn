@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Rule-Ascension-EmailAddress-RuleLibrary-Rajesh">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Rule-GSuite-AccessToken"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+
+  import sailpoint.object.Application;
+  import sailpoint.object.Attributes;
+  import sailpoint.object.Identity;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.tools.Util;
+  import org.apache.commons.io.IOUtils;
+  import org.json.JSONArray;
+  import org.json.JSONException;
+  import org.json.JSONObject;
+
+  private String nextPageToken;
+  private JSONObject getGSuiteUsersByOU(String orgUnitPath, String urlStr) {
+
+    org.json.JSONObject jsonObject = null;
+    token = context.decrypt(jobj); //Passed in via global variable (Rule-GSuite-AccessToken).
+    //String urlStr = null;
+
+    try {
+
+           
+      URL url = new URL(urlStr);
+
+      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn.setDoOutput(true);
+      conn.setRequestMethod("GET");
+      conn.setRequestProperty("Content-Type", "application/json");
+      conn.setRequestProperty("Authorization", "Bearer "+ token);
+
+      BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+      String output = "";
+      String lineOutput = "";
+
+      while ((lineOutput = br.readLine()) != null) {
+        output = output + lineOutput;
+      } 
+
+      if (output != null) {
+
+        jsonObject = new org.json.JSONObject(output);
+        /*List<String> list = new ArrayList<String>();
+        JSONArray jsonArray = jsonObject.getJSONArray("users");
+        for(int i = 0 ; i < jsonArray.length(); i++) {
+
+          outList.add(jsonArray.getJSONObject(i).getString("primaryEmail"));
+
+        }*/
+
+      }
+
+    } catch (FileNotFoundException e) {
+
+      //Handle but do nothing
+
+    } catch (java.io.IOException e) {
+
+      //Handle but do nothing
+
+    }
+
+    return jsonObject;
+
+  }
+
+  private List parseOrgJson(JSONObject jsonObject) throws IOException, JSONException {
+
+    List<String> list = new ArrayList<String>();
+    org.json.JSONArray jsonArray = jsonObject.getJSONArray("users");
+    for(int i = 0 ; i < jsonArray.length(); i++) {
+
+      list.add(jsonArray.getJSONObject(i).getString("primaryEmail"));
+
+    }
+    return list;
+  }
+
+
+  private String getAPIUrl(String nextPageToken, String orgUnitPath){
+
+    String customer = "my_customer";
+    String query = "orgUnitPath=" + orgUnitPath;
+    String fields = "users(primaryEmail),nextPageToken";
+    String urlStr = null;
+    if(nextPageToken == null || nextPageToken == ""){
+      urlStr = "https://admin.googleapis.com/admin/directory/v1/users?customer=" + customer + "&query=" + query + "&fields=" + fields;
+    }else{
+      urlStr = "https://admin.googleapis.com/admin/directory/v1/users?customer=" + customer + "&query=" + query + "&fields=" + fields + "&pageToken=" + nextPageToken;
+    }
+    return urlStr;
+  }
+
+  public List executeJSONCall(String orgUnitPath){
+    System.out.println("Entering executeJSONCall");
+    org.json.JSONObject jo = null;
+    String urlStr = null;
+    List parsedList = new ArrayList();
+    do {
+    if(nextPageToken == null || nextPageToken == ""){
+      System.out.println("nextPageToken is NULL - Continuing");
+      urlStr = getAPIUrl("", orgUnitPath);
+      jo = getGSuiteUsersByOU(orgUnitPath, urlStr);
+      nextPageToken = jo.getString("nextPageToken");
+      System.out.println("nextPageToken-original: " + nextPageToken);
+      parsedList = parseOrgJson(jo);
+    }else{
+      System.out.println("nextPageToken is NOT NULL - Continuing");
+      System.out.println("nextPageToken-new: " + nextPageToken);
+      //do {
+        urlStr = getAPIUrl(nextPageToken, orgUnitPath);
+        jo = getGSuiteUsersByOU(orgUnitPath, urlStr);
+        nextPageToken = jo.getString("nextPageToken");
+        parsedList = parseOrgJson(jo);
+
+      //}while(nextPageToken != "");
+    }
+    }while(nextPageToken != "");
+    System.out.println("parsedList: " + parsedList);
+    return parsedList;
+  }
+
+
+
+  ]]></Source>
+</Rule>

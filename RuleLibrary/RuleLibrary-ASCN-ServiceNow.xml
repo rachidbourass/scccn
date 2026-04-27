@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="ASCN-RuleLibrary-ServiceNow">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+  import org.json.JSONObject;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Application;
+  import org.ascn.utils.WSUtils;
+
+  import org.apache.http.client.HttpClient;
+  import org.apache.http.client.methods.CloseableHttpResponse;
+  import org.apache.http.client.methods.HttpPost;
+  import org.apache.http.entity.StringEntity;
+  import org.apache.http.impl.client.DefaultHttpClient;
+  import org.apache.http.StatusLine;
+  import org.apache.http.util.EntityUtils;
+  
+  String logName = "rule.ASCN-RuleLibrary-ServiceNow";
+
+  /***************************************************************************************************
+    * This method is to SNOW Request for the given Payload
+    * Input: payloadObject, catalogSysId
+    * Output : output
+    ***************************************************************************************************/
+
+  public String createServiceRequest(JSONObject payloadObject, String catalogSysId){
+
+    debug(logName, "Entering method createServiceRequest");
+	
+    String output = null;
+
+    if(null == payloadObject || null == catalogSysId){
+
+      output = "Payload or CatalogSysId is empty";
+
+      debug(logName, "Exiting method createServiceRequest");
+
+      return output;
+
+    }
+
+    Application application = context.getObjectByName(Application.class, "IdentityIQ for ServiceNow Service Desk");
+
+    if(null != application){
+      appUrl = application.getAttributeValue("url");
+    }
+
+    String newUrl = appUrl + "/api/sn_sc/servicecatalog/items/" + catalogSysId + "/order_now";
+    
+    //GET token from the java class
+
+    String accessToken = WSUtils.getSNAccessToken(context,"ServiceNowAuth");
+
+    HttpClient httpClient = new DefaultHttpClient();
+
+    HttpPost httpPost = new HttpPost(newUrl);
+
+    httpPost.setHeader("Content-Type", "application/json");
+    
+    httpPost.setHeader("Accept", "application/json");
+
+    httpPost.setHeader("Authorization", "Bearer " + accessToken);
+
+    httpPost.setEntity(new StringEntity(payloadObject.toString()));
+
+    try {
+      CloseableHttpResponse response = (CloseableHttpResponse) httpClient.execute(httpPost);
+
+      String responseCode = response.getStatusLine().getStatusCode().toString();
+      
+      String responseText = EntityUtils.toString(response.getEntity(), "UTF-8");
+
+      if (responseCode.contains("204") || responseCode.contains("200"))
+      {
+      // Parse JSON and extract the ticket number
+        
+        JSONObject json = new JSONObject(responseText);
+
+        output = json.getJSONObject("result").getString("number");
+      }
+      else
+      {
+        output = "REQ Create request failed with the Response Code: " + responseCode + ". Response: " + responseText;
+      }
+
+
+    } 
+    catch (Exception e) {
+
+
+     output = "Error in creating ServiceNow Request: " + e;
+
+    }
+
+    debug(logName, "Exiting method createServiceRequest");
+
+    return output;
+  }
+  ]]></Source>
+</Rule>

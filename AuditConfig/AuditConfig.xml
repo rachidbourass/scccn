@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<ImportAction name="merge">
+<AuditConfig name="AuditConfig">
+  <AuditActions>
+    <AuditAction displayName="Delegate Remediation" enabled="true" name="delegateRemediation"/>
+    <AuditAction displayName="Persona Joiner Process" enabled="true" name="PersonaJoiner"/>
+    <AuditAction displayName="Persona Leaver Process" enabled="true" name="PersonaLeaver"/>
+    <AuditAction displayName="Persona Rehire Process" enabled="true" name="PersonaRehire"/>
+    <AuditAction displayName="Persona Remediation Process" enabled="true" name="PersonaRemediation"/>
+    <AuditAction displayName="Persona Username Change Process" enabled="true" name="PersonaUsernameChange"/>
+    <AuditAction displayName="Persona Username Move Process" enabled="true" name="PersonaUsernameMove"/>
+    <AuditAction displayName="Create Account" enabled="true" name="CreateAccount"/>
+    <AuditAction displayName="Disable Account" enabled="true" name="DisableAccount"/>
+    <AuditAction displayName="Leaver" enabled="true" name="Leaver"/>
+    <AuditAction displayName="Partial Match" enabled="true" name="PartialMatch"/>
+    <AuditAction displayName="Update InternalID Process" enabled="true" name="UpdateInternalID"/>
+    <AuditAction displayName="UserType Change Process" enabled="true" name="UserTypeChange"/>
+    <AuditAction displayName="EmployeeClass Change Process" enabled="true" name="EmployeeClassChange"/>
+    <AuditAction displayName="WorkItemCleanupTask" enabled="true" name="WorkItemCleanupTask"/>
+  </AuditActions>
+  <AuditClasses>
+    <AuditClass create="true" delete="true" name="Application" update="true"/>
+    <AuditClass create="true" delete="true" name="Configuration" update="true"/>
+    <AuditClass displayName="Custom" name="Custom"/>
+    <AuditClass create="true" delete="true" name="Rule" update="true"/>
+    <AuditClass create="true" delete="true" name="ObjectConfig" update="true"/>
+    <AuditClass create="true" delete="true" name="Workflow" update="true"/>
+  </AuditClasses>
+</AuditConfig>
+</ImportAction>
+</sailpoint>

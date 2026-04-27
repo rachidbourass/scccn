@@ -1,0 +1,846 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension GSuite Leaver Rule Library">
+  <Source><![CDATA[
+
+  import sailpoint.api.IdentityService;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+  import sailpoint.object.Application;
+  import sailpoint.api.SailPointFactory;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.Operation;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.PasswordPolicy;
+  import sailpoint.object.Application.passwordPolicies;
+  import sailpoint.api.PasswordPolice;
+  import sailpoint.api.PasswordGenerator;
+  import sailpoint.tools.Util;
+  import java.util.*;
+  import java.util.List;
+  import java.util.Map;
+  import java.util.Set;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Attributes;
+  import java.io.BufferedReader;
+  import java.io.InputStreamReader;
+  import org.apache.http.HttpResponse;
+  import org.apache.http.NameValuePair;
+  import org.apache.http.client.HttpClient;
+  import org.apache.http.client.entity.UrlEncodedFormEntity;
+  import org.apache.http.client.methods.HttpGet;
+  import org.apache.http.client.methods.HttpPost;
+  import org.apache.http.impl.client.DefaultHttpClient;
+  import org.apache.http.message.BasicNameValuePair;
+  import org.json.simple.JSONObject;
+  import org.json.simple.parser.JSONParser;
+  import sailpoint.tools.GeneralException;
+  import org.apache.log4j.Logger;
+  import org.apache.log4j.Level;
+  import org.json.simple.JSONArray;
+
+  Logger loggerVar = Logger.getLogger("sailpoint.ascension.rules.gsuite.leaver.library");
+  loggerVar.setLevel(Level.DEBUG);
+
+  public boolean isLegalHold(Identity identity){
+    boolean flag = false;
+    String legalHoldAttributeName = "legalHold";   
+    if ( Util.otob(identity.getAttribute(legalHoldAttributeName)) )     flag=true;
+    return flag;
+  }
+
+  public boolean changePasswordAtNextLogin(SailPointContext context,Application application,String objId,boolean flag){
+    boolean isSuccess = true;
+    String customObjectName = "Ascension-Custom-Gsuite";
+    Custom customObject = context.getObject(Custom.class, customObjectName);
+
+    String tokenURL = "";
+    String updateURL = "https://www.googleapis.com/admin/directory/v1/users/" + objId;
+    loggerVar.debug("changePasswordAtNextLogin URL: " + updateURL);
+    if(void !=customObject && customObject != null){
+      Attributes attrs = customObject.getAttributes();
+      if(attrs != null){
+        Map gsuite_status_mapping = attrs.get("gsuite_status_mapping");
+        tokenURL = attrs.get("tokenURL");
+      }
+    }
+
+    if(Util.isNotNullOrEmpty(tokenURL)){
+      try {
+        // Code to get the access token 
+        String clientID = application.getAttributeValue("clientID").toString();
+        String clientSecret = context.decrypt(application.getAttributeValue("clientSecret").toString());
+        String refreshToken = context.decrypt(application.getAttributeValue("refreshToken").toString());
+        String gType="refresh_token";
+        URL accessTokenURL = new URL(tokenURL);
+        HttpURLConnection tokenConn = (HttpURLConnection) accessTokenURL.openConnection();
+        tokenConn.setDoOutput(true);
+        tokenConn.setRequestMethod("POST");
+        tokenConn.setRequestProperty("Content-Type", "application/json");
+        String inputToken = "{\r\n \"refresh_token\":\""+ refreshToken +"\",  \r\n \"client_id\":\""+ clientID +"\",\r\n \"client_secret\":\""+ clientSecret +"\",\r\n \"grant_type\":\""+ gType + "\"}";
+        loggerVar.debug("Access Request : "+ inputToken);
+        OutputStream os = tokenConn.getOutputStream();
+        os.write(inputToken.getBytes());
+        os.flush();
+        loggerVar.info("Access Response : "+ tokenConn.getResponseCode());
+
+        if(tokenConn.getResponseCode()==200){
+          BufferedReader br = new BufferedReader(new InputStreamReader(tokenConn.getInputStream()));
+          String out = "";
+          String line ="";
+          while ((line = br.readLine()) != null) {
+            out=out+line;
+          }
+          br.close();
+          JSONParser parser = new JSONParser();
+          JSONObject jobj = (JSONObject) parser.parse(out);
+          loggerVar.debug("JSON Object check : "+ jobj);
+          try{
+            JSONObject jobj = (JSONObject) parser.parse(out);
+            token = jobj.get("access_token");
+            URL url = new URL(updateURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("PUT");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Authorization", "Bearer "+ token); 
+
+            String input = "{\"changePasswordAtNextLogin\":" + flag + "}";
+            loggerVar.info("Input: " + input);
+            OutputStream os = conn.getOutputStream();
+            os.write(input.getBytes());
+            os.flush();
+
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED && conn.getResponseCode() != 409) {
+              loggerVar.error("Failed : HTTP error code : " + conn.getResponseCode());
+              loggerVar.error("Failed : HTTP error message : " + conn.getResponseMessage());
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String output;
+            while ((output = br.readLine()) != null) {
+              loggerVar.debug("Output: " + output);
+            }
+			br.close();
+            conn.disconnect();
+          } catch(Exception e){   
+            loggerVar.error("Refresh Token Error:::"+e.getMessage());
+            isSuccess = false;           
+          }
+        } else{
+          loggerVar.error("Failed : HTTP error code : " + tokenConn.getResponseCode());
+          loggerVar.error("Failed : HTTP error message : " + tokenConn.getResponseMessage());
+          isSuccess = false;
+        }
+      } catch(Exception e){          
+        isSuccess = false;            
+      }
+    }
+    return isSuccess;
+  }
+
+  public boolean transferData(SailPointContext context,Identity identity){
+    boolean isSuccess = true;
+
+    if(null!=identity){
+      String appName = "GSuite";
+      Application application = context.getObjectByName(Application.class, appName);
+      if(null!=application){
+        String customObjectName = "Ascension-Custom-Gsuite";
+        Custom customObject = context.getObject(Custom.class, customObjectName);
+
+        String tokenURL = "";
+        String driveURL = "https://www.googleapis.com/admin/datatransfer/v1/transfers";
+        String driveAppId = "55656082996";
+        String existingOwner = "";
+        String newOwner = "";
+
+        Link gSuiteLink = getApplicationLink(context, identity, appName);
+        if(null!=gSuiteLink){
+          Object objId = gSuiteLink.getAttribute("objectID");
+          if(null!=objId){
+            existingOwner = Util.otos(objId);
+          }
+        }
+
+        Identity manager = identity.getManager();
+        if(null!=manager){
+          Link mgrGSuiteLink = getApplicationLink(context, manager, appName);
+          if(null!=mgrGSuiteLink){
+            Object mgrObjId = mgrGSuiteLink.getAttribute("objectID");
+            if(null!=mgrObjId){
+              newOwner = Util.otos(mgrObjId);
+            }
+          }
+        }
+
+        if(void !=customObject && customObject != null){
+          Attributes attrs = customObject.getAttributes();
+          if(attrs != null){
+            Map gsuite_status_mapping = attrs.get("gsuite_status_mapping");
+            tokenURL = attrs.get("tokenURL");
+          }
+        }
+
+        if(Util.isNotNullOrEmpty(existingOwner) && Util.isNotNullOrEmpty(newOwner) && Util.isNotNullOrEmpty(tokenURL)){
+          try {
+            // Code to get the access token 
+            String clientID = application.getAttributeValue("clientID").toString();
+            String clientSecret = context.decrypt(application.getAttributeValue("clientSecret").toString());
+            String refreshToken = context.decrypt(application.getAttributeValue("refreshToken").toString());
+            String gType="refresh_token";
+            URL accessTokenURL = new URL(tokenURL);
+            HttpURLConnection tokenConn = (HttpURLConnection) accessTokenURL.openConnection();
+            tokenConn.setDoOutput(true);
+            tokenConn.setRequestMethod("POST");
+            tokenConn.setRequestProperty("Content-Type", "application/json");
+            String inputToken = "{\r\n \"refresh_token\":\""+ refreshToken +"\",  \r\n \"client_id\":\""+ clientID +"\",\r\n \"client_secret\":\""+ clientSecret +"\",\r\n \"grant_type\":\""+ gType + "\"}";
+            loggerVar.debug("Access Request : "+ inputToken);
+            OutputStream os = tokenConn.getOutputStream();
+            os.write(inputToken.getBytes());
+            os.flush();
+            loggerVar.info("Access Response : "+ tokenConn.getResponseCode());
+
+            if(tokenConn.getResponseCode()==200){
+              BufferedReader br = new BufferedReader(new InputStreamReader(tokenConn.getInputStream()));
+              String out = "";
+              String line ="";
+              while ((line = br.readLine()) != null) {
+                out=out+line;
+              }
+			  br.close();
+              JSONParser parser = new JSONParser();
+              JSONObject jobj = (JSONObject) parser.parse(out);
+              loggerVar.debug("JSON Object check : "+ jobj);
+              try{
+                JSONObject jobj = (JSONObject) parser.parse(out);
+                token = jobj.get("access_token");
+
+                URL url = new URL(driveURL);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Authorization", "Bearer "+ token); 
+
+                String input = "{\"kind\": \"admin#datatransfer#DataTransfer\",\"newOwnerUserId\": \"" +newOwner+ "\",\"oldOwnerUserId\": \""+existingOwner+"\",\"applicationDataTransfers\": [{\"applicationId\":\"" +driveAppId+"\",\"applicationTransferParams\": [{\"key\": \"PRIVACY_LEVEL\",\"value\": [\"PRIVATE\",\"SHARED\"]}]}]}";
+                loggerVar.info("Input: " + input);
+                OutputStream os = conn.getOutputStream();
+                os.write(input.getBytes());
+                os.flush();
+
+                if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED && conn.getResponseCode() != 409) {
+                  loggerVar.error("Failed : HTTP error code : " + conn.getResponseCode());
+                  loggerVar.error("Failed : HTTP error message : " + conn.getResponseMessage());
+                }
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String output;
+                while ((output = br.readLine()) != null) {
+                  loggerVar.debug("Output: " + output);
+                }
+				br.close();
+                conn.disconnect();
+              } catch(Exception e){    
+                loggerVar.error("Refresh Token Error:::"+e.getMessage());
+                isSuccess = false;           
+              }
+            } else{
+              loggerVar.error("Failed : HTTP error code : " + tokenConn.getResponseCode());
+              loggerVar.error("Failed : HTTP error message : " + tokenConn.getResponseMessage());
+              isSuccess = false;
+            }
+          } catch(Exception e){          
+            isSuccess = false;            
+          }
+        }
+      }
+    }
+    return isSuccess;
+  }
+
+  public boolean delegateCalendar(SailPointContext context,Identity identity){
+    boolean isSuccess = true;
+
+    if(null!=identity){
+      String appName = "GSuite";
+      Application application = context.getObjectByName(Application.class, appName);
+
+      if(null!=application){
+        String customObjectName = "Ascension-Custom-Gsuite";
+        Custom customObject = context.getObject(Custom.class, customObjectName);
+
+        String tokenURL = "";
+        String calendarURL = "https://www.googleapis.com/calendar/v3/calendars/calendarId/acl";
+        String userEmail = "";
+        String managerEmail = "";
+        String domain = "ascension.org";
+
+        if(void !=customObject && customObject != null){
+          Attributes attrs = customObject.getAttributes();
+          if(attrs != null){
+            Map gsuite_status_mapping = attrs.get("gsuite_status_mapping");
+            tokenURL = attrs.get("tokenURL");
+          }
+        }
+
+        userEmail = identity.getAttribute("primaryEmail");
+        Identity manager = identity.getManager();
+        if(null!=manager){
+          managerEmail = manager.getAttribute("primaryEmail");
+        }
+
+        if(Util.isNotNullOrEmpty(userEmail) && Util.isNotNullOrEmpty(managerEmail) && Util.isNotNullOrEmpty(tokenURL)){
+          try{
+            domain = userEmail.substring(userEmail.lastIndexOf('@') + 1);
+            // Code to get the access token
+            String clientID = application.getAttributeValue("clientID").toString();
+            String clientSecret = context.decrypt(application.getAttributeValue("clientSecret").toString());
+            String refreshToken = context.decrypt(application.getAttributeValue("refreshToken").toString());
+            String gType="refresh_token";
+            URL accessTokenURL = new URL(tokenURL);
+            HttpURLConnection tokenConn = (HttpURLConnection) accessTokenURL.openConnection();
+            tokenConn.setDoOutput(true);
+            tokenConn.setRequestMethod("POST");
+            tokenConn.setRequestProperty("Content-Type", "application/json");
+
+            String inputToken = "{\r\n \"refresh_token\":\""+ refreshToken +"\",  \r\n \"client_id\":\""+ clientID +"\",\r\n \"client_secret\":\""+ clientSecret +"\",\r\n \"grant_type\":\""+ gType + "\",\r\n \"hd\":\""+ domain +"\"}";
+
+            loggerVar.info("Access Request : "+ inputToken);
+            OutputStream os = tokenConn.getOutputStream();
+            os.write(inputToken.getBytes());
+            os.flush();
+            loggerVar.debug("Access Response : "+ tokenConn.getResponseCode());
+
+            if(tokenConn.getResponseCode()==200){
+              BufferedReader br = new BufferedReader(new InputStreamReader(tokenConn.getInputStream()));
+              String out = "";
+              String line ="";
+              while ((line = br.readLine()) != null) {
+                out=out+line;
+              }
+			  br.close();
+              JSONParser parser = new JSONParser();
+              JSONObject jobj = (JSONObject) parser.parse(out);
+              loggerVar.debug("JSON Object check : "+ jobj);
+              try{
+                JSONObject jobj = (JSONObject) parser.parse(out);
+                token = jobj.get("access_token");
+
+                URL url = new URL(calendarURL.replace("calendarId",userEmail));
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Authorization", "Bearer "+ token); 
+
+                String input = "{\"role\": \"owner\",\"scope\": {\"type\": \"user\",\"value\": \""+managerEmail+ "\"},\"kind\": \"calendar#aclRule\"}";
+
+                loggerVar.debug("Input: " + input);
+                OutputStream os = conn.getOutputStream();
+                os.write(input.getBytes());
+                os.flush();
+
+                if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED && conn.getResponseCode() != 409) {
+                  loggerVar.error("Failed : HTTP error code : " + conn.getResponseCode());
+                  loggerVar.error("Failed : HTTP error message : " + conn.getResponseMessage());
+                }
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                String output;
+                while ((output = br.readLine()) != null) {
+                  loggerVar.debug("Output: " + output);
+                }
+				br.close();
+                conn.disconnect();
+
+              } catch(Exception e){ 
+                loggerVar.error("Refresh Token Error:::"+e.getMessage());
+                isSuccess = false;          
+              }
+            } else{
+              loggerVar.error("Failed : HTTP error code : " + tokenConn.getResponseCode());
+              loggerVar.error("Failed : HTTP error message : " + tokenConn.getResponseMessage());
+              isSuccess = false;
+            }
+          } catch(Exception e){       
+            loggerVar.error("Error"); 
+            isSuccess = false;           
+          }
+        }
+      }
+    }
+    return isSuccess;
+  }
+
+  public boolean hasGSuiteMobileDevice(SailPointContext context, Identity identity){
+    loggerVar.info("Entering hasGSuiteMobileDevice()...");
+    boolean hasDevices = false;
+    if(null != identity){
+      String appName = "GSuite";
+      Application application = context.getObjectByName(Application.class, appName);
+
+      if(null != application){
+        String customObjectName = "Ascension-Custom-Gsuite";
+        Custom customObject = context.getObject(Custom.class, customObjectName);
+
+        String tokenURL = "";
+        String listUsersMobileDevicesURL = "https://www.googleapis.com/admin/directory/v1/customer/customerId/devices/mobile?query=email";
+        String userEmail = identity.getAttribute("primaryEmail");
+        String domain = "";
+
+        if(void != customObject && customObject != null){
+          Attributes attrs = customObject.getAttributes();
+          if(attrs != null){
+            Map gsuite_status_mapping = attrs.get("gsuite_status_mapping");
+            tokenURL = attrs.get("tokenURL");
+          }
+        }
+
+        if(Util.isNotNullOrEmpty(userEmail) && Util.isNotNullOrEmpty(tokenURL)){
+          try{
+            domain = userEmail.substring(userEmail.lastIndexOf('@') + 1);
+            // Code to get the access token
+            String clientID = application.getAttributeValue("clientID").toString();
+            String clientSecret = context.decrypt(application.getAttributeValue("clientSecret").toString());
+            String refreshToken = context.decrypt(application.getAttributeValue("refreshToken").toString());
+            String gType="refresh_token";
+            URL accessTokenURL = new URL(tokenURL);
+            HttpURLConnection tokenConn = (HttpURLConnection) accessTokenURL.openConnection();
+            tokenConn.setDoOutput(true);
+            tokenConn.setRequestMethod("POST");
+            tokenConn.setRequestProperty("Content-Type", "application/json");
+
+            String inputToken = "{\r\n \"refresh_token\":\""+ refreshToken +"\",  \r\n \"client_id\":\""+ clientID +"\",\r\n \"client_secret\":\""+ clientSecret +"\",\r\n \"grant_type\":\""+ gType + "\",\r\n \"hd\":\""+ domain +"\"}";
+
+            OutputStream os = tokenConn.getOutputStream();
+            os.write(inputToken.getBytes());
+            os.flush();
+
+            if(tokenConn.getResponseCode() == 200) {
+              BufferedReader br = new BufferedReader(new InputStreamReader(tokenConn.getInputStream()));
+              String out = "";
+              String line = "";
+              while ((line = br.readLine()) != null) {
+                out=out+line;
+              }
+			  br.close();
+              JSONParser parser = new JSONParser();
+              JSONObject jobj = (JSONObject) parser.parse(out);
+              loggerVar.debug("JSON Object check : "+ jobj);
+              try{
+                JSONObject jobj = (JSONObject) parser.parse(out);
+                token = jobj.get("access_token");
+
+                URL url = new URL(listUsersMobileDevicesURL.replace("customerId", "C03b4884n").replace("email", userEmail));
+
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Authorization", "Bearer "+ token); 
+
+                if (conn.getResponseCode() == 403) {
+
+                  throw new GeneralException("GSuite - 403 - Forbidden");
+
+                }
+
+                if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED && conn.getResponseCode() != 409) {
+                  loggerVar.error("Failed : HTTP error code : " + conn.getResponseCode());
+                  loggerVar.error("Failed : HTTP error message : " + conn.getResponseMessage());
+                }
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String output = "";
+                String lineOutput = "";
+                while ((lineOutput = br.readLine()) != null) {
+                  output = output + lineOutput;
+                }
+				br.close();
+                loggerVar.debug("output: " + output);
+                List resourceIds = new ArrayList();
+                if (Util.isNotNullOrEmpty(output)){
+                  JSONParser jParser = new JSONParser();
+                  JSONObject jObj = (JSONObject) jParser.parse(output);
+                  loggerVar.debug("JSON Object check : " + jObj);
+
+                  if (jObj.get("mobiledevices") != null) {
+                    JSONArray jArr = (JSONArray) jObj.get("mobiledevices");
+
+                    //Iterating mobiledevices 
+                    Iterator itr2 = jArr.iterator(); 
+                    while (itr2.hasNext()) { 
+                      JSONObject objMD = (JSONObject) itr2.next();
+                      String resourceId = objMD.get("resourceId");
+                      loggerVar.debug("resourceId : " + resourceId);
+                      resourceIds.add(resourceId);
+                      hasDevices = true;
+                    }
+                  }
+                }
+
+                conn.disconnect();
+
+              } catch(Exception e){
+                loggerVar.error("Conn Error:::" + e.getMessage());        
+                throw new GeneralException(e);
+              }
+            }
+            tokenConn.disconnect();
+          } catch(Exception e){
+            loggerVar.error("Refresh Token Error:::" + e.getMessage());
+            throw new GeneralException(e);
+          }
+        }
+      }
+    }
+    loggerVar.info("Exiting hasGSuiteMobileDevice()...");
+    return hasDevices;
+  }
+
+  public boolean gsuiteMobileWipe(SailPointContext context, Identity identity){
+    loggerVar.info("Entering gsuiteMobileWipe()...");
+    boolean isSuccess = true;
+    if(null != identity){
+      String appName = "GSuite";
+      Application application = context.getObjectByName(Application.class, appName);
+
+      if(null != application){
+        String customObjectName = "Ascension-Custom-Gsuite";
+        Custom customObject = context.getObject(Custom.class, customObjectName);
+
+        String tokenURL = "";
+        String listUsersMobileDevicesURL = "https://www.googleapis.com/admin/directory/v1/customer/customerId/devices/mobile?query=email";
+        String userEmail = identity.getAttribute("primaryEmail");
+        String domain = "";
+
+        if(void != customObject && customObject != null){
+          Attributes attrs = customObject.getAttributes();
+          if(attrs != null){
+            Map gsuite_status_mapping = attrs.get("gsuite_status_mapping");
+            tokenURL = attrs.get("tokenURL");
+          }
+        }
+
+        if(Util.isNotNullOrEmpty(userEmail) && Util.isNotNullOrEmpty(tokenURL)){
+          try{
+            domain = userEmail.substring(userEmail.lastIndexOf('@') + 1);
+            // Code to get the access token
+            String clientID = application.getAttributeValue("clientID").toString();
+            String clientSecret = context.decrypt(application.getAttributeValue("clientSecret").toString());
+            String refreshToken = context.decrypt(application.getAttributeValue("refreshToken").toString());
+            String gType="refresh_token";
+            URL accessTokenURL = new URL(tokenURL);
+            HttpURLConnection tokenConn = (HttpURLConnection) accessTokenURL.openConnection();
+            tokenConn.setDoOutput(true);
+            tokenConn.setRequestMethod("POST");
+            tokenConn.setRequestProperty("Content-Type", "application/json");
+
+            String inputToken = "{\r\n \"refresh_token\":\""+ refreshToken +"\",  \r\n \"client_id\":\""+ clientID +"\",\r\n \"client_secret\":\""+ clientSecret +"\",\r\n \"grant_type\":\""+ gType + "\",\r\n \"hd\":\""+ domain +"\"}";
+
+            loggerVar.info("GSuiteMobileWipe Access Request: " + inputToken);
+            OutputStream os = tokenConn.getOutputStream();
+            os.write(inputToken.getBytes());
+            os.flush();
+            loggerVar.debug("GSuiteMobileWipe Access Response: " + tokenConn.getResponseCode());
+
+            if(tokenConn.getResponseCode() == 200) {
+              BufferedReader br = new BufferedReader(new InputStreamReader(tokenConn.getInputStream()));
+              String out = "";
+              String line = "";
+              while ((line = br.readLine()) != null) {
+                out=out+line;
+              }
+			  br.close();
+              JSONParser parser = new JSONParser();
+              JSONObject jobj = (JSONObject) parser.parse(out);
+              loggerVar.debug("JSON Object check : "+ jobj);
+              try{
+                JSONObject jobj = (JSONObject) parser.parse(out);
+                token = jobj.get("access_token");
+
+                URL url = new URL(listUsersMobileDevicesURL.replace("customerId", "C03b4884n").replace("email", userEmail));
+
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Authorization", "Bearer "+ token); 
+
+                if (conn.getResponseCode() == 403) {
+
+                  throw new GeneralException("GSuite - 403 - Forbidden");
+
+                }
+
+                if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED && conn.getResponseCode() != 409) {
+                  loggerVar.error("Failed : HTTP error code : " + conn.getResponseCode());
+                  loggerVar.error("Failed : HTTP error message : " + conn.getResponseMessage());
+                }
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String output = "";
+                String lineOutput = "";
+                while ((lineOutput = br.readLine()) != null) {
+                  output = output + lineOutput;
+                }
+				br.close();
+                loggerVar.debug("output: " + output);
+                List resourceIds = new ArrayList();
+                if (Util.isNotNullOrEmpty(output)) {
+                  JSONParser jParser = new JSONParser();
+                  JSONObject jObj = (JSONObject) jParser.parse(output);
+                  loggerVar.debug("JSON Object check : " + jObj);
+                  JSONArray jArr = (JSONArray) jObj.get("mobiledevices");
+                  //Iterating mobiledevices 
+                  Iterator itr2 = jArr.iterator(); 
+                  while (itr2.hasNext()) { 
+                    JSONObject objMD = (JSONObject) itr2.next();
+                    String resourceId = objMD.get("resourceId");
+                    loggerVar.debug("resourceId : " + resourceId);
+                    resourceIds.add(resourceId);
+                  }
+                }
+                loggerVar.debug("resourceIds size : " + resourceIds.size());
+                for (String resId : resourceIds) {
+                  loggerVar.debug("Wiping out every resourceId associated with identity:[" + identity.getName() + "] resourceId:[" + resId + "]");
+
+                  try{
+                    String deleteGSuiteAPI = "https://www.googleapis.com/admin/directory/v1/customer/customerId/devices/mobile/resourceId/action";
+                    URL delURL = new URL(deleteGSuiteAPI.replace("customerId", "C03b4884n").replace("resourceId", resId));
+                    HttpURLConnection delConn = (HttpURLConnection) delURL.openConnection();
+                    delConn.setDoOutput(true);
+                    delConn.setRequestMethod("POST");
+                    delConn.setRequestProperty("Content-Type", "application/json");
+                    delConn.setRequestProperty("Authorization", "Bearer " + token);
+
+                    String input1 = "{\"action\": \"admin_remote_wipe\"}";
+
+                    loggerVar.debug("Input1: " + input1);
+                    OutputStream os = delConn.getOutputStream();
+                    os.write(input1.getBytes());
+                    os.flush();
+                    if (delConn.getResponseCode() == 200) {
+                      loggerVar.debug("delConn HTTP repsonse code : " + delConn.getResponseCode());
+                      loggerVar.debug("delConn HTTP response message : " + delConn.getResponseMessage());
+                    }
+
+                    delConn.disconnect();
+
+                  } catch(Exception e){ 
+                    loggerVar.error("Refresh Token Error:::" + e.getMessage());
+                    isSuccess = false;
+                    throw new GeneralException(e);
+                  }
+                }
+                conn.disconnect();
+
+              } catch(Exception e){ 
+                loggerVar.error("Refresh Token Error:::" + e.getMessage());
+                isSuccess = false;
+                throw new GeneralException(e);
+              }
+            } else{
+              loggerVar.error("Failed : HTTP error code : " + tokenConn.getResponseCode());
+              loggerVar.error("Failed : HTTP error message : " + tokenConn.getResponseMessage());
+              isSuccess = false;
+            }
+          } catch(Exception e){       
+            loggerVar.error("Error"); 
+            isSuccess = false;
+            throw new GeneralException(e);
+          }
+        }
+      }
+    }
+    loggerVar.info("Exiting gsuiteMobileWipe()...");
+    return isSuccess;
+  }
+
+  //This method returns the first link for that application
+  public static Link getApplicationLink(SailPointContext context, Identity identity, String appName){
+    Application appObj;
+    Link link = null;
+    try{
+      appObj = context.getObjectByName(Application.class, appName);
+      if(appObj == null){
+        return null;
+      }
+
+      IdentityService idService = new IdentityService(context);
+      List <Link> links = idService.getLinks(identity, appObj);
+
+      if (links != null && !links.isEmpty()){
+        link = links.get(0);
+      }   
+      context.decache(appObj);
+    } catch (GeneralException e){
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    return link;
+  }   
+
+  public String getManagerGsuiteEmail(SailPointContext context, Identity identity){
+    String returnVal = null;
+    String appName = "GSuite";
+    Identity managerIdentity = identity.getManager();
+
+    if(managerIdentity !=null && !managerIdentity.isInactive()){
+      Link gSuiteLink = getApplicationLink(context, managerIdentity, appName);
+      if(gSuiteLink != null)  returnVal= gSuiteLink.getAttribute("primaryEmail");
+
+    }
+    return returnVal;
+  }
+
+
+  public List removeAllEntitlements( Identity identity, String appName, Link appLink){
+
+    List removeEnts = new ArrayList();
+
+    if(appLink != null){
+      try {
+        Application appObj = context.getObjectByName(Application.class, appName);
+        List entAttrs = appObj.getEntitlementAttributeNames();
+        if(entAttrs != null && !entAttrs.isEmpty()){
+          for(String entAttr:entAttrs) {
+            List ents = (List) appLink.getAttribute(entAttr);
+            if(ents != null && !ents.isEmpty()){
+              for(String ent:ents ) {
+                AttributeRequest attrReq= new AttributeRequest();
+                attrReq.setName(entAttr);
+                attrReq.setValue(ent);
+                attrReq.setOp(ProvisioningPlan.Operation.Remove);
+                removeEnts.add(attrReq);
+              }
+            }
+          }
+        }
+      } catch (GeneralException e){
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+    return removeEnts;
+  }
+
+
+  public AccountRequest getDisableAccountRequest(String appName, String nativeId){
+    AccountRequest acctReq = new AccountRequest(AccountRequest.Operation.Disable, appName, null, nativeId);
+    return acctReq;
+  }
+
+  public AccountRequest getModifyAccountRequest(String appName, String nativeId){
+    AccountRequest acctReq = new AccountRequest(AccountRequest.Operation.Modify, appName, null, nativeId);
+    return acctReq;
+  }
+
+  public AccountRequest getDeleteAccountRequest(String appName, String nativeId){
+    AccountRequest acctReq = new AccountRequest(AccountRequest.Operation.Delete, appName, null, nativeId);
+    return acctReq;
+  }
+
+  public AttributeRequest addDelgateAdmin(String adminEmail){
+    AttributeRequest attrReq= new AttributeRequest();
+    attrReq.setName("delegatedAdmins");
+    attrReq.setValue(adminEmail);
+    attrReq.setOp(ProvisioningPlan.Operation.Add);
+    return attrReq;
+  }
+
+
+  public AttributeRequest doTransferData(String newOwner){
+    AttributeRequest attrReq= new AttributeRequest();
+    attrReq.setName("newOwner");
+    attrReq.setValue(newOwner);
+    attrReq.setOp(ProvisioningPlan.Operation.Set);
+    return attrReq;
+  }
+
+  public AttributeRequest changePasswordAtNextLogin(boolean flag){
+    AttributeRequest attrReq = new AttributeRequest();
+    attrReq.setName("changePasswordAtNextLogin");
+    attrReq.setValue(flag);
+    attrReq.setOp(ProvisioningPlan.Operation.Set);
+    return attrReq;
+  }
+
+  public AttributeRequest includeInGlobalAddressList(String flag){
+    AttributeRequest attrReq = new AttributeRequest();
+    attrReq.setName("includeInGlobalAddressList");
+    attrReq.setValue(flag);
+    attrReq.setOp(ProvisioningPlan.Operation.Set);
+    return attrReq;
+  }
+
+  public AttributeRequest changePassword(String password){
+    AttributeRequest attrReq = new AttributeRequest();
+    attrReq.setName("password");
+    attrReq.setValue(password);
+    attrReq.setOp(ProvisioningPlan.Operation.Set);
+    return attrReq;
+  }
+
+  public String generatePassword(SailPointContext context){
+    PasswordGenerator generator = new PasswordGenerator(context);
+    PasswordPolicy policy = context.getObject(PasswordPolicy.class, "GSuite Strong PasswordPolicy");
+    String newPassword = generator.generatePassword(policy);
+    return newPassword;
+  }
+
+  public ProvisioningPlan buildGSuiteLeaverPlan(SailPointContext context, String identityName, ProvisioningPlan plan){
+    if(plan == null) plan = new ProvisioningPlan();
+    Identity identity = context.getObjectByName(Identity.class,identityName);
+
+    boolean isLeagalHold = isLegalHold(identity);
+
+    //Name of the GSuite application hardcoded here
+    String appName ="GSuite";
+
+    Application appObj = context.getObjectByName(Application.class, appName);
+
+    IdentityService idService = new IdentityService(context);
+    List links = idService.getLinks(identity, appObj);
+
+    if(links != null && !links.isEmpty()){
+      for(Link appLink:links){
+        AccountRequest accReq = getModifyAccountRequest(appName, appLink.getNativeIdentity());
+        if(!isLeagalHold){
+          //Add manager as delegated admin
+          String managerEmail = getManagerGsuiteEmail(context, identity);
+          if(managerEmail != null){
+            transferData(context,identity);
+            delegateCalendar(context,identity);
+
+            //Delegation works only for mailbox. This is limitation from the GSuite API https://developers.google.com/gmail/api/v1/reference/users/settings/delegates
+            //accReq.add(addDelgateAdmin(managerEmail));
+          }
+        }
+
+        //Set changePasswordAtNextLogin to true
+        changePasswordAtNextLogin(context,appObj,appLink.getNativeIdentity(),true);
+
+        //Change users password to invalidate current sessions
+        accReq.add(changePassword(generatePassword(context)));
+        
+        //Remove the users account from the Global Address List
+        accReq.add(includeInGlobalAddressList("false"));        
+
+        //remove all entitlements -- Not used at this time
+        //List removeAttrs = removeAllEntitlements(identity, appName, appLink);
+        //if(removeAttrs != null && !removeAttrs.isEmpty())     accReq.addAll(removeAttrs);
+
+        plan.add(accReq);
+      }
+    }
+    return plan;
+  }
+
+  ]]></Source>
+</Rule>

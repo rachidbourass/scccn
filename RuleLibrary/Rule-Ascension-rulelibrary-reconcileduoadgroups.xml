@@ -1,0 +1,249 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-RuleLibrary-ReconcileDuoADGroups">
+  <Description>RuleLibrary for Ascension-Workflow-ReconcileDuoADGroups</Description>
+  <Signature returnType="Object"/>
+  <Source><![CDATA[
+
+  import sailpoint.api.Provisioner;
+  import sailpoint.object.Application;
+  import sailpoint.object.Attributes;
+  import sailpoint.object.Custom;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Identity;
+  import sailpoint.object.IdentityEntitlement;
+  import sailpoint.object.Link;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.Util;
+  
+  private void doProvisioning(ProvisioningPlan plan) {
+
+    Provisioner provisioner = new Provisioner(context);
+
+    if (provisioner != null) {
+
+        provisioner.execute(plan);
+
+    }
+
+  }
+
+  private List getADApps() {
+
+    List adApps = new ArrayList();
+
+    QueryOptions ops = new QueryOptions();
+    ops.addFilter(Filter.eq("type", "Active Directory - Direct"));
+
+    adApps = context.getObjects(Application.class, ops);
+
+    return adApps;
+
+  }
+
+  private boolean hasADEntitlement(Link link, String value) {
+
+    boolean hasADEntitlement = false;
+
+    Filter filter1 = Filter.ignoreCase(Filter.eq("application.name", link.getApplication().getName()));
+    Filter filter2 = Filter.ignoreCase(Filter.eq("nativeIdentity", link.getNativeIdentity()));
+    Filter filter3 = Filter.ignoreCase(Filter.eq("value", value));
+
+    Filter andFilter = Filter.and(filter1, filter2, filter3);
+
+    if (context.getUniqueObject(IdentityEntitlement.class, andFilter) != null) {
+
+      hasADEntitlement = true;
+
+    }
+
+    return hasADEntitlement;
+
+  }
+
+  private boolean isOrphanLink(Link link) {
+
+    boolean isOrphanLink = false;
+
+    if (link.getApplication() == null || link.getIdentity() == null || link.getNativeIdentity() == null) {
+
+      isOrphanLink = true;
+
+    }
+
+    return isOrphanLink;
+
+  }
+
+  private String dnToDomain(String dnStr) {
+
+    return dnStr.replaceAll("^.*?(?=DC)", "");
+
+  }
+
+  private int countActiveADLinks() {
+
+    QueryOptions ops = new QueryOptions();
+
+    ops.addFilter(Filter.eq("application.type", "Active Directory - Direct"));
+    ops.addFilter(Filter.eq("iiqDisabled", false));
+
+    return context.countObjects(Link.class, ops);
+
+  }
+
+  private int countActiveLinksByApp(Application app) {
+
+    QueryOptions ops = new QueryOptions();
+
+    ops.addFilter(Filter.eq("application.name", app.getName()));
+    ops.addFilter(Filter.eq("application.type", app.getType()));
+    ops.addFilter(Filter.eq("iiqDisabled", false));
+
+    return context.countObjects(Link.class, ops);
+
+  }
+
+  private Iterator getActiveADLinkIds() {
+
+    QueryOptions ops = new QueryOptions();
+
+    ops.addFilter(Filter.eq("application.type", "Active Directory - Direct"));
+    ops.addFilter(Filter.eq("iiqDisabled", false));
+
+    return context.search(Link.class, ops, "id");
+
+  }
+
+  private Iterator getActiveLinkIdsByApp(Application app) {
+
+    QueryOptions ops = new QueryOptions();
+
+    ops.addFilter(Filter.eq("application.name", app.getName()));
+    ops.addFilter(Filter.eq("application.type", app.getType()));
+    ops.addFilter(Filter.eq("iiqDisabled", false));
+
+    return context.search(Link.class, ops, "id");
+
+  }
+
+  private ProvisioningPlan buildDuoGroupProvisioningPlan(Identity identity, Application app, String nativeIdentity, List duoGroups) {
+
+    ProvisioningPlan plan = new ProvisioningPlan();
+
+    plan.setIdentity(identity);
+
+    AccountRequest accountReq = new AccountRequest();
+    accountReq.setOperation(AccountRequest.Operation.Modify);
+    accountReq.setNativeIdentity(nativeIdentity);
+    accountReq.setApplication(app.getName());
+
+    for (String duoGroup : duoGroups) {
+
+      accountReq.add(new AttributeRequest("memberOf", ProvisioningPlan.Operation.Add, duoGroup));
+
+    }
+
+    plan.add(accountReq);
+
+    return plan;
+
+  }
+
+  private List getDuoGroups(Custom custom, String domain) {
+
+    List duoGroups = new ArrayList();
+
+    HashMap map = custom.get("duoGroups");
+
+    if (map != null) {
+
+      duoGroups = map.get(domain.toLowerCase());
+
+    }
+
+    return duoGroups;
+
+  }
+
+  private void iterateActiveLinks(Iterator activeLinkIds) {
+
+    while (activeLinkIds.hasNext()) {
+
+      String currentLinkId = null;
+      currentLinkId = activeLinkIds.next()[0];
+
+      if (Util.isNotNullOrEmpty(currentLinkId)) {
+
+        Link link = context.getObjectById(Link.class, currentLinkId);
+
+        if (link != null) {
+
+          if (isOrphanLink(link)) {
+
+            orphanLinks++;
+            continue; //No need to evaluate orphan account links; proceed to next iteration.
+
+            /*
+               This serves two practical purposes:
+               1 Obtaining a tally of orphan links encountered.
+               2 Facilitating NullSafe execution of the buildDuoGroupProvisioningPlan(...) method below.
+            */
+
+          }
+
+          List duoGroups = getDuoGroups(custom, dnToDomain(link.getNativeIdentity()));
+          List missingDuoGroups = new ArrayList();
+
+          if (duoGroups != null && !duoGroups.isEmpty()) {
+
+            for (String duoGroup : duoGroups) {
+
+              if (!hasADEntitlement(link, duoGroup)) { //Determine if current link already has the current DUO group
+
+                missingDuoGroups.add(duoGroup); //If they do not, add it to missingDuoGroups List
+
+              }
+
+            }
+
+            if (!missingDuoGroups.isEmpty()) { //Proceed if there are any missing Duo groups on the current link
+
+              ProvisioningPlan plan = buildDuoGroupProvisioningPlan(link.getIdentity(), link.getApplication(), link.getNativeIdentity(), missingDuoGroups);
+              provisioningPlans.add(plan);
+
+              noncompliantLinks++;
+
+            } else { //Else tally the compliant account link
+
+              compliantLinks++;
+
+            }
+
+            if ((noncompliantLinks % 20) == 0 || (compliantLinks % 20) == 0 || (outOfScopeLinks % 20) == 0) {
+
+              context.decache(); //Decache periodically, otherwise memory consumption will balloon due to volume of iterations.
+
+            }
+
+          } else { //Else tally the out of scope account link
+
+            outOfScopeLinks++;
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+
+
+  ]]></Source>
+</Rule>

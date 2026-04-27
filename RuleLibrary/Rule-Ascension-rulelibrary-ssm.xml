@@ -1,0 +1,427 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-RuleLibrary-SSM">
+  <Signature returnType="String">
+    <Inputs>
+      <Argument name="context">
+        <Description>SailPoint context</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Source><![CDATA[
+     
+
+  import java.text.DateFormat;
+  import java.text.SimpleDateFormat;
+
+  import java.util.ArrayList;
+  import java.util.Calendar;
+  import java.util.Date;
+
+  import sailpoint.tools.Util ;
+
+  import sailpoint.object.Custom ; 
+  import sailpoint.object.Identity ; 
+  import sailpoint.object.Application ;
+  import sailpoint.object.Workflow ;   
+  import sailpoint.object.Link ;
+  import sailpoint.object.Request ;  
+  import sailpoint.object.RequestDefinition ;   
+  import sailpoint.object.Attributes ; 
+  import sailpoint.object.ProvisioningPlan ;  
+  import sailpoint.object.ProvisioningPlan.AccountRequest; 
+  import sailpoint.object.ProvisioningPlan.AttributeRequest; 
+
+  import sailpoint.api.IdentityService ; 
+  import sailpoint.api.RequestManager ;
+
+  import sailpoint.workflow.StandardWorkflowHandler ; 
+
+  import sailpoint.request.WorkflowRequestExecutor ;   
+
+  import com.google.cloud.pubsub.v1.TopicAdminClient;
+  import com.google.pubsub.v1.ProjectName;
+  import com.google.pubsub.v1.Topic;
+
+  import com.google.api.core.ApiFuture;
+  import com.google.cloud.pubsub.v1.Publisher;
+  import com.google.common.collect.ImmutableMap;
+  import com.google.protobuf.ByteString;
+  import com.google.pubsub.v1.PubsubMessage;
+  import com.google.pubsub.v1.TopicName;
+
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+  Log loggerObj = LogFactory.getLog("ascension.sailpoint.rule.ssm");	
+
+  String 	EVENT_TS_FORMAT 						= "yyyy-MM-dd HH:mm:ss" ;
+  String	SSM_PUB_SUB_PROJECT_ID 					= "asc-collab-sailpoint-prod" ;
+  String	SSM_PUB_SUB_EVENTS_PUBLISH_TOPIC_ID 	= "sailpoint.user.prd" ;
+  String	APP_NAME_AD_DS 							= "AD-DS" ;  
+  String 	AD_ATTR_NAME_PRINCIPALNAME 				= "msDS-PrincipalName" ; 
+  String 	AD_ATTR_NAME_DISTINGUISHED_NAME			= "distinguishedName" ;
+  String 	AD_ATTR_NAME_MEMBER_OF					= "memberOf" ;  
+  String 	AD_ATTR_NAME_MSExchExtensionAttribute32	= "msExchExtensionAttribute32" ;
+
+  String 	WF_NAME_LCM_PROVISIONING				= "Ascension-Workflow-LCMProvisioning" ;   
+
+  String	AD_DOMAIN_NAME_TNNAS 					= "TNNAS" ;  
+
+  public String getCurrentTS() {
+
+    String currentTS = "" ;
+
+    try {
+
+      Calendar calendar = Calendar.getInstance() ; 
+      calendar.setTime(new Date());
+
+      DateFormat dateFormat = new SimpleDateFormat(EVENT_TS_FORMAT) ; 
+
+      currentTS = dateFormat.format(calendar.getTime()) ; 
+
+    } catch (Exception exception) {				
+
+      loggerObj.error("Ascension-RuleLibrary-SSM - getCurrentTS() - Exception occured while getting current Timestamp.") ;
+    }
+
+    return currentTS ; 
+  }
+
+  public List getListFromCustomObject(String customObjectName){
+
+    loggerObj.debug("Ascension-RuleLibrary-SSM - getListFromCustomObject() - Start..") ; 
+
+    loggerObj.info("Ascension-RuleLibrary-SSM - getListFromCustomObject() - Getting values from - " + customObjectName) ;
+
+    loggerObj.info("Ascension-RuleLibrary-SSM - getListFromCustomObject() - context - " + context) ;
+
+    List customObjectValues = new ArrayList() ;
+
+    try {
+
+      Custom customObject = context.getObjectByName(Custom.class,customObjectName) ; 
+
+      loggerObj.info("Ascension-RuleLibrary-SSM - Custom Object - " + customObject) ;
+
+      Map practicesMap = (Map)customObject.getList("practices").get(0) ;
+
+      Iterator keySetItr = practicesMap.keySet().iterator() ; 
+
+      while(keySetItr.hasNext()) {
+
+        String practiceID = (String)keySetItr.next() ;
+
+        customObjectValues.add(practiceID + " - " + practicesMap.get(practiceID)) ;
+      }			
+
+    } catch (Exception exception) {
+
+      loggerObj.error("Ascension-RuleLibrary-SSM - getListFromCustomObject() - Exception occured while getting custom object values") ;
+    }
+
+    loggerObj.debug("Ascension-RuleLibrary-SSM - getListFromCustomObject() - End.") ;
+
+    return customObjectValues ; 
+
+  } 
+
+  public String getADGroupDN(String ssmEntitlementName){
+  	
+  	String adGroupDN = "" ;
+  	
+  	if(ssmEntitlementName.equalsIgnoreCase("DS-CT-OFFICESCHEDULER")){
+  		
+  		adGroupDN = "CN=DS-CT-OFFICESCHEDULER,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com" ;
+  	
+  	} else if(ssmEntitlementName.equalsIgnoreCase("DS-CT-OFFICEMANAGER")){
+  		
+  		adGroupDN = "CN=DS-CT-OFFICEMANAGER,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com" ;
+  		
+  	} else if(ssmEntitlementName.equalsIgnoreCase("DS-CT-OFFICEVIEWER")){
+  		
+  		adGroupDN = "CN=DS-CT-OFFICEVIEWER,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com" ;
+  		
+  	} else if(ssmEntitlementName.equalsIgnoreCase("DS-CT-SURGEON")){
+  		
+  		adGroupDN = "CN=DS-CT-SURGEON,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com" ;
+  		
+  	} else if(ssmEntitlementName.equalsIgnoreCase("DS-CT-ORSCHEDULER")){
+  		
+  		adGroupDN = "CN=DS-CT-ORSCHEDULER,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com" ;
+  		
+  	} else if(ssmEntitlementName.equalsIgnoreCase("DS-CT-HOSPITALVIEWER")){
+  		
+  		adGroupDN = "CN=DS-CT-HOSPITALVIEWER,OU=Groups,OU=Managed,DC=DS,DC=SJHS,DC=com" ;
+  	}
+  	
+  	return adGroupDN ; 
+  } 
+  
+  
+  public String publishUserInfoNotificationMessage(Map userInfoMap, String adGroupOperation){
+
+    loggerObj.debug("Ascension-RuleLibrary-SSM - publishUserInfoNotificationMessage() - Start...") ; 
+
+    String messageID = "" ;
+
+    try {	
+
+      loggerObj.info("Ascension-RuleLibrary-SSM - publishUserInfoNotificationMessage() - Input userInfoMap - " + userInfoMap) ;
+
+      String userEmail = "" ;
+      
+      if(userInfoMap.containsKey("Email")){
+      	
+      	userEmail = (String)userInfoMap.get("Email") ;
+      } 
+      
+      String userADDomain = "TNNAS" ;
+      if(userInfoMap.containsKey("Domain")){
+      	userADDomain = (String)userInfoMap.get("Domain") ; 
+      }
+      
+      String username = "" ;
+      
+      if(userInfoMap.containsKey("username")){
+      	
+      	username = (String)userInfoMap.get("username") ;
+      }
+      				
+      String adGroups = (String)userInfoMap.get("adGroups");
+      String currentTS = getCurrentTS() ; 
+
+      // TODO: Define JSON Sample and create JSON object runtime.
+
+      String userInfo = 	"{" +
+        "\"email\": \"<email>\","+
+        "\"windowsAccountName\": \"<domain>\\<username>\","+
+        "\"domain\": \"<domain>\","+
+        "\"username\": \"<username>\","+
+        "\"adGroups\": [\"<ad_group>\"],"+
+        "\"eventTime\": \"<timestamp>\""+
+        "}" ;
+
+      userInfo = userInfo
+        .replaceAll("<email>", userEmail)
+        .replaceAll("<domain>", userADDomain)
+        .replaceAll("<username>", username)
+        .replaceAll("<ad_group>", adGroups)
+        .replaceAll("<timestamp>", currentTS) ; 
+
+      loggerObj.info("Ascension-RuleLibrary-SSM - publishUserInfoNotificationMessage() - User Information - JSON Format - " + userInfo) ;
+
+      TopicName topicName = TopicName.of(SSM_PUB_SUB_PROJECT_ID, SSM_PUB_SUB_EVENTS_PUBLISH_TOPIC_ID);
+      Publisher publisher = Publisher.newBuilder(topicName).build();
+      ByteString data = ByteString.copyFromUtf8(userInfo);
+
+
+      PubsubMessage pubsubMessage = null ; 
+      
+      if(adGroupOperation.equalsIgnoreCase("Add")){
+       		pubsubMessage =
+			        PubsubMessage.newBuilder()
+			        .setData(data)
+			        .putAllAttributes(ImmutableMap.of(adGroups, "true"))
+			        .build();     
+      } else if(adGroupOperation.equalsIgnoreCase("Remove")) {
+       		pubsubMessage =
+			        PubsubMessage.newBuilder()
+			        .setData(data)
+			        .putAllAttributes(ImmutableMap.of(adGroups, "false"))
+			        .build();      
+      }
+
+
+      // Once published, returns a server-assigned message id (unique within the topic)
+      ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
+
+      messageID = messageIdFuture.get();
+
+      loggerObj.info("Ascension-RuleLibrary-SSM - publishUserInfoNotificationMessage() - Successfully published the event.") ;	   
+
+    } catch (Exception exception) {
+
+      loggerObj.error("Ascension-RuleLibrary-SSM - publishUserInfoNotificationMessage() - Exception occured while publishing message - "+exception.getMessage()) ;
+    }	
+
+    loggerObj.info("Ascension-RuleLibrary-SSM - publishUserInfoNotificationMessage() - Message ID of the event published - "+messageID) ;
+
+    loggerObj.debug("Ascension-RuleLibrary-SSM - publishUserInfoNotificationMessage() - End.") ; 
+
+    return messageID ;   	
+  }
+
+
+  public ProvisioningPlan prepareADPlan(ProvisioningPlan plan, String adGroup, String adGroupOperation, String adAttr, String adAttrOperation){
+
+    ProvisioningPlan adPlan = null ;
+
+    loggerObj.debug("Ascension-RuleLibrary-SSM - prepareADPlan() - Start...") ;
+
+    try{ 
+
+      if(plan!=null){
+
+        String nativeIdentity = plan.getNativeIdentity() ;	
+
+        loggerObj.info("Ascension-RuleLibrary-SSM - prepareADPlan() - Native Identity - "+ nativeIdentity) ;
+
+        if(Util.isNotNullOrEmpty(nativeIdentity)){
+
+          Identity targetIdentity = context.getObjectByName(Identity.class, nativeIdentity) ;
+
+          if(targetIdentity!=null){
+
+            Application adDSApplication = context.getObjectByName(Application.class, APP_NAME_AD_DS) ;
+
+            IdentityService idService = new IdentityService(context) ;
+            List applicationLinks = idService.getLinks(targetIdentity, adDSApplication) ; 
+
+            String userADDN = "" ;
+
+            if(applicationLinks!=null && !applicationLinks.isEmpty()){
+
+              for(Link applicationLink: applicationLinks){
+
+                String msDSPrincipalName = applicationLink.getAttribute(AD_ATTR_NAME_PRINCIPALNAME) ;
+
+                if(msDSPrincipalName.contains(AD_DOMAIN_NAME_TNNAS)){
+
+                  userADDN = applicationLink.getAttribute(AD_ATTR_NAME_DISTINGUISHED_NAME) ;	
+
+                  break ;
+                }
+              }	
+            }
+
+            loggerObj.info("Ascension-RuleLibrary-SSM - prepareADPlan() - User AD DN - "+ userADDN) ;
+
+            if(Util.isNotNullOrEmpty(userADDN)){
+
+              adPlan = new ProvisioningPlan() ;
+
+              adPlan.setIdentity(targetIdentity) ;
+
+              AccountRequest adAccountRequest = new AccountRequest() ;
+
+              adAccountRequest.setApplication(APP_NAME_AD_DS) ; 
+              adAccountRequest.setNativeIdentity(userADDN) ;
+              adAccountRequest.setOp(ProvisioningPlan.ObjectOperation.Modify) ;	
+
+              AttributeRequest adAddGroupAttrRequest = new AttributeRequest() ; 
+              adAddGroupAttrRequest.setName(AD_ATTR_NAME_MEMBER_OF) ;
+
+              if(adGroupOperation.equals("Add")){
+                adAddGroupAttrRequest.setOp(ProvisioningPlan.Operation.Add) ;													
+              } else {
+                adAddGroupAttrRequest.setOp(ProvisioningPlan.Operation.Remove) ;
+              }
+
+              adAddGroupAttrRequest.setValue(adGroup) ;
+
+              AttributeRequest adAttrUpdateAttrRequest = new AttributeRequest() ; 
+              adAttrUpdateAttrRequest.setName(AD_ATTR_NAME_MSExchExtensionAttribute32) ;
+              adAttrUpdateAttrRequest.setOp(ProvisioningPlan.Operation.Set) ;
+              adAttrUpdateAttrRequest.setValue(adAttr) ;	
+
+              List attributeRequests = new ArrayList() ;
+              attributeRequests.add(adAddGroupAttrRequest) ;
+              attributeRequests.add(adAttrUpdateAttrRequest) ;
+
+              adAccountRequest.setAttributeRequests(attributeRequests) ;
+
+              List accountRequests = new ArrayList() ;
+              accountRequests.add(adAccountRequest) ;	
+
+              adPlan.setAccountRequests(accountRequests) ; 			
+
+            } else {
+              loggerObj.error("Ascension-RuleLibrary-SSM - prepareADPlan() - No AD Account Found matching to the criteria.") ;
+            }					 
+          } else {
+
+            loggerObj.error("Ascension-RuleLibrary-SSM - prepareADPlan() - Target Identity is Null") ;
+          }			
+        } else {
+
+          loggerObj.error("Ascension-RuleLibrary-SSM - prepareADPlan() - Native Identity is Null or Empty") ;
+        }
+      } else {
+
+        adPlan = plan ;
+      }
+    } catch (Exception exception) {
+
+      loggerObj.error("Ascension-RuleLibrary-SSM - prepareADPlan() - Exception occured while preparing AD Plan - Error - " + exception.getMessage()) ;
+    }	
+
+    loggerObj.info("Ascension-RuleLibrary-SSM - prepareADPlan() - Successfully prepared AD Plan") ;
+
+    loggerObj.debug("Ascension-RuleLibrary-SSM - prepareADPlan() - End.") ; 	
+
+    return adPlan ; 
+
+  }
+
+    
+  public String initiateLCMProvisioningBP(String targetIdentityName, ProvisioningPlan plan, String messageID){
+
+    String result = "ERROR" ;
+
+    loggerObj.debug("Ascension-RuleLibrary-SSM - initiateLCMProvisioningBP() - Start...") ;
+
+    try{ 
+
+      Identity targetIdentity = context.getObjectByName(Identity.class, targetIdentityName) ;
+      
+      //String wfCaseName = "Ascension-SSM-AD-Provisioning-FOR-"+targetIdentity.getName()+"["+targetIdentity.getDisplayName()+"]" ;
+      
+      String wfCaseName = "Ascension-SSM-AD-Provisioning-FOR-"+targetIdentity.getName()+"["+messageID+"]" ;
+
+      Workflow wf = context.getObjectByName(Workflow.class, WF_NAME_LCM_PROVISIONING) ;
+
+      Attributes wfArguments = new Attributes() ;
+      wfArguments.put("identityName",targetIdentity.getName()) ; 
+      wfArguments.put("identityDisplayName",targetIdentity.getDisplayName()) ;
+      wfArguments.put("workflow",wf.getName()) ;
+      wfArguments.put("plan",plan) ;
+      wfArguments.put("flow","AccessRequest") ;
+
+      Attributes accessRequestArgs = new Attributes() ;
+      accessRequestArgs.put(StandardWorkflowHandler.ARG_REQUEST_DEFINITION, WorkflowRequestExecutor.DEFINITION_NAME) ;
+      accessRequestArgs.put(StandardWorkflowHandler.ARG_WORKFLOW, wf.getName()) ;
+      accessRequestArgs.put(StandardWorkflowHandler.ARG_REQUEST_NAME, wfCaseName) ;
+      accessRequestArgs.put("requestName", wfCaseName) ;
+
+      accessRequestArgs.putAll(wfArguments) ;
+
+      RequestDefinition requestDef = context.getObject(RequestDefinition.class, "Workflow Request") ;
+
+      Request request = new Request(requestDef) ; 
+      request.setEventDate(new Date(System.currentTimeMillis()+5000)) ;  
+      request.setOwner(targetIdentity) ; 
+      request.setName(wfCaseName) ; 
+      request.setAttributes(accessRequestArgs) ;
+
+      RequestManager.addRequest(context, request) ; 
+
+      result = "SUCCESS" ; 
+
+    } catch (Exception exception) {
+
+      loggerObj.error("Ascension-RuleLibrary-SSM - initiateLCMProvisioningBP() - Exception occured while intiating LCM Provisioning BP - Error - " + exception.getMessage()) ;
+    }	
+
+    loggerObj.info("Ascension-RuleLibrary-SSM - initiateLCMProvisioningBP() - Successfully initiated LCM Provisioning BP") ;
+
+    loggerObj.debug("Ascension-RuleLibrary-SSM - initiateLCMProvisioningBP() - End.") ; 	
+
+    return result ; 
+
+  } 
+
+     
+  ]]></Source>
+</Rule>

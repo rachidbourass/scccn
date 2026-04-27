@@ -1,0 +1,988 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Rule-Ascension-EmailAddress-RuleLibrary">
+  <ReferencedRules>
+    <Reference class="sailpoint.object.Rule" name="Rule-GSuite-AccessToken"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-GSuite"/>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+  </ReferencedRules>
+  <Source><![CDATA[
+  import sailpoint.object.Application;
+  import sailpoint.object.Attributes;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Link;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.ProvisioningPlan;
+  import sailpoint.object.ProvisioningPlan.AccountRequest;
+  import sailpoint.object.ProvisioningPlan.AttributeRequest;
+  import sailpoint.api.IdentityService;
+  import sailpoint.tools.Util;
+  import org.apache.commons.io.IOUtils;
+  import org.json.JSONArray;
+  import org.json.JSONException;
+  import org.json.JSONObject;
+  import org.ascn.utils.GeneralUtils;
+  
+String logName = "org.ascn.rule.Rule-ASCN-RuleLibrary-EmailAddress";
+  
+  String nextPageToken;
+  List<Link> idnLinks;
+  /*  boolean hasADLink(Identity refIdentity) {
+    idnLinks = getIdADLinks(refIdentity);
+		boolean hasLink = true;
+    if(idnLinks.isEmpty()){
+      hasLink = false;
+    }
+		return hasLink;
+  }
+*/
+  /* boolean hasAIDLink(Identity refIdentity) {
+    idnLinks = getIdentityAppLinks(identity, "AD-AID");
+	boolean hasLink = true;
+    if(idnLinks.isEmpty()){
+      hasLink = false;
+    }
+	return hasLink;
+  }
+
+*/
+  Map pMap;
+
+  String determineNTAccountName(Identity refIdentity, String samAccountName) {
+    pMap = getLinkAttributes(refIdentity,samAccountName);
+    return pMap.get("displayName");
+  }
+
+  String determineTargetADApp(Identity refIdentity, String samAccountName) {
+    pMap = getLinkAttributes(refIdentity,samAccountName);
+    return pMap.get("applicationName");
+  }
+
+  String determineTargetDN(Identity refIdentity, String samAccountName) {
+    pMap = getLinkAttributes(refIdentity,samAccountName);
+    return pMap.get("accountDN");
+  }
+  boolean checkTargetConflict(Identity refIdentity, String samAccountName) {
+    pMap = getLinkAttributes(refIdentity,samAccountName);
+    return pMap.get("targetConflict");
+  }
+  boolean checkTargetConflict(){
+    return pMap.get("targetConflict");
+  }
+
+  String determineNTAccountName() {
+    return pMap.get("displayName");
+  }
+
+  String determineTargetADApp() {
+    return pMap.get("applicationName");
+  }
+
+  String determineTargetDN() {
+    return pMap.get("accountDN");
+  }
+
+  private String determineEA6(Identity refIdentity) {
+
+    import sailpoint.object.Custom;
+    import sailpoint.object.Identity;
+    import sailpoint.tools.Util;
+
+    Custom custom = context.getObjectByName(Custom.class, "Ascension-Custom-Office365");
+    String ea6 = "365_Web";
+
+    if (custom != null && custom.get("noWebList") != null && refIdentity.getAttribute("company") != null) {
+
+      List noWebList = custom.get("noWebList");
+      String company = refIdentity.getAttribute("company");
+      String type = refIdentity.getType();
+      String hrType = getHRType(refIdentity);
+
+      if (Util.containsComparable(noWebList, company, false)) {
+
+        ea6 = "365_NoWeb";
+
+      }
+
+      if (Util.nullSafeCaseInsensitiveEq(type, "employee") || (Util.nullSafeCaseInsensitiveEq(type, "physician") && Util.nullSafeCaseInsensitiveEq(hrType, "EMP"))) {
+
+        if (Util.nullSafeCaseInsensitiveEq(company, "AHDOC") 
+            || Util.nullSafeCaseInsensitiveEq(company, "AHMFM")
+            || Util.nullSafeCaseInsensitiveEq(company, "DCSAR")) {
+
+          ea6 = "365_Full";
+
+        } 
+
+      }
+
+    }
+
+    return ea6;
+
+  }
+
+  private String determineEA40(String orgUnitPath) {
+
+    import sailpoint.object.Custom;
+
+    Map reverseStatusMap = new HashMap();
+
+    Custom gsuiteCustomObject = context.getObject(Custom.class,"Ascension-Custom-Gsuite");
+
+    if(gsuiteCustomObject != null){
+
+      Attributes attr = gsuiteCustomObject.getAttributes();
+
+      if(attr != null){
+
+        Map objectMap = attr.getMap();
+
+        if(objectMap != null){
+
+          reverseStatusMap = objectMap.get("gsuite_reverse_status_mapping");
+
+          if (reverseStatusMap != null) {
+
+            return reverseStatusMap.get(orgUnitPath);
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+  private String getHRType(Identity refIdentity) {
+
+    import sailpoint.api.IdentityService;
+    import sailpoint.object.Application;
+    import sailpoint.object.Link;
+    import sailpoint.tools.Util;
+
+    Application hrApp = context.getObjectByName(Application.class, "DB-Peoplesoft-HCM-Primary");
+    IdentityService iService = new IdentityService(context);
+    String employeeId = refIdentity.getAttribute("employeeId");
+    String type = refIdentity.getAttribute("type");
+
+    List appList = new ArrayList();
+    appList.add(hrApp);
+
+    boolean hasAccount = iService.hasAccounts(refIdentity, appList);
+
+    if (Util.isNullOrEmpty(type) || Util.isNullOrEmpty(employeeId) || !employeeId.matches("[0-9]+") || !hasAccount) {
+
+      //Treat null, empty, or string with non-digit characters as NonHR; do same in case of no PeopleSoft account link 
+
+      return "NonHR";
+
+    } else if (employeeId.matches("[0-9]+")) {
+
+      Link hrLink = iService.getLink(refIdentity, hrApp, null, employeeId);
+
+      return hrLink.getAttribute("PER_ORG");
+
+    }
+
+  }
+
+  private String determineEmailPrefix(Identity refIdentity) {
+
+    String firstName = refIdentity.getFirstname();
+    String lastName = refIdentity.getLastname();
+
+    prefix = firstName.replace(" ","_") + "." + lastName.replace(" ","_");
+
+    prefix = prefix.toLowerCase();
+
+    return prefix;
+
+  }
+
+
+  private String determinePrimaryDomain(Identity refIdentity) {
+
+    import sailpoint.object.Attributes;
+    import sailpoint.object.Custom;
+    import sailpoint.object.Identity;
+    import sailpoint.tools.Util;
+    
+    Custom gsuiteCustomObject = context.getObjectByName(Custom.class, "Ascension-Custom-Gsuite");
+
+    String company = refIdentity.getAttribute("company");
+    String type = refIdentity.getType();
+    String hrType = getHRType(refIdentity);
+    String empClass = refIdentity.getAttribute("employeeClass");
+    //String primary = "ascension-external.org";
+    String primary = "ascension-dev.org"; //modded from ascension-external.org
+
+    if (Util.nullSafeCaseInsensitiveEq(type, "employee") || (Util.nullSafeCaseInsensitiveEq(type, "physician") && Util.nullSafeCaseInsensitiveEq(hrType, "EMP"))) { 
+
+      if (Util.nullSafeCaseInsensitiveEq(company, "AHDOC")) {
+
+        primary = "doc.org";
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "AHMFM")) {
+
+        primary = "medxcel.com";
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "DCSAR")) {
+
+        primary = "depaularkansas.org";
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "DCSNO")) {
+
+        primary = "dcsno.org";
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "DCSSA")) {
+
+        primary = "dcssa.org";
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "MOKAS")) {
+
+        primary = "setonkc.org";
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "RESRC")) {
+
+        //primary = "TheResourceGroup.com";
+        primary = "ascension-dev.org";   //Modified for testing 4-23-24 JZ
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "WAPAS")) {
+
+        primary = "lourdesonline.org";
+
+      } else {
+
+        //primary = "ascension.org";
+        primary = "ascension-dev.org";   //Modified for testing 4-23-24 JZ
+
+      }
+
+    } else if (Util.nullSafeCaseInsensitiveEq(type, "contractor") && (empClass != null && gsuiteCustomObject != null && gsuiteCustomObject.get("emplClassForExternalDomainOverride").contains(empClass))) {
+
+       primary = "ascension-dev.org";
+
+    }
+
+    return primary;
+
+  }
+
+  private List determineSecondaryDomains(Identity refIdentity) {
+
+    import sailpoint.object.Attributes;
+    import sailpoint.object.Identity;
+    import sailpoint.tools.Util;
+
+    String company = refIdentity.getAttribute("company");
+    String type = refIdentity.getType();
+    String hrType = getHRType(refIdentity);
+    ArrayList secondaryList = new ArrayList();
+
+    if (Util.nullSafeCaseInsensitiveEq(type, "employee") || (Util.nullSafeCaseInsensitiveEq(type, "physician") && Util.nullSafeCaseInsensitiveEq(hrType, "EMP"))) {
+
+      if (Util.nullSafeCaseInsensitiveEq(company, "ACMH")) {
+
+        secondaryList.add("USHealthHoldings.com");
+        secondaryList.add("USHealthandLife.com");
+        secondaryList.add("ABS-TPA.com");
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "AHDOC")) {
+
+        secondaryList.add("marillacstvincent.org");
+        secondaryList.add("proyecto-jd.org");
+        secondaryList.add("setonheritage.org");
+        secondaryList.add("setonshrine.org");
+        secondaryList.add("ascension.org");
+        secondaryList.add("ascension-dev.org"); //modded
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "AHMFM")) {
+
+        secondaryList.add("medxcelfm.com");
+        secondaryList.add("ascension.org");
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "DCSAR")) {
+
+        secondaryList.add("ascension.org");
+        secondaryList.add("dcsark.org");
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "DCSNO")) {
+
+        secondaryList.add("ascension.org");
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "DCSSA")) {
+
+        secondaryList.add("ascension.org");
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "MIROC")) {
+
+        secondaryList.add("crittenton.com");
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "MOKAS")) {
+
+        secondaryList.add("ascension.org");
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "RESRC")) {
+
+        secondaryList.add("ascension.org");
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "WAPAS")) {
+
+        secondaryList.add("ascension.org");
+
+      } else if (Util.nullSafeCaseInsensitiveEq(company, "WIMIL")) {
+
+        secondaryList.add("ccon.edu");
+        secondaryList.add("ohow.org");
+
+      }
+
+
+    } 
+
+    return secondaryList;
+
+  }
+
+  private List buildProxyAddressList(Identity refIdentity, String prefix, String suffix) {
+
+    List proxyAddressList = new ArrayList();
+
+    List secondaryList = determineSecondaryDomains(refIdentity);
+
+    proxyAddressList.add("SMTP:" + prefix + "@" + suffix);
+
+    for (String secondary : secondaryList) {
+
+      proxyAddressList.add("smtp:" + prefix + "@" + secondary);
+
+    }
+
+    return proxyAddressList;
+
+  }
+
+  private String buildProxyAddressStr(List proxyAddressList) {
+
+    String proxyAddressStr = String.join("; ", proxyAddressList);
+
+    return proxyAddressStr;
+
+  }
+
+  private String buildTargetAddress(Identity refIdentity, String prefix, String suffix) {
+
+    return "SMTP:" + prefix + "@" + suffix;
+
+  }
+
+  static AccountRequest accountReq;
+
+  private void buildAttrReq(String targetAttribute, String value, AccountRequest accountReq) {
+
+    import sailpoint.object.ProvisioningPlan;
+    import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.AttributeRequest;
+
+    AttributeRequest attributeReq = new AttributeRequest(targetAttribute, value);
+    attributeReq.setOp(ProvisioningPlan.Operation.Set);
+
+    accountReq.add(attributeReq);
+
+  }
+
+  private void buildAttrReq(String targetAttribute, List list, AccountRequest accountReq) {
+
+    import sailpoint.object.ProvisioningPlan;
+    import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.AttributeRequest;
+
+    AttributeRequest attributeReq = new AttributeRequest(targetAttribute, list);
+    attributeReq.setOp(ProvisioningPlan.Operation.Set);
+
+    accountReq.add(attributeReq);
+
+  }
+
+  private boolean contextIsUsersManager(String identityName) {
+
+    // Checks if the current user based on context is the manager of the supplied identityName
+    // Useful for conditional Form and/or Workflow behavior
+
+    import sailpoint.object.Identity;
+    import sailpoint.tools.Util;
+
+    Identity refIdentity = context.getObjectByName(Identity.class, identityName);
+    Identity refManager = refIdentity.getManager();
+
+    if (refManager != null) {
+
+      String managerName = refManager.getName();
+
+      if (Util.nullSafeCaseInsensitiveEq(context.getUserName(), managerName)) {
+
+        return true;
+
+      } else {
+
+        return false;
+
+      }
+
+    } else {
+
+      return false;
+
+    }
+
+  }
+
+  private boolean contextIsUsersContractorManager(String identityName) {
+
+    // Checks if the current user based on context is the contextIsUsersContractorManager of the supplied identityName
+    // Useful for conditional Form and/or Workflow behavior
+    Identity refIdentity = context.getObjectByName(Identity.class, identityName);
+    boolean isUsersContractorManager = false;
+    if (refIdentity != null) {
+      String contractorManagerName = refIdentity.getStringAttribute("contractorManager");
+      if (Util.nullSafeCaseInsensitiveEq(context.getUserName(), contractorManagerName)) {
+        isUsersContractorManager= true;
+      } 
+
+    }
+    return isUsersContractorManager;
+  }
+
+  private boolean contextIsTrustedRequester(String identityName) {
+    // Checks if the current user based on context is present in trusted requestors workgroup with the supplied identityName
+    // Useful for conditional Form and/or Workflow behavior
+    boolean isUsersTrustedRequester  = false;
+    List workgroupMembers = new ArrayList();
+    //Create a filter to get all the trusted requesters workgroups
+    Filter wgFilter = Filter.eq("workgroup", true);
+    Filter wgNameFilter = Filter.like("name","Trusted Requesters", Filter.MatchMode.START);
+    QueryOptions qo = new QueryOptions();
+    qo.add(wgFilter,wgNameFilter);
+    List properties = new ArrayList();
+    List trustedRequestersWGs = new ArrayList();
+    properties.add("name");
+    Iterator iter = context.search(Identity.class, qo, properties);
+    while(iter.hasNext()) {
+      Object[] workGroup = iter.next();
+      if(workGroup != null) {
+        trustedRequestersWGs.add(workGroup[0]);  
+      }        
+    }
+    if(trustedRequestersWGs!=null && !trustedRequestersWGs.isEmpty()){
+      for(String trustedRequestersWGName:trustedRequestersWGs){   
+        if(Util.isNotNullOrEmpty(identityName)){      
+          Identity delegateWGIdentity = context.getObjectByName(Identity.class,trustedRequestersWGName);
+          Identity launcherIdentity = context.getObjectByName(Identity.class,identityName);
+          if(delegateWGIdentity!=null && launcherIdentity!=null){
+            if(launcherIdentity.isInWorkGroup(delegateWGIdentity)){
+              isUsersTrustedRequester=true;
+              break;
+            }
+          }
+        }
+      }			
+    }
+    Util.flushIterator(iter);
+    return isUsersTrustedRequester;
+  }
+
+  private boolean meetsContractorBirthrightGSuite(Identity refIdentity) {
+
+    log.error("Entering method meetsContractorBirthrightGSuite");
+
+    //This method was updated after its inital introduction to trigger birthright provisioning of physician and employee. Therefore, the name of the method should not be taken literally.
+
+    boolean inactive = refIdentity.isInactive();
+    String company = refIdentity.getAttribute("company");
+    String email = refIdentity.getEmail();
+    String type = refIdentity.getType();
+    String personaType = refIdentity.getAttribute("personaType");
+    String samAccountName = refIdentity.getAttribute("samAccountName");
+    Date whenCreated = refIdentity.getCreated();
+    List noGSuiteList = Util.csvToList("AHDOC,AHMFM,CTBRI,DCSAR");
+    boolean hasADLink = hasADLink(refIdentity);
+    boolean hasAIDLink = hasAIDLink(refIdentity);
+    boolean isAmitaHealthEmail = false;
+
+    if (Util.isNotNullOrEmpty(email)) {
+
+      if (email.toLowerCase().endsWith("@amitahealth.org")) {
+
+        isAmitaHealthEmail = true;
+
+      }
+
+    }
+
+    Date logicStartsAt = new Date(new Long("1618462799000")); //Only Identities Created After This UNIX Time Should Be Considered.
+
+    if (!Util.containsComparable(noGSuiteList, company, true) && Util.isDateAfter(whenCreated, logicStartsAt) && hasADLink && !isAmitaHealthEmail) {
+
+      if (Util.nullSafeCaseInsensitiveEq(personaType, "Primary") || Util.isNullOrEmpty(personaType)) { //Only Primary (Parent) Personas, and Identities Not Managed By Persona Module Should Be Considered.
+
+        if (Util.nullSafeCaseInsensitiveEq(type, "contractor") 
+            || Util.nullSafeCaseInsensitiveEq(type, "non-hr contractor")) {
+
+          if (Util.isNotNullOrEmpty(samAccountName)) {
+
+            if (!inactive) {
+
+              if (!Util.nullSafeCaseInsensitiveEq(company, "AMITA")) {
+
+                return true;
+
+              } else if (Util.nullSafeCaseInsensitiveEq(company, "AMITA") && hasAIDLink) {
+
+                return true;
+
+              }
+
+            }
+
+          }
+
+        } else if (Util.nullSafeCaseInsensitiveEq(type, "employee") || Util.nullSafeCaseInsensitiveEq(type, "physician")) {
+
+          if (Util.isNotNullOrEmpty(samAccountName)) {
+
+            if (!inactive) {
+
+              if (Util.nullSafeCaseInsensitiveEq(company, "AMITA") && hasAIDLink) {
+
+                return true;
+
+              } else if(!Util.nullSafeCaseInsensitiveEq(company, "AMITA")){ //adding logic for SI-2110
+
+                return true;
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+    log.error("Exiting method meetsContractorBirthrightGSuite");
+
+    return false;
+
+  }
+
+  private void buildAfterProvisioningWorkItem(Identity refIdentity, Application targetApp, String targetDN, List conflictList) {
+
+    import sailpoint.object.Attributes;
+    import sailpoint.object.Application;
+    import sailpoint.object.ApprovalItem;
+    import sailpoint.object.ApprovalSet;
+    import sailpoint.object.Identity;
+    import sailpoint.object.WorkItem;
+    import sailpoint.persistence.Sequencer; 
+
+    Calendar expiration = Calendar.getInstance();  
+
+    Identity requester = context.getObjectByName(Identity.class, "IDM Team");  
+
+    WorkItem item = new WorkItem();  
+    item.setType(WorkItem.Type.ManualAction);  
+    item.setOwner(requester);  
+    item.setRequester(requester);  
+    Sequencer sequencer = new Sequencer();  
+    item.setName(sequencer.generateId(context, item));  
+    item.setRenderer("lcmManualActionsRendererVariant.xhtml");  
+    item.setLevel(WorkItem.Level.Normal);  
+    item.setTarget(refIdentity);  
+    item.setTargetClass(Identity.class.getName());  
+    item.setDescription("Manual Changes requested for User: " + refIdentity.getDisplayableName());  
+    item.setHandler("sailpoint.api.Workflower");  
+
+    Attributes attributes = new Attributes();  
+    item.setAttributes(attributes);  
+
+    ApprovalSet approvalSet = new ApprovalSet();  
+
+    for (String conflict : conflictList) {
+
+      ApprovalItem approvalItem = new ApprovalItem();
+      approvalItem.setApplication(targetApp);  
+      approvalItem.setNativeIdentity(targetDN);  
+      approvalItem.setOperation("Set");  
+      approvalItem.setValue(conflict);  
+      approvalSet.add(approvalItem);  
+
+    } 
+
+    attributes.put("approvalSet", approvalSet);  
+    attributes.put("identityDisplayName", refIdentity.getDisplayableName());  
+    attributes.put("identityName", refIdentity.getName());  
+
+    //item.setExpiration(expiration.getTime());  
+
+    context.startTransaction();  
+    context.saveObject(item);  
+    context.commitTransaction();  
+
+  }
+
+  private ProvisioningPlan buildMailLicensingPlan(String identityName, String samAccountName, String requestedAction) {
+
+    import sailpoint.api.Provisioner;
+    import sailpoint.object.Application;
+    import sailpoint.object.Identity;
+    import sailpoint.object.ProvisioningPlan;
+    import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.AttributeRequest;
+    import sailpoint.tools.Util;
+
+    Identity identity = context.getObjectByName(Identity.class, identityName);
+    String company = identity.getAttribute("company");
+    String type = identity.getType();
+    String hrType = getHRType(identity);
+    String targetApp = determineTargetADApp(identity, samAccountName);
+    String targetDN = determineTargetDN(identity, samAccountName);
+    List noGSuiteList = Util.csvToList("AHDOC,AHMFM,DCSAR");
+
+    if (Util.nullSafeCaseInsensitiveEq(type, "contractor") || Util.nullSafeCaseInsensitiveEq(type, "non-hr contractor") || (Util.nullSafeCaseInsensitiveEq(type, "physician") && !Util.nullSafeCaseInsensitiveEq(hrType, "EMP"))) {
+
+      // Primary Account Request to Update AD
+
+      ProvisioningPlan plan = new ProvisioningPlan();
+      plan.setNativeIdentity(identityName);
+
+      AccountRequest accountReq = new AccountRequest();
+      accountReq.setOperation(AccountRequest.Operation.Modify);
+      accountReq.setNativeIdentity(targetDN);
+      accountReq.setApplication(targetApp);
+
+      // Supplemental Account Request to Update gsuiteStatus and orgUnitPath
+
+      AccountRequest accountReqTwo = new AccountRequest();
+      accountReqTwo.setOperation(AccountRequest.Operation.Modify);
+      accountReqTwo.setNativeIdentity(identityName);
+      accountReqTwo.setApplication("IIQ");
+
+      if (!Util.containsComparable(noGSuiteList, company, true)) {
+
+        String orgUnitPath = "";
+
+        if (Util.nullSafeCaseInsensitiveEq(requestedAction, "Request License")) {
+
+          orgUnitPath = "/CWR";
+
+        } else if (Util.nullSafeCaseInsensitiveEq(requestedAction, "Revoke License")) {
+
+          orgUnitPath = "/CWR/NoMail";
+
+        }
+
+        String ea40 = determineEA40(orgUnitPath);
+
+        buildAttrReq("msExchExtensionAttribute40", ea40, accountReq);
+        buildAttrReq("gsuiteStatus", ea40, accountReqTwo);
+        buildAttrReq("orgUnitPath", orgUnitPath, accountReqTwo);
+
+      } else if (Util.containsComparable(noGSuiteList, company, true)) {
+
+        String ea6 = "";
+
+        if (Util.nullSafeCaseInsensitiveEq(requestedAction, "Request License")) {
+
+          ea6 = "365_Full";
+
+        } else if (Util.nullSafeCaseInsensitiveEq(requestedAction, "Revoke License")) {
+
+          ea6 = "365_Web";
+
+        }
+
+        buildAttrReq("extensionAttribute6", ea6, accountReq);
+
+      }
+
+      // Finalize Plan
+
+      List accountReqList = new ArrayList();
+
+      accountReqList.add(accountReq);
+      accountReqList.add(accountReqTwo);
+      plan.setAccountRequests(accountReqList);
+      plan.setIdentity(identity);
+
+      //comment decache //context.decache(identity);
+
+      return plan;
+
+    } 
+
+  }
+
+  private String hasGSuiteLicense(String primaryEmail) {
+
+    try {
+
+      token = context.decrypt(jobj); //Passed in via global variable (Rule-GSuite-AccessToken).
+
+      String productId = "Google-Apps";
+      String skuId = "1010020020";
+
+      String urlStr = "https://licensing.googleapis.com/apps/licensing/v1/product/" + productId + "/sku/" + skuId + "/user/" + primaryEmail;
+
+      URL url = new URL(urlStr);
+
+      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn.setDoOutput(true);
+      conn.setRequestMethod("GET");
+      conn.setRequestProperty("Content-Type", "application/json");
+      conn.setRequestProperty("Authorization", "Bearer "+ token);
+
+      BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+      String output = "";
+      String lineOutput = "";
+
+      while ((lineOutput = br.readLine()) != null) {
+        output = output + lineOutput;
+      } 
+      br.close();
+      if (output != null) {
+
+        licenseCheck = "HasLicense";
+
+      }
+
+    } catch (FileNotFoundException e) {
+
+      licenseCheck = "NoLicense";
+
+    } catch (java.io.IOException e) {
+
+      licenseCheck = "Forbidden";
+
+    }     
+
+    return licenseCheck;
+
+  }
+
+  private String revokeGSuiteLicense(String primaryEmail) {
+
+    try {
+
+      token = context.decrypt(jobj); //Passed in via global variable (Rule-GSuite-AccessToken).
+
+      String productId = "Google-Apps";
+      String skuId = "1010020020";
+
+      String urlStr = "https://licensing.googleapis.com/apps/licensing/v1/product/" + productId + "/sku/" + skuId + "/user/" + primaryEmail;
+
+      URL url = new URL(urlStr);
+
+      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn.setDoOutput(true);
+      conn.setRequestMethod("DELETE");
+      conn.setRequestProperty("Content-Type", "application/json");
+      conn.setRequestProperty("Authorization", "Bearer "+ token);
+
+      BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+      String output = "";
+      String lineOutput = "";
+
+      while ((lineOutput = br.readLine()) != null) {
+        output = output + lineOutput;
+      } 
+      br.close();
+      if (output != null) {
+
+        revokeCheck = "License Removed from " + primaryEmail;
+
+      }
+
+
+    } catch (FileNotFoundException e) {
+
+      revokeCheck = "NoLicense";
+
+    } catch (java.io.IOException e) {
+
+      revokeCheck = "UnableToRemoveLicense";
+
+    }     
+
+    return revokeCheck;
+
+  }
+
+  private JSONObject getGSuiteUsersByOU(String orgUnitPath, String urlStr) {
+
+    org.json.JSONObject jsonObject = null;
+    token = context.decrypt(jobj); //Passed in via global variable (Rule-GSuite-AccessToken).
+
+    try {
+
+
+      URL url = new URL(urlStr);
+
+      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn.setDoOutput(true);
+      conn.setRequestMethod("GET");
+      conn.setRequestProperty("Content-Type", "application/json");
+      conn.setRequestProperty("Authorization", "Bearer "+ token);
+
+      BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+      String output = "";
+      String lineOutput = "";
+
+      while ((lineOutput = br.readLine()) != null) {
+        output = output + lineOutput;
+      } 
+      br.close();
+      if (output != null) {
+
+        jsonObject = new org.json.JSONObject(output);
+
+      }
+
+    } catch (FileNotFoundException e) {
+
+      //Handle but do nothing
+
+    } catch (java.io.IOException e) {
+
+      //Handle but do nothing
+
+    }
+
+    return jsonObject;
+
+  }
+
+  private List parseOrgJson(JSONObject jsonObject, List<String> rollingList) throws IOException, JSONException {
+
+    org.json.JSONArray jsonArray = jsonObject.getJSONArray("users");
+
+    for(int i = 0 ; i < jsonArray.length(); i++) {
+
+      rollingList.add(jsonArray.getJSONObject(i).getString("primaryEmail"));
+
+    }
+
+    return rollingList;
+
+  }
+
+
+  private String getAPIUrl(String nextPageToken, String orgUnitPath){
+
+    String customer = "my_customer";
+    String query = "orgUnitPath=" + orgUnitPath;
+    String fields = "users(primaryEmail),nextPageToken";
+    String urlStr = null;
+    if(nextPageToken == null || nextPageToken == ""){
+      urlStr = "https://admin.googleapis.com/admin/directory/v1/users?customer=" + customer + "&query=" + query + "&fields=" + fields;
+    }else{
+      urlStr = "https://admin.googleapis.com/admin/directory/v1/users?customer=" + customer + "&query=" + query + "&fields=" + fields + "&pageToken=" + nextPageToken;
+    }
+    return urlStr;
+  }
+
+  public List executeJSONCall(String orgUnitPath){
+    org.json.JSONObject jo = null;
+    String urlStr = null;
+    List parsedList = new ArrayList();
+    List rollingList = new ArrayList();
+    try{
+      do {
+        if(nextPageToken == null || nextPageToken == ""){
+          urlStr = getAPIUrl("", orgUnitPath);
+          jo = getGSuiteUsersByOU(orgUnitPath, urlStr);
+
+          if(jo.has("nextPageToken") && !jo.isNull("nextPageToken")){
+            nextPageToken = jo.getString("nextPageToken");
+          }
+
+          parsedList = parseOrgJson(jo, rollingList);
+
+        }else{
+
+          urlStr = getAPIUrl(nextPageToken, orgUnitPath);
+          jo = getGSuiteUsersByOU(orgUnitPath, urlStr);
+
+          if(jo.has("nextPageToken") && !jo.isNull("nextPageToken")){
+            nextPageToken = jo.getString("nextPageToken");
+          } else {
+            nextPageToken = "";
+          }
+
+          parsedList = parseOrgJson(jo, rollingList);
+
+        }
+      }while(nextPageToken != "");
+    }catch(Exception e){
+      //Handle but do nothing
+    }
+    return parsedList;
+  }
+
+  public String ascTechContractorWithSpecBU(String identityType,String businessUnit,String ministry)
+  {
+    String customBusinessUnitKey ="businessUnitsForAutoProvisioning";
+    String customMinsitryKey = "ministryForAutoProvisioning";
+    String gsuiteCustomObjectName = "Ascension-Custom-Gsuite";
+    String gsStatus = null;
+    try{
+      List businessUnitsList = GeneralUtils.loadCustomList(customBusinessUnitKey, gsuiteCustomObjectName);
+      List ministryList = GeneralUtils.loadCustomList(customMinsitryKey, gsuiteCustomObjectName);
+
+      if(Util.nullSafeCaseInsensitiveEq(identityType, "Contractor")){
+        if(Util.isNotNullOrEmpty(businessUnit)  @and Util.isNotNullOrEmpty(ministry)){
+          if (businessUnitsList.contains(businessUnit) @and ministryList.contains(ministry)){     
+            gsStatus="CWR_active_mail";
+
+          }
+        }
+      }
+    }catch(Exception e){
+      log.error("Error in calculating gsuiteStatus: " + e.getMessage());
+    }
+
+    return gsStatus;
+  }
+
+  public boolean isAscTechContractorWithSpecBU(String identityType,String businessUnit, String ministry)
+  {
+    String customBusinessUnitKey ="businessUnitsForAutoProvisioning";
+    String customMinsitryKey = "ministryForAutoProvisioning";
+    String gsuiteCustomObjectName = "Ascension-Custom-Gsuite";
+    boolean flag = false;
+    try{
+      List businessUnitsList = GeneralUtils.loadCustomList(customBusinessUnitKey, gsuiteCustomObjectName);
+      List ministryList = GeneralUtils.loadCustomList(customMinsitryKey, gsuiteCustomObjectName);
+
+      if(Util.nullSafeCaseInsensitiveEq(identityType, "Contractor")){
+        if(Util.isNotNullOrEmpty(businessUnit)  @and Util.isNotNullOrEmpty(ministry)){
+          if (businessUnitsList.contains(businessUnit) @and ministryList.contains(ministry)){     
+            flag = true;
+
+          }
+        }
+      }
+    }catch(Exception e){
+      error(logName, "Error in calculating isAscTechContractorWithSpecBU: " + e.getMessage());
+    }
+
+    return flag;
+  }
+
+  ]]></Source>
+</Rule>

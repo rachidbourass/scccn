@@ -1,0 +1,250 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-RuleLibrary-GSuite-DirectAttributeProvisioning">
+  <Source><![CDATA[
+       import sailpoint.object.ProvisioningPlan;
+    import sailpoint.object.ProvisioningPlan.AccountRequest;
+    import sailpoint.object.ProvisioningPlan.AttributeRequest;
+    import sailpoint.object.Custom;
+    import org.json.simple.JSONObject;
+    import org.json.simple.JSONArray;
+    import org.json.simple.parser.JSONParser;
+    import sailpoint.object.Attributes;
+    import java.io.BufferedReader;
+    import java.io.InputStreamReader;
+    import org.apache.http.HttpResponse;
+    import org.apache.http.NameValuePair;
+    import org.apache.http.client.HttpClient;
+    import org.apache.http.client.entity.UrlEncodedFormEntity;
+    import org.apache.http.client.methods.HttpGet;
+    import org.apache.http.client.methods.HttpPost;
+    import org.apache.http.impl.client.DefaultHttpClient;
+    import org.apache.http.message.BasicNameValuePair;
+    import sailpoint.object.Link;
+    import sailpoint.object.Application;
+    import java.util.List;
+    import java.util.Map;
+    import java.util.Set;
+    import sailpoint.object.Identity;
+	import org.apache.commons.logging.Log;
+    import org.apache.commons.logging.LogFactory;
+    
+    private static Log log = LogFactory.getLog("sailpoint.ascension.rules.gsuite.attrSync");
+
+    String GSUITE_APP_CUSTOM_OBJ_NAME = "Ascension-Custom-Gsuite";
+    String gsuiteApplicationName = "GSuite";
+    String attributeUpdateGoogleURL = "";
+
+    /*
+    Method Name - getAttributesMapFromPlan
+    This method gets a Map of Gsuite attribute name and values that need to be included in the update call to Gsuite
+    Attribute list is stored in custom object: Ascension-Custom-Gsuite
+    */
+    List getCustomAttributeList(){
+        Custom customObject = context.getObjectByName(Custom.class,GSUITE_APP_CUSTOM_OBJ_NAME);
+        if(customObject != null){
+            return customObject.getList("gsuite_directAPI_Attributes");
+        }
+        return null;
+    }
+
+    org.json.simple.JSONObject convertStringToJSON(String jsonFormatString){
+        JSONParser parser = new JSONParser();
+        if(void !=jsonFormatString &&  jsonFormatString != null)
+        {
+            org.json.simple.JSONObject json = (org.json.simple.JSONObject) parser.parse(jsonFormatString);
+            return json;
+        }
+        else{
+            return null;
+        }
+    }
+
+    org.json.simple.JSONArray convertListToJSONArray(List jsonFormatList){
+        org.json.simple.JSONArray jsonArray = new org.json.simple.JSONArray();
+        if(jsonFormatList != null && jsonFormatList.size()>0){
+            for(String eachItem : jsonFormatList){
+                org.json.simple.JSONObject eachObject = convertStringToJSON(eachItem);
+                jsonArray.add(eachObject);
+            }
+            return jsonArray;
+        }
+        else{
+            return null;
+        }
+        return null;
+    }
+
+    org.json.simple.JSONArray convertStringToJSONArray(String jsonFormatString){
+       log.info("GSuite: convertMapToJSON: INSIDE convertStringToJSONArray");
+        if(void !=jsonFormatString && jsonFormatString != null){
+           log.info("GSuite: convertMapToJSON: INSIDE convertStringToJSONArray-1");
+            org.json.simple.JSONArray jsonArray = new org.json.simple.JSONArray();
+           log.info("GSuite: convertMapToJSON: INSIDE convertStringToJSONArray-2");
+            org.json.simple.JSONObject eachObject = convertStringToJSON(jsonFormatString);
+           log.info("GSuite: convertMapToJSON: INSIDE convertStringToJSONArray-3");
+            jsonArray.add(eachObject);
+           log.info("GSuite: convertMapToJSON: INSIDE convertStringToJSONArray-4");
+            return jsonArray;
+        } else{
+            return null;
+        }
+        return null;
+    }
+
+    Map getAttributesMapFromPlan(ProvisioningPlan plan){
+        Map attributeUpdateMap = new HashMap();
+        List attributeList = getCustomAttributeList();
+        if(plan != null && attributeList != null && attributeList.size()>0){
+            List accReqList = plan.getAccountRequests();
+            if(accReqList != null && accReqList.size()>0){
+                for(AccountRequest accReq : accReqList){
+                    if(accReq.getOp().toString().equalsIgnoreCase("Modify")){
+                        List attrReqList = new ArrayList();
+                        if(accReq.getAttributeRequests() != null){
+                            for(AttributeRequest attrReq : accReq.getAttributeRequests()){
+                                String attrName = attrReq.getName();
+                                if(attributeList.contains(attrName)){
+                                    Object attrValue = attrReq.getValue();
+                                    if(attrValue != null){
+                                        attributeUpdateMap.put(attrName,attrValue);                     
+                                    }
+                                } else{
+                                    attrReqList.add(attrReq);
+                                }
+                            }       
+                            accReq.setAttributeRequests(attrReqList);
+                        }
+                    }
+                }
+            }
+        }
+        return attributeUpdateMap;
+    }
+
+    org.json.simple.JSONObject convertMapToJSON(Map attributeUpdateMap){
+      log.info("GSuite: convertMapToJSON: INSIDE convertMapToJSON");
+        org.json.simple.JSONObject attributeJSON = new org.json.simple.JSONObject();
+       log.info("GSuite: convertMapToJSON: INSIDE convertMapToJSON-1");
+        if(attributeUpdateMap != null && !attributeUpdateMap.isEmpty()){
+            for(String key : attributeUpdateMap.keySet()){
+              log.info("GSuite: convertMapToJSON: INSIDE convertMapToJSON-2");
+                org.json.simple.JSONObject eachAttributeJSON = new org.json.simple.JSONObject();
+              log.info("GSuite: convertMapToJSON: INSIDE convertMapToJSON-3");
+                Object attrValue =  attributeUpdateMap.get(key);
+                if(attrValue instanceof String){
+                    if("customSchemas".equalsIgnoreCase(key)){
+                        attributeJSON.put(key,convertStringToJSON(attrValue));
+                    }
+
+                    if(attrValue.startsWith("[")){
+                        org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
+                        org.json.simple.JSONArray localArray = (org.json.simple.JSONArray)parser.parse(attrValue);
+                        attributeJSON.put(key,localArray);
+                    } else{
+                      log.info("GSuite: convertMapToJSON: INSIDE convertMapToJSON-4");
+                        attributeJSON.put(key,convertStringToJSONArray(attrValue));
+                       log.info("GSuite: convertMapToJSON: INSIDE convertMapToJSON-5");
+                    }
+                }
+                else if (attrValue instanceof List){
+                   log.info("GSuite: convertMapToJSON: INSIDE convertMapToJSON-6");
+                    attributeJSON.put(key,convertListToJSONArray(attrValue));
+                   log.info("GSuite: convertMapToJSON: INSIDE convertMapToJSON-7");
+                }               
+            }   
+        }
+       log.info("GSuite: convertMapToJSON: EXICITING convertMapToJSON");
+        return attributeJSON;
+    }
+
+    org.json.simple.JSONObject getAttributeUpdateJSON(ProvisioningPlan plan){
+      log.info("GSuite: callGsuiteAPIForAttributeUpdates: INSIDE getAttributeUpdateJSON(plan)");
+        Map attributeUpdateMap = getAttributesMapFromPlan(plan);
+      log.info("GSuite: callGsuiteAPIForAttributeUpdates: AFTER getAttributesMapFromPlan");
+        org.json.simple.JSONObject attributeUpdateJSON = new org.json.simple.JSONObject();
+        if(attributeUpdateMap != null && !attributeUpdateMap.isEmpty()){
+           log.info("GSuite: convertMapToJSON: BEFORE convertMapToJSON");
+            attributeUpdateJSON = convertMapToJSON(attributeUpdateMap);
+          log.info("GSuite: convertMapToJSON: AFTER convertMapToJSON");
+        }
+        return attributeUpdateJSON;
+    }
+
+    public void callGsuiteAPIForAttributeUpdates(ProvisioningPlan plan){
+      log.info("GSuite: callGsuiteAPIForAttributeUpdates: "+plan.toXml());
+        Application application = context.getObjectByName(Application.class,gsuiteApplicationName);
+        String identityName = plan.getNativeIdentity();
+        if(identityName != null){
+            Identity identity = context.getObjectByName(Identity.class,identityName);
+            if(application != null && identity != null && identity.getEmail() != null ){
+              log.info("GSuite: callGsuiteAPIForAttributeUpdates: BEFORE getAttributeUpdateJSON(plan)");
+                org.json.simple.JSONObject attributeUpdateJSON = getAttributeUpdateJSON(plan);
+              log.info("GSuite: callGsuiteAPIForAttributeUpdates: AFTER getAttributeUpdateJSON(plan)");
+                if(attributeUpdateJSON != null && !attributeUpdateJSON.isEmpty()){
+                    Custom customObject = context.getObjectByName(Custom.class,GSUITE_APP_CUSTOM_OBJ_NAME);
+                    if(customObject != null){
+                        attributeUpdateGoogleURL = customObject.getString("attributeUpdateGoogleURL"); 
+                        String tokenURL = customObject.getString("tokenURL");
+                        try {
+                            // Code to get the access token 
+                            String clientID = application.getAttributeValue("clientID").toString();
+                            String clientSecret = context.decrypt(application.getAttributeValue("clientSecret").toString());
+                            String refreshToken = context.decrypt(application.getAttributeValue("refreshToken").toString());
+                            String gType="refresh_token";
+                            URL accessTokenURL = new URL(tokenURL);
+                            HttpURLConnection tokenConn = (HttpURLConnection) accessTokenURL.openConnection();
+                            tokenConn.setDoOutput(true);
+                            tokenConn.setRequestMethod("POST");
+                            tokenConn.setRequestProperty("Content-Type", "application/json");
+                            String inputToken = "{\r\n \"refresh_token\":\""+ refreshToken +"\",    \r\n \"client_id\":\""+ clientID +"\",\r\n \"client_secret\":\""+ clientSecret +"\",\r\n \"grant_type\":\""+ gType +"\"}";
+                            OutputStream os = tokenConn.getOutputStream();
+                            os.write(inputToken.getBytes());
+                            os.flush();
+                            if(tokenConn.getResponseCode()==200){
+                                BufferedReader br = new BufferedReader(new InputStreamReader(tokenConn.getInputStream()));
+                                String out = "";
+                                String line ="";
+                                while ((line = br.readLine()) != null){
+                                    out=out+line;
+                                }
+								br.close();
+                                org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
+                                org.json.simple.JSONObject jobj = (org.json.simple.JSONObject) parser.parse(out);
+                                try{
+                                    org.json.simple.JSONObject jobj = (org.json.simple.JSONObject) parser.parse(out);
+                                    token = jobj.get("access_token");
+                                    attributeUpdateGoogleURL = attributeUpdateGoogleURL + identity.getEmail();
+                                    URL url = new URL(attributeUpdateGoogleURL);
+                                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                    conn.setDoOutput(true);
+                                    conn.setRequestMethod("PUT");
+                                    conn.setRequestProperty("Content-Type", "application/json");
+                                    conn.setRequestProperty("Authorization", "Bearer "+ token); 
+
+                                    String input = attributeUpdateJSON.toString();  
+
+                                    OutputStream os = conn.getOutputStream();
+                                    os.write(input.getBytes());
+                                    os.flush();
+                                    if (conn.getResponseCode() != 200) {
+                                        throw new RuntimeException("Failed : HTTP error code : "
+                                        + conn.getResponseCode());
+                                    }
+                                    conn.disconnect();
+                                } catch(Exception e){                       
+                                    log.info("Refresh Token Error:::"+e.getMessage());                          
+                                }
+                            }
+                        } catch (MalformedURLException e){
+                            e.printStackTrace();
+                        } catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+    }
+  ]]></Source>
+</Rule>

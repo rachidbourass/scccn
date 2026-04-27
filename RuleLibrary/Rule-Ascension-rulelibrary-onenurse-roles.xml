@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Ascension-RuleLibrary-OneNurse-Roles">
+  <Description>This RuleLIbrary is used for OneNurse RBAC provisioning</Description>
+  <Source><![CDATA[
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+  import sailpoint.object.Application;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.object.Filter;
+  import sailpoint.tools.Util;
+
+  import sailpoint.object.Bundle;
+  import sailpoint.object.Filter;
+  import sailpoint.object.Filter.LeafFilter;
+  import sailpoint.object.Profile;
+
+  import java.util.ArrayList;
+  import java.util.List;
+
+  import org.apache.commons.logging.Log;
+  import org.apache.commons.logging.LogFactory;
+
+
+
+  public List getIdLinksDN(Identity identity){
+    List idLinksDN = new ArrayList();
+    List links = new ArrayList();
+    if(null!=identity){
+      Filter filter=Filter.ignoreCase(Filter.and(Filter.eq("application.type","Active Directory - Direct"),Filter.eq("identity.name",identity.getName())));
+      QueryOptions qops=new QueryOptions();
+      qops.addFilter(filter);
+      List links = context.getObjects(Link.class,qops);
+      if(!links.isEmpty()){
+        for(Link link : links){
+          if(null != link  @and null != link.getApplication()){
+            String appType = link.getApplication().getType();
+            String ldapName  = link.getAttribute("distinguishedName");
+            if(ldapName!=null){
+              idLinksDN.add(parseDCFromDN(ldapName));
+            }
+          }
+
+        }
+      }
+    }
+    return idLinksDN;
+  }
+  public List getBundleEntitlements(Bundle bundle) {
+    List values = new ArrayList();
+    List profiles = bundle.getProfiles();
+    for(Profile profile : profiles) {
+      Application application = profile.getApplication();
+      List constraints = profile.getConstraints();
+      for(Filter constraint : constraints) {
+        LeafFilter leafFilter = (LeafFilter)constraint;
+        String attributeName = leafFilter.getProperty();
+        Object valueObj = leafFilter.getValue();
+        if(valueObj instanceof String) {
+          values.add(valueObj.toString());
+        }else {
+          values.addAll((List)valueObj);
+        }
+      }
+    }
+    return values;
+  }
+
+  public String parseDCFromDN(String dnString){
+    String returnStr = null;
+    int dnIndex =  dnString.indexOf("DC=");
+    returnStr = dnString.substring(dnIndex,dnString.length());
+    return returnStr;
+
+  }
+
+  public boolean containsIgnoreCase(ArrayList list, String str) {
+    if (list != null @and !list.isEmpty()) {
+      for (String s : list) {
+        String parsedDN = parseDCFromDN(s);
+        if (parsedDN != null @and parsedDN.equalsIgnoreCase(str)) {
+          return true;
+          break;
+        }
+      }
+    }
+    return false;
+  }
+  ]]></Source>
+</Rule>
