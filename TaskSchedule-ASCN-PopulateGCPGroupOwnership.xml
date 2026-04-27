@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule id="Schedule-Ascension-TaskDefinition-PopulateGCPGroupOwnership" name="Schedule-Ascension-TaskDefinition-PopulateGCPGroupOwnership">
+  <Arguments>
+    <Map>
+      <entry key="executor" value="Ascension-TaskDefinition-PopulateGCPGroupOwnership"/>
+      <entry key="launcher" value="IDM Team"/>
+      <entry key="nextActualFireTime"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 30 19 ? * 2 </String>
+  </CronExpressions>
+  <Description>Populates GCP Group Ownership</Description>
+</TaskSchedule>

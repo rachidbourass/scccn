@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684108800000" name="Schedule-EndDateCleanup-ByIdentityType" nextExecution="1684195200000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="EndDateCleanup-ByIdentityType"/>
+      <entry key="launcher" value="sp_jpend008-albir"/>
+      <entry key="nextActualFireTime" value="1684195200000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 0 19 * * ? </String>
+  </CronExpressions>
+  <Description/>
+</TaskSchedule>

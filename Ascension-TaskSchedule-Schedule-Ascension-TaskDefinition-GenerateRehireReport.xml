@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule id="Schedule-Ascension-TaskDefinition-GenerateRehireReport" name="Schedule-Ascension-TaskDefinition-GenerateRehireReport">
+  <Arguments>
+    <Map>
+      <entry key="executor" value="Ascension-TaskDefinition-GenerateRehireReport"/>
+      <entry key="launcher" value="IDM Team"/>
+      <entry key="nextActualFireTime"/>
+      <entry key="taskName" value="Schedule-Ascension-TaskDefinition-GenerateRehireReport"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 0 6-18/4 ? * MON,TUE,WED,THU,FRI * </String>
+  </CronExpressions>
+  <Description>Generates report for the Rehired Identities</Description>
+</TaskSchedule>

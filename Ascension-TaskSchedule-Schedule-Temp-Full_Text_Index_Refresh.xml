@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684134000000" name="Schedule-Temp-Full Text Index Refresh" nextExecution="1684220400000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="Full Text Index Refresh"/>
+      <entry key="launcher" value="sp_jpend008-albir"/>
+      <entry key="nextActualFireTime" value="1684220400000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 0 2 * * ? </String>
+  </CronExpressions>
+  <Description>Temporary scheduled task to run the Full Text Index Refresh daily at midnight</Description>
+</TaskSchedule>

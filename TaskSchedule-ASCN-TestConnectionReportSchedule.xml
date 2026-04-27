@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule name="ASCN-TestConnectionReportSchedule">
+  <Arguments>
+    <Map>
+      <entry key="executor" value="ASCN-TestConnectionReport-RunRule"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 53 5 * * ? </String>
+  </CronExpressions>
+  <Description>This is  a schedule to run Test Connection Report Task</Description>
+</TaskSchedule>

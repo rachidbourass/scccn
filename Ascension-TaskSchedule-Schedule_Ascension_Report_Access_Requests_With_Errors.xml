@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684153800000" name="Schedule Ascension Report Access Requests With Errors" nextExecution="1684240200000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="Ascension Report Access Requests With Errors"/>
+      <entry key="launcher" value="sp_anaya007"/>
+      <entry key="nextActualFireTime" value="1684240200000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 30 7 * * ? </String>
+  </CronExpressions>
+  <Description/>
+</TaskSchedule>

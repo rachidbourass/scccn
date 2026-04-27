@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684112280000" name="Schedule-AA-PolicyStat-TNNAS" nextExecution="1684198680000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="AA-PolicyStat TNNAS"/>
+      <entry key="launcher" value="sp_jpend008-albir"/>
+      <entry key="nextActualFireTime" value="1684198680000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 58 19 * * ? </String>
+  </CronExpressions>
+  <Description/>
+</TaskSchedule>

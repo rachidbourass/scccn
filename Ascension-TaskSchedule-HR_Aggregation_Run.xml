@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684130400000" name="HR Aggregation Run" nextExecution="1684216800000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="ASC-SEQ-Peoplesoft"/>
+      <entry key="launcher" value="sp_eramocki"/>
+      <entry key="nextActualFireTime" value="1684216800000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 0 1 * * ? </String>
+  </CronExpressions>
+  <Description>HR Aggregation Run</Description>
+</TaskSchedule>

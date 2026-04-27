@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1683900000000" name="SystemAdministrator Capability Certification [DATE] [7/12/22 11:15 AM]" nextExecution="1686578400000">
+  <Arguments>
+    <Map>
+      <entry key="certificationDefinitionId" value="Advanced Certification [10/8/20 11:02 AM] Modified 1657633679359"/>
+      <entry key="executor" value="Certification Manager"/>
+      <entry key="nextActualFireTime" value="1686578400000"/>
+      <entry key="resultName" value="SystemAdministrator Capability Certification [DATE] [7/12/22 11:15 AM]"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 0 9 12 * ? </String>
+  </CronExpressions>
+  <Description>Advanced Certification</Description>
+</TaskSchedule>

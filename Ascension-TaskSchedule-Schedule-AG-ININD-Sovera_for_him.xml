@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684135800000" name="Schedule-AG-ININD-Sovera for him" nextExecution="1684222200000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="AG-ININD-Sovera for him"/>
+      <entry key="launcher" value="sp_anaya007"/>
+      <entry key="nextActualFireTime" value="1684222200000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 30 2 * * ? </String>
+  </CronExpressions>
+  <Description/>
+</TaskSchedule>

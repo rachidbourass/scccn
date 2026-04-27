@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684130100000" name="Schedule-NonHR-CWR Manager Assignment Bubble UP" nextExecution="1684216500000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="NonHR-CWR Manager Assignment Bubble UP"/>
+      <entry key="launcher" value="sp_jpend008-albir"/>
+      <entry key="nextActualFireTime" value="1684216500000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 55 0 * * ? </String>
+  </CronExpressions>
+  <Description>Schedule for related task </Description>
+</TaskSchedule>

@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684123500000" name="Schedule-AGA-RACF-Invision" nextExecution="1684209900000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="AGA-RACF-Invision"/>
+      <entry key="launcher" value="sp_anaya007"/>
+      <entry key="nextActualFireTime" value="1684209900000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 5 23 * * ? </String>
+  </CronExpressions>
+  <Description/>
+</TaskSchedule>

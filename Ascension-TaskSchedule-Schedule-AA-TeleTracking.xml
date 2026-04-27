@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684128840000" name="Schedule-AA-TeleTracking" nextExecution="1684215240000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="AA-TeleTracking"/>
+      <entry key="launcher" value="sp_eramocki"/>
+      <entry key="nextActualFireTime" value="1684215240000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 34 0 * * ? </String>
+  </CronExpressions>
+  <Description/>
+</TaskSchedule>

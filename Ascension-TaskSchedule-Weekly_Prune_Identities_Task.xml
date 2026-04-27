@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1683972000000" name="Weekly Prune Identities Task" nextExecution="1684576800000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="Prune Identity Cubes"/>
+      <entry key="launcher" value="sp_jjohn568"/>
+      <entry key="nextActualFireTime" value="1684576800000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 0 5 ? * 7 </String>
+  </CronExpressions>
+  <Description/>
+</TaskSchedule>

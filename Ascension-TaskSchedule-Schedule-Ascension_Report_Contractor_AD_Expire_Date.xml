@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1683604800000" name="Schedule-Ascension Report Contractor AD Expire Date" nextExecution="1684209600000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="Ascension Report Contractor AD Expire Date"/>
+      <entry key="launcher" value="sp_anaya007"/>
+      <entry key="nextActualFireTime" value="1684209600000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 0 23 ? * 2 </String>
+  </CronExpressions>
+  <Description>Schedule-Ascension Report Contractor AD Expire Date</Description>
+</TaskSchedule>

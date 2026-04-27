@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684156200000" name="Perform Maintenance - Prune" nextExecution="1684156500000">
+  <Arguments>
+    <Map>
+      <entry key="executor" value="Perform Maintenance - Prune"/>
+      <entry key="launcher" value="sp_rsaka"/>
+      <entry key="nextActualFireTime" value="1684156500000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 0/5 * * * ?</String>
+  </CronExpressions>
+  <Description>Perform Maintenance - Prune</Description>
+</TaskSchedule>

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule id="Tableau - AscensionNational" name="Tableau - AscensionNational-SeqAgg">
+  <Arguments>
+    <Map>
+      <entry key="executor" value="Tableau - AscensionNational-SeqAgg"/>
+      <entry key="launcher" value="IDM Team"/>
+      <entry key="nextActualFireTime"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 57 18 14 * ? </String>
+  </CronExpressions>
+</TaskSchedule>

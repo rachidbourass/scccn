@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1684112220000" name="Schedule-AA-Optimum-Patcom" nextExecution="1684198620000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="executor" value="AA-Optimum-Patcom"/>
+      <entry key="launcher" value="sp_jpend008-albir"/>
+      <entry key="nextActualFireTime" value="1684198620000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 57 19 * * ? </String>
+  </CronExpressions>
+  <Description/>
+</TaskSchedule>
