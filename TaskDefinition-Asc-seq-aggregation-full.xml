@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition formPath="/monitor/tasks/sequentialTask.xhtml" name="ASC-SEQ-Aggregation-FULL" resultAction="Rename" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="44281"/>
+      <entry key="TaskDefinition.runLengthTotal" value="14657083"/>
+      <entry key="TaskDefinition.runs" value="331"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="exitOnError" value="false"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+      <entry key="taskList" value="AA-DB-Peoplesoft-HCM-Primary, AA-AD-ACMHO FULL no Optimization, AA-AD-AHSCN FULL No Optimization, AA-AD-KSWIC FULL No Optimization, AA-AD-MIROC FULL No Optimization, AA-AD-OKTUL FULL No Optimization, AA-AD-WIAPP FULL No Optimization, AA-AD-WIGLE FULL No Optimization, AA-AD-DS FULL no Optimization, AA-AD-AID FULL no Optimization, AA-AD-AMITA FULL no Optimization, AA-AD-PRESENCEHEALTH FULL no Optimization, AA-DUO, AA-Azure, AA-GSuite-FULL"/>
+      <entry key="trace" value="false"/>
+    </Map>
+  </Attributes>
+  <Description>Template for creating a task that runs multiple other tasks.</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="sp_eramocki"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Sequential Task Launcher"/>
+  </Parent>
+</TaskDefinition>

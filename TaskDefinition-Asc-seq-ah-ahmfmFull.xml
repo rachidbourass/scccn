@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition formPath="/monitor/tasks/sequentialTask.xhtml" name="ASC-SEQ-AH-AHMFM Full" resultAction="Delete" subType="task_item_type_generic" type="Generic">
+  <Attributes>
+    <Map>
+      <entry key="TaskDefinition.runLengthAverage" value="744"/>
+      <entry key="TaskDefinition.runLengthTotal" value="558878"/>
+      <entry key="TaskDefinition.runs" value="751"/>
+      <entry key="TaskSchedule.host"/>
+      <entry key="exitOnError" value="false"/>
+      <entry key="taskCompletionEmailNotify" value="Disabled"/>
+      <entry key="taskCompletionEmailRecipients"/>
+      <entry key="taskCompletionEmailTemplate"/>
+      <entry key="taskList" value="AA-AD-AHMFM FULL"/>
+      <entry key="trace" value="false"/>
+    </Map>
+  </Attributes>
+  <Description>Scheduled Task to launch aggregation of AH-AMFM Full aggregation</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="sp_zelkoj01"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Sequential Task Launcher"/>
+  </Parent>
+</TaskDefinition>

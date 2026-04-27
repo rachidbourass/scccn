@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule name="5b88a1545c6045b59391e63e560fccaa">
+  <Arguments>
+    <Map>
+      <entry key="executor" value="AA-Cerner Dependent"/>
+      <entry key="launcher" value="sp_svemuru"/>
+      <entry key="locale" value="en_US"/>
+      <entry key="timezone" value="Asia/Calcutta"/>
+    </Map>
+  </Arguments>
+  <Description>Immediate task runner</Description>
+</TaskSchedule>

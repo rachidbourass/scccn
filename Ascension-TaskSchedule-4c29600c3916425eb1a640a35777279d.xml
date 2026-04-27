@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule name="4c29600c3916425eb1a640a35777279d">
+  <Arguments>
+    <Map>
+      <entry key="executor" value="AA-Passport"/>
+      <entry key="launcher" value="sp_kramalin"/>
+      <entry key="locale" value="en_US"/>
+      <entry key="timezone" value="Asia/Calcutta"/>
+    </Map>
+  </Arguments>
+  <Description>Immediate task runner</Description>
+</TaskSchedule>

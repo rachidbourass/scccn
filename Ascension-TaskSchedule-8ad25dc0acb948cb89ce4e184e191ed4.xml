@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule name="8ad25dc0acb948cb89ce4e184e191ed4">
+  <Arguments>
+    <Map>
+      <entry key="certificationGroupId" value="0af01f3e879f117981879f9bd3f14204"/>
+      <entry key="executor" value="Apply Certification Definition Changes"/>
+      <entry key="launcher" value="sp_ssany005"/>
+    </Map>
+  </Arguments>
+  <Description>Immediate task runner</Description>
+</TaskSchedule>
