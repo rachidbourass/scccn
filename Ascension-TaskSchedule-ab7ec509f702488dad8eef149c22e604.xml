@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule name="ab7ec509f702488dad8eef149c22e604">
+  <Arguments>
+    <Map>
+      <entry key="SequentialTask.monitoringTaskResult" value="ASC-SEQ-Aggregation-Task - 2714"/>
+      <entry key="executor" value="AA-DUO"/>
+      <entry key="launcher" value="sp_eramocki"/>
+      <entry key="resultId" value="0af0603f87071d0a81873223b8e34abc"/>
+    </Map>
+  </Arguments>
+  <Description>Immediate task runner</Description>
+</TaskSchedule>

@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule name="02413da2cdb64f819525c93f45e0cd6a">
+  <Arguments>
+    <Map>
+      <entry key="executor" value="Temp-Populate-DomainAccounts"/>
+      <entry key="launcher" value="sp_rsaka"/>
+      <entry key="locale" value="en_US"/>
+      <entry key="timezone" value="America/New_York"/>
+    </Map>
+  </Arguments>
+  <Description>Immediate task runner</Description>
+</TaskSchedule>

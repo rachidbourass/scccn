@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule lastExecution="1682832300000" name="AA-PWCSmart" nextExecution="1685424300000">
+  <Arguments>
+    <Map>
+      <entry key="TaskSchedule.host" value="andc1wapp0147"/>
+      <entry key="executor" value="AA-PWCSmart"/>
+      <entry key="launcher" value="sp_svemuru"/>
+      <entry key="nextActualFireTime" value="1685424300000"/>
+    </Map>
+  </Arguments>
+  <CronExpressions>
+    <String>0 25 0 30 * ? </String>
+    <String>0 25 0 28 2 ? *</String>
+  </CronExpressions>
+  <Description/>
+</TaskSchedule>

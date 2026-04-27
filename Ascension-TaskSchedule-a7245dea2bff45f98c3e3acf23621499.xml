@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskSchedule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskSchedule name="a7245dea2bff45f98c3e3acf23621499">
+  <Arguments>
+    <Map>
+      <entry key="SequentialTask.monitoringTaskResult" value="0af01f3e86be11d68186c48696431b2d"/>
+      <entry key="executor" value="AGA-GSuite"/>
+      <entry key="launcher" value="sp_eramocki"/>
+      <entry key="resultId" value="0af01f3e86be11d68186c48696941b2e"/>
+    </Map>
+  </Arguments>
+  <Description>Immediate task runner</Description>
+</TaskSchedule>
