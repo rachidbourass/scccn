@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" monitored="true" name="Ascension-Workflow-Lifecycle-UserTypeChange" type="IdentityLifecycle">
+  <Variable input="true" name="trigger">
+    <Description>The IdentityTrigger</Description>
+  </Variable>
+  <Variable input="true" name="event" transient="true">
+    <Description>
+      The IdentityChangeEvent.  It can be used to build the provisioning plan, but does not need to bepersisted with the case, so marked as transient.
+    </Description>
+  </Variable>
+  <Variable initializer="false" input="true" name="trace">
+    <Description>
+      Used for debugging this workflow and when set to true trace will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable input="true" name="launcher"/>
+  <Variable initializer="true" name="trace"/>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable input="true" name="event" transient="true">
+    <Description>
+      The IdentityChangeEvent.  It can be used to build
+      the provisioning plan, but does not need to be
+      persisted with the case, so marked as transient.
+    </Description>
+  </Variable>
+  <Variable initializer="string:AccessRequest" input="true" name="flow">
+    <Description>The name of the LCM flow that launched this workflow.</Description>
+  </Variable>
+  <Variable initializer="string:LCE" input="true" name="source">
+    <Description>
+      String version of sailpoint.object.Source to indicate where the request originated.  Defaults to LCE.
+    </Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      Query for this using a projection query and fall back to the name.
+    </Description>
+  </Variable>
+  <Variable editable="true" input="true" name="requestType">
+    <Description>The Decider determining the Use Case</Description>
+  </Variable>
+  <Variable input="true" name="inputMap"/>
+  <Description>
+    This is the Workflow for User Type Change Process
+  </Description>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Persona-Management-RuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="LCM Workflow Library"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Gsuite-Email-Provisioning"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-GSuite-AccessToken"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-Ascension-ExistingAccount-RuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-Ascension-EmailAddress-RuleLibrary"/>
+  </RuleLibraries>
+  <Step icon="Start" monitored="true" name="Start" posX="2" posY="135">
+    <Transition to="Process Conversion"/>
+    <Transition to="End"/>
+  </Step>
+  <Step icon="Task" name="Process Conversion" posX="481" posY="122">
+    <Arg name="event" value="ref:event"/>
+    <Script>
+      <Source><![CDATA[
+        import org.apache.log4j.Logger;
+        import sailpoint.object.Identity;
+        import sailpoint.server.Auditor;
+        import sailpoint.object.AuditEvent;    
+        String prevType=null;
+        String newType=null;
+        String strEmail = null;
+        String gStatus = null;
+        String prevgStatus = null;
+        try{
+
+        if(event != null){
+
+        Identity oldIdentity = event.getOldObject();
+        Identity newIdentity = event.getNewObject();
+        if(oldIdentity!=null && newIdentity!=null){
+        prevType = oldIdentity.getType();
+        newType = newIdentity.getType();
+        prevgStatus = oldIdentity.getStringAttribute("gsuiteStatus");
+        }
+        } else if(null != inputMap){
+        newType = inputMap.get("new_type");  
+        prevType = inputMap.get("old_type");
+        prevgStatus = inputMap.get("old_gsuite_status");
+        }
+        Identity identity = context.getObjectByName(Identity.class, identityName);
+
+        if(null!=identity){
+        modifyGsuiteLicense(identityName,"typeChange"); 
+        if(null!=identity.getAttribute("email"))
+        {
+        strEmail=identity.getAttribute("email");
+        }
+        if(null!=identity.getAttribute("gsuiteStatus"))
+        {
+        gStatus=identity.getAttribute("gsuiteStatus");
+        }
+
+        identity.setAttribute("ctrexpDt", " ");
+        context.saveObject(identity);
+
+        //Write Audit records to IIQ.
+        String auditString1 = "Identity that was processed-Type Change: "+identityName;
+        String auditString2 = "Previous Type Value : "+prevType +", New EmpType value : "+newType;
+        String auditString3 = "Previous GSuite Status : "+prevgStatus +", New Gsuite Status : "+gStatus;
+
+        String strAction=null;
+        String strTarget=null;
+        AuditEvent adtEvent=null;
+
+        strTarget=identityName;
+        strAction = "UserTypeChange";
+        if(Auditor.isEnabled(strAction)){
+        adtEvent = new AuditEvent();
+        adtEvent.setSource("UserTypeChange");
+        adtEvent.setTarget(strTarget);
+        adtEvent.setAction(strAction);
+        adtEvent.setAccountName(strEmail);
+        adtEvent.setAttributeName("UserTypeChange Process");
+        adtEvent.setApplication("IIQ");
+
+        adtEvent.setString1(auditString1);
+        adtEvent.setString2(auditString2);
+        adtEvent.setString3(auditString3);
+
+        Auditor.log(adtEvent);
+        context.commitTransaction();
+
+        }
+        }
+        }catch(Exception e){
+
+        throw e;
+        }
+
+
+     ]]></Source>
+    </Script>
+    <Transition to="Refresh Identity"/>
+  </Step>
+  <Step action="call:refreshIdentity" condition="ref:doRefresh" icon="Task" name="Refresh Identity" posX="599" posY="315">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="correlateEntitlements" value="true"/>
+    <Arg name="provision" value="true"/>
+    <Arg name="synchronizeAttributes" value="true"/>
+    <Arg name="event" value="ref:event"/>
+    <Description>
+      Add arguments as necessary to enable refresh features.  Typically you only want this
+      to correlate roles and possibly provision if we notice new assigned roles.
+      Note that provisioning will be done in the Identity Refresh workflow so if there
+      are any provisioning forms to display we won't feed them directly to the 
+      current user, they'll have to return to the inbox.
+    </Description>
+    <Transition to="end"/>
+  </Step>
+  <Step icon="Stop" monitored="true" name="end" posX="960" posY="17"/>
+</Workflow>

@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Ascension-Workflow-NestedGWSGroup-Remediations" type="Subprocess">
+  <Variable input="true" name="certificationObj">
+    <Description>Certification object passed in from Ascension-Rule-Certification-NestedGWSGroups-EndPhase</Description>
+  </Variable>
+  <Variable editable="true" input="true" name="remediations" output="true">
+    <Description>Placeholder variable for list of remediations gathered during workflow</Description>
+    <Script>
+      <Source><![CDATA[
+         return new ArrayList();
+      ]]></Source>
+    </Script>
+  </Variable>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Rule-GSuite-AccessToken"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="20" posY="20">
+    <Transition to="Gather Remediations"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="496" posY="20"/>
+  <Step icon="Default" name="Gather Remediations" posX="196" posY="20" resultVariable="remediations">
+    <Arg name="certificationObj" value="ref:certificationObj"/>
+    <Arg name="remediations" value="ref:remediations"/>
+    <Return name="remediations" to="remediations"/>
+    <Script>
+      <Source><![CDATA[  import sailpoint.object.Certification;
+  import sailpoint.object.CertificationAction;
+  import sailpoint.object.CertificationEntity;
+  import sailpoint.object.CertificationItem;
+  import sailpoint.tools.Util;
+
+  if (certificationObj != null) {
+
+    List entities = certificationObj.getEntities();
+
+    for (CertificationEntity entity : entities) {
+
+      List certItems = entity.getItems();
+
+      for (CertificationItem item : certItems) {
+
+        log.error("Looping items: " + item);
+
+        if (Util.nullSafeCaseInsensitiveEq(item.getAction().getStatus().toString(), "Remediated")) {
+
+           remediations.add(item);
+
+        }
+
+      }
+
+    }
+
+  }
+      
+
+return remediations;
+      ]]></Source>
+    </Script>
+    <Transition to="Audit and Process Remediations"/>
+  </Step>
+  <Step icon="Default" name="Audit and Process Remediations" posX="352" posY="20">
+    <Arg name="remediations" value="ref:remediations"/>
+    <Script>
+      <Source><![CDATA[  import sailpoint.object.AuditEvent;
+  import sailpoint.object.Certification;
+  import sailpoint.object.CertificationAction;
+  import sailpoint.object.CertificationEntity;
+  import sailpoint.object.CertificationItem;
+  import sailpoint.object.Identity;
+  import sailpoint.tools.Util;
+   
+ 
+   private int removeGSuiteGroupMember(String groupKey, String memberKey) {
+    
+    System.out.println("In Method: removeGSuiteGroupMember");
+
+    int responseCode;
+    token = context.decrypt(jobj); //Passed in via global variable (Rule-GSuite-AccessToken).
+
+    try {
+
+      String urlStr = "https://admin.googleapis.com/admin/directory/v1/groups/" + groupKey + "/members/" + memberKey;
+      URL url = new URL(urlStr);
+
+      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn.setDoOutput(true);
+      conn.setRequestMethod("DELETE");
+      conn.setRequestProperty("Content-Type", "application/json");
+      conn.setRequestProperty("Authorization", "Bearer "+ token);
+
+      responseCode = conn.getResponseCode();
+
+    } catch (FileNotFoundException e) {
+
+      //Handle but do nothing
+
+    } catch (java.io.IOException e) {
+
+      //Handle but do nothing
+
+    }
+
+    return responseCode;
+
+ }
+
+
+ private void auditGSuiteGroupMemberRemovalPreCall(String certificationId, String actor, String actorDisplayName, String groupKey, String memberKey) {
+
+    AuditEvent auditEvent = new AuditEvent();
+    auditEvent.setApplication("GSuite");
+    auditEvent.setSource("CertificationRemediation");
+    auditEvent.setAction("Comment");
+    auditEvent.setTarget(groupKey);
+    auditEvent.setAttributeName("Groups");
+    auditEvent.setAttributeValue(memberKey);
+    auditEvent.setString1("Nested GSuite Group to be removed from Parent Group per Access Review.");
+    auditEvent.setString2("Actor Identity: " + actor);
+    auditEvent.setString3("Actor Display Name: " + actorDisplayName);
+    auditEvent.setString4("Certification ID: " + certificationId);
+    context.saveObject(auditEvent);
+    context.commitTransaction();
+
+ }
+
+ private void auditGSuiteGroupMemberRemovalPostCall(String certificationId, String actor, String actorDisplayName, String groupKey, String memberKey, int responseCode) {
+
+    AuditEvent auditEvent = new AuditEvent();
+    auditEvent.setApplication("GSuite");
+    auditEvent.setSource("CertificationRemediation");
+    auditEvent.setAction("Comment");
+    auditEvent.setTarget(groupKey);
+    auditEvent.setAttributeName("Groups");
+    auditEvent.setAttributeValue(memberKey);
+    auditEvent.setString1("API Response Code: " + responseCode);
+    auditEvent.setString2("Actor Identity: " + actor);
+    auditEvent.setString3("Actor Display Name: " + actorDisplayName);
+    auditEvent.setString4("Certification ID: " + certificationId);
+    context.saveObject(auditEvent);
+    context.commitTransaction();
+
+ }
+
+ if (!remediations.isEmpty()) {
+
+    int responseCode = 0;
+
+    for (CertificationItem item : remediations) {
+
+      String groupKey = item.getCertificationEntity().getNativeIdentity();
+      String memberKey = item.getExceptionAttributeValue();
+      String certificationId = item.getAction().getDecisionCertificationId();
+      String actorDisplayName = item.getAction().getActorDisplayName();
+      String actor = item.getAction().getActorName();
+
+      if (Util.isNotNullOrEmpty(groupKey) && 
+          Util.isNotNullOrEmpty(memberKey) && 
+          Util.isNotNullOrEmpty(certificationId) &&
+          Util.isNotNullOrEmpty(actorDisplayName) &&
+          Util.isNotNullOrEmpty(actor)) {
+
+          auditGSuiteGroupMemberRemovalPreCall(certificationId, actor, actorDisplayName, groupKey, memberKey);
+
+          responseCode = removeGSuiteGroupMember(groupKey, memberKey);
+
+          auditGSuiteGroupMemberRemovalPostCall(certificationId, actor, actorDisplayName, groupKey, memberKey, responseCode);
+
+          
+      } else {
+
+        log.error(workflow.getName() + "One or more required parameters missing after evaluating CertificationItem, proceeding to next iteration...");
+
+      }
+
+    }
+
+ }]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+</Workflow>

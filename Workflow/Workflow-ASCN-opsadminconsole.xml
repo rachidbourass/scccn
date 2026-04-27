@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow handler="sailpoint.api.StandardWorkflowHandler" name="ASCN-Workflow-Opsadminconsole">
+  <Variable name="identityName"/>
+  <Variable name="errorMsg"/>
+  <Variable name="logName">
+    <Script>
+      <Source><![CDATA[
+        return "ASCN.Workflow."+workflow.getName();
+      ]]></Source>
+    </Script>
+  </Variable>
+  <Variable name="selectedWorkItems"/>
+  <Variable name="selectedWorkItemNames"/>
+  <Variable input="true" name="httpSession" transient="true">
+    <Description>httpSession</Description>
+  </Variable>
+  <Variable name="employee"/>
+  <Variable name="comments"/>
+  <Variable name="manager"/>
+  <Variable name="sendMail"/>
+  <Variable name="actionType"/>
+  <Variable name="targetOwner"/>
+  <Variable name="taskName"/>
+  <Variable name="idAttribute"/>
+  <Variable name="op"/>
+  <Variable name="oldValue"/>
+  <Variable name="newValueExpDate"/>
+  <Variable name="newValue"/>
+  <Variable initializer="Ops Override" name="flow"/>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="ASCN-Rule-Opsadminconsole-Rulelibrary"/>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="25" posY="50">
+    <Transition to="Launch Form"/>
+  </Step>
+  <Step icon="Approval" name="Launch Form" posX="50" posY="50">
+    <Approval name="Launch Form" owner="ref:launcher" return="employee,actionType,appname,entitlements,sendMail,manager,comments,origRequestId,taskName,processLifeCycle,appRoles,idAttribute,op,operation,oldValue,newValueExpDate,newValue,singleAggAppName,singleAggAccountName,userForTask">
+      <Arg name="workItemForm" value="ASCN-Form-Opsadminconsole"/>
+      <Arg name="workItemDescription" value="ASCN Ops Admin Console"/>
+    </Approval>
+    <Transition to="Stop" when="!script:approved"/>
+    <Transition to="Enable Identity Links" when="script:(&quot;Enable Identity Links&quot;.equals(actionType))"/>
+    <Transition to="Disable Identity Links" when="script:(&quot;Disable Identity Links&quot;.equals(actionType))"/>
+    <Transition to="Request Entitlements" when="script:(&quot;Request Entitlements&quot;.equals(actionType))"/>
+    <Transition to="Relaunch Joiner" when="script:(&quot;Relaunch Joiner&quot;.equals(actionType))"/>
+    <Transition to="Run Task" when="script:(&quot;Run Task&quot;.equals(operation))"/>
+    <Transition to="Remove Entitlements" when="script:(&quot;Remove Entitlements&quot;.equals(actionType))"/>
+    <Transition to="Update Manager" when="script:(&quot;Update Manager&quot;.equals(actionType))"/>
+    <Transition to="Update Attribute" when="script:(&quot;Update Attribute&quot;.equals(actionType))"/>
+    <Transition to="Account Aggregation Result Form" when="script:(&quot;Single Account Aggregation&quot;.equals(operation))"/>
+    <Transition to="Relaunch Termination" when="script:(&quot;Relaunch Termination&quot;.equals(actionType))"/>
+    <Transition to="Stop"/>
+  </Step>
+  <Step background="true" icon="task" name="Enable Identity Links" posX="75" posY="50">
+    <Arg name="flow" value="Ops Enable Identity Links"/>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.ProvisioningPlan;
+
+        trace(logName,"Entering Step: "+wfcontext.getStep().getName());
+        addMessage(wfcontext, "Entering Step: "+wfcontext.getStep().getName());
+        try{
+        ProvisioningPlan plan = enableAllLinks(employee);     
+        debug(logName,"ProvisioningPlan::"+plan.toXml());
+        launchWorkflow(employee,plan,comments,flow);
+        logAuditEvent("Enable Identity Links",null,null,comments,employee);
+        }catch(Exception e) {
+        errorMsg = "Exception encountered in: "+wfcontext.getStep().getName()+" "+e;
+        error(logName, errorMsg,e);
+        workflow.put("Message", errorMsg);
+        handleWorkFlowException(wfcontext, e);
+        }
+        trace(logName,"Exiting Step: "+wfcontext.getStep().getName());
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step background="true" icon="task" name="Disable Identity Links" posX="100" posY="50">
+    <Arg name="flow" value="Ops Disable Identity Links"/>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.ProvisioningPlan;
+        trace(logName,"Entering Step: "+wfcontext.getStep().getName());
+        try{
+        ProvisioningPlan plan = disableAllLinks(employee); 
+        debug(logName,"ProvisioningPlan::"+plan.toXml());
+        launchWorkflow(employee,plan,comments,flow);
+        logAuditEvent("Disable Identity Links",null,null,comments,employee);
+        }catch(Exception e) {
+        errorMsg = "Exception encountered in: "+wfcontext.getStep().getName()+" "+e;
+        error(logName, errorMsg,e);
+        workflow.put("Message", errorMsg);
+        handleWorkFlowException(wfcontext, e);
+        }
+        trace(logName,"Exiting Step: "+wfcontext.getStep().getName());
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="task" name="Run Task" posX="125" posY="50">
+    <Script>
+      <Source><![CDATA[
+        trace(logName,"Entering Step: "+wfcontext.getStep().getName());
+        try{
+        TaskResult tResult = opsRunTask(taskName,userForTask,launcher);
+        String usersList = Util.listToCsv(userForTask);
+        String status = tResult.getCompletionStatus()+"::"+usersList;
+        debug(logName,"Task Status and users List: "+status);
+
+        logAuditEvent("Run Task","taskName",taskName,comments,status);
+        }catch(Exception e) {
+        errorMsg = "Exception encountered in: "+wfcontext.getStep().getName()+" "+e;
+        error(logName, errorMsg,e);
+        workflow.put("Message", errorMsg);
+        handleWorkFlowException(wfcontext, e);
+        }
+        trace(logName,"Exiting Step: "+wfcontext.getStep().getName());
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step background="true" icon="task" name="Remove Entitlements" posX="125" posY="50">
+    <Arg name="flow" value="Ops Remove Entitlment"/>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.ProvisioningPlan; 
+
+        trace(logName,"Entering Step: "+wfcontext.getStep().getName());
+        try{
+        ProvisioningPlan plan = getEntitlementPlan(employee,appname,entitlements,"Remove");       
+        launchWorkflow(employee,plan,comments,flow);
+        String entitlementsList = Util.listToCsv(entitlements);
+        logAuditEvent("Remove Entitlements","entitlements",entitlementsList,comments,employee);
+        }catch(Exception e){
+        errorMsg = "Exception encountered in: "+wfcontext.getStep().getName()+" "+e;
+        log.error(errorMsg);
+        }
+        log.trace("Exiting Step: "+wfcontext.getStep().getName());
+        return;
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step background="true" icon="task" name="Request Entitlements" posX="150" posY="50">
+    <Arg name="flow" value="Ops Request Access"/>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.ProvisioningPlan;
+        trace(logName,"Entering Step: "+wfcontext.getStep().getName());
+        try{
+        ProvisioningPlan plan = getEntitlementPlan(employee,appname,entitlements,"Add");
+        launchWorkflow(employee,plan,comments,flow);
+        String entitlementsList = Util.listToCsv(entitlements);
+        logAuditEvent("Request Entitlements","entitlements",entitlementsList,comments,employee);
+        }catch(Exception e) {
+        errorMsg = "Exception encountered in: "+wfcontext.getStep().getName()+" "+e;
+        error(logName, errorMsg,e);
+        workflow.put("Message", errorMsg);
+        handleWorkFlowException(wfcontext, e);
+        }
+        trace(logName,"Exiting Step: "+wfcontext.getStep().getName());     
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step background="true" icon="task" name="Relaunch Joiner" posX="175" posY="50">
+    <Script>
+      <Source><![CDATA[ 
+        log.trace("Entering Step: "+wfcontext.getStep().getName());
+        try{
+        cleanUpIdentity(employee);
+        launchWorkflow(employee,"Ascension-Workflow-Persona-Joiner-Process",launcher,false,comments);
+        logAuditEvent("Relaunch Joiner",null,null,comments,employee);
+        }catch(Exception e) {
+        errorMsg = "Exception encountered in: "+wfcontext.getStep().getName()+" "+e;
+        error(logName, errorMsg,e);
+        workflow.put("Message", errorMsg);
+        handleWorkFlowException(wfcontext, e);
+        }
+        trace(logName,"Exiting Step: "+wfcontext.getStep().getName());
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step background="true" icon="task" name="Relaunch Termination" posX="175" posY="50">
+    <Script>
+      <Source><![CDATA[
+        trace(logName,"Entering Step: "+wfcontext.getStep().getName());
+        try{
+        launchLeaver(employee,"Ascension-Workflow-Immediate-Termination",launcher);
+        logAuditEvent("Relaunch Termination",null,null,comments,employee);
+        }catch(Exception e) {
+        errorMsg = "Exception encountered in: "+wfcontext.getStep().getName()+" "+e;
+        error(logName, errorMsg,e);
+        workflow.put("Message", errorMsg);
+        handleWorkFlowException(wfcontext, e);
+        }
+        trace(logName,"Exiting Step: "+wfcontext.getStep().getName());
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step background="true" icon="task" name="Update Manager" posX="75" posY="50">
+    <Arg name="flow" value="Ops Update Manager"/>
+    <Script>
+      <Source><![CDATA[   
+        trace(logName,"Entering Step: "+wfcontext.getStep().getName());
+        try{
+        ProvisioningPlan plan = getIdentityCubePlan(employee,"manager",manager);
+        launchWorkflow(employee,plan,comments,flow);
+        logAuditEvent("Update Manager","manager",manager,comments,employee);
+        }catch(Exception e) {
+        errorMsg = "Exception encountered in: "+wfcontext.getStep().getName()+" "+e;
+        error(logName, errorMsg,e);
+        workflow.put("Message", errorMsg);
+        handleWorkFlowException(wfcontext, e);
+        }
+        trace(logName,"Exiting Step: "+wfcontext.getStep().getName());
+        return;
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step background="true" icon="task" name="Update Attribute" posX="75" posY="50">
+    <Arg name="flow" value="Ops Update Attribute"/>
+    <Arg name="approvalScheme" value="none"/>
+    <Script>
+      <Source><![CDATA[
+        trace(logName,"Entering Step: "+wfcontext.getStep().getName());
+        try{
+        ProvisioningPlan plan = null;
+        String opsconCustomObjectName = "ASCN-Custom-Opsadminconsole";
+        String updateAttrKey ="updateAttribute";   
+
+        if(op!=null){
+        if(op.equals("Update")){
+        if(newValueExpDate != null){
+        plan  = getIdentityCubePlan(employee,"ctrexpDt",newValueExpDate);
+        }
+        else{
+        String idAtrr = GeneralUtils.loadCustomMap("updateAttribute", opsconCustomObjectName).get(idAttribute);
+        plan = getIdentityCubePlan(employee,idAtrr,newValue);
+
+        }
+        }
+        else{
+        if(idAttribute.equals("Contractor Expiration Date")){
+        plan = getIdentityCubePlan(employee,"ctrexpDt",null);
+        }
+        else{
+        String idAtrr = GeneralUtils.loadCustomMap("updateAttribute", opsconCustomObjectName).get(idAttribute);
+        plan = getIdentityCubePlan(employee,idAtrr,null);
+        }
+        }
+
+        launchWorkflow(employee,plan,comments,flow);
+        if(newValueExpDate != null){
+        logAuditEvent("Update Attribute",idAttribute,newValueExpDate,comments,employee);
+        } else {
+        logAuditEvent("Update Attribute",idAttribute,newValue,comments,employee);
+        }       
+        return;
+        }
+        }catch(Exception e) {
+        errorMsg = "Exception encountered in: "+wfcontext.getStep().getName()+" "+e;
+        error(logName, errorMsg,e);
+        workflow.put("Message", errorMsg);
+        handleWorkFlowException(wfcontext, e);
+        }
+        trace(logName,"Exiting Step: "+wfcontext.getStep().getName());
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Approval" name="Account Aggregation Result Form" posX="50" posY="50">
+    <Approval name="Account Aggregation Result Form" owner="ref:launcher">
+      <Arg name="workItemType" value="Form"/>
+      <Arg name="workItemForm" value="ASCN-Form-Opsadminconsole-SingleAccAgg"/>
+      <Arg name="workItemDescription" value="ASCN Ops Admin Console"/>
+      <Arg name="singleAggAppName" value="ref:singleAggAppName"/>
+      <Arg name="singleAggAccountName" value="ref:singleAggAccountName"/>
+    </Approval>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="200" posY="50"/>
+</Workflow>

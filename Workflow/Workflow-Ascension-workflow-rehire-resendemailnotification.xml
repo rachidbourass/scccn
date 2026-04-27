@@ -1,0 +1,440 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" libraries="Identity" monitored="true" name="Ascension-Workflow-Rehire-ResendEmailNotification" type="subprocess">
+  <Variable initializer="script:return &quot;ASCN.Workflow.&quot;+workflow.getName();" name="logName"/>
+  <Variable initializer="true" name="trace"/>
+  <Variable input="true" name="identityName"/>
+  <Variable name="identityType"/>
+  <Variable name="temporaryPassword"/>
+  <Variable name="templateName"/>
+  <Variable name="stepName"/>
+  <Variable name="identity">
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Identity;
+        Identity identity = context.getObjectByName(Identity.class, identityName);
+        return identity;
+      ]]></Source>
+    </Script>
+  </Variable>
+  <Variable name="hiringManager">
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Identity;
+        String managerEmail = "Not Available";
+        Identity identity = context.getObjectByName(Identity.class, identityName);
+        if(identity != null){
+        Identity managerIdentity = identity.getManager();
+        if(managerIdentity != null && managerIdentity.getEmail() != null){
+        managerEmail = managerIdentity.getEmail();
+        }
+        }
+        return managerEmail;
+      ]]></Source>
+    </Script>
+  </Variable>
+  <Variable name="adAccountsList"/>
+  <Description>Workflow to resend Email Notification</Description>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="ASCN-RuleLibrary-Common"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-Rehire"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-Encryption"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+    <Transition to="Find Matching AD Account"/>
+  </Step>
+  <Step icon="Default" name="Find Matching AD Account" posX="98" posY="10" resultVariable="proceedToResetPassword">
+    <Script>
+      <Source><![CDATA[
+        Map rehireAccountsMap = new HashMap();
+        List potentialAccountsList = new ArrayList();
+        List adAccountsList = new ArrayList();
+        boolean proceedToResetPassword = true;
+
+        String message = "";        
+        
+        addMessage(wfcontext, "Started Workflow - Ascension-Workflow-Rehire-ResendEmailNotification for user: " + identityName);
+
+        Identity identity = context.getObjectByName(Identity.class, identityName);
+
+        rehireAccountsMap = findPotentialAccountsForRehire(identityName,"");
+
+        if(rehireAccountsMap != null){
+        potentialAccountsList = rehireAccountsMap.get("potentialAccountsList");
+        }
+
+        if(potentialAccountsList != null){
+        for(String potentialAccount: potentialAccountsList){
+        if(potentialAccount.startsWith("AD-")){
+        adAccountsList.add(potentialAccount.split(":")[1]);
+        }
+        }
+        }
+
+        if(adAccountsList.size() > 1){
+        
+        //more than one valid AD account present for user
+        addMessage(wfcontext, "More than one valid AD account found for Password Reset");
+        proceedToResetPassword = false;
+        
+        } else if(adAccountsList.size() < 1){
+        
+        //no valid AD account present for user
+        addMessage(wfcontext, "No valid AD account found for Password Reset");
+        proceedToResetPassword = false;
+        
+        } 
+        
+        if(proceedToResetPassword){
+        addMessage(wfcontext, "Valid AD account found for Password Reset");
+        }
+
+        workflow.put("adAccountsList", adAccountsList);
+
+        return proceedToResetPassword;
+      ]]></Source>
+    </Script>
+    <Transition to="Stop">
+      <Script>
+        <Source><![CDATA[
+          if(wfcase.hasErrors()){
+          workflow.put("stepName" , wfcontext.getStep().getName());
+          return true;
+          } else{
+          return false;
+          }
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Reset Password" when="(proceedToResetPassword)"/>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Default" name="Reset Password" posX="98" posY="10" resultVariable="temporaryPassword">
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.ProvisioningPlan;
+        import sailpoint.object.ProvisioningPlan.Operation;  
+        import sailpoint.object.ProvisioningPlan.AccountRequest; 
+        import sailpoint.object.ProvisioningPlan.AttributeRequest;
+        import sailpoint.api.Provisioner;
+        
+        String temporaryPassword = "";
+        try{
+        List adAccountsList = workflow.get("adAccountsList");
+        String matchingAccountName = adAccountsList.get(0);
+        List linksAccount= (List) identity.getLinks();
+        ProvisioningPlan plan = new ProvisioningPlan();
+        List accReqs = new ArrayList();
+        if( null != linksAccount){
+        Iterator itrlinksAccount = linksAccount.iterator();
+        while(itrlinksAccount.hasNext()){
+        Link account = (Link) itrlinksAccount.next();
+        if(null != account  && null != account.getApplication()){
+        appName = account.getApplicationName();
+        accountName = account.getNativeIdentity();
+        appType = account.getApplication().getType();
+
+        ProvisioningPlan.AccountRequest acctReqModify = new ProvisioningPlan.AccountRequest();
+
+        if(Util.isNotNullOrEmpty(appName) && Util.isNotNullOrEmpty(accountName) && Util.isNotNullOrEmpty(appType) && appType.equalsIgnoreCase("Active Directory - Direct")){
+        if(matchingAccountName.equalsIgnoreCase(accountName)){
+        temporaryPassword = resetPassword(appName, identity);
+
+        if(Util.isNotNullOrEmpty(temporaryPassword)){
+        //Create provisioning plan to set password in the target AD application
+        acctReqModify.setApplication(appName);
+        acctReqModify.setNativeIdentity(accountName);
+        acctReqModify.setOperation(ProvisioningPlan.AccountRequest.Operation.Modify);
+        List attreqs = new ArrayList();
+        attreqs.add(new AttributeRequest("password", ProvisioningPlan.Operation.Set, temporaryPassword));
+        acctReqModify.setAttributeRequests(attreqs);
+        accReqs.add(acctReqModify);
+        break;
+        }
+        }
+        }
+
+        }
+        }
+        if(accReqs != null){
+        plan.setAccountRequests(accReqs);
+        plan.setIdentity(identity);
+        plan.setNativeIdentity(identity.getStringAttribute("name"));
+        }
+
+        if(plan != null){
+        Provisioner provisioner = new Provisioner(context);
+        provisioner.execute(plan);
+        addMessage(wfcontext, "Password Reset Complete");
+        }
+        
+        }
+        } catch(Exception e){
+        error("Exception in reseting password : " + e);
+        } 
+        
+        if(Util.isNullOrEmpty(temporaryPassword)){
+        addMessage(wfcontext, "Password cannot be Reset");
+        }
+        
+        return temporaryPassword;
+      ]]></Source>
+    </Script>
+    <Transition to="Stop">
+      <Script>
+        <Source><![CDATA[
+          if(wfcase.hasErrors()){
+          workflow.put("stepName" , wfcontext.getStep().getName());
+          return true;
+          } else{
+          return false;
+          }
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Get Identity Type" when="script:(Util.isNotNullOrEmpty(temporaryPassword))"/>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Default" name="Get Identity Type" posX="98" posY="10" resultVariable="identityType">
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.api.IdentityService;
+        import sailpoint.object.Application;
+        import sailpoint.object.Link;
+        import sailpoint.object.Identity;
+
+        Identity identity=context.getObjectByName(Identity.class,identityName);  
+        Application applicationName=context.getObjectByName(Application.class,"DB-Peoplesoft-HCM-Primary");
+        String identityType;
+        IdentityService idService = new IdentityService(context);
+        List links = idService.getLinks(identity,applicationName);
+        if(null!=links)
+        {
+        for(Link link:links){
+        identityType= link.getAttribute("PER_ORG");
+        if(null!=identityType && "EMP".equalsIgnoreCase(identityType))
+        {
+        identityType="EMP";
+        }
+        else if(null!=identityType && "CWR".equalsIgnoreCase(identityType))
+        {
+        identityType="CWR";
+        }
+        else{
+        return null;
+        }
+        }
+        }
+        debug(logName, "identityType" + identityType);
+        return identityType;
+
+      ]]></Source>
+    </Script>
+    <Transition to="Stop">
+      <Script>
+        <Source><![CDATA[
+          if(wfcase.hasErrors()){
+          workflow.put("stepName" , wfcontext.getStep().getName());
+          return true;
+          } else{
+          return false;
+          }
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Set Template Name" when="(null != identityType)"/>
+    <Transition to="Stop"/>
+  </Step>
+  <Step name="Set Template Name" posX="454" posY="126" resultVariable="templateName">
+    <Script>
+      <Source><![CDATA[
+        String templateName = null;
+        if(identityType.equals("EMP")){
+        templateName = "Ascension-EmailTemplate-Rehire-EMP-Notification";
+        } else if(identityType.equals("CWR")){
+        templateName = "Ascension-EmailTemplate-Rehire-CWR-Notification";
+        }
+        addMessage(wfcontext, "Triggering Send Email Step");
+        return templateName;
+      ]]></Source>
+    </Script>
+    <Transition to="Stop">
+      <Script>
+        <Source><![CDATA[
+          if(wfcase.hasErrors()){
+          workflow.put("stepName" , wfcontext.getStep().getName());
+          return true;
+          } else{
+          return false;
+          }
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Send Rehire Email Notification"/>
+  </Step>
+  <Step action="call:sendEmail" icon="Email" name="Send Rehire Email Notification" posX="668" posY="126">
+    <Arg name="template" value="ref:templateName"/>
+    <Arg name="cc">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.object.Custom;
+
+          List ccMembersList = new ArrayList();
+          Custom custom = context.getObjectByName(Custom.class,"Ascension-Custom-Rehire-Configuration");
+          if(null!=custom){
+          Map emailAttributes = custom.get("Email Attributes");
+          if(null != emailAttributes){
+          ccMembersList = emailAttributes.get("cc");
+          }
+          }
+          return ccMembersList;
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="workerType" value="ref:identityType"/>
+    <Arg name="activeDirectoryId">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("samAccountName"))) ? "Not Available" : identity.getStringAttribute("samAccountName")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="workerId">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("employeeId"))) ? "Not Available" : identity.getStringAttribute("employeeId")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="businessUnit">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("businessUnit"))) ? "Not Available" : identity.getStringAttribute("businessUnit")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="displayName">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("displayName"))) ? "Not Available" : identity.getStringAttribute("displayName")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="corporateJobCode">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("jobcode"))) ? "Not Available" : identity.getStringAttribute("jobcode")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="hiringManager" value="ref:hiringManager"/>
+    <Arg name="userName">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("displayName"))) ? "Not Available" : identity.getStringAttribute("displayName")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="temporaryPassword">
+      <Script>
+        <Source><![CDATA[(null == temporaryPassword || (void == temporaryPassword)) ? "Password Not Changed" : temporaryPassword]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="domain">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("domain"))) ? "Not Available" : identity.getStringAttribute("domain")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="from">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.object.Custom;
+
+          String fromAddress=null;
+          Custom custom = context.getObjectByName(Custom.class,"Ascension-Custom-Rehire-Configuration");
+          if(null!=custom){
+          Map emailAttributes = custom.get("Email Attributes");
+          if(null != emailAttributes){
+          fromAddress = emailAttributes.get("from");
+          }
+          }
+          return fromAddress;
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="to">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.object.Custom;
+
+          List toAddress= new ArrayList();
+          String dlEmailAddress = null;
+          String ministryDlEmailAddress = null;
+
+          Custom contractorCustom = context.getObjectByName(Custom.class,"Ascension-Custom-ContractorConfiguration");
+
+          //Get the Ministry DL Email address from the Custom Object
+          if(null != contractorCustom){
+          Map distributionLists = contractorCustom.get("DistributionList");
+          dlEmailAddress = distributionLists.get("IDM");
+          if(identity != null){
+          String domain = identity.getStringAttribute("domain");
+          if(null != distributionLists && !Util.isEmpty(domain)){
+          ministryDlEmailAddress = distributionLists.get(domain);
+          }
+          }
+          }
+
+          //If the Email Address is not null add them to the To Address List
+          if(Util.isNotNullOrEmpty(dlEmailAddress)){
+          toAddress.add(dlEmailAddress);
+          }
+          if(Util.isNotNullOrEmpty(hiringManager) && !Util.nullSafeCaseInsensitiveEq(hiringManager, "Not Available")){
+          toAddress.add(hiringManager);
+          }
+          if(Util.isNotNullOrEmpty(ministryDlEmailAddress)){
+          toAddress.add(ministryDlEmailAddress);
+          }
+          String toAddressStr = Util.join(toAddress, ",");
+          addMessage(wfcontext, "Notification is sent to: " + toAddressStr);
+          return toAddressStr;
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="healthMinistry">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("ministry"))) ? "Not Available" : identity.getStringAttribute("ministry")]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="operation" value="Rehire"/>
+    <Arg name="startDate">
+      <Script>
+        <Source><![CDATA[
+          String startDate = null;
+          if(identity != null){
+          startDate = findEffectiveDate(identity);
+          }
+          if(Util.isEmpty(startDate)){
+          startDate = "Not Available";
+          }
+          return startDate;
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="email">
+      <Script>
+        <Source><![CDATA[(identity == null || Util.isEmpty(identity.getStringAttribute("email"))) ? "Not Available" : identity.getStringAttribute("email")]]></Source>
+      </Script>
+    </Arg>
+    <Transition to="Stop">
+      <Script>
+        <Source><![CDATA[
+          if(wfcase.hasErrors()){
+          workflow.put("stepName" , wfcontext.getStep().getName());
+          return true;
+          } else{
+          return false;
+          }
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="1215" posY="12">
+    <Script>
+      <Source><![CDATA[
+        if(wfcase.hasErrors()){
+        throw new RuntimeException("ERROR: in step - " + workflow.get("stepName") + " : " + wfcase.getErrors());
+        }
+      ]]></Source>
+    </Script>
+  </Step>
+</Workflow>

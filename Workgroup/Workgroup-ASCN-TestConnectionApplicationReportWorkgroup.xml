@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Identity PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Identity name="ASCN-TestConnectionApplicationReportWorkgroup" workgroup="true">
+  <Attributes>
+    <Map>
+      <entry key="displayName" value="ASCN-TestConnectionApplicationReportWorkgroup"/>
+    </Map>
+  </Attributes>
+  <Description>This workgroup is for test connection report.</Description>
+  <Preferences>
+    <Map>
+      <entry key="workgroupNotificationOption">
+        <value>
+          <WorkgroupNotifationOption>MembersOnly</WorkgroupNotifationOption>
+        </value>
+      </entry>
+    </Map>
+  </Preferences>
+</Identity>

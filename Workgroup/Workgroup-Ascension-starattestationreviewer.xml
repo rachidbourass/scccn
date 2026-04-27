@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Identity PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Identity name="Ascension-StarAttestationReviewer" workgroup="true">
+  <Attributes>
+    <Map>
+      <entry key="displayName" value="Ascension-StarAttestationReviewer"/>
+      <entry key="email" value="IdentityCollabSailPointProv@ascension.org"/>
+    </Map>
+  </Attributes>
+  <Description>Star Backup Attestation Reviewer</Description>
+  <Preferences>
+    <Map>
+      <entry key="workgroupNotificationOption">
+        <value>
+          <WorkgroupNotifationOption>Both</WorkgroupNotifationOption>
+        </value>
+      </entry>
+    </Map>
+  </Preferences>
+</Identity>

@@ -1,0 +1,2696 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+	<ImportAction name="merge">
+		<ObjectConfig name="Identity">
+		<ObjectAttribute displayName="Employee ID" editMode="ReadOnly" name="employeeId" namedColumn="true" type="string">
+		<AttributeSource name="EMPLID">
+		  <ApplicationRef>
+			<Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+		  </ApplicationRef>
+		</AttributeSource>
+		<AttributeSource name="employeeNumber">
+		  <ApplicationRef>
+			<Reference class="sailpoint.object.Application" name="AD-DS"/>
+		  </ApplicationRef>
+		</AttributeSource>
+		<AttributeSource name="employeeNumber">
+		  <ApplicationRef>
+			<Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+		  </ApplicationRef>
+		</AttributeSource>
+		<AttributeSource name="employeeNumber">
+		  <ApplicationRef>
+			<Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+		  </ApplicationRef>
+		</AttributeSource>
+		<AttributeSource name="employeeNumber">
+		  <ApplicationRef>
+			<Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+		  </ApplicationRef>
+		</AttributeSource>
+		<AttributeSource name="employeeNumber">
+		  <ApplicationRef>
+			<Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+		  </ApplicationRef>
+		</AttributeSource>
+		<AttributeSource name="employeeNumber">
+		  <ApplicationRef>
+			<Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+		  </ApplicationRef>
+		</AttributeSource>
+		<AttributeSource name="employeeNumber">
+		  <ApplicationRef>
+			<Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+		  </ApplicationRef>
+		</AttributeSource>
+		<AttributeSource name="employeeNumber">
+		  <ApplicationRef>
+			<Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+		  </ApplicationRef>
+		</AttributeSource>
+		<AttributeSource name="employeeNumber">
+		  <ApplicationRef>
+			<Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+		  </ApplicationRef>
+		</AttributeSource>
+		<AttributeSource name="employeeNumber">
+		  <ApplicationRef>
+			<Reference class="sailpoint.object.Application" name="AD-Optimal"/>
+		  </ApplicationRef>
+		</AttributeSource>
+		<AttributeTargets>
+		  <AttributeTarget name="employeeNumber" provisionAllAccounts="true">
+			<ApplicationRef>
+			  <Reference class="sailpoint.object.Application" name="AD-DS"/>
+			</ApplicationRef>
+		  </AttributeTarget>
+		  <AttributeTarget name="employeeNumber" provisionAllAccounts="true">
+			<ApplicationRef>
+			  <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+			</ApplicationRef>
+		  </AttributeTarget>
+		  <AttributeTarget name="employeeNumber" provisionAllAccounts="true">
+			<ApplicationRef>
+			  <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+			</ApplicationRef>
+		  </AttributeTarget>
+		  <AttributeTarget name="employeeNumber" provisionAllAccounts="true">
+			<ApplicationRef>
+			  <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+			</ApplicationRef>
+		  </AttributeTarget>
+		  <AttributeTarget name="employeeNumber" provisionAllAccounts="true">
+			<ApplicationRef>
+			  <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+			</ApplicationRef>
+		  </AttributeTarget>
+		  <AttributeTarget name="employeeNumber" provisionAllAccounts="true">
+			<ApplicationRef>
+			  <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+			</ApplicationRef>
+		  </AttributeTarget>
+		  <AttributeTarget name="employeeNumber" provisionAllAccounts="true">
+			<ApplicationRef>
+			  <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+			</ApplicationRef>
+		  </AttributeTarget>
+		  <AttributeTarget name="employeeNumber" provisionAllAccounts="true">
+			<ApplicationRef>
+			  <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+			</ApplicationRef>
+		  </AttributeTarget>
+		  <AttributeTarget name="employeeNumber" provisionAllAccounts="true">
+			<ApplicationRef>
+			  <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+			</ApplicationRef>
+		  </AttributeTarget>
+		  <AttributeTarget name="employeeNumber" provisionAllAccounts="true">
+			<ApplicationRef>
+			  <Reference class="sailpoint.object.Application" name="AD-Optimal"/>
+			</ApplicationRef>
+		  </AttributeTarget>
+		  <AttributeTarget name="employeeNumber" provisionAllAccounts="true">
+			<ApplicationRef>
+			  <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+			</ApplicationRef>
+		  </AttributeTarget>
+		  <AttributeTarget name="customSchemas.User_Info.Employee_Number" provisionAllAccounts="true">
+			<ApplicationRef>
+			  <Reference class="sailpoint.object.Application" name="GSuite"/>
+			</ApplicationRef>
+		  </AttributeTarget>			
+		</AttributeTargets>
+		</ObjectAttribute>
+  <ObjectAttribute displayName="Date of Birth" editMode="ReadOnly" name="dob" namedColumn="true" type="string">
+    <AttributeSource name="AH_DOB_DDMM">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-DS">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-DS"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-WIAPP">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-WIGLE">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-KSWIC">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-OKTUL">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-MIROC">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-AHMFM">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-ACMHO">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-AHSCN">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="BirthDate">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-DateOfBirth-DOB MDStaff - AMITA">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - AMITA"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-DateOfBirth-DOB"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-DateOfBirth-DOB Morrisey">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Morrisey"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-DateOfBirth-DOB"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="employeeType">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+      </ApplicationRef>
+    </AttributeSource>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="ssn" editMode="ReadOnly" name="ssn" namedColumn="true" type="string">
+    <AttributeSource name="AHHR_SSN_LAST4">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-DS">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-DS"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-WIAPP">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-WIGLE">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-KSWIC">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-OKTUL">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-MIROC">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-AHMFM">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-ACMHO">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-AHSCN">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="SSN">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - AMITA"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="MaskedSSN">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="SSN">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Morrisey"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="departmentNumber">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="organizations" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Organizations"/>
+        </RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+		<ObjectAttribute displayName="Network (Logon) ID" editMode="ReadOnly" name="samAccountName" namedColumn="true" type="string">
+			<AttributeSource name="OPRID">
+			  <ApplicationRef>
+				<Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+			  </ApplicationRef>
+			</AttributeSource>
+			<AttributeSource name="sAMAccountName">
+			  <ApplicationRef>
+				<Reference class="sailpoint.object.Application" name="AD-DS"/>
+			  </ApplicationRef>
+			</AttributeSource>
+			<AttributeSource name="sAMAccountName">
+			  <ApplicationRef>
+				<Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+			  </ApplicationRef>
+			</AttributeSource>
+			<AttributeSource name="sAMAccountName">
+			  <ApplicationRef>
+				<Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+			  </ApplicationRef>
+			</AttributeSource>
+			<AttributeSource name="sAMAccountName">
+			  <ApplicationRef>
+				<Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+			  </ApplicationRef>
+			</AttributeSource>
+			<AttributeSource name="sAMAccountName">
+			  <ApplicationRef>
+				<Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+			  </ApplicationRef>
+			</AttributeSource>
+			<AttributeSource name="sAMAccountName">
+			  <ApplicationRef>
+				<Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+			  </ApplicationRef>
+			</AttributeSource>
+			<AttributeSource name="sAMAccountName">
+			  <ApplicationRef>
+				<Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+			  </ApplicationRef>
+			</AttributeSource>
+			<AttributeSource name="sAMAccountName">
+			  <ApplicationRef>
+				<Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+			  </ApplicationRef>
+			</AttributeSource>
+			<AttributeSource name="sAMAccountName">
+			  <ApplicationRef>
+				<Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+			  </ApplicationRef>
+			</AttributeSource>
+			<AttributeTargets>
+			  <AttributeTarget name="customSchemas.User_Info.ntAccountName" provisionAllAccounts="true">
+				<ApplicationRef>
+				  <Reference class="sailpoint.object.Application" name="GSuite"/>
+				</ApplicationRef>
+			  </AttributeTarget>
+			</AttributeTargets>
+		  </ObjectAttribute>
+			<ObjectAttribute displayName="businessUnit" editMode="ReadOnly" name="businessUnit" namedColumn="true" type="string">
+				<RuleRef>
+				  <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+				</RuleRef>
+				<AttributeSource name="BUSINESS_UNIT">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+				  <RuleRef>
+					<Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+				  </RuleRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute11">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-DS"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute11">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute11">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute11">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute11">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute11">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute11">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute11">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute11">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeTargets>
+				  <AttributeTarget name="customSchemas.User_Info.Business_Unit" provisionAllAccounts="true">
+					<ApplicationRef>
+					  <Reference class="sailpoint.object.Application" name="GSuite"/>
+					</ApplicationRef>
+				  </AttributeTarget>
+				  <AttributeTarget name="forwardingAddress" provisionAllAccounts="true">
+					<ApplicationRef>
+					  <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+					</ApplicationRef>
+					<RuleRef>
+						<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+					</RuleRef>
+				  </AttributeTarget>
+				</AttributeTargets>
+			</ObjectAttribute>
+			<ObjectAttribute displayName="departmentNumber" editMode="ReadOnly" name="departmentNumber" namedColumn="true" type="string">
+				<RuleRef>
+				  <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+				</RuleRef>
+				<AttributeSource name="DEPTID">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+				  <RuleRef>
+					<Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+				  </RuleRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute10">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-DS"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute10">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute10">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute10">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute10">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute10">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute10">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute10">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeSource name="extensionAttribute10">
+				  <ApplicationRef>
+					<Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+				  </ApplicationRef>
+				</AttributeSource>
+				<AttributeTargets>
+				  <AttributeTarget name="customSchemas.User_Info.Department_ID" provisionAllAccounts="true">
+					<ApplicationRef>
+					  <Reference class="sailpoint.object.Application" name="GSuite"/>
+					</ApplicationRef>
+				  </AttributeTarget>
+				  <AttributeTarget name="preferredLanguage" provisionAllAccounts="true">
+					<ApplicationRef>
+					  <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+					</ApplicationRef>
+					<RuleRef>
+						<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+					</RuleRef>
+				  </AttributeTarget>
+				</AttributeTargets>
+			  </ObjectAttribute>
+			  <ObjectAttribute displayName="Vendor Company" editMode="ReadOnly" name="vendorName" type="string">
+				  <AttributeTargets>
+				  <AttributeTarget name="company" provisionAllAccounts="true">
+					<ApplicationRef>
+					  <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+					</ApplicationRef>
+					<RuleRef>
+						<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+					</RuleRef>
+				  </AttributeTarget>
+				  <AttributeTarget name="company" provisionAllAccounts="true">
+					<ApplicationRef>
+					  <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+					</ApplicationRef>
+					<RuleRef>
+						<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+					</RuleRef>
+				  </AttributeTarget>
+				  </AttributeTargets>
+			  </ObjectAttribute>
+  <ObjectAttribute displayName="att_first_name" editMode="ReadOnly" name="firstname" standard="true" type="string">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+    </RuleRef>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-DS">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-DS"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-WIAPP">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-WIGLE">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-KSWIC">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-OKTUL">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-MIROC">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-AHMFM">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-ACMHO">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-AHSCN">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="PREF_FIRST_NAME">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="FIRST_NAME">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="FirstName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - AMITA"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="FirstName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="FirstName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Morrisey"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="givenName" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+      </AttributeTarget>
+      <AttributeTarget name="givenName" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="givenName" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+        </RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+	  <ObjectAttribute displayName="Location" editMode="ReadOnly" name="location" type="string">
+    <AttributeSource name="LOCATION_DESCR">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="PrimaryAddress_Location">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+    </AttributeSource>
+	 <AttributeTargets>      
+	  <AttributeTarget name="physicalDeliveryOfficeName" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+	  <AttributeTarget name="physicalDeliveryOfficeName" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Title" editMode="ReadOnly" name="title" namedColumn="true" type="string">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+    </RuleRef>
+    <AttributeSource name="POSITION_NBR_DESCR">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="Title">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="title">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="title">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="title">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="title">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="title">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="title">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="title">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="title">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="title">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="title">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-Optimal"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="organizations" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Organizations"/>
+        </RuleRef>
+		</AttributeTarget>
+	<AttributeTarget name="title" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="title" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Last Name" editMode="ReadOnly" name="lastname" standard="true" type="string">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+    </RuleRef>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-DS">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-DS"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-WIAPP">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-WIGLE">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-KSWIC">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-OKTUL">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-MIROC">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-AHMFM">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-ACMHO">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-AHSCN">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="LAST_NAME">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - AMITA"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Morrisey"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="sn" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="sn" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+        </RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Middle Name" editMode="ReadOnly" name="middleName" namedColumn="true" type="string">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+    </RuleRef>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-DS">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-DS"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-WIAPP">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-WIGLE">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-KSWIC">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-OKTUL">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-MIROC">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-AHMFM">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-ACMHO">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-AHSCN">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="MiddleName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - AMITA"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="MiddleName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="MiddleName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Morrisey"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="initials" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Amita-MiddleName"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="initials" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Amita-MiddleName"/>
+        </RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+<ObjectAttribute displayName="state" editMode="ReadOnly" name="st" type="string">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+    </RuleRef>
+	<AttributeSource name="STATE">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="PrimaryAddress_OfficeState">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="st">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="st">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="st">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="st">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="st">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="st">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="st">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="st">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="st">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="st">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-Optimal"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="addresses" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Addresses"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="customSchemas.User_Info.State" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+      </AttributeTarget>
+	  <AttributeTarget name="st" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+	  <AttributeTarget name="st" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>	
+    </AttributeTargets>	
+  </ObjectAttribute>
+  <ObjectAttribute displayName="City" editMode="ReadOnly" name="city" type="string">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+    </RuleRef>
+	 <AttributeSource name="CITY">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="PrimaryAddress_OfficeCity">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="l">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="l">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="l">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="l">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="l">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="l">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="l">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="l">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="l">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="l">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-Optimal"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="addresses" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Addresses"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="customSchemas.User_Info.City" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+      </AttributeTarget>	
+	 <AttributeTarget name="l" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="l" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Street Address" editMode="ReadOnly" name="streetAddress" type="string">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+    </RuleRef>
+	 <AttributeSource name="ADDRESS1">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="PrimaryAddress_OfficeAddress1">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="streetAddress">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="streetAddress">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="streetAddress">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="streetAddress">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="streetAddress">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="streetAddress">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="streetAddress">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="streetAddress">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="streetAddress">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="streetAddress">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-Optimal"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="addresses" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Addresses"/>
+        </RuleRef>
+      </AttributeTarget>
+	  <AttributeTarget name="streetAddress" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="streetAddress" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="PostalCode" editMode="ReadOnly" name="postalCode" type="string">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+    </RuleRef>
+    <AttributeSource name="PrimaryAddress_OfficeZipCode">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="postalCode">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="postalCode">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="postalCode">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="postalCode">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="postalCode">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="postalCode">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="postalCode">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="postalCode">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="postalCode">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="postalCode">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-Optimal"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="addresses" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Addresses"/>
+        </RuleRef>
+      </AttributeTarget>
+	   <AttributeTarget name="postalCode" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+	   <AttributeTarget name="postalCode" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+<ObjectAttribute displayName="Business Unit Description" editMode="ReadOnly" name="businessUnitDescription" namedColumn="true" type="string">
+    <AttributeSource name="AH_BUS_UNIT_DESCR">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-PeopleSoftDB-BU_Desc DB-Peoplesoft-HCM-Primary">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-PeopleSoftDB-BU_Desc"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="customSchemas.User_Info.Business_Unit_Description" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+      </AttributeTarget>
+      <AttributeTarget name="roomNumber" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Location Description" editMode="ReadOnly" name="locationDescription" namedColumn="true" type="string">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+    </RuleRef>
+    <AttributeSource name="LOCATION_DESCR">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="physicalDeliveryOfficeName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="physicalDeliveryOfficeName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="physicalDeliveryOfficeName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="physicalDeliveryOfficeName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="physicalDeliveryOfficeName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="physicalDeliveryOfficeName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="physicalDeliveryOfficeName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="physicalDeliveryOfficeName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="physicalDeliveryOfficeName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="physicalDeliveryOfficeName" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="physicalDeliveryOfficeName" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+<ObjectAttribute displayName="Sailpoint Internal ID" editMode="ReadOnly" name="internalId" namedColumn="true" type="string">
+    <AttributeTargets>
+      <AttributeTarget name="businessCategory" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-InternalIDs"/>
+		</RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="businessCategory" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-InternalIDs"/>
+		</RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Display Name" editMode="ReadOnly" name="displayName" standard="true" type="string">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+    </RuleRef>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-DS">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-DS"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-WIAPP">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-WIGLE">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-KSWIC">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-OKTUL">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-MIROC">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-AHMFM">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-ACMHO">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-Complex AD-AHSCN">
+	  <ApplicationRef>
+	    <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+	  </ApplicationRef>
+	  <RuleRef>
+	    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-Complex"/>
+	  </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-DisplayName DB-Peoplesoft-HCM-Primary">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-DisplayName"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-DisplayName MDStaff - Ascension">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-DisplayName"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-DisplayName MDStaff - AMITA">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - AMITA"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-DisplayName"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-DisplayName Morrisey">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Morrisey"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-DisplayName"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="fullName" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+      </AttributeTarget>
+      <AttributeTarget name="displayName" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="displayName" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+        </RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Department" editMode="ReadOnly" name="department" namedColumn="true" type="string">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+    </RuleRef>
+    <AttributeSource name="DEPT_DESCR">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="department">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="department">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="department">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="department">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="department">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="department">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="department">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="department">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="department">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="customSchemas.User_Info.Department_Description" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+      </AttributeTarget>    
+      <AttributeTarget name="department" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="department" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute> 
+  <ObjectAttribute displayName="Jobcode" editMode="ReadOnly" name="jobcode" namedColumn="true" type="string">
+    <AttributeSource name="JOBCODE">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="customSchemas.User_Info.Job_Code" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+      </AttributeTarget>
+      <AttributeTarget name="extensionAttribute5" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+		<RuleRef>
+			<Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-IgnoreDisableAccount"/>
+		</RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+<ObjectAttribute displayName="Manager" editMode="ReadOnly" groupFactory="true" name="manager" standard="true" type="sailpoint.object.Identity">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-Manager"/>
+    </RuleRef>
+    <AttributeSource name="SUPERVISOR_ID">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+  <AttributeSource name="GlobalRule:Ascension-Rule-Global-Manager">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-Manager"/>
+      </RuleRef>
+    </AttributeSource>	
+    <AttributeSource name="ManagerID">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - AMITA"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="ManagerID">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Morrisey"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-IdentityAttribute-Manager-from-Identity">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-IdentityAttribute-Manager-from-Identity"/>
+      </RuleRef>
+    </AttributeSource>  
+    <AttributeTargets>
+      <AttributeTarget name="relations" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Relations"/>
+        </RuleRef>
+      </AttributeTarget>
+	   <AttributeTarget name="manager" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Amita-Manager"/>
+        </RuleRef>
+      </AttributeTarget>
+       <AttributeTarget name="manager" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Amita-Manager"/>
+        </RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+<ObjectAttribute categoryName="Contractor" displayName="Contractor Expiration Date" editMode="ReadOnly" name="ctrexpDt" namedColumn="true" type="string">
+    <AttributeTargets>
+      <AttributeTarget name="accountExpires" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-DS"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+	  <AttributeTarget name="extensionAttribute4" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Amita-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="accountExpires" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="accountExpires" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="accountExpires" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="accountExpires" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="accountExpires" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="accountExpires" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="accountExpires" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="accountExpires" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="accountExpires" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-Optimal"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+	   <AttributeTarget name="accountExpires" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-ASC"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+	  <AttributeTarget name="accountExpires" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AID"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-ExpirationDate"/>
+        </RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Initial Name" editMode="ReadOnly" name="initialName" namedColumn="true" type="string"/>
+  <ObjectAttribute displayName="Identity Type" editMode="ReadOnly" name="identityType" namedColumn="true" type="string">
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-IdentityType-Rule DB-Peoplesoft-HCM-Primary">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-IdentityType-Rule"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-IdentityType-Rule MDStaff - AMITA">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - AMITA"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-IdentityType-Rule"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-IdentityType-Rule MDStaff - Ascension">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="MDStaff - Ascension"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-IdentityType-Rule"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-IdentityType-Rule Midas Seeker - Provider Onboarding">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Midas Seeker - Provider Onboarding"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-IdentityType-Rule"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-IdentityType-Rule Morrisey">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="Morrisey"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-IdentityType-Rule"/>
+      </RuleRef>
+    </AttributeSource>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="authSourceAppName" editMode="ReadOnly" name="authSourceAppName" namedColumn="true" type="string"/>
+  <ObjectAttribute displayName="GSuite Status" editMode="ReadOnly" name="gsuiteStatus" namedColumn="true" type="string">
+  <AttributeSource name="msExchExtensionAttribute40">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ASC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute40">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AID"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute40">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute40">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute40">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute40">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute40">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute40">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute40">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute40">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute40">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="OrgUnit Path" editMode="ReadOnly" name="orgUnitPath" namedColumn="true" type="string">
+  <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-OrgUnitPath AD-ASC">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ASC"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-OrgUnitPath"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-OrgUnitPath AD-AID">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AID"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-OrgUnitPath"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-OrgUnitPath AD-DS">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-OrgUnitPath"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-OrgUnitPath AD-WIAPP">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-OrgUnitPath"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-OrgUnitPath AD-WIGLE">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-OrgUnitPath"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-OrgUnitPath AD-KSWIC">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-OrgUnitPath"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-OrgUnitPath AD-OKTUL">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-OrgUnitPath"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-OrgUnitPath AD-MIROC">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-OrgUnitPath"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-OrgUnitPath AD-AHMFM">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-OrgUnitPath"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-OrgUnitPath AD-ACMHO">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-OrgUnitPath"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-OrgUnitPath AD-AHSCN">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-OrgUnitPath"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="orgUnitPath" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="GSuite Last Name" editMode="ReadOnly" name="gsuiteLastName" type="string">
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="ASC_GSuite_LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ASC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="ASC_GSuite_LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AID"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="ASC_GSuite_LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="ASC_GSuite_LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="ASC_GSuite_LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="ASC_GSuite_LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="ASC_GSuite_LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="ASC_GSuite_LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="ASC_GSuite_LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="ASC_GSuite_LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="ASC_GSuite_LastName">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="familyName" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Mobile" editMode="ReadOnly" name="mobile" type="string">
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+	<AttributeSource name="mobile">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ASC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mobile">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AID"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mobile">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mobile">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mobile">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mobile">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mobile">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mobile">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mobile">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mobile">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mobile">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="phones" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Phones"/>
+        </RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="GSuite MDM" editMode="ReadOnly" name="gsuiteMdm" type="string">
+  <AttributeSource name="msExchExtensionAttribute20">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ASC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute20">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AID"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute20">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute20">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute20">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute20">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute20">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute20">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute20">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute20">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="msExchExtensionAttribute20">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="GSuite GAL" editMode="ReadOnly" name="gsuiteGal" type="string">
+    <AttributeSource name="GlobalRule:Ascension-Rule-IdentityAttribute-GAL">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-GAL"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="includeInGlobalAddressList" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Company" editMode="ReadOnly" name="company" namedColumn="true" type="string">
+    <AttributeSource name="AppRule: Ascension-Rule-IdentityAttribute-PeopleSoftDB-Company DB-Peoplesoft-HCM-Primary">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttribute-PeopleSoftDB-Company"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="SETID_LOCATION">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="company">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="company">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="company">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="company">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="company">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="company">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="company">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="company">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="company">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-Company">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-Company"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="organizations" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-Organizations"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="customSchemas.User_Info.Company_Code" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+      </AttributeTarget>
+	  <AttributeTarget name="company" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-ASC"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-AD-AID-Company"/>
+        </RuleRef>
+      </AttributeTarget>
+	  <AttributeTarget name="company" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AID"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-IdentityAttributeTarget-AD-AID-Company"/>
+        </RuleRef>
+      </AttributeTarget>
+    </AttributeTargets>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="att_email" editMode="ReadOnly" name="email" standard="true" type="string">
+    <RuleRef>
+      <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+    </RuleRef>
+    <AttributeSource name="GlobalRule:Ascension-Rule-Global-SetADAttribute">
+      <RuleRef>
+        <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Global-SetADAttribute"/>
+      </RuleRef>
+    </AttributeSource>
+    <AttributeSource name="mail">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-DS"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mail">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mail">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mail">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-KSWIC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mail">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mail">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mail">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mail">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-ACMHO"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeSource name="mail">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="primaryEmail" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="GSuite"/>
+        </ApplicationRef>
+      </AttributeTarget>
+      <AttributeTarget name="mail" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+      </AttributeTarget>
+      <AttributeTarget name="mail" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+      </AttributeTarget>	  
+    </AttributeTargets>
+  </ObjectAttribute>	
+<ObjectAttribute displayName="Domain(s) Accounts" editMode="Permanent" name="domainAccounts" type="string"/>  
+  <ObjectAttribute displayName="Badge Number" editMode="UntilFeedValueChanges" name="badgeNumber" type="string">
+    <AttributeSource name="BADGE_NBR">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Primary"/>
+      </ApplicationRef>
+    </AttributeSource>
+    <AttributeTargets>
+      <AttributeTarget name="msExchExtensionAttribute33" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-DS"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-BadgeNumber"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="msExchExtensionAttribute33" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AHMFM"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-BadgeNumber"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="msExchExtensionAttribute33" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AHSCN"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-BadgeNumber"/>
+        </RuleRef>
+      </AttributeTarget>    
+	  <AttributeTarget name="msExchExtensionAttribute33" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-ASC"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-BadgeNumber"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="msExchExtensionAttribute33" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-AMITA"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-BadgeNumber"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="msExchExtensionAttribute33" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-MIROC"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-BadgeNumber"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="msExchExtensionAttribute33" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-OKTUL"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-BadgeNumber"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="msExchExtensionAttribute33" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-WIAPP"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-BadgeNumber"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="msExchExtensionAttribute33" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-WIGLE"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-BadgeNumber"/>
+        </RuleRef>
+      </AttributeTarget>
+      <AttributeTarget name="msExchExtensionAttribute33" provisionAllAccounts="true">
+        <ApplicationRef>
+          <Reference class="sailpoint.object.Application" name="AD-PRESENCEHEALTH"/>
+        </ApplicationRef>
+        <RuleRef>
+          <Reference class="sailpoint.object.Rule" name="Ascension-Rule-AD-BadgeNumber"/>
+        </RuleRef>
+      </AttributeTarget>
+      </AttributeTargets>
+	</ObjectAttribute>
+	 <ObjectAttribute displayName="Rehire Action" editMode="ReadOnly" name="rehireAction" namedColumn="true" type="string">
+    <AttributeSource name="ACTION">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Rehire"/>
+      </ApplicationRef>
+    </AttributeSource>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Rehire Effective Date" editMode="UntilFeedValueChanges" name="rehireEffDate" namedColumn="true" type="string">
+    <AttributeSource name="EFFDT">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Rehire"/>
+      </ApplicationRef>
+    </AttributeSource>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Rehire Type" editMode="UntilFeedValueChanges" name="rehireType" namedColumn="true" type="string">
+    <AttributeSource name="REHIRE_TYPE">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Rehire"/>
+      </ApplicationRef>
+    </AttributeSource>
+  </ObjectAttribute>
+   <ObjectAttribute displayName="Rehire Action Reason" editMode="UntilFeedValueChanges" name="rehireActionReason" type="string">
+    <AttributeSource name="ACTION_REASON">
+      <ApplicationRef>
+        <Reference class="sailpoint.object.Application" name="DB-Peoplesoft-HCM-Rehire"/>
+      </ApplicationRef>
+    </AttributeSource>
+  </ObjectAttribute>
+  <ObjectAttribute displayName="Rehire Conversion Triggered" editMode="UntilFeedValueChanges" name="rehire_conversion_Triggered" type="string"/>
+  </ObjectConfig>
+  </ImportAction>
+</sailpoint>

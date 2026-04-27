@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Identity PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Identity name="gcp-asc-ahnat-computelab-nonprod" workgroup="true">
+  <Attributes>
+    <Map>
+      <entry key="displayName" value="gcp-asc-ahnat-computelab-nonprod"/>
+    </Map>
+  </Attributes>
+  <Preferences>
+    <Map>
+      <entry key="workgroupNotificationOption">
+        <value>
+          <WorkgroupNotifationOption>Both</WorkgroupNotifationOption>
+        </value>
+      </entry>
+    </Map>
+  </Preferences>
+</Identity>

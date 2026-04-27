@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Capability PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Capability displayName="IDEAS Analyst" name="ideasAnalyst">
+  <Description>Capability to grant specfic access to the IDEAS team</Description>
+  <RightRefs>
+    <Reference class="sailpoint.object.SPRight" name="ideasReportAccessSPRight"/>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessReport"/>
+    <Reference class="sailpoint.object.SPRight" name="ViewAccountGroups"/>
+    <Reference class="sailpoint.object.SPRight" name="ViewCertifications"/>
+    <Reference class="sailpoint.object.SPRight" name="ViewIdentity"/>
+    <Reference class="sailpoint.object.SPRight" name="ViewIdentityRequest"/>
+    <Reference class="sailpoint.object.SPRight" name="ViewLink"/>
+    <Reference class="sailpoint.object.SPRight" name="ViewAuditLog"/>
+    <Reference class="sailpoint.object.SPRight" name="ViewRole"/>
+    <Reference class="sailpoint.object.SPRight" name="ViewWorkgroup"/>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessIdentityRequest"/>
+  </RightRefs>
+</Capability>

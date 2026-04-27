@@ -1,0 +1,697 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" handler="sailpoint.api.StandardWorkflowHandler" libraries="Identity,BatchRequest" name="Ascension-Workflow-EnableContractor" taskType="LCM" type="LCMRegistration">
+  <Variable initializer="false" name="trace">
+    <Description>Used for debugging this workflow and when set to true
+      will be sent to stdout.</Description>
+  </Variable>
+  <Variable initializer="true" name="transient"/>
+  <Variable initializer="false" name="enableAccounts"/>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity being updated.</Description>
+  </Variable>
+  <Variable initializer="false" name="userExists">
+    <Description>whether user already exists for re-enablement.</Description>
+  </Variable>
+  <Variable name="matchingUsers">
+    <Description>list of users matching for re-enablement.</Description>
+    <Script>
+      <Source><![CDATA[
+        return (new ArrayList());
+      ]]></Source>
+    </Script>
+  </Variable>
+  <Variable name="identityModel">
+    <Description>The custom model that is used to house and pass application data.</Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>The displayName of the identity being updated.
+      Query for this using a projection query and fall back to the name.</Description>
+  </Variable>
+  <Variable input="true" name="launcher">
+    <Description>requester of the form</Description>
+  </Variable>
+  <Variable name="plan">
+    <Description>The provisioning plan, which is built by a service method.</Description>
+  </Variable>
+  <Variable name="planAD">
+    <Description>The provisioning plan, which is built by a service method.</Description>
+  </Variable>
+  <Variable editable="true" initializer="false" name="optimisticProvisioning">
+    <Description>Set to true to enable optimistic provisioning.  This will cause
+      changes to the entitlements compiled from role assignments to be
+      applied immediately to the identity cube rather than waiting
+      for the next refresh/reaggregation after the provisioning system
+      completes the request.</Description>
+  </Variable>
+  <Variable editable="true" initializer="true" name="backgroundProvisioning"/>
+  <Variable editable="true" initializer="false" name="foregroundProvisioning">
+    <Description>Normally provisioning is done in a step that uses the &amp;quot;background&amp;quot;
+      option to force the workflow to be suspend and be resumed in a
+      background task thread.  This prevents the browser session from
+      hanging since provision can sometimes take a long time.  For demos
+      and testing it can be better to do this in the foreground so that
+      provisioning will have been performed when control is returned to the
+      user.  This prevents having to run the Perform Maintenance task to
+      see the results of the request.</Description>
+  </Variable>
+  <Variable initializer="IDM Team" input="true" name="fallbackApprover">
+    <Description>A String that specifies the name of the Identity that will
+      be assigned any approvals where the owner of the approver
+      can&amp;#39;t be resolved. Example if the scheme is &amp;quot;owner&amp;quot; and the
+      application doesn&amp;#39;t specify and owner.</Description>
+  </Variable>
+  <Variable initializer="LCM" input="true" name="source">
+    <Description>String version of sailpoint.object.Source to indicate
+      where the request originated.  Defaults to LCM.</Description>
+  </Variable>
+  <Variable initializer="false" name="trace">
+    <Description>Used for debugging this workflow and when set to true
+      will be sent to stdout.</Description>
+  </Variable>
+  <Variable name="project">
+    <Description>ProvisioningProject which is just a compiled version of the ProvisioningPlan.</Description>
+  </Variable>
+  <Variable name="identityRequestId" output="true">
+    <Description>The sequence id of the Identity request object which is stored in
+      the name field of the identity request.</Description>
+  </Variable>
+  <Variable name="iiqIdentityRequestId" output="true">
+    <Description>
+      The sequence id of the Identity request object which is stored in
+      the name field of the identity request.
+    </Description>
+  </Variable>
+  <Variable name="cart" output="true">
+    <Description>This variable includes all ApprovalItems that are part of
+      the request process and is updated during the AfterScript
+      of the approval process by assimilating the decisions
+      and comments from the Approvals copy of the ApprovalItem.</Description>
+  </Variable>
+  <Variable initializer="Normal" input="true" name="workItemPriority">
+    <Description>The String version of a WorkItem.Priority. This variable is
+      used to set the priority on all of the workitems generated
+      as part of this workflow and also set on the IdentityRequest
+      object.</Description>
+  </Variable>
+  <Variable name="policyViolations">
+    <Description>
+      List of policy violations that were found during our initial policy scan.
+      This list is passed into each work item so the approvers can see
+      pending violations.
+    </Description>
+  </Variable>
+  <Variable initializer="Create Contractor" name="flow"/>
+  <Variable editable="true" initializer="true" name="doRefresh">
+    <Description>
+      Set to true to cause an identity refresh after the changes in the plan
+      have been provisioned.  This is normally off, you might want this on
+      if you want modification of identity or link attributes to result in
+      an immediate re-evaluation of assigned and detected roles.
+    </Description>
+  </Variable>
+  <Variable name="partialMatchingUsers">
+    <Description>list of users matching for re-enablement.</Description>
+    <Script>
+      <Source><![CDATA[
+        return (new ArrayList());
+      ]]></Source>
+    </Script>
+  </Variable>
+  <Variable name="trustedUser">
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Identity;
+		import sailpoint.object.Filter;
+		import sailpoint.object.QueryOptions;
+		
+        Identity identity=context.getObjectByName(Identity.class,launcher);
+        if(identity.getManagerStatus()){
+			return "true";
+        }
+		List workGroups=null;
+		QueryOptions qo=new QueryOptions();
+		Filter filter=Filter.ignoreCase(Filter.and(Filter.eq("workgroup",true),Filter.like("name","Trusted Requesters", Filter.MatchMode.START)));
+		qo.add(filter);
+		workGroups= context.getObjects(Identity.class,qo);
+		if(workGroups.size()>0){
+			for(Identity wrkGrpObj:workGroups){
+				if(identity.isInWorkGroup(wrkGrpObj)){
+					return "true";
+				}
+			}
+		}
+		return "false";
+      ]]></Source>
+    </Script>
+  </Variable>
+  <Variable name="identityID"/>
+  <Variable name="httpSession" transient="true">
+    <Description>httpSession</Description>
+  </Variable>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Library"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-Encryption"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-Ascension-ExistingAccount-RuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-Ascension-EmailAddress-RuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-GSuite-AccessToken"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Library-DatabaseFields"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-InitialName-Sequence-Generator"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Persona-Management-RuleLibrary"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+    <Transition to="Initialize"/>
+  </Step>
+  <Step action="call:getIdentityModel" name="Initialize" posX="98" posY="10" resultVariable="identityModel">
+    <Description>
+      Initialize the data for the identity that we are creating.
+    </Description>
+    <Transition to="Contractor Search Form"/>
+  </Step>
+  <Step icon="Approval" name="Contractor Search Form" posX="208" posY="10">
+    <Approval mode="serial" owner="ref:launcher" return="identityModel" send="identityModel,trustedUser,launcher">
+      <Arg name="workItemType" value="Form"/>
+      <Arg name="workItemDescription" value="Enable Contractor"/>
+      <Arg name="workItemForm" value="Ascension-Form-EnableContractor"/>
+      <Arg name="workItemFormBasePath" value="identityModel"/>
+    </Approval>
+    <Description>
+      Display the Search Contractor form
+    </Description>
+    <Transition to="Update IdentityModel" when="approved"/>
+    <Transition to="stop"/>
+  </Step>
+  <Step icon="Message" name="Update IdentityModel" posX="1430" posY="10">
+    <Description>Displays a FacesMessage upon initial form submission when the launcher of the workflow was not the manager of the target user. Informs them that an approval will be opened.</Description>
+    <Script>
+      <Source><![CDATA[
+        import java.text.SimpleDateFormat;
+        import java.util.Date;
+
+        import sailpoint.object.Filter;
+        import sailpoint.object.Identity;
+        log.info("Get User Input: Network ID*******"+identityModel.get("cwrusername"));
+        Filter filter=Filter.ignoreCase(Filter.and(Filter.eq("name",identityModel.get("cwrusername")),Filter.or(Filter.eq("type","Contractor"),Filter.eq("type","Non-HR Contractor"))));
+        Identity identity=context.getUniqueObject(Identity.class,filter);
+        String date=null;
+        SimpleDateFormat simpleDateFormat=null;
+        if(identity != null){
+        date=identity.getAttribute("ctrexpDt");
+        workflow.put("identityName",identity.getName());
+        identityModel.putAll(identity.getAttributes().getMap());
+        if(identity.getManager()!=null){
+        //identityModel.put("manager",identity.getManager());
+        }
+        if(date!=null){
+        if(date.contains("/")){
+        simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        }
+        if(date.contains("-")){
+        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        }
+       // String pattern = "yyyy-MM-dd";
+       // SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        Date dateCtexpDate = simpleDateFormat.parse(date);
+        identityModel.put("ctrexpDt",dateCtexpDate);
+        }
+        }
+
+        log.info("Updated identityModel********"+identityModel);
+      ]]></Source>
+    </Script>
+    <Transition to="stop">
+      <Script>
+        <Source><![CDATA[
+          import sailpoint.object.*;
+          Filter filter=Filter.ignoreCase(Filter.and(Filter.eq("name",identityModel.get("cwrusername")),Filter.or(Filter.eq("type","Contractor"),Filter.eq("type","Non-HR Contractor"))));
+          Identity identity=context.getUniqueObject(Identity.class,filter);
+          if(identity == null){
+          log.info("*******Given Identity is not present in IIQ, Hence returning to home page********");
+          return true;
+          }
+          return false;
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Contractor Display Form"/>
+  </Step>
+  <Step action="call:getIdentityModel" name="Contractor identityModel" posX="98" posY="10" resultVariable="identityModel">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Description>
+      Initialize the data for the identity that we are creating.
+    </Description>
+    <Transition to="Contractor Display Form"/>
+  </Step>
+  <Step icon="Approval" name="Contractor Display Form" posX="596" posY="10">
+    <Approval mode="serial" owner="ref:launcher" return="identityModel" send="launcher,identityModel">
+      <Arg name="workItemType" value="Form"/>
+      <Arg name="workItemDescription" value="Enable Contractor"/>
+      <Arg name="workItemForm" value="Ascension-Form-EnableContractor-Details"/>
+      <Arg name="workItemFormBasePath" value="identityModel"/>
+    </Approval>
+    <Description>
+      Display the Create Contractor form
+    </Description>
+    <Transition to="Confirm Launcher Submission" when="approved"/>
+    <Transition to="stop"/>
+  </Step>
+  <Step icon="Message" name="Confirm Launcher Submission" posX="1430" posY="10">
+    <Description>Displays a FacesMessage upon initial form submission when the launcher of the workflow was not the manager of the target user. Informs them that an approval will be opened.</Description>
+    <Script>
+      <Source><![CDATA[
+        import javax.faces.application.FacesMessage;
+        import sailpoint.tools.Util;
+
+        if (httpSession != null) {
+
+        List currentMessages = httpSession.getAttribute("sailpoint.web.PageCodeBase.sessionMessages");
+        FacesMessage myMessage = null;
+
+        String message = "Request has been submitted successfully.";
+        myMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, message + ".", "Success");
+
+        List myMessages = new ArrayList();
+        myMessages.add(myMessage);
+        httpSession.setAttribute("sailpoint.web.PageCodeBase.sessionMessages", myMessages);
+        }
+      ]]></Source>
+    </Script>
+    <Transition to="Update WorkflowContext"/>
+  </Step>
+  <Step icon="Analysis" name="Update WorkflowContext" posX="1676" posY="10">
+    <Description>Sets various global variables for use in later workflow steps</Description>
+    <Script>
+      <Source><![CDATA[
+
+        wfcontext.setVariable("identityModel", identityModel);
+
+      ]]></Source>
+    </Script>
+    <Transition to="Build Enable AD Plan"/>
+  </Step>
+  <Step icon="plan" name="Build Enable AD Plan" posX="2198" posY="126" resultVariable="planAD">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="identityModel" value="ref:identityModel"/>
+    <Description>Process the user to enable AD Account.</Description>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.api.SailPointContext;
+        import sailpoint.object.Identity;
+        import sailpoint.tools.Util;
+        import sailpoint.object.Application;
+        import sailpoint.object.ProvisioningPlan;
+        import sailpoint.object.ProvisioningPlan.AccountRequest;
+        import sailpoint.object.ProvisioningPlan.AttributeRequest;
+        import sailpoint.object.Custom;
+        import java.util.Iterator;
+        import sailpoint.object.Link;
+        import sailpoint.object.ProvisioningPlan.Operation;
+        import sailpoint.api.PasswordGenerator;
+        import sailpoint.object.PasswordPolicy;
+        import java.text.Format;
+        import java.text.SimpleDateFormat;
+
+        ProvisioningPlan plan = new ProvisioningPlan();
+
+
+        Identity identityObject = null;
+        String appName = null;
+        String accountName = null;
+        String appType = null;
+        String adExpDate = null;
+        String valueCN = null;
+        String activeOU = null;
+        String domainAD = null;
+        String ministryAD = null;
+        String locationID = null;
+        String description = "";
+        Map domainMap = new HashMap();
+        HashMap activeOUMap = new HashMap();
+        List listOfAccounts = new ArrayList();
+        String idnCtrExpDate = null;
+        Custom custom = context.getObjectByName(Custom.class, "Ascension-Custom-AD-DomainMapping");
+        Custom customApp = context.getObjectByName(Custom.class, "Ascension-Custom-ContractorConfiguration");
+
+        if (null != identityModel @and null != identityModel.get("ctrexpDt")) {
+        log.info("getADFormatedDateString---------------------" + identityModel.get("ctrexpDt"));
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss Z");
+        String formattedCtrexpDt = formatter.format(identityModel.get("ctrexpDt"));
+        SimpleDateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd");
+        idnCtrExpDate = formatter1.format(identityModel.get("ctrexpDt"));
+
+        adExpDate = getADFormatedDateString(formattedCtrexpDt);
+        }
+
+        if (null != identityName) {
+
+        identityObject = context.getObjectByName(Identity.class, identityName);
+
+        if (null != identityObject) {
+        boolean idInactive=identityObject.isInactive();
+        log.info("is id inactive?::::"+idInactive);
+        if(idInactive){
+
+        identityObject.setAttribute("inactive",false);
+        context.saveObject(identityObject);
+        context.commitTransaction();
+        log.info("----------identity is set to inactive false-------------");
+        }
+        if(null != idnCtrExpDate){
+        identityObject.setAttribute("ctrexpDt",idnCtrExpDate);
+        context.saveObject(identityObject);
+        context.commitTransaction();
+        }
+
+        domainAD = identityObject.getAttribute("domain");
+        ministryAD = identityObject.getAttribute("ministry");
+        locationID = identityObject.getAttribute("buildingId");
+
+        if (Util.isNotNullOrEmpty(domainAD)) {
+        domainAD = domainConversion(domainAD);
+        }
+
+        if (custom != null @and null != custom.get("DomainOUMapping")) {
+        domainMap = custom.get("DomainOUMapping");
+        //comment decache //context.decache(custom);
+        }
+
+        if (null != customApp @and null != customApp.get("IncludeReenableApplications")) {
+        listOfAccounts = customApp.get("IncludeReenableApplications");
+        //comment decache //context.decache(customApp);
+        }
+
+        List linksAccount = (List) identityObject.getLinks();
+        if (null != linksAccount) {
+        Iterator itrlinksAccount = linksAccount.iterator();
+        while (itrlinksAccount.hasNext()) {
+        Link account = (Link) itrlinksAccount.next();
+        ProvisioningPlan.AccountRequest acctReq = new ProvisioningPlan.AccountRequest();
+        ProvisioningPlan.AccountRequest acctReqModify = new ProvisioningPlan.AccountRequest();
+
+        if (null != account @and null != account.getApplication()) {
+        appName = account.getApplicationName();
+        accountName = account.getNativeIdentity();
+        appType = account.getApplication().getType();
+
+        if (Util.isNotNullOrEmpty(appName) @and Util.isNotNullOrEmpty(accountName) @and Util.isNotNullOrEmpty(appType) @and appType.equalsIgnoreCase("Active Directory - Direct") @and listOfAccounts.contains(appName)) {
+
+
+        String principalName = account.getAttribute("msDS-PrincipalName");
+        String domainofAcc = "";
+
+        if (Util.isNotNullOrEmpty(principalName)) {
+        domainofAcc = getDomain(principalName);
+        }
+
+
+        // if (Util.nullSafeCaseInsensitiveEq(domainofAcc, domainAD)) 
+        if (account.isDisabled()) {
+
+        acctReq.setApplication(appName);
+        acctReq.setNativeIdentity(accountName);
+        acctReq.setOperation(ProvisioningPlan.AccountRequest.Operation.Enable);
+        plan.add(acctReq);
+
+
+        if (null != domainMap @and!domainMap.isEmpty() @and null != domainMap.get(domainAD)) {
+        activeOUMap = domainMap.get(domainAD).get("activeOU");
+        if (null != activeOUMap @and!activeOUMap.isEmpty()) {
+        if (Util.isNotNullOrEmpty(locationID) @and Util.isNotNullOrEmpty(activeOUMap.get(locationID))) {
+        activeOU = activeOUMap.get(locationID);
+        } else {
+        activeOU = activeOUMap.get("DEFAULT");
+        }
+        }
+        }
+
+        String password = null;
+
+        PasswordPolicy policy = context.getObjectByName(PasswordPolicy.class, "AD Default Password Policy");
+
+        
+		if (policy != null) {
+        password = new PasswordGenerator(context).generatePassword(policy);
+        }
+
+        acctReqModify.setApplication(appName);
+        acctReqModify.setNativeIdentity(accountName);
+        acctReqModify.setOperation(ProvisioningPlan.AccountRequest.Operation.Modify);
+
+        List attreqs = new ArrayList();
+
+        if (!Util.nullSafeCaseInsensitiveEq(identityObject.getStringAttribute("domain"), "AMITA")) {
+        if (Util.isNotNullOrEmpty(adExpDate)) {
+        attreqs.add(new AttributeRequest("accountExpires", ProvisioningPlan.Operation.Set, adExpDate));
+        description = "";
+        }
+        } else if (Util.isNotNullOrEmpty(identityObject.getAttribute("title")) @and Util.isNotNullOrEmpty(identityObject.getAttribute("department"))) {
+        description = identityObject.getAttribute("title") + " - " + identityObject.getAttribute("department");
+        }
+
+        attreqs.add(new AttributeRequest("description", ProvisioningPlan.Operation.Set, description));
+
+        if (Util.isNotNullOrEmpty(password)) {
+        attreqs.add(new AttributeRequest("password", ProvisioningPlan.Operation.Set, password));
+        }
+
+        if (Util.isNotNullOrEmpty(accountName)) {
+        valueCN = accountName.substring(0, accountName.indexOf("OU=") - 1);
+        }
+
+        if (Util.isNotNullOrEmpty(activeOU)) {
+        attreqs.add(new AttributeRequest("AC_NewParent", ProvisioningPlan.Operation.Set, activeOU));
+        }
+
+        if (Util.isNotNullOrEmpty(valueCN)) {
+        attreqs.add(new AttributeRequest("AC_NewName", ProvisioningPlan.Operation.Set, valueCN));
+        }
+        acctReqModify.setAttributeRequests(attreqs);
+        plan.add(acctReqModify);
+        }
+        } else if (Util.isNotNullOrEmpty(appName) @and Util.isNotNullOrEmpty(accountName)) {
+        if (listOfAccounts.contains(appName) @and account.isDisabled()) {
+        acctReq.setApplication(appName);
+        acctReq.setNativeIdentity(accountName);
+        acctReq.setOperation(ProvisioningPlan.AccountRequest.Operation.Enable);
+        plan.add(acctReq);
+        }
+        }
+        }
+        }
+        if (null != itrlinksAccount) {
+        Util.flushIterator(itrlinksAccount);
+        }
+        }
+        }
+        plan.setIdentity(identityObject);
+        //comment decache //context.decache(identityObject);
+        }
+        return plan;
+      ]]></Source>
+    </Script>
+    <Transition to="Build AD Plan"/>
+  </Step>
+  <Step icon="plan" name="Build AD Plan" posX="2388" posY="126" resultVariable="planAD">
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="planAD" value="ref:planAD"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Description>Process the user for AD account creation.</Description>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.api.SailPointContext;
+        import sailpoint.object.Identity;
+        import sailpoint.object.Form;
+        import sailpoint.object.Application;
+        import sailpoint.tools.Util;
+        import sailpoint.object.ProvisioningPlan;
+        import sailpoint.object.ProvisioningPlan.AccountRequest;
+        import sailpoint.object.ProvisioningPlan.AttributeRequest;
+        import sailpoint.object.Custom;
+        import sailpoint.object.Bundle;
+
+        ProvisioningPlan plan = new ProvisioningPlan();
+
+        if (null != planAD) {
+        plan = planAD;
+        }
+
+        Identity identityObject = context.getObjectByName(Identity.class, identityName);
+        Custom custRole = context.getObjectByName(Custom.class, "Ascension-Custom-AD-DomainMapping");
+        String domainAD = null;
+        String ministryAD = null;
+        List roleNames = new ArrayList();
+        Bundle bundle;
+        Application app;
+
+        if (null != identityObject) {
+        domainAD = identityObject.getAttribute("domain");
+        ministryAD = identityObject.getAttribute("ministry");
+        }
+
+        if (Util.isNotNullOrEmpty(domainAD)) {
+        domainAD = domainConversion(domainAD);
+        }
+
+        if (custRole != null @and null != custRole.get("DomainOUMapping")) {
+        domainMap = custRole.get("DomainOUMapping");
+        if (null != domainMap @and !domainMap.isEmpty() @and null != domainMap.get(domainAD)) {
+        roleNames = domainMap.get(domainAD).get("RoleName");
+        }
+        //comment decache //context.decache(custRole);
+        }
+
+        if (null != roleNames @and !roleNames.isEmpty()) {
+        ProvisioningPlan.AccountRequest acctRoleReq = new ProvisioningPlan.AccountRequest();
+        acctRoleReq.setApplication("IIQ");
+        acctRoleReq.setNativeIdentity(identityName);
+        acctRoleReq.setOperation(ProvisioningPlan.AccountRequest.Operation.Modify);
+        for (String roleName: roleNames) {
+        AttributeRequest attReq = new AttributeRequest(ProvisioningPlan.ATT_IIQ_ASSIGNED_ROLES, ProvisioningPlan.Operation.Add, roleName);
+        acctRoleReq.add(attReq);
+        }
+
+
+        plan.add(acctRoleReq);
+
+        if (null != identityObject) {
+        plan.setIdentity(identityObject);
+
+
+        if(identityObject.isInactive()){
+
+        identityObject.setInactive(false);
+        context.saveObject(identityObject);
+        context.commitTransaction();		
+        }
+
+        //comment decache //context.decache(identityObject);
+        }
+        }
+
+        return plan;
+      ]]></Source>
+    </Script>
+    <Transition to="RequestInitialize" when="script:(null != planAD &amp;&amp;  !planAD.isEmpty())"/>
+    <Transition to="stop"/>
+  </Step>
+  <Step icon="Task" name="RequestInitialize" posX="2522" posY="126">
+    <Arg name="formTemplate" value="Identity Update"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="enableRetryRequest"/>
+    <Arg name="allowRequestsWithViolations"/>
+    <Arg name="endOnManualWorkItems"/>
+    <Arg name="policiesToCheck"/>
+    <Arg name="workItemPriority" value="ref:workItemPriority"/>
+    <Arg name="workItemComments"/>
+    <Arg name="source" value="ref:source"/>
+    <Arg name="violationReviewDecision"/>
+    <Arg name="policyScheme" value="none"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="requireViolationReviewComments"/>
+    <Arg name="identityRequest"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="enableApprovalRecommendations"/>
+    <Arg name="asyncCacheRefresh"/>
+    <Arg name="endOnProvisioningForms"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Arg name="plan" value="ref:planAD"/>
+    <Arg name="flow" value="Reenable Contractor"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Description>
+      Call the standard subprocess to initialize the request, this includes
+      auditing, building the approvalset, compiling the plan into
+      project and checking policy violations.
+    </Description>
+    <Return name="project" to="project"/>
+    <Return name="approvalSet" to="cart"/>
+    <Return name="identityRequestId" to="identityRequestId"/>
+    <Return name="policyViolations" to="policyViolations"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Initialize"/>
+    </WorkflowRef>
+    <Transition to="Provision"/>
+  </Step>
+  <Step condition="script:!((size(policyViolations) &gt; 0 ) &amp;&amp; (policyScheme.equals(&quot;fail&quot;)))" icon="Task" name="Provision" posX="2688" posY="126">
+    <Arg name="formTemplate" value="Identity Update"/>
+    <Arg name="approvalScheme" value="ref:approvalScheme"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="fallbackApprover" value="ref:fallbackApprover"/>
+    <Arg name="approvalSet"/>
+    <Arg name="manualActionsEmailTemplate" value="Pending Manual Changes"/>
+    <Arg name="workItemComments"/>
+    <Arg name="workItemPriority" value="ref:workItemPriority"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Arg name="policyScheme" value="none"/>
+    <Arg name="splitProvisioning"/>
+    <Arg name="saveUnmanagedPlan"/>
+    <Arg name="foregroundProvisioning" value="ref:foregroundProvisioning"/>
+    <Arg name="noTriggers" value="true"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="saveUnmanagedPlan_WithProjectArgument"/>
+    <Arg name="recompile"/>
+    <Arg name="optimisticProvisioning" value="ref:optimisticProvisioning"/>
+    <Arg name="plan"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Description>
+      Call the standard subprocess that will process the
+      approval decisions and do provisioning.  This
+      includes calling any configured provisioning
+      connectors and building manual actions.
+    </Description>
+    <Return name="project" to="project"/>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Provision"/>
+    </WorkflowRef>
+    <Transition to="Finalize"/>
+  </Step>
+  <Step catches="complete" condition="script:!((size(policyViolations) &gt; 0 ) &amp;&amp; (policyScheme.equals(&quot;fail&quot;)))" icon="Task" name="Finalize" posX="2790" posY="126">
+    <Arg name="trace" value="ref:trace"/>
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="autoVerifyIdentityRequest"/>
+    <Arg name="approvalSet" value="ref:cart"/>
+    <Arg name="ticketManagementApplication"/>
+    <Arg name="project" value="ref:project"/>
+    <Arg name="workItemPriority" value="ref:workItemPriority"/>
+    <Arg name="identityRequestId" value="ref:identityRequestId"/>
+    <Arg name="ticketDataGenerationRule"/>
+    <Description>
+      Call the standard subprocess that can audit/finalize the request.
+    </Description>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Identity Request Finalize"/>
+    </WorkflowRef>
+    <Transition to="Refresh Identity"/>
+  </Step>
+  <Step action="call:refreshIdentity" condition="ref:doRefresh" icon="Task" name="Refresh Identity" posX="2884" posY="126">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="provision" value="true"/>
+    <Arg name="promoteAttributes" value="true"/>
+    <Arg name="correlateEntitlements" value="true"/>
+    <Arg name="synchronizeAttributes" value="true"/>
+    <Arg name="doManualActions" value="ref:doManualActions"/>
+    <Transition to="Set ExternalTicketId In identityRequest" when="script:(null != identityRequestId)"/>
+    <Transition to="stop"/>
+  </Step>
+  <Step icon="task" name="Set ExternalTicketId In identityRequest" posX="3042" posY="126">
+    <Description>Set ExternalTicketId In identityRequest</Description>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.IdentityRequest;
+        import sailpoint.api.ObjectUtil;
+
+        IdentityRequest iRequest = ObjectUtil.transactionLock(context, IdentityRequest.class, identityRequestId);
+        if(iRequest!=null){
+        iRequest.setExternalTicketId(iiqIdentityRequestId);
+        context.saveObject(iRequest);
+        context.commitTransaction();
+        //comment decache //context.decache(iRequest);
+        }
+      ]]></Source>
+    </Script>
+    <Transition to="stop"/>
+  </Step>
+  <Step icon="Stop" name="stop" posX="2116" posY="10"/>
+</Workflow>

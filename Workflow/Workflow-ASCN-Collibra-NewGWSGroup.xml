@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="ASCN-Workflow-Collibra-NewGWSGroup" type="LCMProvisioning">
+  <Variable initializer="true" name="trace">
+    <Description>Used for debugging this workflow and when set to true trace
+      will be sent to stdout.</Description>
+  </Variable>
+  <Variable name="errorMsg"/>
+  <Variable name="identityRequestId"/>
+  <Variable input="true" name="requesterPrimaryEmail"/>
+  <Variable input="true" name="groupPrimaryEmail"/>
+  <Variable input="true" name="collibraGUID"/>
+  <Variable initializer="Successfully launched rest call" name="Message" output="true"/>
+  <Variable name="plan"/>
+  <Variable name="project"/>
+  <Variable name="identityName">
+    <Description>The name of the identity being updated.</Description>
+  </Variable>
+  <Variable name="groupCorrespondingDataset"/>
+  <Variable input="true" name="collibraRequestTimestamp"/>
+  <Variable name="approvalSet">
+    <Description>Placeholder variable; populated upon subprocess generation of the approvalSet.</Description>
+  </Variable>
+  <Variable initializer="manager,owner,securityOfficer" input="true" name="approvalScheme">
+    <Description>A csv string that specifies how approval items should be generated
+      for the incoming request.
+
+      The value can be &amp;quot;none&amp;quot;, in which case approvals are disabled.
+
+      The value can also be a combination of any of the values below
+      in any order, separated by commas. The order in which they are
+      specified is the order in which they are processed:
+
+      owner
+        The object owner gets the approval item.
+        For Role approvals this is the Role object owner.
+        For Entitlement approvals this is the Entitlement object owner.
+
+      manager
+        The manager gets the approval item.
+
+      securityOfficer
+        The identity in the variable securityOfficerName gets the approval item.
+
+      identity
+        The identities/workgroups in the variable approvingIdentities get the approval item.</Description>
+  </Variable>
+  <Variable initializer="user, requester" input="true" name="notificationScheme">
+    <Description>A string that specifies who should be notified when the request has been complete.
+     The value can be null or a csv of one or more of the following options.
+
+     none or null
+       disable notifications
+
+     user
+       Identity that is being update will be notified.
+
+     manager
+       The manager of the Identity that is being updated will be notified.
+
+     requester
+       The person that has requested the update will be notified.</Description>
+  </Variable>
+  <Variable initializer="Collibra Request" name="flow"/>
+  <Variable initializer="ref:approvalEmailTemplate" name="identityEmailTemplate"/>
+  <Variable initializer="ref:approvalEmailTemplate" name="workItemNotificationTemplate"/>
+  <Variable initializer="Ascension-EmailTemplate-AccessRequestEscalation" name="workItemEscalationTemplate"/>
+  <Variable initializer="Ascension-EmailTemplate-AccessRequestReminder" name="workItemReminderTemplate"/>
+  <Variable initializer="ref:approvalEmailTemplate" name="securityOfficerEmailTemplate"/>
+  <Variable initializer="Pending Manual Changes" name="manualActionsEmailTemplate"/>
+  <Variable initializer="ref:approvalEmailTemplate" name="ownerEmailTemplate"/>
+  <Variable initializer="LCM Manager Notification" name="managerEmailTemplate"/>
+  <Variable initializer="Ascension-EmailTemplate-AccessRequest-RequesterNotification" name="requesterEmailTemplate"/>
+  <Variable initializer="Ascension-EmailTemplate-AccessRequest-RequesterNotification" name="userEmailTemplate"/>
+  <Variable initializer="Ascension-EmailTemplate-AccessRequestApproval" name="approvalEmailTemplate"/>
+  <Variable initializer="WebService" name="source"/>
+  <Variable name="successList"/>
+  <Variable name="failedMap"/>
+  <Variable name="failedList"/>
+  <Variable name="rejectedList"/>
+  <Variable name="workItemComments"/>
+  <Variable input="true" name="groupDescription"/>
+  <Variable input="true" name="groupOwner"/>
+  <Variable input="true" name="requestType"/>
+  <Variable name="groupName"/>
+  <Variable name="provisioningResultIsFailed"/>
+  <Variable name="objectId"/>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-Collibra-RequestHandler"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-GSuite-AccessToken"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-GSuite"/>
+    <Reference class="sailpoint.object.Rule" name="Rule-Ascension-EmailAddress-RuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="LCM Workflow Library"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="65" posY="9">
+    <Transition to="Validate Input"/>
+  </Step>
+  <Step icon="Message" name="Validate Input" posX="200" posY="10" resultVariable="errorMsg">
+    <Script>
+      <Source><![CDATA[String errorMsg=getValidationMessage(context,workflow,getRequiredVariables(workflow));
+return errorMsg;
+      ]]></Source>
+    </Script>
+    <Transition to="Create Group" when="errorMsg==null"/>
+    <Transition to="Return Error Message (Validation Failed)"/>
+  </Step>
+  <Step icon="Message" name="Return Error Message (Validation Failed)" posX="400" posY="169" resultVariable="Message">
+    <Script>
+      <Source><![CDATA[
+      return errorMsg;
+      ]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Analysis" name="Create Group" posX="545" posY="8" resultVariable="objectId">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="groupDescription" value="ref:groupDescription"/>
+    <Arg name="groupPrimaryEmail" value="ref:groupPrimaryEmail"/>
+    <Arg name="collibraGUID" value="ref:collibraGUID"/>
+    <Arg name="requesterPrimaryEmail" value="ref:requesterPrimaryEmail"/>
+    <Script>
+      <Source><![CDATA[import sailpoint.tools.JsonHelper;
+import sailpoint.tools.Util;
+
+if (Util.isNotNullOrEmpty(groupPrimaryEmail)) {
+
+  String[] strArray = groupPrimaryEmail.split("@");
+
+   if (strArray.length == 2) {
+
+      intendedGroupName = strArray[0];
+
+      if (Util.isNotNullOrEmpty(intendedGroupName)) {
+
+         workflow.put("groupName", intendedGroupName);
+
+      }
+
+   }
+
+  result = createCloudGroup(intendedGroupName, groupPrimaryEmail, "C04h4ias1", groupDescription);
+
+  logger.info("createCloudGroup Method Result: " + result);
+  
+  jsonMap = JsonHelper.mapFromJson(String.class, String.class, JsonHelper.makePretty(result)).get("response");
+  
+  rawName = jsonMap.get("name");
+  
+  return rawName.replace("groups/",""); //objectId of the created GWS group
+
+}]]></Source>
+    </Script>
+    <Transition to="Update Group"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="917" posY="170"/>
+  <Step icon="Default" name="Update Group" posX="677" posY="8">
+    <Arg name="groupPrimaryEmail" value="ref:groupPrimaryEmail"/>
+    <Script>
+      <Source><![CDATA[import sailpoint.tools.Util;
+
+if (Util.isNotNullOrEmpty(groupPrimaryEmail)) {
+
+  result = makeCloudGroupRestricted(groupPrimaryEmail);
+
+  logger.info("makeCloudGroupRestrictedMethod Result: " + result);
+
+}]]></Source>
+    </Script>
+    <Transition to="Stop" when="provisioningResultIsFailed"/>
+    <Transition to="Aggregate Group"/>
+  </Step>
+  <Step icon="Default" name="Create Workgroup" posX="979" posY="4">
+    <Arg name="groupName" value="ref:groupName"/>
+    <Arg name="groupOwner" value="ref:groupOwner"/>
+    <Script>
+      <Source><![CDATA[import sailpoint.object.Identity;
+
+Identity workgroup = createWorkgroupForCollibra(groupName);
+
+if (workgroup != null) {
+
+   populateCollibraWorkgroup(groupOwner, workgroup, groupName);
+
+}]]></Source>
+    </Script>
+    <Transition to="Update ManagedAttribute"/>
+  </Step>
+  <Step action="script:updateCollibraManagedAttribute(groupName, groupDescription);" icon="Default" name="Update ManagedAttribute" posX="979" posY="99">
+    <Arg name="groupName" value="ref:groupName"/>
+    <Arg name="groupDescription" value="ref:groupDescription"/>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Default" name="Aggregate Group" posX="869" posY="4">
+    <Arg name="objectId" value="ref:objectId"/>
+    <Script>
+      <Source><![CDATA[import sailpoint.tools.Util;
+
+if (Util.isNotNullOrEmpty(objectId)) {
+
+   aggregateGroup(objectId, "GSuite");
+
+}]]></Source>
+    </Script>
+    <Transition to="Create Workgroup"/>
+  </Step>
+</Workflow>

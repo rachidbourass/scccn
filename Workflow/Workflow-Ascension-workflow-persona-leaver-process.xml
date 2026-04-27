@@ -1,0 +1,435 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" libraries="Identity" name="Ascension-Workflow-Persona-Leaver-Process" type="IdentityLifecycle">
+  <Variable input="true" name="trigger">
+    <Description>The IdentityTrigger</Description>
+  </Variable>
+  <Variable input="true" name="event" transient="true">
+    <Description>
+      The IdentityChangeEvent.  It can be used to build the provisioning plan, but does not need to be persisted with the case, so marked as transient.
+    </Description>
+  </Variable>
+  <Variable initializer="false" input="true" name="trace">
+    <Description>
+      Used for debugging this workflow and when set to true trace will be sent to stdout.
+    </Description>
+  </Variable>
+  <Variable initializer="false" name="trace"/>
+  <Variable name="launcher">
+    <Description>The launcher</Description>
+    <Script>
+      <Source><![CDATA[
+        return context.getUserName();
+      ]]></Source>
+    </Script>
+  </Variable>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+          The displayName of the identity being updated. Query for this using a projection query and fall back to the name.
+    </Description>
+  </Variable>
+  <Variable name="plan"/>
+  <Variable name="project"/>
+  <Description>
+		This is the Workflow for Leaver - Persona Process
+	</Description>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Persona-Management-RuleLibrary"/>
+    <Reference class="sailpoint.object.Rule" name="LCM Workflow Library"/>
+  </RuleLibraries>
+  <Step icon="Start" monitored="true" name="Start" posX="2" posY="135">
+    <Transition to="User Check"/>
+  </Step>
+  <Step icon="Task" monitored="true" name="User Check" posX="2" posY="135">
+    <Transition to="Process Leaver For Identity">
+      <Script>
+        <Source><![CDATA[
+        import sailpoint.object.Custom;
+        import sailpoint.object.Identity;
+
+          String ministryValue= "";
+          boolean transitionVal = false;
+
+          Identity identity = context.getObjectByName(Identity.class,identityName);                      
+
+          if(null != identity){
+          ministryValue = identity.getAttribute("ministry");
+          //context.decache(identity);
+          }
+
+          if(!Util.nullSafeCaseInsensitiveEq(ministryValue,"AMITA Health")){
+          transitionVal = true;
+		  //Write Audit records to IIQ.
+                String auditString1 = "Identity that is disabled: "+identityName;
+                String auditString2 = "Leaver for Ascension user";
+                String auditString3 = "Triggering Leaver Workflow for the identity: "+identityName;
+                writeAuditRecordToIIQ("PersonaLeaver",auditString1, auditString2,auditString3,identityName,"Ascension Leaver");
+          }
+
+          return transitionVal;
+        ]]></Source>
+      </Script>
+    </Transition>
+    <Transition to="Check Persona For Leaver"/>
+  </Step>
+  <Step name="Check Persona For Leaver" resultVariable="triggerLeaver">
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Identity;
+        import sailpoint.tools.Util;
+        
+         boolean triggerLeaverWF = false;
+         Identity identity = context.getObjectByName(Identity.class,identityName);
+         String personaType = identity.getAttribute("personaType");
+        
+         //already marked by the persona solution
+         if(Util.isNotNullOrEmpty(personaType))
+         {
+			if(personaType.equalsIgnoreCase("Child"))
+            {
+				//Write Audit records to IIQ.
+                String auditString1 = "Identity that is disabled: "+identityName;
+                String auditString2 = "Persona type: "+personaType;
+                String auditString3 = "Triggering Leaver Workflow for the identity: "+identityName;
+                writeAuditRecordToIIQ("PersonaLeaver",auditString1, auditString2,auditString3,identityName,"Persona Leaver");
+        
+				//Just trigger normal leaver process
+				triggerLeaverWF = true;
+        				
+            }
+			else if(personaType.equalsIgnoreCase("Primary"))
+            {
+				List childPersonaList = identity.getAttribute("childPersonas");
+				boolean setProtectedFlag = false;
+				
+
+				if(null!=childPersonaList && !childPersonaList.isEmpty()) //parent has child personas
+				{
+					//parent has 1 or more children
+					if(childPersonaList.size()>0)
+					{
+						List childIdentitiesList = getChildIdentities(childPersonaList);
+						
+						String newParent = null;
+						boolean priorityParentFound = false;
+						//Priority 1 - Search EmployeeProfile Child.
+						for(String childIdenName :childIdentitiesList)
+						  {
+							Identity tempIden = context.getObjectByName(Identity.class,childIdenName);
+							boolean isActive = getIdentityStatus(childIdenName);
+							if(null!=tempIden && isActive)
+							{
+							  String tempIdentityType = tempIden.getAttribute("identityType");
+							  if(null==tempIdentityType)
+							  {
+								 tempIdentityType = getProfileType(childIdenName);
+							  }
+							  if(null!=tempIdentityType && tempIdentityType.equalsIgnoreCase("EmployeePersona"))
+							  {
+								newParent = childIdenName;
+								priorityParentFound = true;
+								break;
+							  }
+								//comment decache //context.decache(tempIden);
+							}
+						  }
+					
+						if(!priorityParentFound)
+						{
+							//Priority 2 - Search ProviderProfile Child.
+							for(String childIdenName :childIdentitiesList)
+							{
+							  Identity tempIden = context.getObjectByName(Identity.class,childIdenName);
+							  boolean isActive = getIdentityStatus(childIdenName);
+							  if(null!=tempIden && isActive)
+							  {
+								String tempIdentityType = tempIden.getAttribute("identityType");
+								if(null==tempIdentityType)
+								{
+								   tempIdentityType = getProfileType(childIdenName);
+								}
+								if(null!=tempIdentityType && tempIdentityType.equalsIgnoreCase("ProviderPersona"))
+								{
+								  newParent = childIdenName;
+								  priorityParentFound = true;
+								  break;
+								}
+								//comment decache //context.decache(tempIden);
+							  }
+							}
+						}
+
+						if(!priorityParentFound)
+						{
+							//Priority 3 - Search NHRCProfile Child.
+							for(String childIdenName :childIdentitiesList)
+							{
+							  Identity tempIden = context.getObjectByName(Identity.class,childIdenName);
+							  boolean isActive = getIdentityStatus(childIdenName);
+							  if(null!=tempIden && isActive)
+							  {
+								String tempIdentityType = tempIden.getAttribute("identityType");
+								if(null==tempIdentityType)
+								{
+								   tempIdentityType = getProfileType(childIdenName);
+								}
+								if(null!=tempIdentityType && tempIdentityType.equalsIgnoreCase("NonHRContractorPersona"))
+								{
+								  newParent = childIdenName;
+								  priorityParentFound = true;
+								  break;
+								}
+								//comment decache //context.decache(tempIden);
+							  }
+							}
+						}
+
+						if(!priorityParentFound)
+						{
+							//Priority 4 - Search OtherProfile Child.
+							for(String childIdenName :childIdentitiesList)
+							{
+							  Identity tempIden = context.getObjectByName(Identity.class,childIdenName);
+							  boolean isActive = getIdentityStatus(childIdenName);
+							  if(null!=tempIden && isActive)
+							  {
+								String tempIdentityType = tempIden.getAttribute("identityType");
+								if(null==tempIdentityType)
+								{
+								   tempIdentityType = getProfileType(childIdenName);
+								}
+								if(null!=tempIdentityType && tempIdentityType.equalsIgnoreCase("OtherPersona"))
+								{
+								  newParent = childIdenName;
+								  priorityParentFound = true;
+								  break;
+								}
+								//comment decache //context.decache(tempIden);
+							  }
+							}
+						}
+						
+						//Write Audit records to IIQ.
+						String auditString1 = "New Parent (Primary) Identity: "+newParent;
+						String auditString2 = "Old Parent (Primary) Identity: "+identityName + " was disabled.";
+						String auditString3 = "Birthright links and roles moved from : "+identityName + " to "+newParent;
+						writeAuditRecordToIIQ("PersonaLeaver",auditString1, auditString2,auditString3,identityName,"Persona Leaver");
+			
+						Identity newParentIdentity = context.getObjectByName(Identity.class,newParent);
+						Identity newChildIdentity = context.getObjectByName(Identity.class,identityName);
+						
+						if(null!=newParentIdentity && null!=newChildIdentity)
+						{
+
+							newParentIdentity.setAttribute("personaType","Primary");
+							newParentIdentity.removeAttribute("parentPersonaName");
+							newParentIdentity.removeAttribute("parentPersonaSID");
+							
+							childPersonaList.remove(newParentIdentity.getAttribute("internalId"));
+							childPersonaList.add(identity.getAttribute("internalId"));
+							
+							newChildIdentity.setAttribute("personaType","Child");
+							newChildIdentity.removeAttribute("childPersonas");
+							newChildIdentity.removeAttribute("childPersonaNames");
+							newChildIdentity.setAttribute("parentPersonaName",newParentIdentity.getName());
+							newChildIdentity.setAttribute("parentPersonaSID",newParentIdentity.getAttribute("internalId"));
+							newChildIdentity.setAttribute("samAccountName","");
+			
+							context.saveObject(newChildIdentity);
+							context.commitTransaction();
+							//comment decache //context.decache(newChildIdentity);
+			
+							newParentIdentity.setAttribute("childPersonas", childPersonaList);
+
+							List childNamesStr = getChildIdentities(childPersonaList);
+							newParentIdentity.setAttribute("childPersonaNames", childNamesStr);
+			
+							context.saveObject(newParentIdentity);
+							context.commitTransaction();
+							//comment decache //context.decache(newParentIdentity);
+			
+							//Update parent identities in secondary identities
+							updateParentPersonaAttributesInSecondaryIdentities(childPersonaList,newParent);
+
+							//Move Links and Birthright Roles
+							boolean linkedMovedSuccess = false;
+							try
+							{
+							  moveIdentityLinks(identityName,newParent);
+							  linkedMovedSuccess = true;
+							}
+							catch(Exception e)
+							{
+							  log.error("Error occurred while moving the links from "+identityName+" to "+newParent);
+							}
+
+													
+							List assignedRolesList = getBirthRightAssignedRolesForIdentity(identityName);
+							removeBirthRightRolesFromIdentity(identityName);
+							if(linkedMovedSuccess)
+							{
+								 //Check if the old identity from which links were moved has any links. 
+							   //If no links are there then mark it as protected, set protected=true, and if any links are there set protected = false
+							   boolean linksPresent = checkIfLinksExistOnIdentity(identityName);
+							   if(!linksPresent)
+							   {
+								  setProtectedFlag = true;
+							   }
+							   addBirthRightRolesToIdentity(newParent,assignedRolesList);
+							}
+			
+						}
+										
+						  //Username rename scenario logic
+						Identity latestParentIden = context.getObjectByName(Identity.class,newParent);
+						Identity latestChildIden = context.getObjectByName(Identity.class,identityName);
+
+						String initialName = latestChildIden.getAttribute("initialName");
+						boolean nameChangeNeededForNewParent = checkIfUserNameNeedsToBeChanged(newParent);
+
+						if(null!=initialName && nameChangeNeededForNewParent)
+						{
+							String samName = latestChildIden.getName();
+							String initName = initialName;
+							String inIdenName = latestParentIden.getName();
+							workflow.put("identityName",initName);
+
+							latestChildIden.setName(initName);
+
+							try
+							{
+							  context.saveObject(latestChildIden);
+							  context.commitTransaction();
+							  //comment decache //context.decache(latestChildIden);
+							}
+							catch(Exception e)
+							{
+							  //do nothing
+							}
+
+							latestParentIden.setName(samName);
+							latestParentIden.setAttribute("initialName",inIdenName);
+
+							try
+							{
+							  context.saveObject(latestParentIden);
+							  context.commitTransaction();
+							  //comment decache //context.decache(latestParentIden);
+							}
+							catch(Exception e)
+							{
+							 //do nothing
+							}
+
+
+					 
+							Identity latestParentIdentity = context.getObjectByName(Identity.class,samName);
+							List chdPersonaList = latestParentIdentity.getAttribute("childPersonas");
+
+							List childNamesStr = getChildIdentities(childPersonaList);
+							latestParentIdentity.setAttribute("childPersonaNames", childNamesStr);
+
+							//Update primary identities details in child identities
+							updateParentPersonaAttributesInSecondaryIdentities(childPersonaList,samName);
+
+							try
+							{
+							  context.saveObject(latestParentIdentity);
+							  context.commitTransaction();
+							  //comment decache //context.decache(latestParentIdentity);
+							}
+							catch(Exception e)
+							{
+							 // do nothing
+							}
+
+							workflow.put("modifiedName",samName);
+											
+							if(setProtectedFlag)
+							{
+								Identity tempChildIden = context.getObjectByName(Identity.class,initName);
+								tempChildIden.setProtected(setProtectedFlag);
+								tempChildIden.setAttribute("samAccountName","");
+								context.saveObject(tempChildIden);
+								context.commitTransaction();
+								//comment decache //context.decache(tempChildIden);
+							}
+											
+							if(null!=initialName)
+							{
+							  auditString1 = "Based on the username move criteria, username moved from Child Identity to Parent Identity";
+							  auditString2 = "Incoming identity (New Parent) username now is:"+ workflow.get("modifiedName") + " from earlier username: "+newParent;
+							  auditString3 = "Matching identity (New Child) username now is:"+ initialName+ " from earlier username: "+identityName;
+							  writeAuditRecordToIIQ("PersonaUsernameMove",auditString1, auditString2,auditString3,workflow.get("modifiedName"),"Persona Leaver");
+							}
+						}
+						else
+						{
+							if(setProtectedFlag)
+							{
+								Identity tempChildIden = context.getObjectByName(Identity.class,latestChildIden.getName());
+								tempChildIden.setProtected(setProtectedFlag);
+								tempChildIden.setAttribute("samAccountName","");
+								context.saveObject(tempChildIden);
+								context.commitTransaction();
+								//comment decache //context.decache(tempChildIden);
+							}
+			
+						}
+        
+					}//parent has 1 or more child personas
+				}//parent has child personas ends
+				else //parent does not have any child personas
+				{
+					//Write Audit records to IIQ.
+                  String auditString1 = "Identity that is disabled: "+identityName;
+                  String auditString2 = "Persona type: "+personaType;
+                  String auditString3 = "Identity does not have any child personas. Triggering Leaver Workflow for the identity: "+identityName;
+                  writeAuditRecordToIIQ("PersonaLeaver",auditString1,auditString2,auditString3,identityName,"Persona Leaver");
+        
+					triggerLeaverWF = true;
+					//Just trigger normal leaver process
+				}
+			}//else if primary
+         }//end first if
+         else
+         {
+			//Not marked by Persona - Need to trigger Leaver Process as-is
+			triggerLeaverWF = true;
+         }
+         return triggerLeaverWF;
+  		]]></Source>
+    </Script>
+    <Transition to="Process Leaver For Identity"/>
+    <Transition to="End" when="(triggerLeaver==false)"/>
+  </Step>
+  <Step name="Process Leaver For Identity">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="identityDisplayName" value="ref:identityDisplayName"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Arg name="leaverType" value="Immediate"/>
+    <Arg name="trigger">
+      <Script>
+        <Source><![CDATA[
+          return trigger;
+        ]]></Source>
+      </Script>
+    </Arg>
+    <Arg name="event">
+      <Script>
+        <Source><![CDATA[
+          return event;
+      	]]></Source>
+      </Script>
+    </Arg>
+    <Description>Process the user for immediate Termination and call wrapper workflow.</Description>
+    <WorkflowRef>
+      <Reference class="sailpoint.object.Workflow" name="Workflow-Ascension-Lifecycle-Leaver-RequestObject-Wrapper"/>
+    </WorkflowRef>
+    <Transition to="End"/>
+  </Step>
+  <Step icon="Stop" monitored="true" name="End" posX="960" posY="17"/>
+</Workflow>

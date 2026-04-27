@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" monitored="true" name="Workflow-Ascension-Leaver-Subprocess-Duo" type="Subprocess">
+  <Variable input="true" name="identityName">
+    <Description>Passed in from Leaver Wrapper</Description>
+  </Variable>
+  <Variable input="true" name="duoUsername">
+    <Description>username attribute from Duo link; passed in from Leaver Wrapper</Description>
+  </Variable>
+  <Variable name="duoTokens">
+    <Description>Placeholder variable; populated during workflow</Description>
+  </Variable>
+  <Variable name="duoPhones">
+    <Description>Placeholder variable; populated during workflow</Description>
+  </Variable>
+  <Variable initializer="script:true" name="skipStep">
+    <Description>For Step Conditions (e.g. When !skipStep)</Description>
+  </Variable>
+  <Variable input="true" name="project">
+    <Description>Passed in from Leaver Wrapper</Description>
+  </Variable>
+  <Description>Handles Leaver Operations for the Duo Application.</Description>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-Duo"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start" posX="108" posY="21">
+    <Transition to="Get Phones"/>
+  </Step>
+  <Step action="script:return getDuoUserObject(duoUsername, &quot;phones&quot;);" icon="Analysis" name="Get Phones" posX="207" posY="21" resultVariable="duoPhones">
+    <Transition to="Get Tokens"/>
+  </Step>
+  <Step action="script:return getDuoUserObject(duoUsername, &quot;tokens&quot;);" icon="Analysis" name="Get Tokens" posX="299" posY="21" resultVariable="duoTokens">
+    <Transition to="Delete Phones"/>
+  </Step>
+  <Step action="script:deleteDuoObject(duoPhones, &quot;phone&quot;);" condition="duoPhones != null &amp;&amp; !duoPhones.isEmpty()" icon="Provision" name="Delete Phones" posX="393" posY="21">
+    <Transition to="Delete Tokens"/>
+  </Step>
+  <Step action="script:deleteDuoObject(duoTokens, &quot;token&quot;);" condition="duoTokens != null &amp;&amp; !duoTokens.isEmpty()" icon="Provision" name="Delete Tokens" posX="494" posY="21">
+    <Transition to="Do Sync"/>
+  </Step>
+  <Step icon="Undo" name="Do Sync" posX="591" posY="21" resultVariable="syncResponse">
+    <Description>Calls the Duo Admin API to trigger a sync with AD. This step is intentionally designed to NOT result in workflow failure if the sync is unsuccessful due to 404 or 429 errors.</Description>
+    <Script>
+      <Source><![CDATA[String directoryKey = resolveDirectoryKey(identityName, duoUsername);
+
+return syncDuoUserWithAD(duoUsername, directoryKey);]]></Source>
+    </Script>
+    <Transition to="Verify Deletions"/>
+  </Step>
+  <Step action="rule:Rule-Ascension-FinalizeWorkflow" catches="complete" icon="Catches" name="Finalize" posX="732" posY="128">
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="803" posY="21"/>
+  <Step condition="(duoPhones != null &amp;&amp; !duoPhones.isEmpty()) || (duoTokens != null &amp;&amp; !duoTokens.isEmpty())" icon="Audit" name="Verify Deletions" posX="700" posY="21" wait="2">
+    <Description>Throws exceptions when attempted DELETE operations in earlier steps appear to have left objects on the Duo user that should have been purged. Waits at least two minutes before running.</Description>
+    <Script>
+      <Source><![CDATA[boolean phonesIssue = false;
+boolean tokensIssue = false;
+
+if (duoPhones != null && !duoPhones.isEmpty()) {
+
+   List phones = getDuoUserObject(duoUsername, "phones");
+
+   if (phones != null && !phones.isEmpty()) {
+
+     phonesIssue = true;
+
+   }
+
+}
+
+if (duoTokens != null && !duoTokens.isEmpty()) {
+
+   List tokens = getDuoUserObject(duoUsername, "tokens");
+
+   if (tokens != null && !tokens.isEmpty()) {
+
+     tokensIssue = true;
+
+   }
+
+}
+
+if (phonesIssue && tokensIssue) {
+
+throw new GeneralException("Tokens and Phones appear to remain following DELETE attempt against [" + duoUsername + "]; if this occurred during an Immediate Termination inform the Security Team immediately; otherwise, simply mark this WorkItem complete.");
+
+} else if (phonesIssue) {
+
+throw new GeneralException("Phones appear to remain following DELETE attempt against [" + duoUsername + "]; if this occurred during an Immediate Termination inform the Security Team immediately; otherwise, simply mark this WorkItem complete.");
+
+} else if (tokensIssue) {
+
+throw new GeneralException("Tokens appear to remain following DELETE attempt against [" + duoUsername + "]; if this occurred during an Immediate Termination inform the Security Team immediately; otherwise, simply mark this WorkItem complete.");
+
+}]]></Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+</Workflow>

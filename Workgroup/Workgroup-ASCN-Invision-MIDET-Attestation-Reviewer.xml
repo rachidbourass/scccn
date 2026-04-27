@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Identity PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Identity name="ASCN-Invision-MIDET-Attestation-Reviewer" workgroup="true">
+  <Attributes>
+    <Map>
+      <entry key="displayName" value="ASCN-Invision-MIDET-Attestation-Reviewer"/>
+      <entry key="email" value="IdentityCollabSailPointProv@ascension.org"/>
+    </Map>
+  </Attributes>
+  <Capabilities>
+    <Reference class="sailpoint.object.Capability" name="CertificationAdministrator"/>
+  </Capabilities>
+  <Description>Invision-MIDET Backup Attestation Reviewer</Description>
+  <Preferences>
+    <Map>
+      <entry key="workgroupNotificationOption">
+        <value>
+          <WorkgroupNotifationOption>Both</WorkgroupNotifationOption>
+        </value>
+      </entry>
+    </Map>
+  </Preferences>
+</Identity>

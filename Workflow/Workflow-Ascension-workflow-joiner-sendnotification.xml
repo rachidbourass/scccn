@@ -1,0 +1,470 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" name="Ascension-Workflow-Joiner-SendNotification" type="Subprocess">
+  <Variable input="true" name="identityName">
+    <Description>
+      The name of the identity object being modified.
+    </Description>
+  </Variable>
+  <Variable input="true" name="applicationName">
+    <Description>
+      The applicationName of the identity object being modified.
+    </Description>
+  </Variable>
+  <Variable input="true" name="processName">
+    <Description>
+      The process Name of the identity object being modified.
+    </Description>
+  </Variable>
+  <Variable initializer="script:(identityDisplayName != void) ? identityDisplayName : resolveDisplayName(identityName)" input="true" name="identityDisplayName">
+    <Description>
+      The displayName of the identity being updated.
+      This may be passed in, if not the script queries for this
+      using a projection query and falls back to the name.
+    </Description>
+  </Variable>
+  <Variable name="nativeId"/>
+  <RuleLibraries>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Library-DatabaseFields"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Library"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-RuleLibrary-Encryption"/>
+    <Reference class="sailpoint.object.Rule" name="Ascension-Rule-Persona-Management-RuleLibrary"/>
+  </RuleLibraries>
+  <Step icon="Start" name="Start">
+    <Arg name="processName" value="ref:processName"/>
+    <Transition to="Get Account Name" when="script:(Util.nullSafeCaseInsensitiveEq(processName,&quot;joiner&quot;))"/>
+    <Transition to="Send Termination Notify To Manager"/>
+  </Step>
+  <Step name="Get Account Name" posX="802" posY="10" resultVariable="nativeId">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="applicationName" value="ref:applicationName"/>
+    <Description>
+      Get all list of users whose has mdstaff ascension application and immediately terminated
+    </Description>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.api.SailPointContext;
+        import sailpoint.object.Link;
+        import sailpoint.object.Identity;
+        import sailpoint.object.Application;
+        import sailpoint.tools.Util;
+        import sailpoint.api.IdentityService;
+
+        String accName = null;
+       
+        IdentityService idService = new IdentityService(context);
+        Identity identity = context.getObjectByName(Identity.class,identityName);
+        Link link = null;
+        StringBuilder str = new StringBuilder();
+
+        if(null != identity){
+
+          List appLinks = null;
+          Application app = context.getObjectByName(Application.class,applicationName);		
+
+          if(null != app && !Util.isEmpty((appLinks = idService.getLinks( identity, app)))){
+            
+        		link = appLinks.get(0);
+        
+        		if(null != link){
+              accName = link.getAttribute("distinguishedName");
+        			workflow.put("email",link.getAttribute("mail"));
+					if(Util.isNotNullOrEmpty(link.getAttribute("streetAddress"))){
+                str.append(link.getAttribute("streetAddress"));
+                str.append(",");
+              }
+        
+              if(Util.isNotNullOrEmpty(link.getAttribute("l"))){
+                str.append(link.getAttribute("l"));
+                str.append(",");
+              }
+              if(Util.isNotNullOrEmpty(link.getAttribute("st"))){
+                str.append(link.getAttribute("st"));
+              }
+              if(Util.isNotNullOrEmpty(link.getAttribute("postalcode"))){
+                str.append(link.getAttribute("postalcode"));
+              }
+        			workflow.put("address",str);        
+        		}
+          }
+        
+          if(null != app){
+          	context.decache(app);
+          }
+        }
+
+        return accName;
+      ]]></Source>
+    </Script>
+    <Transition to="Single Account Aggregation"/>
+  </Step>
+  <Step name="Single Account Aggregation" posX="802" posY="10">
+    <Arg name="nativeId" value="ref:nativeId"/>
+    <Arg name="applicationName" value="ref:applicationName"/>
+    <Description>
+      Get all list of users whose has mdstaff ascension application and immediately terminated
+    </Description>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Application;
+        import sailpoint.object.Attributes;
+        import sailpoint.object.Custom;
+        import sailpoint.object.Filter;
+        import sailpoint.object.Identity;
+        import sailpoint.object.Link;
+        import sailpoint.object.QueryOptions;
+        import sailpoint.object.ResourceObject;
+        import sailpoint.object.TaskResult;
+        import sailpoint.object.Rule;
+        import sailpoint.connector.JDBCConnector;
+        import sailpoint.api.Aggregator;
+        import sailpoint.connector.Connector;
+
+        import org.apache.log4j.Logger;
+        import org.apache.log4j.Level;
+
+        Logger loggers = Logger.getLogger("sailpoint.services.DemonstrateSingleAccountAggregation");
+        loggers.setLevel(Level.DEBUG);
+
+        String errorMessage = "";
+        String appName = applicationName;
+        String accountName=nativeId;
+
+        Application appObject = context.getObjectByName(Application.class, appName);
+        String appConnName = appObject.getConnector();
+
+        Connector appConnector = sailpoint.connector.ConnectorFactory.getConnector(appObject, null);
+
+        if (null == appConnector) {
+        errorMessage = "Failed to construct an instance of connector [" + appConnName + "]";
+        return errorMessage;
+        }
+
+        ResourceObject rObj = null;
+        try {
+
+        rObj = (ResourceObject) appConnector.getObject("account", accountName, null);
+
+        } catch (sailpoint.connector.ObjectNotFoundException onfe) {
+        errorMessage = "Connector could not find account: [" + accountName + "]";
+        errorMessage += " in application  [" + appName + "]";
+        loggers.error(errorMessage);
+        loggers.error(onfe);   
+        return errorMessage;
+        }
+
+        if (null == rObj) {
+        errorMessage = "ERROR: Could not get ResourceObject for account: " + accountName;
+        loggers.eror(errorMessage);
+        return errorMessage;
+        }
+
+        Rule customizationRule = appObject.getCustomizationRule();
+        if (null != customizationRule) {
+
+        loggers.debug("Customization rule found for applicaiton " + appName);   
+
+        try {
+
+        // Pass the mandatory arguments to the Customization rule for the app.
+        HashMap ruleArgs = new HashMap();
+        ruleArgs.put("context",     context);
+        ruleArgs.put("log",         log);
+        ruleArgs.put("object",      rObj);
+        ruleArgs.put("application", appObject);
+        ruleArgs.put("connector",   appConnector);
+        ruleArgs.put("state",       new HashMap());
+
+        // Call the customization rule just like a normal aggregation would.
+        ResourceObject newRObj = context.runRule(customizationRule, ruleArgs, null);
+
+        // Make sure we got a valid resourceObject back from the rule.  
+        if (null != newRObj) {
+        rObj = newRObj;
+        
+        }    
+
+        } catch (Exception ex) {      
+        loggers.error("Error while running Customization rule for " + appName);
+        }  
+
+        }
+
+        Attributes argMap = new Attributes();
+        argMap.put("promoteAttributes",       "true");
+        argMap.put("correlateEntitlements",   "true");
+        argMap.put("noOptimizeReaggregation", "true"); 
+        argMap.put("checkDeleted", "true");
+
+        Aggregator agg = new Aggregator(context, argMap);
+        if (null == agg) {
+        errorMessage = "Null Aggregator returned from constructor.  Unable to Aggregate!";
+        loggers.error(errorMessage);
+        return errorMessage;
+        }
+
+        TaskResult taskResult = agg.aggregate(appObject, rObj);
+        loggers.debug("aggregation complete.");
+
+        if (null == taskResult) {
+        errorMessage = "ERROR: Null taskResult returned from aggregate() call.";
+        loggers.eror(errorMessage);
+        return errorMessage;
+        }
+
+        return ("Success");
+      ]]></Source>
+    </Script>
+    <Transition to="Notify Manager"/>
+  </Step>
+  <Step icon="Email" name="Notify Manager" posX="98" posY="10">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Identity;
+        import sailpoint.object.EmailOptions;
+        import sailpoint.object.EmailTemplate;
+        import sailpoint.object.Bundle;
+        import sailpoint.api.ObjectUtil;
+        import java.text.Format;
+        import sailpoint.tools.Util;
+        import java.text.SimpleDateFormat;
+        import java.util.Date;
+
+
+        EmailTemplate template = context.getObjectByName(EmailTemplate.class, "Ascension-EmailTemplate-UserAdd-Courion");
+        template.setBcc("thomas.blackburn@ascension.org");
+        Identity identity = context.getObjectByName(Identity.class,identityName);
+
+        String toEmail = "ascensionprod@service-now.com";
+
+        LinkedHashMap argValues = new LinkedHashMap();
+        LinkedHashMap descMap = new LinkedHashMap();
+        LinkedHashMap adInfo= new LinkedHashMap();
+        
+        Format startDateformatter = new SimpleDateFormat("MM/dd/yyyy");
+        
+        String decryptValue = "";
+        if(null != identity && null != identity.getAttribute("dob")){
+          decryptValue = identity.getAttribute("dob");
+          if(Util.isNotNullOrEmpty(decryptValue)){
+            decryptValue = getDecryptAESValue(decryptValue);
+            if(Util.isNotNullOrEmpty(decryptValue)){
+              decryptValue = decryptValue.replaceAll("/","");
+            }
+          }
+        }		
+        
+        boolean rbacRole = false;
+        String jobcode = "";
+        String username ="";
+
+        if (null != identity){	
+        if(Util.isNotNullOrEmpty(identity.getLastname())){         
+          	username = identity.getLastname()+", ";
+          }
+          if(Util.isNotNullOrEmpty(identity.getFirstname())){
+            username =  username+identity.getFirstname()+", ";
+          }
+          if(Util.isNotNullOrEmpty(identity.getAttribute("middleName"))){
+            username = username+identity.getAttribute("middleName");
+          }
+		  }
+        List assignedRoles = new ArrayList();
+     
+        if (null != identity){	
+        	String startDate = startDateformatter.format(convertStringToDate(identity.getStringAttribute("hireDate")));
+         assignedRoles = identity.getAssignedRoles();
+        
+         if((assignedRoles != null) && !assignedRoles.isEmpty()){
+           for(Bundle role : assignedRoles) {
+             if(role != null && Util.isNotNullOrEmpty(role.getName()) && role.getName().startsWith("AMITA-BirthrightRole") && role.getName().contains("Dept=") && role.getName().contains("Loc=") && role.getName().contains("Job=") ){
+                rbacRole = true;
+        				break;
+             }
+           }          
+         }     
+        
+        if(Util.isNotNullOrEmpty(identity.getStringAttribute("jobcode"))){
+          jobcode = "("+identity.getStringAttribute("jobcode")+")";
+        }
+ 
+          descMap.put("Department",identity.getStringAttribute("department") != null? identity.getStringAttribute("department") : "");       
+          descMap.put("DepartmentCostCenter",identity.getStringAttribute("departmentNumber") != null? identity.getStringAttribute("departmentNumber") : "");
+          descMap.put("JobCode",identity.getStringAttribute("title") != null? identity.getStringAttribute("title") : "");
+          descMap.put("Location",identity.getStringAttribute("location") != null? "("+identity.getStringAttribute("buildingId")+")"+identity.getStringAttribute("location") : "");
+          descMap.put("Address",workflow.get("address"));
+
+          adInfo.put("AD",identity.getName() != null? identity.getName() : "");
+          adInfo.put("AD_AMITA",identity.getName() != null? identity.getName() : "");
+          adInfo.put("Profile",identity.getStringAttribute("internalId") != null? identity.getStringAttribute("internalId") : "");
+          adInfo.put("Mail Address",workflow.get("email"));
+ 
+          if(identity.getStringAttribute("contractorManager") != null){
+           managerId = context.getObjectByName(Identity.class,identity.getStringAttribute("contractorManager"));
+          }else{
+           managerId = identity.getManager();
+          }
+
+          argValues.put("customer_id",managerId != null? managerId.getStringAttribute("samAccountName") : "");                 	
+          argValues.put("manager",managerId != null? managerId.getDisplayName() : "");        
+          argValues.put("user_name",username != null? username : "");
+          argValues.put("start_date",startDate != null? startDate : "");
+          argValues.put("job_code",identity.getStringAttribute("title") != null? jobcode+identity.getStringAttribute("title") : "");
+          argValues.put("department",identity.getStringAttribute("department") != null? identity.getStringAttribute("department") : "");
+          argValues.put("location",identity.getStringAttribute("location") != null? "("+identity.getStringAttribute("buildingId")+")"+identity.getStringAttribute("location") : "");
+          argValues.put("new_user_windows_login",identity.getStringAttribute("initialOperId") != null? identity.getStringAttribute("initialOperId") : "");
+         argValues.put("initial_pwd", "Password will be shared in a separate email.");
+        }
+
+        Map args = new HashMap();
+        args.put("identityDisplayName",identityDisplayName);
+        args.put("map",argValues);
+        args.put("launcher",launcher);
+        args.put("description",descMap);
+        args.put("adInfo",adInfo);
+        if(rbacRole){
+          args.put("subject","Automated Request");
+        }
+
+        EmailOptions options = new EmailOptions(toEmail, args);
+
+        if(null != options && template !=null){
+          context.sendEmailNotification(template,options);
+          context.decache(template);
+        }
+      ]]></Source>
+    </Script>
+    <Transition to="stop"/>
+  </Step>
+  <Step icon="Email" name="Send Termination Notify To Manager" posX="98" posY="10">
+    <Arg name="identityName" value="ref:identityName"/>
+    <Arg name="launcher" value="ref:launcher"/>
+    <Script>
+      <Source><![CDATA[
+        import sailpoint.object.Identity;
+        import sailpoint.object.EmailOptions;
+        import sailpoint.object.EmailTemplate;
+        import sailpoint.api.ObjectUtil;
+        import java.text.Format;
+        import sailpoint.tools.Util;
+        import sailpoint.object.Link;
+        import sailpoint.object.Application;
+        import sailpoint.api.IdentityService;
+        
+        
+        StringBuilder str = new StringBuilder();                
+        
+        IdentityService idService = new IdentityService(context);
+        EmailTemplate template = context.getObjectByName(EmailTemplate.class, "Ascension-EmailTemplate-UserDisable-Courion");
+        Identity identity = context.getObjectByName(Identity.class,identityName);
+
+        LinkedHashMap argValues = new LinkedHashMap();
+        LinkedHashMap descMap = new LinkedHashMap();
+        
+        List disableDetails = new ArrayList();
+        String appType ="";
+        String appName = "";
+        String username = "";
+ 
+        String toEmail = "ascensionprod@service-now.com"; 
+             
+ 				if( null != identity){ 
+        
+          descMap.put("Location",identity.getStringAttribute("location") != null? "("+identity.getStringAttribute("buildingId")+")"+identity.getStringAttribute("location") : "");
+          descMap.put("Department",identity.getStringAttribute("department") != null? identity.getStringAttribute("department") : "");
+        
+        if(Util.isNotNullOrEmpty(identity.getLastname())){         
+          	username = identity.getLastname()+", ";
+          }
+          if(Util.isNotNullOrEmpty(identity.getFirstname())){
+            username =  username+identity.getFirstname()+", ";
+          }
+          if(Util.isNotNullOrEmpty(identity.getAttribute("middleName"))){
+            username = username+identity.getAttribute("middleName");
+          }
+                   
+					
+					List appLinks= (List) identity.getLinks();        
+        	if( null != appLinks){
+          	Iterator itrlinksAccount = appLinks.iterator();
+           	while (itrlinksAccount.hasNext()){
+              Link account = (Link) itrlinksAccount.next();
+        			
+              if(null != account  && null != account.getApplication()){
+        				appType = account.getApplication().getType();
+        				appName = account.getApplication().getName();
+        
+                if(Util.isNotNullOrEmpty(appType) && appType.equalsIgnoreCase("Active Directory - Direct")){
+                if(null != account.getAttribute("memberOf")){        
+                  for(String group : account.getAttribute("memberOf")){
+        						StringTokenizer stringTokenizer = new StringTokenizer(group, ","); 
+
+                      while(stringTokenizer.hasMoreTokens()) {
+                        String groupValue = stringTokenizer.nextToken(); 
+        								if(groupValue != null){
+                          String finalVal = groupValue.substring(3,groupValue.length());                     
+                          str.append(finalVal);
+                          str.append("|");
+                          break;
+        							}
+        						}
+                  }
+                }
+                disableDetails.add("AD:"+account.getAttribute("sAMAccountName"));
+                disableDetails.add(appName+":"+account.getAttribute("sAMAccountName"));
+        
+        				if(null != str  || str.toString().equals("")){
+                	disableDetails.add("GroupMemberships:"+str);        
+        				}        				
+              }
+            }        		
+          }
+          if(null != itrlinksAccount){
+            Util.flushIterator(itrlinksAccount);
+          }
+        
+        }
+        
+        if(Util.isNotNullOrEmpty(identity.getStringAttribute("internalId"))){
+        disableDetails.add("Profile:"+identity.getStringAttribute("internalId"));
+        }
+        if(Util.isNotNullOrEmpty(identity.getStringAttribute("email"))){
+        disableDetails.add("EXCHANGE:"+identity.getStringAttribute("email"));
+        }                          
+                                       
+         if(identity.getStringAttribute("contractorManager") != null){
+           managerId = context.getObjectByName(Identity.class,identity.getStringAttribute("contractorManager"));
+        	}else{
+           managerId = identity.getManager();
+          }
+
+          argValues.put("customer_id",managerId != null? managerId.getStringAttribute("samAccountName") : "");                 	
+          argValues.put("manager",managerId != null? managerId.getDisplayName() : "");        
+          argValues.put("user_name",username != null? username : "");
+          argValues.put("term_date",identity.getStringAttribute("ctrexpDt") != null? identity.getStringAttribute("ctrexpDt") : "");
+          argValues.put("job_code",identity.getStringAttribute("title") != null? identity.getStringAttribute("title") : "");
+          argValues.put("department",identity.getStringAttribute("department") != null? identity.getStringAttribute("department") : "");
+          argValues.put("location",identity.getStringAttribute("location") != null? "("+identity.getStringAttribute("buildingId")+")"+identity.getStringAttribute("location") : "");     
+        }
+
+        Map args = new HashMap();
+        args.put("identityDisplayName",identityDisplayName);
+        args.put("map",argValues);
+        args.put("launcher",launcher);
+        args.put("description",descMap);
+        args.put("disableDetails",disableDetails);
+        
+        EmailOptions options = new EmailOptions(toEmail, args);
+
+        if(null != options && template !=null){
+          context.sendEmailNotification(template,options);
+          context.decache(template);
+        }
+      ]]></Source>
+    </Script>
+    <Transition to="stop"/>
+  </Step>
+  <Step icon="Stop" name="stop"/>
+</Workflow>
